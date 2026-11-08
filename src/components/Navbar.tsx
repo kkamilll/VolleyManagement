@@ -19,6 +19,11 @@ import {
   Crown,
   Bell,
   CheckCircle,
+  CheckCircle2,
+  AlertTriangle,
+  Megaphone,
+  Clock,
+  ArrowRight,
   X,
   Menu,
   Smartphone,
@@ -113,6 +118,16 @@ export default function Navbar() {
       if (res.ok) {
         await fetchAnnouncements();
       }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      const unread = announcements.filter(a => user && !a.readBy.some(r => r.userId === user.id));
+      await Promise.all(unread.map(a => fetch(`/api/announcements/${a.id}/read`, { method: 'POST' })));
+      await fetchAnnouncements();
     } catch (e) {
       console.error(e);
     }
@@ -346,41 +361,71 @@ export default function Navbar() {
 
               {/* Notifications Dropdown Drawer */}
               {showNotifications && (
-                <div className="fixed sm:absolute right-3 sm:right-0 top-16 sm:top-full mt-2 w-[calc(100vw-1.5rem)] max-w-sm sm:w-96 bg-[#0c1016] border border-slate-800 rounded-2xl shadow-2xl p-4 z-50 backdrop-blur-2xl">
+                <div className="fixed sm:absolute right-3 sm:right-0 top-16 sm:top-full mt-2 w-[calc(100vw-1.5rem)] max-w-sm sm:w-[420px] bg-[#090d16] border border-slate-800 rounded-3xl shadow-2xl p-4 z-50 backdrop-blur-2xl">
+                  {/* Header */}
                   <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                     <div className="flex items-center gap-2">
-                      <Bell className="w-4 h-4 text-sky-400" />
-                      <h4 className="text-xs font-black uppercase text-white tracking-wider">Powiadomienia i Komunikaty</h4>
+                      <div className="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center">
+                        <Bell className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-black uppercase text-white tracking-wider">
+                          Powiadomienia
+                        </h4>
+                        <span className="text-[10px] text-slate-400 font-medium">
+                          {unreadCount > 0 ? `${unreadCount} nieprzeczytanych` : 'Wszystko odczytane'}
+                        </span>
+                      </div>
                     </div>
-                    <button
-                      onClick={() => setShowNotifications(false)}
-                      className="p-1 text-slate-400 hover:text-white rounded-lg"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
+
+                    <div className="flex items-center gap-2">
+                      {user && unreadCount > 0 && (
+                        <button
+                          onClick={handleMarkAllAsRead}
+                          className="text-[10px] text-sky-400 hover:text-sky-300 font-bold underline transition"
+                        >
+                          Odczytaj wszystkie
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setShowNotifications(false)}
+                        className="p-1 text-slate-400 hover:text-white rounded-lg bg-slate-900 border border-slate-800"
+                        aria-label="Zamknij powiadomienia"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Browser Push Notification Permission Banner */}
                   {browserNotificationPerm !== 'granted' && (
-                    <div className="mt-2.5 p-2.5 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-between gap-2">
+                    <div className="mt-2.5 p-2.5 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-between gap-2 shadow-sm">
                       <div className="text-[11px] text-sky-200">
-                        🔔 <strong>Włącz powiadomienia</strong>, aby nie przegapić nowych meczów.
+                        🔔 <strong>Włącz powiadomienia</strong> push na telefonie.
                       </div>
                       <button
                         onClick={requestBrowserNotifications}
-                        className="px-2.5 py-1 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-[10px] uppercase shrink-0 transition"
+                        className="px-2.5 py-1 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-[10px] uppercase shrink-0 transition shadow-sm"
                       >
                         Włącz
                       </button>
                     </div>
                   )}
 
-                  <div className="mt-3 max-h-80 overflow-y-auto space-y-2 pr-1">
+                  {/* List of Announcements */}
+                  <div className="mt-3 max-h-[380px] overflow-y-auto space-y-3 pr-1">
                     {announcements.length === 0 ? (
-                      <p className="text-xs text-slate-500 text-center py-4">Brak nowych komunikatów</p>
+                      <div className="py-8 text-center text-slate-500 space-y-1">
+                        <Bell className="w-8 h-8 text-slate-700 mx-auto mb-2" />
+                        <p className="text-xs font-bold text-slate-400">Brak nowych komunikatów</p>
+                        <p className="text-[11px] text-slate-600">Nowe ogłoszenia sztabu pojawią się tutaj.</p>
+                      </div>
                     ) : (
                       announcements.map((ann) => {
                         const isRead = user && ann.readBy.some(r => r.userId === user.id);
+                        const isUrgent = ann.priority === 'PILNY';
+                        const isImportant = ann.priority === 'WAZNY';
+
                         return (
                           <div
                             key={ann.id}
@@ -390,49 +435,90 @@ export default function Navbar() {
                                 window.location.href = ann.link;
                               }
                             }}
-                            className={`p-2.5 rounded-xl border transition ${ann.link ? 'cursor-pointer hover:border-sky-500/60 hover:bg-slate-900/60' : ''} ${
-                              ann.priority === 'PILNY'
-                                ? 'bg-rose-950/30 border-rose-600/40'
-                                : ann.priority === 'WAZNY'
-                                ? 'bg-amber-950/30 border-amber-600/40'
-                                : 'bg-[#080910] border-slate-800'
+                            className={`p-3.5 rounded-2xl border transition-all duration-200 space-y-2.5 ${
+                              ann.link ? 'cursor-pointer' : ''
+                            } ${
+                              !isRead
+                                ? isUrgent
+                                  ? 'bg-rose-950/40 border-l-[5px] border-l-rose-500 border-rose-500/40 shadow-lg shadow-rose-950/20'
+                                  : isImportant
+                                  ? 'bg-amber-950/35 border-l-[5px] border-l-amber-500 border-amber-500/40 shadow-lg shadow-amber-950/20'
+                                  : 'bg-slate-900 border-l-[5px] border-l-sky-500 border-slate-700 shadow-md'
+                                : 'bg-slate-950/70 border-slate-800/80 opacity-70 hover:opacity-100 hover:border-slate-700'
                             }`}
                           >
-                            <div className="flex items-center justify-between gap-2 mb-1">
-                              <span className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded ${
-                                ann.priority === 'PILNY'
-                                  ? 'bg-rose-600 text-white'
-                                  : ann.priority === 'WAZNY'
-                                  ? 'bg-amber-500 text-slate-950'
-                                  : 'bg-slate-800 text-slate-300'
-                              }`}>
-                                {ann.priority}
-                              </span>
-                              <span className="text-[10px] text-slate-500">
-                                {new Date(ann.createdAt).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })}
-                              </span>
+                            {/* Card Top: Priority Badge + NEW / READ status + Date */}
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-1.5">
+                                {isUrgent ? (
+                                  <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-rose-500 text-white flex items-center gap-1 shadow-sm">
+                                    <AlertTriangle className="w-3 h-3 text-white" />
+                                    PILNY
+                                  </span>
+                                ) : isImportant ? (
+                                  <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-amber-500 text-slate-950 flex items-center gap-1 shadow-sm">
+                                    <Megaphone className="w-3 h-3 text-slate-950" />
+                                    WAŻNY
+                                  </span>
+                                ) : (
+                                  <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-sky-500/20 text-sky-300 border border-sky-500/40 flex items-center gap-1">
+                                    <Bell className="w-3 h-3 text-sky-400" />
+                                    INFORMACJA
+                                  </span>
+                                )}
+
+                                <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1">
+                                  <Clock className="w-3 h-3 text-slate-500" />
+                                  {new Date(ann.createdAt).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })}
+                                </span>
+                              </div>
+
+                              <div>
+                                {!isRead ? (
+                                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-sky-500 text-slate-950 shadow-sm flex items-center gap-1 animate-pulse">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-950" />
+                                    NOWE
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+                                    <CheckCircle2 className="w-3 h-3" /> Odczytano
+                                  </span>
+                                )}
+                              </div>
                             </div>
 
-                            <h5 className="text-xs font-bold text-white line-clamp-1">{ann.title}</h5>
-                            <p className="text-[11px] text-slate-300 line-clamp-2 mt-0.5">{ann.content}</p>
+                            {/* Card Title & Content */}
+                            <div>
+                              <h5 className="text-xs sm:text-sm font-black text-white leading-snug">
+                                {ann.title}
+                              </h5>
+                              <p className="text-xs text-slate-200 mt-1.5 leading-relaxed bg-black/40 p-2.5 rounded-xl border border-white/5">
+                                {ann.content}
+                              </p>
+                            </div>
 
-                            <div className="mt-2 pt-1.5 border-t border-slate-800/80 flex items-center justify-between text-[10px]">
-                              <span className="text-slate-400">
-                                {ann.link ? <span className="text-sky-400 font-bold hover:underline">Otwórz ➔</span> : ann.createdByName}
+                            {/* Card Footer */}
+                            <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+                              <span className="text-slate-400 text-[10.5px]">
+                                Od: <strong className="text-slate-200">{ann.createdByName}</strong>
                               </span>
-                              {user && !isRead && (
-                                <button
-                                  onClick={(e) => handleMarkAsRead(ann.id, e)}
-                                  className="text-emerald-400 hover:underline font-bold flex items-center gap-1"
-                                >
-                                  <CheckCircle className="w-3 h-3" /> Potwierdź
-                                </button>
-                              )}
-                              {isRead && (
-                                <span className="text-emerald-400/80 font-bold flex items-center gap-1">
-                                  <CheckCircle className="w-3 h-3" /> Odczytano
-                                </span>
-                              )}
+
+                              <div className="flex items-center gap-2">
+                                {user && !isRead && (
+                                  <button
+                                    onClick={(e) => handleMarkAsRead(ann.id, e)}
+                                    className="px-2 py-0.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold transition flex items-center gap-1"
+                                  >
+                                    <CheckCircle2 className="w-3 h-3" /> Potwierdź
+                                  </button>
+                                )}
+                                {ann.link && (
+                                  <span className="text-sky-400 hover:text-sky-300 font-bold flex items-center gap-0.5 text-xs">
+                                    <span>Otwórz</span>
+                                    <ArrowRight className="w-3 h-3" />
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
                         );

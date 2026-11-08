@@ -1151,24 +1151,46 @@
   ],
   "announcements": [
     {
-      "id": "ann_evt_evt_1793983444232_1793983444239",
-      "title": "📅 Nowe wydarzenie: asddas",
-      "content": "Trening zaplanowany na niedziela, 8 listopada 17:44 (Hala Sportowa OSiR, ul. Sportowa 5). Zadeklaruj swoją obecność w ankiecie!",
-      "priority": "NORMALNY",
-      "category": "TRENING",
+      "id": "ann_mecz_lals_1",
+      "title": "🏐 Ważny Mecz LALS: Zbiórka na hali 18:45!",
+      "content": "W najbliższy wtorek gramy oficjalny mecz ligowy z Volley Radzymin. Zbiórka na hali o 18:45. Pamiętajcie o czarnych strojach meczowych i deklaracji obecności w ankiecie!",
+      "priority": "PILNY",
+      "category": "MECZ",
+      "isPinned": true,
+      "link": "/events",
+      "createdById": "usr_kierownik",
+      "createdByName": "Łukasz Kremer (Kierownik)",
+      "createdByRole": "KIEROWNIK",
+      "createdAt": "2026-11-08T10:00:00.000Z",
+      "readBy": []
+    },
+    {
+      "id": "ann_taktyka_update",
+      "title": "📋 Nowe rozpiski przyjęcia zagrywki w P1 i P6",
+      "content": "Trener Hubert Obara zaktualizował założenia taktyczne i korytarze przyjęcia zagrywki pod serwis rywali. Prosimy wszystkich przyjmujących i libero o zapoznanie się z tablicą taktyczną.",
+      "priority": "WAZNY",
+      "category": "OGOLNE",
       "isPinned": false,
-      "link": "/events?eventId=evt_1793983444232",
+      "link": "/taktyka",
       "createdById": "usr_trener",
-      "createdByName": "Hubert",
+      "createdByName": "Hubert Obara (Trener)",
       "createdByRole": "TRENER",
-      "createdAt": "2026-11-06T16:44:04.239Z",
-      "readBy": [
-        {
-          "userId": "usr_trener",
-          "userName": "Hubert",
-          "readAt": "2026-11-06T16:44:04.239Z"
-        }
-      ]
+      "createdAt": "2026-11-07T14:30:00.000Z",
+      "readBy": []
+    },
+    {
+      "id": "ann_fees_nov",
+      "title": "💳 Składki klubowe za Listopad",
+      "content": "Przypominamy o uregulowaniu comiesięcznej składki klubowej (150 zł na halę i ligę). Możliwość opłacenia jednym kliknięciem przez BLIK w zakładce Składki.",
+      "priority": "NORMALNY",
+      "category": "SKLADKI",
+      "isPinned": false,
+      "link": "/fees",
+      "createdById": "usr_kierownik",
+      "createdByName": "Łukasz Kremer",
+      "createdByRole": "KIEROWNIK",
+      "createdAt": "2026-11-05T09:00:00.000Z",
+      "readBy": []
     }
   ],
   "polls": [],
