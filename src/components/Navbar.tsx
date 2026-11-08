@@ -174,7 +174,7 @@ export default function Navbar() {
                 <span className="font-black text-base sm:text-lg tracking-wider text-white uppercase drop-shadow font-athletic text-gradient-cyan">
                   ANGELS ZTP
                 </span>
-                <span className="text-[9px] sm:text-[10px] font-bold text-sky-400 tracking-widest uppercase">
+                <span className="hidden xs:inline-block text-[9px] sm:text-[10px] font-bold text-sky-400 tracking-widest uppercase">
                   VOLLEYBALL TEAM
                 </span>
               </div>
@@ -483,13 +483,13 @@ export default function Navbar() {
               <div className="flex items-center gap-1.5">
                 <a
                   href="/login"
-                  className="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-slate-200 border border-slate-700"
+                  className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-slate-200 border border-slate-700"
                 >
                   Logowanie
                 </a>
                 <a
                   href="/register"
-                  className="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-500 text-white shadow-md transition"
+                  className="hidden xs:inline-flex px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-500 text-white shadow-md transition"
                 >
                   Dołącz
                 </a>

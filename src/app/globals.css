@@ -8,12 +8,14 @@
   --background-end-rgb: 10, 14, 22;
 }
 
+html,
 body {
   color: rgb(var(--foreground-rgb));
   background-color: #05070b;
   min-height: 100vh;
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
+  max-width: 100%;
   position: relative;
 }
 

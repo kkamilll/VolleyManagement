@@ -1501,20 +1501,20 @@ function TacticsContent() {
       </div>
 
       {/* Sub-navigation tabs: Tablica Taktyczna vs Playbook & Scouting */}
-      <div className="flex items-center gap-2 border-b border-steel-800/80 pb-2">
+      <div className="flex flex-wrap items-center gap-2 border-b border-slate-800/80 pb-2">
         <Link
           href="/taktyka"
-          className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm"
         >
-          <Compass className="w-4 h-4 text-sky-400" />
-          <span>Tablica Taktyczna & Rysowanie</span>
+          <Compass className="w-4 h-4 text-sky-400 shrink-0" />
+          <span>Tablica Taktyczna</span>
         </Link>
         <Link
           href="/coach"
-          className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold text-steel-400 hover:text-white hover:bg-slate-800/60 border border-transparent transition"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent transition"
         >
-          <Target className="w-4 h-4 text-amber-400" />
-          <span>Playbook Trenerski & Scouting</span>
+          <Target className="w-4 h-4 text-amber-400 shrink-0" />
+          <span>Playbook & Scouting</span>
         </Link>
       </div>
 
@@ -1733,7 +1733,7 @@ function TacticsContent() {
 
               {/* Roster & Auto-populate action */}
               {activeTargetEvent && (
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="text-[11px] font-mono font-bold text-slate-300 px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
                     ✓ {(activeTargetEvent.attendees || []).filter(a => a.status === 'BEDE').length} obecnych z ankiety
                   </span>
