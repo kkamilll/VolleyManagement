@@ -1,0 +1,88 @@
+{
+  "name": "Angels ZTP Volleyball Team",
+  "short_name": "Angels ZTP",
+  "description": "Oficjalny system drużyny siatkarskiej Angels ZTP: terminarz, obecność, sparingi, liga, taktyka i składki.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#07090c",
+  "theme_color": "#07090c",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "pl-PL",
+  "categories": [
+    "sports",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "/icon-192.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Terminarz & Frekwencja",
+      "short_name": "Terminarz",
+      "description": "Sprawdź harmonogram i obecność na treningach",
+      "url": "/events",
+      "icons": [
+        {
+          "src": "/icon-192.jpg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Sparingi & Rozgrywki",
+      "short_name": "Sparingi",
+      "description": "Ankiety obecności i wyniki meczów",
+      "url": "/rozgrywki?tab=sparingi",
+      "icons": [
+        {
+          "src": "/icon-192.jpg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Tablica Taktyczna",
+      "short_name": "Taktyka",
+      "description": "Playbook i schematy taktyczne trenera",
+      "url": "/taktyka",
+      "icons": [
+        {
+          "src": "/icon-192.jpg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Składki Klubowe",
+      "short_name": "Składki",
+      "description": "Płatności BLIK i stan skarbca",
+      "url": "/fees",
+      "icons": [
+        {
+          "src": "/icon-192.jpg",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
+
