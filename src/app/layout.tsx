@@ -62,7 +62,7 @@ export default function RootLayout({
             <SeasonArchiveProvider>
               <ArchiveModeBanner />
               <Navbar />
-              <main className="flex-1 pb-20 md:pb-12">
+              <main className="flex-1 pb-24 md:pb-16">
                 {children}
               </main>
               <Footer />
