@@ -389,7 +389,6 @@ function TacticsContent() {
   const [submittingPost, setSubmittingPost] = useState(false);
   const [editingPostModal, setEditingPostModal] = useState<TacticalPost | null>(null);
   const [editCoachFeedback, setEditCoachFeedback] = useState('');
-  const [showOverlappingInfo, setShowOverlappingInfo] = useState(false);
   const [showDiagonalsHint, setShowDiagonalsHint] = useState(false);
 
   // Player Read-Only & Sandbox State
@@ -491,75 +490,6 @@ function TacticsContent() {
       ]);
     }
   }, [activeTargetEvent, activeTargetMatch]);
-
-  // Rotation Overlapping Validator according to FIVB / PZPS rules
-  const overlappingValidation = useMemo(() => {
-    if (phase !== 'PRZYJECIE') {
-      return { isValid: true, errors: [], faultPlayerIds: [] };
-    }
-
-    const byZone = new Map<number, CourtPlayerPosition>();
-    positions.forEach(p => byZone.set(p.zone, p));
-
-    const p1 = byZone.get(1);
-    const p2 = byZone.get(2);
-    const p3 = byZone.get(3);
-    const p4 = byZone.get(4);
-    const p5 = byZone.get(5);
-    const p6 = byZone.get(6);
-
-    const errors: string[] = [];
-    const faultPlayerIds = new Set<string>();
-
-    // 1. Front row vs Back row (Y coordinate: 0 is net, so front row must have smaller Y)
-    if (p4 && p5 && p4.y >= p5.y) {
-      errors.push(`Strefa 4 (${p4.name}) stoi głębiej niż Strefa 5 (${p5.name}) — błąd przód/tył`);
-      faultPlayerIds.add(p4.id);
-      faultPlayerIds.add(p5.id);
-    }
-    if (p3 && p6 && p3.y >= p6.y) {
-      errors.push(`Strefa 3 (${p3.name}) stoi głębiej niż Strefa 6 (${p6.name}) — błąd przód/tył`);
-      faultPlayerIds.add(p3.id);
-      faultPlayerIds.add(p6.id);
-    }
-    if (p2 && p1 && p2.y >= p1.y) {
-      errors.push(`Strefa 2 (${p2.name}) stoi głębiej niż Strefa 1 (${p1.name}) — błąd przód/tył`);
-      faultPlayerIds.add(p2.id);
-      faultPlayerIds.add(p1.id);
-    }
-
-    // 2. Left vs Center vs Right (X coordinate: 0 is left, 100 is right)
-    if (p4 && p3 && p4.x >= p3.x) {
-      errors.push(`Strefa 4 (${p4.name}) stoi na prawo od Strefy 3 (${p3.name}) — błąd lewo/prawo`);
-      faultPlayerIds.add(p4.id);
-      faultPlayerIds.add(p3.id);
-    }
-    if (p3 && p2 && p3.x >= p2.x) {
-      errors.push(`Strefa 3 (${p3.name}) stoi na prawo od Strefy 2 (${p2.name}) — błąd lewo/prawo`);
-      faultPlayerIds.add(p3.id);
-      faultPlayerIds.add(p2.id);
-    }
-    if (p5 && p6 && p5.x >= p6.x) {
-      errors.push(`Strefa 5 (${p5.name}) stoi na prawo od Strefy 6 (${p6.name}) — błąd lewo/prawo`);
-      faultPlayerIds.add(p5.id);
-      faultPlayerIds.add(p6.id);
-    }
-    if (p6 && p1 && p6.x >= p1.x) {
-      errors.push(`Strefa 6 (${p6.name}) stoi na prawo od Strefy 1 (${p1.name}) — błąd lewo/prawo`);
-      faultPlayerIds.add(p6.id);
-      faultPlayerIds.add(p1.id);
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors,
-      faultPlayerIds: Array.from(faultPlayerIds)
-    };
-  }, [positions, phase]);
-
-  const handleAutoFixOverlapping = () => {
-    applyPreset(rotation, phase);
-  };
 
   // Fetch tactics and events
   const fetchData = async () => {
@@ -2630,53 +2560,6 @@ function TacticsContent() {
                 </span>
               </div>
             )}
-
-            {/* Slim FIVB Overlapping Validator Banner */}
-            {phase === 'PRZYJECIE' && (
-              <div className={`px-2.5 py-1.5 rounded-xl border text-xs flex items-center justify-between gap-2 transition ${
-                overlappingValidation.isValid
-                  ? 'bg-emerald-950/30 border-emerald-500/30 text-emerald-300'
-                  : 'bg-rose-950/40 border-rose-500/50 text-rose-300'
-              }`}>
-                <div className="flex items-center gap-1.5 min-w-0">
-                  {overlappingValidation.isValid ? (
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  ) : (
-                    <AlertCircle className="w-3.5 h-3.5 text-rose-400 shrink-0 animate-pulse" />
-                  )}
-                  <span className="font-bold text-[11px] truncate">
-                    {overlappingValidation.isValid
-                      ? `✓ Zgodne z FIVB (Brak błędów w rotacji ${rotation})`
-                      : `⚠️ Błąd rotacji (${overlappingValidation.errors.length} kolizje)`}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0">
-                  {!overlappingValidation.isValid && (
-                    <button
-                      onClick={handleAutoFixOverlapping}
-                      className="px-2 py-0.5 rounded-lg bg-rose-500 hover:bg-rose-400 text-white font-black text-[10px] transition"
-                    >
-                      Skoryguj
-                    </button>
-                  )}
-                  <button
-                    onClick={() => setShowOverlappingInfo(!showOverlappingInfo)}
-                    className="text-[10px] text-slate-400 hover:text-white underline font-bold"
-                  >
-                    {showOverlappingInfo ? 'Zwiń' : 'Zasady'}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Collapsible Rules Explanation */}
-            {showOverlappingInfo && (
-              <div className="p-2 rounded-xl bg-slate-900 border border-slate-200 text-[11px] text-slate-300 space-y-1 animate-fadeIn">
-                <p>• <strong>Pion (przód/tył):</strong> Gracze I linii (4, 3, 2) muszą stać bliżej siatki niż gracze II linii (5, 6, 1).</p>
-                <p>• <strong>Poziom (lewo/prawo):</strong> Gracze strefy 4 i 5 muszą stać bardziej na lewo niż strefa 3 i 6; strefa 2 i 1 bardziej na prawo niż strefa 3 i 6.</p>
-              </div>
-            )}
           </div>
 
           {/* Full Volleyball Court Canvas Area */}
@@ -2916,7 +2799,6 @@ function TacticsContent() {
               const isSelected = selectedPlayerId === player.id;
               const isDragging = draggingId === player.id;
               const isLibero = player.roleCode === 'L';
-              const isFault = overlappingValidation.faultPlayerIds.includes(player.id);
               const cleanPlayerName = player.name.replace(/\s*\([^)]*\)/, '');
               return (
                 <div
@@ -2950,9 +2832,7 @@ function TacticsContent() {
                 >
                   <div
                     className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-black text-xs shadow-lg border-2 transition ${
-                      isFault
-                        ? 'ring-4 ring-rose-500 bg-rose-600 text-white border-white animate-pulse shadow-rose-500/50'
-                        : isLibero
+                      isLibero
                         ? 'bg-amber-500 text-slate-950 border-white'
                         : isSelected
                         ? 'bg-sky-400 text-slate-950 border-white animate-pulse ring-2 ring-sky-300'
@@ -2961,9 +2841,7 @@ function TacticsContent() {
                   >
                     {player.roleCode}
                   </div>
-                  <div className={`-mt-1 px-1.5 py-0.2 rounded-full backdrop-blur-sm border text-[8.5px] font-bold tracking-tight whitespace-nowrap shadow ${
-                    isFault ? 'bg-rose-950/90 border-rose-500 text-rose-200' : 'bg-white border-slate-300 text-slate-800 shadow-sm'
-                  }`}>
+                  <div className="mt-1 px-1.5 py-0.2 rounded-full backdrop-blur-sm border text-[8.5px] font-bold tracking-tight whitespace-nowrap shadow bg-white border-slate-300 text-slate-800 shadow-sm">
                     {cleanPlayerName}
                   </div>
                 </div>
@@ -3061,7 +2939,6 @@ function TacticsContent() {
           {positions.map(p => {
             const isSelected = selectedPlayerId === p.id;
             const isLibero = p.roleCode === 'L';
-            const isFault = overlappingValidation.faultPlayerIds.includes(p.id);
 
             return (
               <div
@@ -3069,10 +2946,8 @@ function TacticsContent() {
                 onClick={() => setSelectedPlayerId(isSelected ? null : p.id)}
                 className={`p-3.5 rounded-2xl border text-xs cursor-pointer transition-all ${
                   isSelected
-                    ? 'bg-sky-500/15 border-sky-400 text-white shadow-xl ring-2 ring-sky-400/30'
-                    : isFault
-                    ? 'bg-rose-950/20 border-rose-500/50 text-slate-200 hover:border-rose-400'
-                    : 'bg-slate-900/70 border-slate-200 text-slate-300 hover:bg-slate-900 hover:border-slate-700'
+                    ? 'bg-sky-50 border-sky-300 text-slate-900 shadow-md ring-2 ring-sky-200'
+                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-2xs'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-200">
