@@ -31,9 +31,7 @@ import {
   FolderArchive,
   Camera,
   Compass,
-  FileText,
-  Sun,
-  Moon
+  FileText
 } from 'lucide-react';
 import { Announcement } from '@/lib/types';
 
@@ -42,7 +40,6 @@ export default function Navbar() {
   const { user, logout, refreshUser } = useAuth();
   const { isArchiveMode, activeSeason } = useSeasonArchive();
 
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
   const [avatarPreview, setAvatarPreview] = useState<string>('');
   const [savingAvatar, setSavingAvatar] = useState<boolean>(false);
@@ -132,33 +129,11 @@ export default function Navbar() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('angels_theme') as 'light' | 'dark' | null;
-      const initial = saved || 'light';
-      setTheme(initial);
-      if (initial === 'light') {
-        document.documentElement.classList.add('theme-light', 'light');
-        document.documentElement.classList.remove('dark');
-      } else {
-        document.documentElement.classList.remove('theme-light', 'light');
-        document.documentElement.classList.add('dark');
-      }
+      localStorage.removeItem('angels_theme');
+      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('theme-light', 'light');
     }
   }, []);
-
-  const toggleTheme = () => {
-    const next = theme === 'light' ? 'dark' : 'light';
-    setTheme(next);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('angels_theme', next);
-      if (next === 'light') {
-        document.documentElement.classList.add('theme-light', 'light');
-        document.documentElement.classList.remove('dark');
-      } else {
-        document.documentElement.classList.remove('theme-light', 'light');
-        document.documentElement.classList.add('dark');
-      }
-    }
-  };
 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
@@ -504,20 +479,6 @@ export default function Navbar() {
                 </span>
               </a>
             )}
-
-            {/* Szybki przełącznik motywu (Jasny / Ciemny) */}
-            <button
-              onClick={toggleTheme}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 transition flex items-center justify-center shrink-0 shadow-sm"
-              title={theme === 'light' ? 'Przełącz na ciemny motyw' : 'Przełącz na jasny motyw'}
-              aria-label="Zmień motyw"
-            >
-              {theme === 'light' ? (
-                <Moon className="w-4 h-4 text-slate-700" />
-              ) : (
-                <Sun className="w-4 h-4 text-amber-500" />
-              )}
-            </button>
 
             {/* Notifications Bell */}
             <div className="relative shrink-0">
@@ -948,32 +909,6 @@ export default function Navbar() {
             <Camera className="w-4 h-4 text-sky-600" />
             <span>Galeria Zdjęć</span>
           </a>
-
-          {/* Szybki przełącznik motywu w menu mobilnym */}
-          <button
-            onClick={() => {
-              toggleTheme();
-              setIsMobileMenuOpen(false);
-            }}
-            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 transition"
-          >
-            <span className="flex items-center gap-2">
-              {theme === 'light' ? (
-                <>
-                  <Moon className="w-4 h-4 text-slate-700" />
-                  <span>Przełącz na ciemny motyw</span>
-                </>
-              ) : (
-                <>
-                  <Sun className="w-4 h-4 text-amber-500" />
-                  <span>Przełącz na jasny motyw</span>
-                </>
-              )}
-            </span>
-            <span className="text-[10px] uppercase font-bold text-slate-500">
-              {theme === 'light' ? 'Jasny' : 'Ciemny'}
-            </span>
-          </button>
 
           {(user?.role === 'KIEROWNIK' || user?.role === 'TRENER' || user?.permissions?.isAdmin) && (
             <a
