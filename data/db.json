@@ -1207,7 +1207,13 @@
       "createdByName": "Łukasz Kremer (Kierownik)",
       "createdByRole": "KIEROWNIK",
       "createdAt": "2026-11-08T10:00:00.000Z",
-      "readBy": []
+      "readBy": [
+        {
+          "userId": "usr_trener",
+          "userName": "Hubert Obara",
+          "readAt": "2026-11-12T21:25:07.272Z"
+        }
+      ]
     },
     {
       "id": "ann_taktyka_update",
@@ -1221,7 +1227,13 @@
       "createdByName": "Hubert Obara (Trener)",
       "createdByRole": "TRENER",
       "createdAt": "2026-11-07T14:30:00.000Z",
-      "readBy": []
+      "readBy": [
+        {
+          "userId": "usr_trener",
+          "userName": "Hubert Obara",
+          "readAt": "2026-11-12T21:25:07.267Z"
+        }
+      ]
     },
     {
       "id": "ann_fees_nov",
@@ -1235,7 +1247,13 @@
       "createdByName": "Łukasz Kremer",
       "createdByRole": "KIEROWNIK",
       "createdAt": "2026-11-05T09:00:00.000Z",
-      "readBy": []
+      "readBy": [
+        {
+          "userId": "usr_trener",
+          "userName": "Hubert Obara",
+          "readAt": "2026-11-12T21:25:07.270Z"
+        }
+      ]
     }
   ],
   "polls": [],

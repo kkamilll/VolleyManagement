@@ -60,6 +60,7 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
   const [events, setEvents] = useState<EventItem[]>([]);
   const [players, setPlayers] = useState<{ id: string; name: string; number?: number; position: string }[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<TrainingPlan | null>(null);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(queryEventId || null);
   const [loading, setLoading] = useState(true);
 
   // Active sub-tab inside the selected plan
@@ -127,15 +128,25 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
         setEvents(d.events || []);
         setPlayers(d.players || []);
 
-        if (queryPlanId) {
+        const evList = (d.events || []).filter((e: EventItem) => e.type === 'TRENING');
+        setEvents(evList);
+
+        let targetEventId = queryEventId;
+        if (!targetEventId && evList.length > 0) {
+          const upcoming = evList.find((e: EventItem) => new Date(e.date).getTime() >= Date.now() - 3600000 * 3);
+          targetEventId = (upcoming || evList[0]).id;
+        }
+
+        if (targetEventId) {
+          setSelectedEventId(targetEventId);
+          const match = pList.find((p: TrainingPlan) => p.eventId === targetEventId || p.id === targetEventId);
+          if (match) setSelectedPlan(match);
+          else if (pList.length > 0) setSelectedPlan(pList[0]);
+        } else if (queryPlanId) {
           const match = pList.find((p: TrainingPlan) => p.id === queryPlanId);
           if (match) setSelectedPlan(match);
           else if (pList.length > 0) setSelectedPlan(pList[0]);
-        } else if (queryEventId) {
-          const match = pList.find((p: TrainingPlan) => p.eventId === queryEventId);
-          if (match) setSelectedPlan(match);
-          else if (pList.length > 0) setSelectedPlan(pList[0]);
-        } else if (pList.length > 0 && !selectedPlan) {
+        } else if (pList.length > 0 && !activePlan) {
           setSelectedPlan(pList[0]);
         }
       }
@@ -304,7 +315,7 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
   // Save exercise
   const handleSaveExercise = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedPlan || !exTitle.trim()) return;
+    if (!activePlan || !exTitle.trim()) return;
     setSavingExercise(true);
     try {
       const keyPoints = exKeyPointsInput
@@ -317,7 +328,7 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'SAVE_EXERCISE',
-          planId: selectedPlan.id,
+          planId: activePlan.id,
           exercise: {
             id: editingExercise?.id,
             title: exTitle.trim(),
@@ -353,7 +364,7 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
 
   // Delete exercise
   const handleDeleteExercise = async (exerciseId: string) => {
-    if (!selectedPlan) return;
+    if (!activePlan) return;
     if (!confirm('Czy na pewno chcesz usunąć to ćwiczenie z planu?')) return;
     try {
       const res = await fetch('/api/trainings', {
@@ -361,7 +372,7 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'DELETE_EXERCISE',
-          planId: selectedPlan.id,
+          planId: activePlan.id,
           exerciseId
         })
       });
@@ -374,6 +385,48 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
       }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+    // Quick 1-click plan creation for a selected Terminarz event
+  const handleQuickCreatePlanForEvent = async (ev: EventItem) => {
+    setCreating(true);
+    try {
+      const timeStr = ev.date.includes('T') ? ev.date.split('T')[1].slice(0, 5) : '19:30';
+      const res = await fetch('/api/trainings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'CREATE_PLAN',
+          plan: {
+            title: ev.title,
+            date: ev.date.slice(0, 10),
+            time: timeStr ? `${timeStr} - ${parseInt(timeStr.split(':')[0]) + 1}:${timeStr.split(':')[1] || '00'}` : '19:30 - 21:00',
+            location: ev.location,
+            durationMinutes: 90,
+            mainGoal: 'Doskonalenie techniki i założeń taktycznych',
+            intensity: 'WYSOKA',
+            equipmentNeeded: '16 piłek Mikasa V200W, pachołki, tablica taktyczna',
+            eventId: ev.id
+          }
+        })
+      });
+
+      if (res.ok) {
+        const d = await res.json();
+        if (d.plan) {
+          setPlans(prev => [d.plan, ...prev]);
+          setSelectedPlan(d.plan);
+          setSelectedEventId(ev.id);
+        }
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Błąd tworzenia planu');
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -425,7 +478,7 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
   // Add conclusion
   const handleAddConclusion = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedPlan || !conclContent.trim()) return;
+    if (!activePlan || !conclContent.trim()) return;
     setSavingConcl(true);
     try {
       const targetPlayer = players.find(p => p.id === conclTargetPlayerId);
@@ -435,7 +488,7 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'ADD_CONCLUSION',
-          planId: selectedPlan.id,
+          planId: activePlan.id,
           conclusionType: conclType,
           content: conclContent.trim(),
           targetPlayerId: targetPlayer?.id,
@@ -462,7 +515,7 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
   // Add comment
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedPlan || !commentContent.trim()) return;
+    if (!activePlan || !commentContent.trim()) return;
     setSavingComment(true);
     try {
       const res = await fetch('/api/trainings', {
@@ -470,7 +523,7 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'ADD_COMMENT',
-          planId: selectedPlan.id,
+          planId: activePlan.id,
           content: commentContent.trim()
         })
       });
@@ -479,8 +532,8 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
         const d = await res.json();
         if (d.comment) {
           const updated = {
-            ...selectedPlan,
-            comments: [...(selectedPlan.comments || []), d.comment]
+            ...activePlan,
+            comments: [...(activePlan.comments || []), d.comment]
           };
           setSelectedPlan(updated);
           setPlans(prev => prev.map(p => (p.id === updated.id ? updated : p)));
@@ -493,6 +546,19 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
       setSavingComment(false);
     }
   };
+
+  // List of all training events from Terminarz
+  const trainingEvents: EventItem[] = events
+    .filter(e => e.type === 'TRENING')
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  // Currently active event from Terminarz
+  const activeEvent: EventItem | null = trainingEvents.find(e => e.id === selectedEventId) || trainingEvents[0] || null;
+
+  // Active plan associated with this event (or fallback to selectedPlan)
+  const activePlan: TrainingPlan | null = activeEvent
+    ? (plans.find(p => p.eventId === activeEvent.id || p.id === activeEvent.id) || null)
+    : (selectedPlan || plans[0] || null);
 
   return (
     <div className="w-full max-w-[2000px] mx-auto px-2 sm:px-6 lg:px-10 xl:px-12 pt-4 sm:pt-6 pb-24 md:pb-12 space-y-4">
@@ -537,79 +603,95 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
 
       {/* Main Layout Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* Left Column: Training Plans Selector List */}
+        {/* Left Column: Training Plans Selector List (Tied to Terminarz) */}
         <div className="lg:col-span-4 xl:col-span-3 space-y-3">
           <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-sm space-y-3">
             <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-              <span className="text-xs font-black uppercase text-slate-500 tracking-wider">
-                Jednostki ({plans.length})
-              </span>
-              {canManage && (
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="text-xs text-sky-400 hover:text-sky-300 font-bold flex items-center gap-1"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Nowa</span>
-                </button>
-              )}
+              <div>
+                <span className="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4 text-sky-600" />
+                  Treningi z Terminarza ({trainingEvents.length})
+                </span>
+                <p className="text-[10px] text-slate-500">Wybierz jednostkę do rozpiski</p>
+              </div>
+              <Link
+                href="/events"
+                className="text-[11px] font-bold text-sky-700 hover:text-sky-900 flex items-center gap-1 bg-sky-50 hover:bg-sky-100 px-2.5 py-1 rounded-xl border border-sky-200 transition shadow-sm"
+                title="Przejdź do Terminarza, aby dodać nowy trening"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Terminarz</span>
+              </Link>
             </div>
 
-            {plans.length === 0 ? (
+            {trainingEvents.length === 0 ? (
               <div className="text-center py-8 px-3 bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-2">
-                <Volleyball className="w-8 h-8 text-slate-600 mx-auto" />
-                <p className="text-xs text-slate-500">Brak rozpisanych treningów.</p>
-                {canManage && (
-                  <button
-                    onClick={() => setShowCreateModal(true)}
-                    className="px-3 py-1.5 rounded-xl bg-sky-500 text-slate-950 text-xs font-black"
-                  >
-                    Stwórz pierwszy plan
-                  </button>
-                )}
+                <Volleyball className="w-8 h-8 text-sky-500 mx-auto" />
+                <p className="text-xs font-bold text-slate-700">Brak treningów w Terminarzu.</p>
+                <p className="text-[11px] text-slate-500">Treningi dodaje się w Terminarzu z frekwencją, a tutaj rozpisuje się ćwiczenia i założenia.</p>
+                <Link
+                  href="/events"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-black shadow-sm transition mt-1"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Zaplanuj Trening w Terminarzu</span>
+                </Link>
               </div>
             ) : (
               <div className="space-y-2 max-h-[calc(100vh-280px)] overflow-y-auto pr-1 scrollbar-thin">
-                {plans.map(p => {
-                  const isSelected = selectedPlan?.id === p.id;
-                  const exCount = p.exercises?.length || 0;
-                  const conclCount = p.conclusions?.length || 0;
+                {trainingEvents.map(ev => {
+                  const isSelected = activeEvent?.id === ev.id;
+                  const plan = plans.find(p => p.eventId === ev.id || p.id === ev.id);
+                  const exCount = plan?.exercises?.length || 0;
+                  const conclCount = plan?.conclusions?.length || 0;
+                  const attendeesCount = ev.attendees?.filter(a => a.status === 'BEDE').length || 0;
+                  const evDate = new Date(ev.date);
 
                   return (
                     <div
-                      key={p.id}
-                      onClick={() => setSelectedPlan(p)}
+                      key={ev.id}
+                      onClick={() => {
+                        setSelectedEventId(ev.id);
+                        if (plan) setSelectedPlan(plan);
+                        else setSelectedPlan(null);
+                      }}
                       className={`p-3 rounded-2xl border transition cursor-pointer text-left space-y-1.5 ${
                         isSelected
-                          ? 'bg-sky-950/60 border-sky-400 ring-2 ring-sky-400/30 text-slate-900 shadow-lg'
-                          : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-600'
+                          ? 'bg-sky-50 border-sky-400 ring-2 ring-sky-300 text-slate-900 shadow-sm'
+                          : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700'
                       }`}
                     >
-                      <div className="flex items-center justify-between text-[10px] font-mono">
-                        <span className="text-sky-300 font-bold">
-                          {new Date(p.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} • {p.time || '19:30'}
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span className="font-mono font-bold text-sky-700 flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-sky-600" />
+                          {evDate.toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' })} • {evDate.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
                         </span>
-                        <span className={`px-1.5 py-0.2 rounded uppercase font-black text-[9px] ${
-                          p.intensity === 'WYSOKA' ? 'bg-rose-500/20 text-rose-300' :
-                          p.intensity === 'MECZOWA' ? 'bg-amber-500/20 text-amber-300' :
-                          'bg-emerald-500/20 text-emerald-300'
+                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
+                          plan ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-amber-100 text-amber-800 border border-amber-300'
                         }`}>
-                          {p.intensity}
+                          {plan ? `✓ Rozpisany (${exCount})` : 'Do rozpisania'}
                         </span>
                       </div>
 
-                      <h4 className="font-bold text-xs line-clamp-1 text-slate-900">
-                        {p.title}
+                      <h4 className="font-black text-xs line-clamp-1 text-slate-900">
+                        {ev.title}
                       </h4>
 
-                      <p className="text-[11px] text-slate-500 line-clamp-2">
-                        {p.mainGoal}
+                      <p className="text-[11px] text-slate-500 line-clamp-1 flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
+                        <span>{ev.location}</span>
                       </p>
 
-                      <div className="flex items-center gap-3 text-[10px] text-slate-500 pt-1 border-t border-slate-200">
-                        <span>📋 {exCount} ćwiczeń</span>
-                        {conclCount > 0 && <span className="text-emerald-400 font-bold">✓ {conclCount} wniosków</span>}
-                        <span>⏱ {p.durationMinutes} min</span>
+                      <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1 border-t border-slate-100">
+                        <span className="text-emerald-700 font-bold flex items-center gap-1">
+                          <Users className="w-3 h-3" />
+                          {attendeesCount} obecnych (Terminarz)
+                        </span>
+                        {plan && conclCount > 0 && (
+                          <span className="text-purple-700 font-bold">
+                            ✓ {conclCount} wniosków
+                          </span>
+                        )}
                       </div>
                     </div>
                   );
@@ -621,12 +703,50 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
 
         {/* Right Column: Selected Training Plan Workspace */}
         <div className="lg:col-span-8 xl:col-span-9 space-y-4">
-          {!selectedPlan ? (
-            <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center text-slate-500 space-y-3">
-              <Volleyball className="w-12 h-12 text-slate-600 mx-auto" />
-              <h3 className="text-base font-bold text-slate-900">Wybierz jednostkę treningową z listy po lewej</h3>
-              <p className="text-xs">Możesz przeglądać ćwiczenia, rysować schematy boiska oraz zapisywać wnioski trenerskie.</p>
-            </div>
+          {!activePlan ? (
+            activeEvent ? (
+              <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 text-center space-y-5 shadow-sm">
+                <div className="w-14 h-14 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto border border-sky-200 shadow-sm">
+                  <Volleyball className="w-7 h-7" />
+                </div>
+
+                <div className="space-y-1.5 max-w-lg mx-auto">
+                  <span className="px-3 py-1 rounded-full text-xs font-black uppercase bg-sky-100 text-sky-800 border border-sky-200">
+                    Wybrany Trening z Terminarza
+                  </span>
+                  <h3 className="text-xl font-black text-slate-900 mt-2">{activeEvent.title}</h3>
+                  <p className="text-xs text-slate-500">
+                    📅 {new Date(activeEvent.date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })} • 📍 {activeEvent.location}
+                  </p>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold mt-2">
+                    <Users className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Deklaracje z Terminarza: {activeEvent.attendees?.filter(a => a.status === 'BEDE').length || 0} zawodników na tak</span>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 max-w-md mx-auto text-xs text-slate-600 space-y-3">
+                  <p>
+                    Ten trening został zaplanowany w Terminarzu, ale nie posiada jeszcze dodanej rozpiski ćwiczeń, tablicy i wniosków trenera.
+                  </p>
+                  {canManage && (
+                    <button
+                      onClick={() => handleQuickCreatePlanForEvent(activeEvent)}
+                      disabled={creating}
+                      className="w-full px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider transition shadow-sm flex items-center justify-center gap-2"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>{creating ? 'Tworzenie rozpiski...' : 'Rozpisz ćwiczenia dla tego treningu'}</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center text-slate-500 space-y-3 shadow-sm">
+                <Volleyball className="w-12 h-12 text-slate-600 mx-auto" />
+                <h3 className="text-base font-bold text-slate-900">Wybierz jednostkę treningową z listy po lewej</h3>
+                <p className="text-xs">Treningi pobierane są bezpośrednio z Terminarza klubu. Kliknij jednostkę, aby sprawdzić ćwiczenia, tablicę i wnioski.</p>
+              </div>
+            )
           ) : (
             <div className="space-y-4">
               {/* Training Plan Header Card */}
@@ -639,26 +759,26 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
                       </span>
                       <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-sky-300 border border-sky-200 flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
-                        {new Date(selectedPlan.date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' })}
+                        {new Date(activePlan.date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' })}
                       </span>
                       <span className="px-2 py-0.5 rounded text-[10px] font-mono text-slate-600 bg-slate-100 border border-slate-300 flex items-center gap-1">
                         <Clock className="w-3 h-3 text-amber-400" />
-                        {selectedPlan.time || '19:30 - 21:00'} ({selectedPlan.durationMinutes} min)
+                        {activePlan.time || '19:30 - 21:00'} ({activePlan.durationMinutes} min)
                       </span>
                     </div>
 
                     <h2 className="text-lg sm:text-2xl font-black text-slate-900 mt-1">
-                      {selectedPlan.title}
+                      {activePlan.title}
                     </h2>
 
                     <div className="flex items-center gap-2 text-xs text-slate-600 flex-wrap">
                       <span className="flex items-center gap-1 text-slate-500">
                         <MapPin className="w-3.5 h-3.5 text-rose-400" />
-                        {selectedPlan.location || 'Hala POSiR'}
+                        {activePlan.location || 'Hala POSiR'}
                       </span>
                       <span className="text-slate-600">•</span>
                       <span className="text-amber-300 font-bold">
-                        Intensywność: {selectedPlan.intensity}
+                        Intensywność: {activePlan.intensity}
                       </span>
                     </div>
                   </div>
@@ -683,11 +803,11 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
                       🎯 Główny cel treningu:
                     </span>
                     <p className="text-slate-900 font-bold leading-snug">
-                      {selectedPlan.mainGoal}
+                      {activePlan.mainGoal}
                     </p>
-                    {selectedPlan.secondaryGoals && selectedPlan.secondaryGoals.length > 0 && (
+                    {activePlan.secondaryGoals && activePlan.secondaryGoals.length > 0 && (
                       <ul className="text-[11px] text-slate-500 list-disc list-inside pt-1 space-y-0.5">
-                        {selectedPlan.secondaryGoals.map((g, i) => (
+                        {activePlan.secondaryGoals.map((g, i) => (
                           <li key={i}>{g}</li>
                         ))}
                       </ul>
@@ -699,11 +819,11 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
                       📦 Sprzęt & Założenia organizacyjne:
                     </span>
                     <p className="text-slate-700 text-xs">
-                      {selectedPlan.equipmentNeeded || '15 piłek, tablica taktyczna, pachołki'}
+                      {activePlan.equipmentNeeded || '15 piłek, tablica taktyczna, pachołki'}
                     </p>
-                    {selectedPlan.coachNotes && (
+                    {activePlan.coachNotes && (
                       <p className="text-[11px] text-slate-500 italic pt-1 border-t border-slate-200">
-                        "{selectedPlan.coachNotes}"
+                        "{activePlan.coachNotes}"
                       </p>
                     )}
                   </div>
@@ -720,7 +840,7 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
                       : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
                   }`}
                 >
-                  <span>📋 Ćwiczenia & Rozpiska ({selectedPlan.exercises?.length || 0})</span>
+                  <span>📋 Ćwiczenia & Rozpiska ({activePlan.exercises?.length || 0})</span>
                 </button>
 
                 <button
@@ -731,7 +851,7 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
                       : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
                   }`}
                 >
-                  <span>📝 Wnioski & Ocena Trenera ({selectedPlan.conclusions?.length || 0})</span>
+                  <span>📝 Wnioski & Ocena Trenera ({activePlan.conclusions?.length || 0})</span>
                 </button>
 
                 <button
@@ -742,14 +862,14 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
                       : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
                   }`}
                 >
-                  <span>💬 Dyskusja Drużyny ({selectedPlan.comments?.length || 0})</span>
+                  <span>💬 Dyskusja Drużyny ({activePlan.comments?.length || 0})</span>
                 </button>
               </div>
 
               {/* TAB 1: EXERCISES TIMELINE */}
               {activeTab === 'EXERCISES' && (
                 <div className="space-y-4">
-                  {(!selectedPlan.exercises || selectedPlan.exercises.length === 0) ? (
+                  {(!activePlan.exercises || activePlan.exercises.length === 0) ? (
                     <div className="text-center py-10 px-4 bg-slate-50 rounded-3xl border border-dashed border-slate-200 space-y-3">
                       <Volleyball className="w-8 h-8 text-sky-400/60 mx-auto" />
                       <p className="text-xs font-bold text-slate-600">
@@ -766,7 +886,7 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {selectedPlan.exercises.map((ex, idx) => (
+                      {activePlan.exercises.map((ex, idx) => (
                         <div
                           key={ex.id}
                           className="p-4 sm:p-5 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3 hover:border-slate-300 transition"
@@ -972,13 +1092,13 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
                   )}
 
                   {/* List of conclusions */}
-                  {(!selectedPlan.conclusions || selectedPlan.conclusions.length === 0) ? (
+                  {(!activePlan.conclusions || activePlan.conclusions.length === 0) ? (
                     <div className="text-center py-8 px-4 bg-slate-100/30 rounded-2xl border border-dashed border-slate-200 text-xs text-slate-500">
                       Brak wpisanych wniosków po tym treningu.
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {selectedPlan.conclusions.map(concl => (
+                      {activePlan.conclusions.map(concl => (
                         <div
                           key={concl.id}
                           className={`p-4 rounded-2xl border space-y-2 ${
@@ -1045,13 +1165,13 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
                   </form>
 
                   {/* Comments list */}
-                  {(!selectedPlan.comments || selectedPlan.comments.length === 0) ? (
+                  {(!activePlan.comments || activePlan.comments.length === 0) ? (
                     <div className="text-center py-6 text-xs text-slate-500">
                       Brak komentarzy do tego treningu. Bądź pierwszy!
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      {selectedPlan.comments.map(c => (
+                      {activePlan.comments.map(c => (
                         <div key={c.id} className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
                           <div className="flex items-center justify-between text-[10px] text-slate-500">
                             <span className="font-bold text-slate-900">
