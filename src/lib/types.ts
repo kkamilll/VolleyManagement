@@ -339,12 +339,23 @@ export interface LeagueTableTeam {
   id: string;
   position: number;
   teamName: string;
+  teamUrl?: string;
   matchesPlayed: number;
+  matchesWon?: number;
+  matchesLost?: number;
   points: number;
   setsWon: number;
   setsLost: number;
+  setRatio?: number | string;
   pointsWon: number;
   pointsLost: number;
+  pointRatio?: number | string;
+  w3_0?: number;
+  w3_1?: number;
+  w3_2?: number;
+  p2_3?: number;
+  p1_3?: number;
+  p0_3?: number;
   form: ('W' | 'P')[];
 }
 

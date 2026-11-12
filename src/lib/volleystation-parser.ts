@@ -4,7 +4,8 @@ import {
   LeagueMatchReport,
   MatchSetScore,
   VolleyStationMvp,
-  VolleyStationScheduleMatch
+  VolleyStationScheduleMatch,
+  LeagueTableTeam
 } from './types';
 
 // Map of Polish month names to month index (0-11)
@@ -479,4 +480,247 @@ export function computeLeaderboards(reports: LeagueMatchReport[]) {
     angelsBlockers: angelsBlockers.slice(0, 10),
     angelsServers: angelsServers.slice(0, 10)
   };
+}
+
+/**
+ * Parses full VolleyStation standings/table copied from the website.
+ * Supports:
+ * - Multi-line cell-by-cell copy-paste (rank -> [Team](url) -> 16 numbers)
+ * - Tab-separated row-by-row copy-paste from table or spreadsheet
+ * - Standard space-delimited line format
+ */
+export function parseVolleyStationTable(raw: string): LeagueTableTeam[] {
+  if (!raw || !raw.trim()) return [];
+
+  const rawLines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const headerWords = new Set([
+    'drużyna', 'druzyna', 'punkty', 'mecze', 'sety', 'stosunek', 'wynik',
+    'rozegr.', 'rozegr', 'wygr.', 'wygr', 'przegr.', 'przegr',
+    '3-0', '3-1', '3-2', '2-3', '1-3', '0-3', 'lp', 'poz', 'poz.', 'miejsce', 'bilans'
+  ]);
+
+  // Strategy 1: Multi-line cell stream (where each cell is its own line)
+  const teams: LeagueTableTeam[] = [];
+  let i = 0;
+
+  while (i < rawLines.length) {
+    const line = rawLines[i];
+    const lower = line.toLowerCase();
+
+    // Skip table header lines
+    if (headerWords.has(lower) || /^(3-[012]|2-3|[01]-3)$/.test(line)) {
+      i++;
+      continue;
+    }
+
+    // Check if line is a tab-separated or multi-space line (Strategy 2)
+    const tabCols = line.split(/\t|\s{3,}/).map(c => c.trim()).filter(Boolean);
+    if (tabCols.length >= 7) {
+      // Possible single-line table row
+      const firstIsNum = !isNaN(parseInt(tabCols[0], 10));
+      const pos = firstIsNum ? parseInt(tabCols[0], 10) : (teams.length + 1);
+      const teamRaw = firstIsNum ? tabCols[1] : tabCols[0];
+      let tName = cleanTeamName(teamRaw);
+      let tUrl = '';
+      const mdMatch = teamRaw.match(/^\[(.*?)\](?:\((https?:\/\/[^\)]+)\))?$/);
+      if (mdMatch) {
+        tName = cleanTeamName(mdMatch[1]);
+        tUrl = mdMatch[2] || '';
+      }
+
+      const restNumbers = (firstIsNum ? tabCols.slice(2) : tabCols.slice(1))
+        .map(n => n.replace(',', '.'));
+
+      const pts = parseFloat(restNumbers[0]) || 0;
+      const matchesPlayed = parseInt(restNumbers[1], 10) || 0;
+      const matchesWon = parseInt(restNumbers[2], 10) || 0;
+      const matchesLost = parseInt(restNumbers[3], 10) || 0;
+      const setsWon = parseInt(restNumbers[4], 10) || 0;
+      const setsLost = parseInt(restNumbers[5], 10) || 0;
+      const pointsWon = parseInt(restNumbers[6], 10) || 0;
+      const pointsLost = parseInt(restNumbers[7], 10) || 0;
+      const setRatio = restNumbers[8] ? parseFloat(restNumbers[8]) : undefined;
+      const pointRatio = restNumbers[9] ? parseFloat(restNumbers[9]) : undefined;
+      const w3_0 = restNumbers[10] ? parseInt(restNumbers[10], 10) : undefined;
+      const w3_1 = restNumbers[11] ? parseInt(restNumbers[11], 10) : undefined;
+      const w3_2 = restNumbers[12] ? parseInt(restNumbers[12], 10) : undefined;
+      const p2_3 = restNumbers[13] ? parseInt(restNumbers[13], 10) : undefined;
+      const p1_3 = restNumbers[14] ? parseInt(restNumbers[14], 10) : undefined;
+      const p0_3 = restNumbers[15] ? parseInt(restNumbers[15], 10) : undefined;
+
+      const form: ('W' | 'P')[] = [];
+      for (let k = 0; k < matchesWon; k++) form.push('W');
+      for (let k = 0; k < matchesLost; k++) form.push('P');
+
+      if (tName) {
+        teams.push({
+          id: `team_${Date.now()}_${teams.length}`,
+          position: pos,
+          teamName: tName,
+          teamUrl: tUrl || undefined,
+          points: pts,
+          matchesPlayed,
+          matchesWon,
+          matchesLost,
+          setsWon,
+          setsLost,
+          setRatio,
+          pointsWon,
+          pointsLost,
+          pointRatio,
+          w3_0,
+          w3_1,
+          w3_2,
+          p2_3,
+          p1_3,
+          p0_3,
+          form: form.slice(0, 5)
+        });
+        i++;
+        continue;
+      }
+    }
+
+    // Check if line is a rank/position number, e.g. "1" or "1."
+    const rankMatch = line.match(/^(\d+)[.)]?$/);
+    if (rankMatch) {
+      const position = parseInt(rankMatch[1], 10);
+      const nextLine = rawLines[i + 1];
+      if (nextLine) {
+        let teamName = '';
+        let teamUrl = '';
+
+        const mdLinkMatch = nextLine.match(/^\[(.*?)\](?:\((https?:\/\/[^\)]+)\))?$/);
+        if (mdLinkMatch) {
+          teamName = cleanTeamName(mdLinkMatch[1]);
+          teamUrl = mdLinkMatch[2] || '';
+        } else if (!headerWords.has(nextLine.toLowerCase()) && isNaN(Number(nextLine))) {
+          teamName = cleanTeamName(nextLine);
+        }
+
+        if (teamName) {
+          i += 2;
+          const numTokens: string[] = [];
+          while (i < rawLines.length) {
+            const token = rawLines[i];
+            // If next rank number followed by a team name/link, stop collecting
+            if (/^\d{1,2}$/.test(token)) {
+              const peekNext = rawLines[i + 1];
+              if (peekNext && (peekNext.includes('[') || (!headerWords.has(peekNext.toLowerCase()) && isNaN(Number(peekNext))))) {
+                break;
+              }
+            }
+            // Check if token is a valid numeric value
+            if (/^-?\d+(?:[.,]\d+)?$/.test(token) || /^\d+[:\-]\d+$/.test(token)) {
+              numTokens.push(token);
+              i++;
+              if (numTokens.length >= 16) break;
+            } else {
+              break;
+            }
+          }
+
+          const points = parseFloat(numTokens[0]?.replace(',', '.') || '0') || 0;
+          const matchesPlayed = parseInt(numTokens[1] || '0', 10) || 0;
+          const matchesWon = parseInt(numTokens[2] || '0', 10) || 0;
+          const matchesLost = parseInt(numTokens[3] || '0', 10) || 0;
+          const setsWon = parseInt(numTokens[4] || '0', 10) || 0;
+          const setsLost = parseInt(numTokens[5] || '0', 10) || 0;
+          const pointsWon = parseInt(numTokens[6] || '0', 10) || 0;
+          const pointsLost = parseInt(numTokens[7] || '0', 10) || 0;
+          const setRatio = numTokens[8] ? parseFloat(numTokens[8].replace(',', '.')) : undefined;
+          const pointRatio = numTokens[9] ? parseFloat(numTokens[9].replace(',', '.')) : undefined;
+          const w3_0 = numTokens[10] !== undefined ? parseInt(numTokens[10], 10) : undefined;
+          const w3_1 = numTokens[11] !== undefined ? parseInt(numTokens[11], 10) : undefined;
+          const w3_2 = numTokens[12] !== undefined ? parseInt(numTokens[12], 10) : undefined;
+          const p2_3 = numTokens[13] !== undefined ? parseInt(numTokens[13], 10) : undefined;
+          const p1_3 = numTokens[14] !== undefined ? parseInt(numTokens[14], 10) : undefined;
+          const p0_3 = numTokens[15] !== undefined ? parseInt(numTokens[15], 10) : undefined;
+
+          const form: ('W' | 'P')[] = [];
+          for (let k = 0; k < matchesWon; k++) form.push('W');
+          for (let k = 0; k < matchesLost; k++) form.push('P');
+
+          teams.push({
+            id: `team_${Date.now()}_${teams.length}`,
+            position,
+            teamName,
+            teamUrl: teamUrl || undefined,
+            points,
+            matchesPlayed,
+            matchesWon,
+            matchesLost,
+            setsWon,
+            setsLost,
+            setRatio,
+            pointsWon,
+            pointsLost,
+            pointRatio,
+            w3_0,
+            w3_1,
+            w3_2,
+            p2_3,
+            p1_3,
+            p0_3,
+            form: form.slice(0, 5)
+          });
+          continue;
+        }
+      }
+    }
+
+    i++;
+  }
+
+  // Fallback: If no teams were parsed by Strategy 1 or 2, try legacy single-line regex
+  if (teams.length === 0) {
+    rawLines.forEach((line, idx) => {
+      if (headerWords.has(line.toLowerCase())) return;
+      const endStatsMatch = line.match(/(.*?)\s+(\d+)\s+(\d+)(?:\s+(\d+[:\-]\d+))?(?:\s+(\d+[:\-]\d+))?$/);
+      if (endStatsMatch) {
+        const lead = endStatsMatch[1].trim();
+        const matches = parseInt(endStatsMatch[2], 10) || 0;
+        const pts = parseInt(endStatsMatch[3], 10) || 0;
+        const setsStr = endStatsMatch[4] || '';
+        const ptsStr = endStatsMatch[5] || '';
+
+        const posMatch = lead.match(/^(\d+)[.)\s]+(.*)$/);
+        const pos = posMatch ? parseInt(posMatch[1], 10) : (teams.length + 1);
+        const teamName = posMatch ? cleanTeamName(posMatch[2]) : cleanTeamName(lead);
+
+        let setsWon = 0;
+        let setsLost = 0;
+        if (setsStr) {
+          const [sw, sl] = setsStr.split(/[:\-]/).map(n => parseInt(n, 10) || 0);
+          setsWon = sw || 0;
+          setsLost = sl || 0;
+        }
+
+        let pointsWon = 0;
+        let pointsLost = 0;
+        if (ptsStr) {
+          const [pw, pl] = ptsStr.split(/[:\-]/).map(n => parseInt(n, 10) || 0);
+          pointsWon = pw || 0;
+          pointsLost = pl || 0;
+        }
+
+        if (teamName) {
+          teams.push({
+            id: `team_${Date.now()}_${idx}`,
+            position: pos,
+            teamName,
+            matchesPlayed: matches,
+            points: pts,
+            setsWon,
+            setsLost,
+            pointsWon,
+            pointsLost,
+            form: []
+          });
+        }
+      }
+    });
+  }
+
+  return teams;
 }

@@ -73,6 +73,7 @@ import {
   TacticalPlay
 } from '@/lib/types';
 import { recognizeTextFromImage } from '@/lib/ocr';
+import { parseVolleyStationTable } from '@/lib/volleystation-parser';
 
 type TabType = 'sparingi' | 'liga' | 'turnieje';
 type LigaSubTab = 'tabela' | 'wyniki' | 'statystyki' | 'zdjecia';
@@ -115,6 +116,7 @@ function RozgrywkiContent() {
   const [leagueTable, setLeagueTable] = useState<LeagueTableTeam[]>([]);
   const [leaguePhases, setLeaguePhases] = useState<LeaguePhase[]>([]);
   const [activeLeaguePhaseId, setActiveLeaguePhaseId] = useState<string>('faza_1');
+  const [tableDetailedView, setTableDetailedView] = useState<boolean>(true);
 
   // Dynamic LALS Phases & Groups Modals
   const [showCreatePhaseModal, setShowCreatePhaseModal] = useState(false);
@@ -1223,6 +1225,15 @@ function RozgrywkiContent() {
   const handleParseRawTable = (overrideText?: string) => {
     const textToParse = typeof overrideText === 'string' ? overrideText : rawTableInput;
     if (!textToParse.trim()) return;
+
+    // 1. Spróbuj inteligentnego parsera VolleyStation (obsługuje wklejanie bezpośrednio ze strony LALS/VolleyStation, ze schowka, z Excela)
+    const vsParsed = parseVolleyStationTable(textToParse);
+    if (vsParsed.length > 0) {
+      setTableRows(vsParsed);
+      alert(`Wczytano pomyślnie ${vsParsed.length} zespołów ze statystykami z VolleyStation!`);
+      return;
+    }
+
     const lines = textToParse.split('\n').map(l => l.trim()).filter(Boolean);
     const parsed: LeagueTableTeam[] = [];
     
@@ -2655,9 +2666,39 @@ function RozgrywkiContent() {
                 </div>
 
                 <div className="flex items-center gap-2 text-[11px] text-slate-400 shrink-0 flex-wrap">
-                  <span className="font-bold text-slate-300 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">
-                    Drużyn w grupie: <strong className="text-white font-mono">{leagueTable.length}</strong>
-                  </span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-bold text-slate-300 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">
+                      Drużyn w grupie: <strong className="text-white font-mono">{leagueTable.length}</strong>
+                    </span>
+
+                    {/* Przełącznik widoku tabeli */}
+                    <div className="flex items-center gap-1 bg-slate-950 p-0.5 rounded-xl border border-slate-800 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => setTableDetailedView(false)}
+                        className={`px-2.5 py-1 rounded-lg font-bold transition text-xs ${
+                          !tableDetailedView ? 'bg-sky-500 text-slate-950 shadow-sm' : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        Kompaktowa
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setTableDetailedView(true)}
+                        className={`px-2.5 py-1 rounded-lg font-bold transition text-xs flex items-center gap-1.5 ${
+                          tableDetailedView ? 'bg-sky-500 text-slate-950 shadow-sm' : 'text-slate-400 hover:text-white'
+                        }`}
+                        title="Pełna tabela zgodna z oficjalnym systemem VolleyStation"
+                      >
+                        <span>Pełna VolleyStation</span>
+                        <span className={`text-[9px] px-1 py-0.2 rounded font-mono font-black ${
+                          tableDetailedView ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-800 text-sky-400'
+                        }`}>
+                          LIVE
+                        </span>
+                      </button>
+                    </div>
+                  </div>
 
                   {canManage && !isArchiveMode && (
                     <div className="flex items-center gap-1.5">
@@ -2698,15 +2739,50 @@ function RozgrywkiContent() {
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left">
                   <thead className="bg-slate-900 text-slate-400 uppercase font-black tracking-wider text-[10px] border-b border-slate-800">
-                    <tr>
-                      <th className="py-3 px-3">Poz.</th>
-                      <th className="py-3 px-4">Drużyna</th>
-                      <th className="py-3 px-2 text-center">Mecze</th>
-                      <th className="py-3 px-2 text-center font-black text-white">Punkty</th>
-                      <th className="py-3 px-3 text-center">Sety (W:P)</th>
-                      <th className="py-3 px-3 text-center">Małe Punkty</th>
-                      <th className="py-3 px-4 text-center">Forma</th>
-                    </tr>
+                    {tableDetailedView ? (
+                      <>
+                        <tr>
+                          <th rowSpan={2} className="py-2.5 px-3 border-r border-slate-800 text-center">Poz.</th>
+                          <th rowSpan={2} className="py-2.5 px-4 border-r border-slate-800">Drużyna</th>
+                          <th rowSpan={2} className="py-2.5 px-3 text-center font-black text-white border-r border-slate-800">Punkty</th>
+                          <th colSpan={3} className="py-1 px-2 text-center border-b border-r border-slate-800 bg-slate-950/40 text-slate-300 font-bold">Mecze</th>
+                          <th colSpan={3} className="py-1 px-2 text-center border-b border-r border-slate-800 bg-slate-950/40 text-slate-300 font-bold">Sety</th>
+                          <th colSpan={3} className="py-1 px-2 text-center border-b border-r border-slate-800 bg-slate-950/40 text-slate-300 font-bold">Punkty</th>
+                          <th colSpan={6} className="py-1 px-2 text-center border-b border-r border-slate-800 bg-slate-950/40 text-slate-300 font-bold">Wynik</th>
+                          <th rowSpan={2} className="py-2.5 px-3 text-center">Forma</th>
+                        </tr>
+                        <tr className="border-b border-slate-800 text-[9px]">
+                          <th className="py-1.5 px-2 text-center text-slate-400">Rozegr.</th>
+                          <th className="py-1.5 px-2 text-center text-emerald-400">Wygr.</th>
+                          <th className="py-1.5 px-2 text-center text-rose-400 border-r border-slate-800">Przegr.</th>
+
+                          <th className="py-1.5 px-2 text-center text-emerald-400">Wygr.</th>
+                          <th className="py-1.5 px-2 text-center text-rose-400">Przegr.</th>
+                          <th className="py-1.5 px-2 text-center text-sky-400 border-r border-slate-800">Stosunek</th>
+
+                          <th className="py-1.5 px-2 text-center text-emerald-400">Wygr.</th>
+                          <th className="py-1.5 px-2 text-center text-rose-400">Przegr.</th>
+                          <th className="py-1.5 px-2 text-center text-sky-400 border-r border-slate-800">Stosunek</th>
+
+                          <th className="py-1.5 px-1.5 text-center text-slate-300 font-mono">3-0</th>
+                          <th className="py-1.5 px-1.5 text-center text-slate-300 font-mono">3-1</th>
+                          <th className="py-1.5 px-1.5 text-center text-slate-300 font-mono">3-2</th>
+                          <th className="py-1.5 px-1.5 text-center text-slate-400 font-mono">2-3</th>
+                          <th className="py-1.5 px-1.5 text-center text-slate-400 font-mono">1-3</th>
+                          <th className="py-1.5 px-1.5 text-center text-slate-400 font-mono border-r border-slate-800">0-3</th>
+                        </tr>
+                      </>
+                    ) : (
+                      <tr>
+                        <th className="py-3 px-3">Poz.</th>
+                        <th className="py-3 px-4">Drużyna</th>
+                        <th className="py-3 px-2 text-center">Mecze</th>
+                        <th className="py-3 px-2 text-center font-black text-white">Punkty</th>
+                        <th className="py-3 px-3 text-center">Sety (W:P)</th>
+                        <th className="py-3 px-3 text-center">Małe Punkty</th>
+                        <th className="py-3 px-4 text-center">Forma</th>
+                      </tr>
+                    )}
                   </thead>
                   <tbody className="divide-y divide-slate-800/60 font-mono">
                     {leagueTable.map((team, idx) => {
@@ -2716,6 +2792,19 @@ function RozgrywkiContent() {
                       const isGoldMedalist = advSpots === 0 && team.position === 1;
                       const isMedalist = advSpots === 0 && team.position <= 3;
 
+                      const mWon = team.matchesWon !== undefined
+                        ? team.matchesWon
+                        : (team.form ? team.form.filter(f => f === 'W').length : '-');
+                      const mLost = team.matchesLost !== undefined
+                        ? team.matchesLost
+                        : (team.form ? team.form.filter(f => f === 'P').length : '-');
+                      const setRatioStr = team.setRatio !== undefined
+                        ? (typeof team.setRatio === 'number' ? team.setRatio.toFixed(4) : team.setRatio)
+                        : (team.setsLost > 0 ? (team.setsWon / team.setsLost).toFixed(4) : (team.setsWon > 0 ? 'MAX' : '-'));
+                      const pointRatioStr = team.pointRatio !== undefined
+                        ? (typeof team.pointRatio === 'number' ? team.pointRatio.toFixed(4) : team.pointRatio)
+                        : (team.pointsLost > 0 ? (team.pointsWon / team.pointsLost).toFixed(4) : (team.pointsWon > 0 ? 'MAX' : '-'));
+
                       return (
                         <React.Fragment key={team.id || idx}>
                           <tr
@@ -2723,8 +2812,8 @@ function RozgrywkiContent() {
                               isAngels ? 'bg-sky-500/10 font-bold' : ''
                             } ${isAdvancing ? 'bg-emerald-500/5' : ''}`}
                           >
-                            <td className="py-3.5 px-3">
-                              <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs ${
+                            <td className="py-3 px-3 text-center">
+                              <span className={`w-6 h-6 rounded-lg inline-flex items-center justify-center font-black text-xs ${
                                 isAdvancing
                                   ? 'bg-emerald-500 text-slate-950 shadow-sm shadow-emerald-500/30'
                                   : isGoldMedalist
@@ -2738,8 +2827,21 @@ function RozgrywkiContent() {
                                 {team.position}
                               </span>
                             </td>
-                            <td className="py-3.5 px-4 font-sans font-black text-white text-sm flex items-center gap-2 flex-wrap">
-                              <span>{team.teamName}</span>
+
+                            <td className="py-3 px-4 font-sans font-black text-white text-sm flex items-center gap-2 flex-wrap">
+                              {team.teamUrl ? (
+                                <a
+                                  href={team.teamUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="hover:underline hover:text-sky-400 transition flex items-center gap-1.5"
+                                  title="Otwórz profil drużyny na VolleyStation"
+                                >
+                                  <span>{team.teamName}</span>
+                                </a>
+                              ) : (
+                                <span>{team.teamName}</span>
+                              )}
                               {isAngels && (
                                 <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-sky-500/20 text-sky-300 border border-sky-500/40">
                                   Nasz Klub
@@ -2756,15 +2858,48 @@ function RozgrywkiContent() {
                                 </span>
                               )}
                             </td>
-                            <td className="py-3.5 px-2 text-center text-slate-300">{team.matchesPlayed}</td>
-                            <td className="py-3.5 px-2 text-center text-sm font-black text-amber-400">{team.points}</td>
-                            <td className="py-3.5 px-3 text-center text-slate-300">
-                              {team.setsWon} : {team.setsLost}
-                            </td>
-                            <td className="py-3.5 px-3 text-center text-slate-400">
-                              {team.pointsWon} : {team.pointsLost}
-                            </td>
-                            <td className="py-3.5 px-4 text-center">
+
+                            {tableDetailedView ? (
+                              <>
+                                <td className="py-3 px-3 text-center text-sm font-black text-amber-400 border-r border-slate-800">{team.points}</td>
+                                
+                                {/* Mecze */}
+                                <td className="py-3 px-2 text-center text-slate-300">{team.matchesPlayed}</td>
+                                <td className="py-3 px-2 text-center text-emerald-400 font-bold">{mWon}</td>
+                                <td className="py-3 px-2 text-center text-rose-400 border-r border-slate-800">{mLost}</td>
+
+                                {/* Sety */}
+                                <td className="py-3 px-2 text-center text-emerald-400 font-bold">{team.setsWon}</td>
+                                <td className="py-3 px-2 text-center text-rose-400">{team.setsLost}</td>
+                                <td className="py-3 px-2 text-center text-sky-300 border-r border-slate-800">{setRatioStr}</td>
+
+                                {/* Punkty */}
+                                <td className="py-3 px-2 text-center text-emerald-400">{team.pointsWon}</td>
+                                <td className="py-3 px-2 text-center text-rose-400">{team.pointsLost}</td>
+                                <td className="py-3 px-2 text-center text-sky-300 border-r border-slate-800">{pointRatioStr}</td>
+
+                                {/* Wyniki */}
+                                <td className="py-3 px-1.5 text-center text-slate-300">{team.w3_0 ?? 0}</td>
+                                <td className="py-3 px-1.5 text-center text-slate-300">{team.w3_1 ?? 0}</td>
+                                <td className="py-3 px-1.5 text-center text-slate-300">{team.w3_2 ?? 0}</td>
+                                <td className="py-3 px-1.5 text-center text-slate-400">{team.p2_3 ?? 0}</td>
+                                <td className="py-3 px-1.5 text-center text-slate-400">{team.p1_3 ?? 0}</td>
+                                <td className="py-3 px-1.5 text-center text-slate-400 border-r border-slate-800">{team.p0_3 ?? 0}</td>
+                              </>
+                            ) : (
+                              <>
+                                <td className="py-3.5 px-2 text-center text-slate-300">{team.matchesPlayed}</td>
+                                <td className="py-3.5 px-2 text-center text-sm font-black text-amber-400">{team.points}</td>
+                                <td className="py-3.5 px-3 text-center text-slate-300">
+                                  {team.setsWon} : {team.setsLost}
+                                </td>
+                                <td className="py-3.5 px-3 text-center text-slate-400">
+                                  {team.pointsWon} : {team.pointsLost}
+                                </td>
+                              </>
+                            )}
+
+                            <td className="py-3 px-4 text-center">
                               <div className="flex items-center justify-center gap-1">
                                 {(team.form || []).map((f, i) => (
                                   <span
@@ -2783,14 +2918,14 @@ function RozgrywkiContent() {
                           {/* Dynamiczna linia oddzielająca strefę awansu */}
                           {advSpots > 0 && team.position === advSpots && (
                             <tr className="bg-emerald-950/30 border-y-2 border-emerald-500/40">
-                              <td colSpan={7} className="py-2.5 px-4">
+                              <td colSpan={tableDetailedView ? 19 : 7} className="py-2.5 px-4">
                                 <div className="flex items-center justify-between gap-3 text-xs font-black uppercase text-emerald-300">
                                   <div className="flex items-center gap-2">
                                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                                    <span>▲ STREFA AWANSU: ${advSpots} ${advSpots === 1 ? 'DRUŻYNA AWANSUJE' : advSpots < 5 ? 'DRUŻYNY AWANSUJĄ' : 'DRUŻYN AWANSUJE'} DO: ${currentLeaguePhase?.advancementTargetName || 'KOLEJNEJ FAZY'} ▲</span>
+                                    <span>▲ STREFA AWANSU: {advSpots} {advSpots === 1 ? 'DRUŻYNA AWANSUJE' : advSpots < 5 ? 'DRUŻYNY AWANSUJĄ' : 'DRUŻYN AWANSUJE'} DO: {currentLeaguePhase?.advancementTargetName || 'KOLEJNEJ FAZY'} ▲</span>
                                   </div>
                                   <span className="text-[10px] font-mono text-emerald-400/80 lowercase">
-                                    miejsca 1–${advSpots} &rarr; ${currentLeaguePhase?.advancementTargetName || 'kolejny etap'}
+                                    miejsca 1–{advSpots} &rarr; {currentLeaguePhase?.advancementTargetName || 'kolejny etap'}
                                   </span>
                                 </div>
                               </td>
@@ -6008,13 +6143,27 @@ function RozgrywkiContent() {
                 {tableImportTab === 'text' ? (
                   <div className="space-y-2 pt-1">
                     <p className="text-[11px] text-slate-400">
-                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
+                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation (zaznacz całą tabelę na stronie lub wklej z Excela):
                     </p>
                     <textarea
-                      rows={4}
+                      rows={5}
                       value={rawTableInput}
                       onChange={e => setRawTableInput(e.target.value)}
-                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
+                      placeholder={`Możesz wkleić bezpośrednio z VolleyStation, np.:
+Drużyna
+Punkty
+...
+1
+[Gladiatorzy BUD-WENT](...)
+8
+3
+3
+0
+9
+2
+258
+218...
+(lub wierszami: 1 Gladiatorzy 8 3 3 0 9 2...)`}
                       className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
                     />
                     <div className="flex justify-end">
