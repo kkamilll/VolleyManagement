@@ -1217,11 +1217,14 @@ function RozgrywkiContent() {
     }
   };
 
-  const handleOpenEditTable = (phaseId: string) => {
+  const handleOpenEditTable = (phaseId: string, initialImportTab?: 'text' | 'image') => {
     const targetPhase = leaguePhases.find(p => p.id === phaseId) || currentLeaguePhase;
     setEditingTablePhaseId(targetPhase?.id || 'faza_1');
     setTableRows(targetPhase?.table ? JSON.parse(JSON.stringify(targetPhase.table)) : []);
     setRawTableInput('');
+    if (initialImportTab) {
+      setTableImportTab(initialImportTab);
+    }
     setShowEditTableModal(true);
   };
 
@@ -2466,33 +2469,48 @@ function RozgrywkiContent() {
             </div>
 
             {canManage && (
-              <button
-                onClick={() => {
-                  setEventTypeToCreate('SPARING');
-                  setEventTitle('Sparing kontrolny');
-                  setShowAddEventModal(true);
-                }}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm"
-              >
-                <Plus className="w-4 h-4" />
-                Utwórz Sparing
-              </button>
-            )}
-
-            {canManage && sparingSubTab === 'zdjecia' && (
-              <button
-                onClick={() => {
-                  setPhotoCategory('SPARING');
-                  setPhotoTitle('');
-                  setPhotoMatch('');
-                  setPhotoSeriesList([]);
-                  setShowAddPhotoModal(true);
-                }}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm"
-              >
-                <Camera className="w-4 h-4" />
-                + Dodaj Zdjęcia ze Sparingów
-              </button>
+              <div className="flex items-center gap-2 flex-wrap">
+                {sparingSubTab === 'mecze' && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setShowAddMatchModal(true)}
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 transition shadow-sm"
+                    >
+                      <Plus className="w-3.5 h-3.5 text-amber-600" />
+                      <span>Dodaj Wynik Meczu</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEventTypeToCreate('SPARING');
+                        setEventTitle('Sparing kontrolny');
+                        setShowAddEventModal(true);
+                      }}
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm"
+                    >
+                      <Calendar className="w-3.5 h-3.5" />
+                      <span>Utwórz Sparing</span>
+                    </button>
+                  </>
+                )}
+                {sparingSubTab === 'zdjecia' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPhotoCategory('SPARING');
+                      setPhotoTitle('');
+                      setPhotoMatch('');
+                      setPhotoSeriesList([]);
+                      setShowAddPhotoModal(true);
+                    }}
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm"
+                  >
+                    <Camera className="w-3.5 h-3.5" />
+                    <span>+ Dodaj Zdjęcia ze Sparingów</span>
+                  </button>
+                )}
+              </div>
             )}
           </div>
 
@@ -3043,6 +3061,27 @@ function RozgrywkiContent() {
 
             {canManage && (
               <div className="flex items-center gap-2 flex-wrap">
+                {ligaSubTab === 'tabela' && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditTable(currentLeaguePhase?.id || 'faza_1', 'text')}
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm"
+                    >
+                      <Upload className="w-3.5 h-3.5 text-sky-600" />
+                      <span className="hidden sm:inline">Importuj Tabelę (Tekst / OCR)</span>
+                      <span className="sm:hidden">Import Tabeli</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditTable(currentLeaguePhase?.id || 'faza_1')}
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      <span>Edytuj Tabelę</span>
+                    </button>
+                  </>
+                )}
                 {ligaSubTab === 'wyniki' && (
                   <>
                     <button
@@ -3062,6 +3101,29 @@ function RozgrywkiContent() {
                       <Plus className="w-3.5 h-3.5" />
                       <span>Dodaj Wynik Meczu</span>
                     </button>
+                  </>
+                )}
+                {ligaSubTab === 'statystyki' && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setShowVolleyStationImportModal(true)}
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Importuj z VolleyStation</span>
+                      <span className="sm:hidden">Import Statystyk</span>
+                    </button>
+                    <a
+                      href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
+                      <span className="hidden sm:inline">VolleyStation LALS ↗</span>
+                      <span className="sm:hidden">VolleyStation ↗</span>
+                    </a>
                   </>
                 )}
                 {ligaSubTab === 'zdjecia' && (
@@ -4340,33 +4402,48 @@ function RozgrywkiContent() {
             </div>
 
             {canManage && (
-              <button
-                onClick={() => {
-                  setEventTypeToCreate('TURNIEJ');
-                  setEventTitle('Turniej Siatkarski');
-                  setShowAddEventModal(true);
-                }}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-purple-500 hover:bg-purple-400 text-slate-950 transition shadow-lg shadow-purple-500/20"
-              >
-                <Plus className="w-4 h-4" />
-                Utwórz Turniej
-              </button>
-            )}
-
-            {canManage && turniejSubTab === 'zdjecia' && (
-              <button
-                onClick={() => {
-                  setPhotoCategory('TURNIEJ');
-                  setPhotoTitle('');
-                  setPhotoMatch('');
-                  setPhotoSeriesList([]);
-                  setShowAddPhotoModal(true);
-                }}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-purple-500 hover:bg-purple-400 text-slate-900 transition shadow-lg shadow-purple-500/20"
-              >
-                <Camera className="w-4 h-4" />
-                + Dodaj Zdjęcia z Turnieju
-              </button>
+              <div className="flex items-center gap-2 flex-wrap">
+                {turniejSubTab === 'drabinki' && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setShowAddMatchModal(true)}
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 transition shadow-sm"
+                    >
+                      <Plus className="w-3.5 h-3.5 text-purple-600" />
+                      <span>Dodaj Wynik Meczu</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEventTypeToCreate('TURNIEJ');
+                        setEventTitle('Turniej Siatkarski');
+                        setShowAddEventModal(true);
+                      }}
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-purple-600 hover:bg-purple-500 text-white transition shadow-sm"
+                    >
+                      <Award className="w-3.5 h-3.5" />
+                      <span>Utwórz Turniej</span>
+                    </button>
+                  </>
+                )}
+                {turniejSubTab === 'zdjecia' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPhotoCategory('TURNIEJ');
+                      setPhotoTitle('');
+                      setPhotoMatch('');
+                      setPhotoSeriesList([]);
+                      setShowAddPhotoModal(true);
+                    }}
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-purple-600 hover:bg-purple-500 text-white transition shadow-sm"
+                  >
+                    <Camera className="w-3.5 h-3.5" />
+                    <span>+ Dodaj Zdjęcia z Turnieju</span>
+                  </button>
+                )}
+              </div>
             )}
           </div>
 
