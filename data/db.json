@@ -179,68 +179,26 @@
   ],
   "matches": [
     {
-      "id": "mat_lals_1926",
-      "opponent": "Gladiatorzy BUD-WENT",
-      "date": "2026-10-18T18:00:00.000Z",
-      "location": "Hala Wyjazdowa (Luboń)",
-      "isHome": false,
-      "matchType": "Mecz ligowy",
-      "sets": [
-        {
-          "setNumber": 1,
-          "teamScore": 22,
-          "opponentScore": 25
-        },
-        {
-          "setNumber": 2,
-          "teamScore": 21,
-          "opponentScore": 25
-        },
-        {
-          "setNumber": 3,
-          "teamScore": 25,
-          "opponentScore": 22
-        },
-        {
-          "setNumber": 4,
-          "teamScore": 25,
-          "opponentScore": 21
-        },
-        {
-          "setNumber": 5,
-          "teamScore": 9,
-          "opponentScore": 15
-        }
-      ],
-      "teamSetsWon": 2,
-      "opponentSetsWon": 3,
-      "mvp": "Bogdan Voropai (Gladiatorzy BUD-WENT)",
-      "notes": "Mecz ligowy LALS (Runda 7, Nr 1926). Protokół VolleyStation: https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583864/",
-      "coachComments": "Oficjalny protokół ligowy z VolleyStation. Czas meczu: 1g 27m, Widzów: 25. Sędziował: Karinskiy Ivan.",
-      "createdById": "u_trener",
-      "createdByName": "Trener Michał",
-      "createdAt": "2026-11-06T14:39:39.532Z",
-      "reportId": "rep_vs_2583864",
-      "leaguePhaseId": "faza_1",
-      "leaguePhaseName": "Faza I: Grupa Eliminacyjna (Top 3 awans)"
-    },
-    {
       "id": "mat_lals_1948",
       "opponent": "Volleyboars",
-      "date": "2026-11-08T18:00:00.000Z",
-      "location": "Wyjazd",
+      "date": "2026-11-08T17:00:00.000Z",
+      "location": "Hala OSiR, Luboń",
       "isHome": false,
       "matchType": "Mecz ligowy",
+      "competition": "Lubońska Amatorska Liga Siatkówki (LALS)",
+      "matchNumber": 1948,
+      "round": 9,
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584336/",
       "sets": [
         {
           "setNumber": 1,
           "teamScore": 25,
-          "opponentScore": 19
+          "opponentScore": 21
         },
         {
           "setNumber": 2,
           "teamScore": 25,
-          "opponentScore": 21
+          "opponentScore": 19
         },
         {
           "setNumber": 3,
@@ -250,73 +208,77 @@
       ],
       "teamSetsWon": 3,
       "opponentSetsWon": 0,
-      "mvp": "Kamil Pujanek",
-      "notes": "Mecz ligowy LALS (Runda 9, Nr 1948). Zwycięstwo 3:0 na wyjeździe! Protokół VolleyStation: https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584336/",
-      "coachComments": "Kapitalne spotkanie na wyjeździe. Pełna kontrola od pierwszego do ostatniego seta, 3 cenne punkty do tabeli ligowej.",
-      "createdById": "usr_trener",
-      "createdByName": "Hubert",
-      "createdAt": "2026-11-08T20:30:00Z",
+      "mvp": "Hubert Obara",
+      "notes": "Runda 9 LALS: Przekonujące zwycięstwo 3:0 na wyjeździe z Volleyboars.",
       "leaguePhaseId": "faza_1",
-      "leaguePhaseName": "Faza I: Grupa Eliminacyjna (Top 3 awans)"
+      "leaguePhaseName": "Faza I (Eliminacje)",
+      "createdById": "usr_hubert",
+      "createdByName": "Hubert Obara",
+      "createdAt": "2026-11-08T19:00:00.000Z"
     },
     {
       "id": "mat_lals_1926",
       "opponent": "Gladiatorzy BUD-WENT",
-      "date": "2026-10-31T18:00:00.000Z",
-      "location": "Hala Luboń (Wyjazd)",
+      "date": "2026-10-31T15:00:00.000Z",
+      "location": "Hala OSiR, Luboń",
       "isHome": false,
       "matchType": "Mecz ligowy",
+      "competition": "Lubońska Amatorska Liga Siatkówki (LALS)",
+      "matchNumber": 1926,
+      "round": 7,
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583864/",
       "sets": [
         {
           "setNumber": 1,
-          "teamScore": 22,
+          "teamScore": 23,
           "opponentScore": 25
         },
         {
           "setNumber": 2,
-          "teamScore": 21,
-          "opponentScore": 25
-        },
-        {
-          "setNumber": 3,
           "teamScore": 25,
           "opponentScore": 22
         },
         {
+          "setNumber": 3,
+          "teamScore": 21,
+          "opponentScore": 25
+        },
+        {
           "setNumber": 4,
           "teamScore": 25,
-          "opponentScore": 21
+          "opponentScore": 20
         },
         {
           "setNumber": 5,
-          "teamScore": 9,
+          "teamScore": 13,
           "opponentScore": 15
         }
       ],
       "teamSetsWon": 2,
       "opponentSetsWon": 3,
-      "mvp": "Bogdan Voropai (Gladiatorzy BUD-WENT)",
-      "notes": "Mecz ligowy LALS (Runda 7, Nr 1926). Porażka 2:3 po tie-breaku (1 punkt zdobyty). Protokół VolleyStation: https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583864/",
-      "coachComments": "Wielki powrót ze stanu 0:2 do 2:2! W tie-breaku zadecydowały pojedyncze błędy na siatce, ale zdobyty 1 punkt w starciu z liderem jest bardzo cenny.",
-      "createdById": "usr_trener",
-      "createdByName": "Hubert",
-      "createdAt": "2026-10-31T21:00:00Z",
-      "reportId": "rep_vs_2583864",
+      "notes": "Runda 7 LALS: Zacięty mecz walki z liderem Gladiatorami (2:3, zdobyty cenny punkt ligowy).",
       "leaguePhaseId": "faza_1",
-      "leaguePhaseName": "Faza I: Grupa Eliminacyjna (Top 3 awans)"
+      "leaguePhaseName": "Faza I (Eliminacje)",
+      "createdById": "usr_hubert",
+      "createdByName": "Hubert Obara",
+      "createdAt": "2026-10-31T17:30:00.000Z"
     },
     {
       "id": "mat_lals_1887",
       "opponent": "Koty Broniszewice",
-      "date": "2026-10-18T18:00:00.000Z",
-      "location": "Hala Luboń (Domowa)",
+      "date": "2026-10-18T15:00:00.000Z",
+      "location": "Hala OSiR, Luboń",
       "isHome": true,
       "matchType": "Mecz ligowy",
+      "competition": "Lubońska Amatorska Liga Siatkówki (LALS)",
+      "matchNumber": 1887,
+      "round": 5,
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583849/",
       "sets": [
         {
           "setNumber": 1,
           "teamScore": 25,
-          "opponentScore": 17
+          "opponentScore": 18
         },
         {
           "setNumber": 2,
@@ -326,20 +288,18 @@
         {
           "setNumber": 3,
           "teamScore": 25,
-          "opponentScore": 19
+          "opponentScore": 16
         }
       ],
       "teamSetsWon": 3,
       "opponentSetsWon": 0,
-      "mvp": "Michał Śmigiel (Angels ZTP)",
-      "notes": "Mecz ligowy LALS (Runda 5, Nr 1887). Protokół VolleyStation: https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583849/",
-      "coachComments": "Oficjalny protokół ligowy z VolleyStation. Zwycięstwo 3:0 przed własną publicznością! Czas meczu: 0g 52m.",
-      "createdById": "u_trener",
-      "createdByName": "Trener Michał",
-      "createdAt": "2026-10-18T20:00:00Z",
-      "reportId": "rep_vs_2583849",
+      "mvp": "Kamil Wolski",
+      "notes": "Runda 5 LALS: Inauguracyjne pewne zwycięstwo Angels 3:0 przed własną publicznością.",
       "leaguePhaseId": "faza_1",
-      "leaguePhaseName": "Faza I: Grupa Eliminacyjna (Top 3 awans)"
+      "leaguePhaseName": "Faza I (Eliminacje)",
+      "createdById": "usr_hubert",
+      "createdByName": "Hubert Obara",
+      "createdAt": "2026-10-18T17:00:00.000Z"
     }
   ],
   "events": [
@@ -542,96 +502,6 @@
       }
     },
     {
-      "id": "evt_lals_1972",
-      "title": "Mecz ligowy LALS: Angels ZTP vs Coco Jumbo",
-      "type": "MECZ",
-      "status": "ANKIETA",
-      "date": "2026-11-15T18:30",
-      "location": "Hala Luboń",
-      "opponent": "Coco Jumbo",
-      "description": "Runda 11, Mecz nr 1972. Zbiórka o 17:45 w strojach meczowych VIGO. Raport VolleyStation: https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584360/",
-      "attendees": [
-        {
-          "userId": "usr_kierownik",
-          "userName": "Łukasz",
-          "userRole": "KIEROWNIK",
-          "status": "BEDE"
-        },
-        {
-          "userId": "usr_zawodnik_1",
-          "userName": "Tomasz Krupa",
-          "userRole": "ZAWODNIK",
-          "status": "BEDE"
-        },
-        {
-          "userId": "usr_zawodnik_2",
-          "userName": "Kamil Pujanek",
-          "userRole": "ZAWODNIK",
-          "status": "BEDE"
-        },
-        {
-          "userId": "usr_zawodnik_4",
-          "userName": "Michał Śmigiel",
-          "userRole": "ZAWODNIK",
-          "status": "BEDE"
-        },
-        {
-          "userId": "usr_kierownik",
-          "userName": "Łukasz Kremer",
-          "userRole": "ZAWODNIK",
-          "status": "BEDE"
-        }
-      ],
-      "actualAttendees": [],
-      "createdById": "usr_trener",
-      "createdByName": "Hubert",
-      "createdAt": "2026-11-12T20:00:00Z"
-    },
-    {
-      "id": "evt_lals_1997",
-      "title": "Mecz ligowy LALS: Czelendż vs Angels ZTP",
-      "type": "MECZ",
-      "status": "ANKIETA",
-      "date": "2026-11-29T17:00",
-      "location": "Wyjazd",
-      "opponent": "Czelendż",
-      "description": "Runda 13, Mecz nr 1997. Godzina 17:00. Raport VolleyStation: https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584385/",
-      "attendees": [
-        {
-          "userId": "usr_zawodnik_2",
-          "userName": "Kamil Pujanek",
-          "userRole": "ZAWODNIK",
-          "status": "BEDE"
-        }
-      ],
-      "actualAttendees": [],
-      "createdById": "usr_trener",
-      "createdByName": "Hubert",
-      "createdAt": "2026-11-12T20:00:00Z"
-    },
-    {
-      "id": "evt_lals_2037",
-      "title": "Mecz ligowy LALS: Angels ZTP vs Afera Volley",
-      "type": "MECZ",
-      "status": "ANKIETA",
-      "date": "2026-12-13T15:30",
-      "location": "Hala Luboń",
-      "opponent": "Afera Volley",
-      "description": "Runda 16, Mecz nr 2037. Godzina 15:30. Hit kolejki LALS! Raport VolleyStation: https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584423/",
-      "attendees": [
-        {
-          "userId": "usr_zawodnik_2",
-          "userName": "Kamil Pujanek",
-          "userRole": "ZAWODNIK",
-          "status": "BEDE"
-        }
-      ],
-      "actualAttendees": [],
-      "createdById": "usr_trener",
-      "createdByName": "Hubert",
-      "createdAt": "2026-11-12T20:00:00Z"
-    },
-    {
       "id": "evt_past_1",
       "title": "Trening: Przyjęcie & Blok sytuacyjny",
       "type": "TRENING",
@@ -765,6 +635,51 @@
       "createdById": "usr_trener",
       "createdByName": "Hubert",
       "createdAt": "2026-11-06T16:44:04.232Z"
+    },
+    {
+      "id": "evt_lals_1972",
+      "title": "Mecz LALS (R11): Angels ZTP vs Coco Jumbo",
+      "type": "MECZ",
+      "date": "2026-11-15T18:30:00.000Z",
+      "location": "Hala OSiR, Luboń",
+      "opponent": "Coco Jumbo",
+      "description": "Oficjalny mecz ligowy LALS (Runda 11). Gramy jako gospodarz.",
+      "costPerPerson": 0,
+      "status": "ANKIETA",
+      "attendees": [],
+      "createdById": "usr_hubert",
+      "createdByName": "Hubert Obara",
+      "createdAt": "2026-11-12T22:50:07.092Z"
+    },
+    {
+      "id": "evt_lals_1997",
+      "title": "Mecz LALS (R13): Czelendż vs Angels ZTP",
+      "type": "MECZ",
+      "date": "2026-11-29T17:00:00.000Z",
+      "location": "Hala OSiR, Luboń",
+      "opponent": "Czelendż",
+      "description": "Oficjalny mecz ligowy LALS (Runda 13). Gramy na wyjeździe.",
+      "costPerPerson": 0,
+      "status": "ANKIETA",
+      "attendees": [],
+      "createdById": "usr_hubert",
+      "createdByName": "Hubert Obara",
+      "createdAt": "2026-11-12T22:50:07.093Z"
+    },
+    {
+      "id": "evt_lals_2037",
+      "title": "Mecz LALS (R16): Angels ZTP vs Afera Volley",
+      "type": "MECZ",
+      "date": "2026-12-13T15:30:00.000Z",
+      "location": "Hala OSiR, Luboń",
+      "opponent": "Afera Volley",
+      "description": "Oficjalny mecz ligowy LALS (Runda 16). Hit kolejki - walka o awans do Top 3.",
+      "costPerPerson": 0,
+      "status": "ANKIETA",
+      "attendees": [],
+      "createdById": "usr_hubert",
+      "createdByName": "Hubert Obara",
+      "createdAt": "2026-11-12T22:50:07.093Z"
     }
   ],
   "leagueReports": [
@@ -3455,139 +3370,208 @@
       "uploadedBy": "Sztab Klubu"
     }
   ],
-  "activeLeaguePhaseId": "faza_2",
+  "activeLeaguePhaseId": "faza_1",
   "leaguePhases": [
     {
       "id": "faza_1",
       "name": "Faza I: Grupa Eliminacyjna (Top 3 awans)",
       "shortName": "Faza I",
       "groupName": "Grupa Angels ZTP (7 zespołów)",
-      "isActive": false,
+      "isActive": true,
       "advancementSpots": 3,
       "advancementTargetName": "Awans do Grupy Finałowej (Top 3)",
       "teamsCount": 7,
       "table": [
         {
-          "id": "t1",
+          "id": "t_glad",
           "position": 1,
-          "teamName": "Angels ZTP",
-          "matchesPlayed": 5,
-          "points": 13,
-          "setsWon": 14,
-          "setsLost": 4,
-          "pointsWon": 432,
-          "pointsLost": 370,
-          "form": [
-            "W",
-            "W",
-            "W",
-            "W",
-            "L"
-          ]
-        },
-        {
-          "id": "t2",
-          "position": 2,
           "teamName": "Gladiatorzy BUD-WENT",
-          "matchesPlayed": 5,
-          "points": 12,
-          "setsWon": 13,
-          "setsLost": 6,
-          "pointsWon": 435,
-          "pointsLost": 395,
+          "teamUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/teams/2237370-178/",
+          "points": 8,
+          "matchesPlayed": 3,
+          "matchesWon": 3,
+          "matchesLost": 0,
+          "setsWon": 9,
+          "setsLost": 2,
+          "pointsWon": 258,
+          "pointsLost": 218,
+          "setRatio": 4.5,
+          "pointRatio": 1.1835,
+          "w3_0": 2,
+          "w3_1": 0,
+          "w3_2": 1,
+          "p2_3": 0,
+          "p1_3": 0,
+          "p0_3": 0,
           "form": [
             "W",
             "W",
-            "W",
-            "L",
             "W"
           ]
         },
         {
-          "id": "t3",
+          "id": "t_angels",
+          "position": 2,
+          "teamName": "Angels ZTP",
+          "teamUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/teams/2237343-52/",
+          "points": 7,
+          "matchesPlayed": 3,
+          "matchesWon": 2,
+          "matchesLost": 1,
+          "setsWon": 8,
+          "setsLost": 3,
+          "pointsWon": 252,
+          "pointsLost": 227,
+          "setRatio": 2.6667,
+          "pointRatio": 1.1101,
+          "w3_0": 2,
+          "w3_1": 0,
+          "w3_2": 0,
+          "p2_3": 1,
+          "p1_3": 0,
+          "p0_3": 0,
+          "form": [
+            "W",
+            "P",
+            "W"
+          ]
+        },
+        {
+          "id": "t_afera",
           "position": 3,
           "teamName": "Afera Volley",
-          "matchesPlayed": 5,
-          "points": 10,
-          "setsWon": 11,
-          "setsLost": 7,
-          "pointsWon": 410,
-          "pointsLost": 390,
-          "form": [
-            "W",
-            "L",
-            "W",
-            "W",
-            "L"
-          ]
-        },
-        {
-          "id": "t4",
-          "position": 4,
-          "teamName": "Coco Jumbo",
-          "matchesPlayed": 4,
-          "points": 7,
-          "setsWon": 8,
-          "setsLost": 6,
-          "pointsWon": 320,
-          "pointsLost": 305,
-          "form": [
-            "W",
-            "W",
-            "L",
-            "L"
-          ]
-        },
-        {
-          "id": "t5",
-          "position": 5,
-          "teamName": "Volleyboars",
-          "matchesPlayed": 5,
+          "teamUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/teams/2237344-34/",
           "points": 6,
-          "setsWon": 7,
-          "setsLost": 10,
-          "pointsWon": 360,
-          "pointsLost": 385,
+          "matchesPlayed": 3,
+          "matchesWon": 2,
+          "matchesLost": 1,
+          "setsWon": 6,
+          "setsLost": 3,
+          "pointsWon": 214,
+          "pointsLost": 172,
+          "setRatio": 2,
+          "pointRatio": 1.2442,
+          "w3_0": 2,
+          "w3_1": 0,
+          "w3_2": 0,
+          "p2_3": 0,
+          "p1_3": 0,
+          "p0_3": 1,
           "form": [
-            "L",
+            "P",
             "W",
-            "L",
-            "L",
             "W"
           ]
         },
         {
-          "id": "t6",
+          "id": "t_coco",
+          "position": 4,
+          "teamName": "Coco Jumbo",
+          "teamUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/teams/2237363-177/",
+          "points": 6,
+          "matchesPlayed": 3,
+          "matchesWon": 2,
+          "matchesLost": 1,
+          "setsWon": 6,
+          "setsLost": 4,
+          "pointsWon": 224,
+          "pointsLost": 216,
+          "setRatio": 1.5,
+          "pointRatio": 1.037,
+          "w3_0": 1,
+          "w3_1": 1,
+          "w3_2": 0,
+          "p2_3": 0,
+          "p1_3": 0,
+          "p0_3": 1,
+          "form": [
+            "W",
+            "W",
+            "P"
+          ]
+        },
+        {
+          "id": "t_boars",
+          "position": 5,
+          "teamName": "Volleyboars",
+          "teamUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/teams/2237367-63/",
+          "points": 6,
+          "matchesPlayed": 4,
+          "matchesWon": 2,
+          "matchesLost": 2,
+          "setsWon": 6,
+          "setsLost": 7,
+          "pointsWon": 303,
+          "pointsLost": 293,
+          "setRatio": 0.8571,
+          "pointRatio": 1.0341,
+          "w3_0": 1,
+          "w3_1": 1,
+          "w3_2": 0,
+          "p2_3": 0,
+          "p1_3": 0,
+          "p0_3": 2,
+          "form": [
+            "W",
+            "P",
+            "W",
+            "P"
+          ]
+        },
+        {
+          "id": "t_koty",
           "position": 6,
           "teamName": "Koty Broniszewice",
+          "teamUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/teams/2311843-225/",
+          "points": 3,
           "matchesPlayed": 4,
-          "points": 2,
+          "matchesWon": 1,
+          "matchesLost": 3,
+          "setsWon": 3,
+          "setsLost": 9,
+          "pointsWon": 247,
+          "pointsLost": 290,
+          "setRatio": 0.3333,
+          "pointRatio": 0.8517,
+          "w3_0": 1,
+          "w3_1": 0,
+          "w3_2": 0,
+          "p2_3": 0,
+          "p1_3": 0,
+          "p0_3": 3,
+          "form": [
+            "P",
+            "P",
+            "P",
+            "W"
+          ]
+        },
+        {
+          "id": "t_czelendz",
+          "position": 7,
+          "teamName": "Czelendż",
+          "teamUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/teams/2237346-129/",
+          "points": 0,
+          "matchesPlayed": 4,
+          "matchesWon": 0,
+          "matchesLost": 4,
           "setsWon": 2,
           "setsLost": 12,
           "pointsWon": 270,
-          "pointsLost": 340,
+          "pointsLost": 352,
+          "setRatio": 0.1667,
+          "pointRatio": 0.767,
+          "w3_0": 0,
+          "w3_1": 0,
+          "w3_2": 0,
+          "p2_3": 0,
+          "p1_3": 2,
+          "p0_3": 2,
           "form": [
-            "L",
-            "L",
-            "L",
-            "L"
-          ]
-        },
-        {
-          "id": "t7",
-          "position": 7,
-          "teamName": "Czelendż",
-          "matchesPlayed": 4,
-          "points": 1,
-          "setsWon": 2,
-          "setsLost": 12,
-          "pointsWon": 250,
-          "pointsLost": 345,
-          "form": [
-            "L",
-            "L",
-            "L",
-            "L"
+            "P",
+            "P",
+            "P",
+            "P"
           ]
         }
       ]
@@ -3597,7 +3581,7 @@
       "name": "Faza II: Grupa Finałowa (7 zespołów)",
       "shortName": "Faza II",
       "groupName": "Grupa Mistrzowska LALS (7 zespołów)",
-      "isActive": true,
+      "isActive": false,
       "advancementSpots": 1,
       "advancementTargetName": "Mistrz LALS 2026/2027",
       "teamsCount": 7,
@@ -3812,6 +3796,463 @@
       "createdByName": "Kamil (Trener)",
       "createdAt": "2026-11-12T19:34:45.065Z",
       "updatedAt": "2026-11-12T20:27:15.470Z"
+    }
+  ],
+  "leagueSchedule": [
+    {
+      "round": 2,
+      "matchNumber": 1850,
+      "homeTeam": "Coco Jumbo",
+      "awayTeam": "Czelendż",
+      "homeSetsWon": 3,
+      "awaySetsWon": 1,
+      "isFinished": true,
+      "timeStr": "12:30",
+      "date": "2026-10-04T12:30:00",
+      "dateStr": "4 października 2026, Niedziela",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583851/"
+    },
+    {
+      "round": 2,
+      "matchNumber": 1848,
+      "homeTeam": "Afera Volley",
+      "awayTeam": "Gladiatorzy BUD-WENT",
+      "homeSetsWon": 0,
+      "awaySetsWon": 3,
+      "isFinished": true,
+      "timeStr": "15:00",
+      "date": "2026-10-04T15:00:00",
+      "dateStr": "4 października 2026, Niedziela",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583852/"
+    },
+    {
+      "round": 2,
+      "matchNumber": 1849,
+      "homeTeam": "Volleyboars",
+      "awayTeam": "Koty Broniszewice",
+      "homeSetsWon": 3,
+      "awaySetsWon": 0,
+      "isFinished": true,
+      "timeStr": "17:00",
+      "date": "2026-10-04T17:00:00",
+      "dateStr": "4 października 2026, Niedziela",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583853/"
+    },
+    {
+      "round": 5,
+      "matchNumber": 1889,
+      "homeTeam": "Volleyboars",
+      "awayTeam": "Coco Jumbo",
+      "homeSetsWon": 0,
+      "awaySetsWon": 3,
+      "isFinished": true,
+      "timeStr": "12:30",
+      "date": "2026-10-18T12:30:00",
+      "dateStr": "18 października 2026, Niedziela",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583848/"
+    },
+    {
+      "round": 5,
+      "matchNumber": 1887,
+      "homeTeam": "Angels ZTP",
+      "awayTeam": "Koty Broniszewice",
+      "homeSetsWon": 3,
+      "awaySetsWon": 0,
+      "isFinished": true,
+      "timeStr": "15:00",
+      "date": "2026-10-18T15:00:00",
+      "dateStr": "18 października 2026, Niedziela",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583849/",
+      "isAngels": true
+    },
+    {
+      "round": 5,
+      "matchNumber": 1888,
+      "homeTeam": "Afera Volley",
+      "awayTeam": "Czelendż",
+      "homeSetsWon": 3,
+      "awaySetsWon": 0,
+      "isFinished": true,
+      "timeStr": "17:00",
+      "date": "2026-10-18T17:00:00",
+      "dateStr": "18 października 2026, Niedziela",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583850/"
+    },
+    {
+      "round": 7,
+      "matchNumber": 1926,
+      "homeTeam": "Gladiatorzy BUD-WENT",
+      "awayTeam": "Angels ZTP",
+      "homeSetsWon": 3,
+      "awaySetsWon": 2,
+      "isFinished": true,
+      "timeStr": "15:00",
+      "date": "2026-10-31T15:00:00",
+      "dateStr": "31 października 2026, Sobota",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583864/",
+      "isAngels": true
+    },
+    {
+      "round": 7,
+      "matchNumber": 1925,
+      "homeTeam": "Koty Broniszewice",
+      "awayTeam": "Afera Volley",
+      "homeSetsWon": 0,
+      "awaySetsWon": 3,
+      "isFinished": true,
+      "timeStr": "17:00",
+      "date": "2026-10-31T17:00:00",
+      "dateStr": "31 października 2026, Sobota",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583846/"
+    },
+    {
+      "round": 7,
+      "matchNumber": 1924,
+      "homeTeam": "Czelendż",
+      "awayTeam": "Volleyboars",
+      "homeSetsWon": 1,
+      "awaySetsWon": 3,
+      "isFinished": true,
+      "timeStr": "19:00",
+      "date": "2026-10-31T19:00:00",
+      "dateStr": "31 października 2026, Sobota",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583847/"
+    },
+    {
+      "round": 9,
+      "matchNumber": 1949,
+      "homeTeam": "Coco Jumbo",
+      "awayTeam": "Gladiatorzy BUD-WENT",
+      "homeSetsWon": 0,
+      "awaySetsWon": 3,
+      "isFinished": true,
+      "timeStr": "12:30",
+      "date": "2026-11-08T12:30:00",
+      "dateStr": "8 listopada 2026, Niedziela",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584337/"
+    },
+    {
+      "round": 9,
+      "matchNumber": 1950,
+      "homeTeam": "Czelendż",
+      "awayTeam": "Koty Broniszewice",
+      "homeSetsWon": 0,
+      "awaySetsWon": 3,
+      "isFinished": true,
+      "timeStr": "15:00",
+      "date": "2026-11-08T15:00:00",
+      "dateStr": "8 listopada 2026, Niedziela",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584338/"
+    },
+    {
+      "round": 9,
+      "matchNumber": 1948,
+      "homeTeam": "Volleyboars",
+      "awayTeam": "Angels ZTP",
+      "homeSetsWon": 0,
+      "awaySetsWon": 3,
+      "isFinished": true,
+      "timeStr": "17:00",
+      "date": "2026-11-08T17:00:00",
+      "dateStr": "8 listopada 2026, Niedziela",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584336/",
+      "isAngels": true
+    },
+    {
+      "round": 11,
+      "matchNumber": 1971,
+      "homeTeam": "Gladiatorzy BUD-WENT",
+      "awayTeam": "Czelendż",
+      "isFinished": false,
+      "timeStr": "17:00",
+      "date": "2026-11-15T17:00:00",
+      "dateStr": "15 listopada 2026, Niedziela",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584359/"
+    },
+    {
+      "round": 11,
+      "matchNumber": 1972,
+      "homeTeam": "Angels ZTP",
+      "awayTeam": "Coco Jumbo",
+      "isFinished": false,
+      "timeStr": "18:30",
+      "date": "2026-11-15T18:30:00",
+      "dateStr": "15 listopada 2026, Niedziela",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584360/",
+      "isAngels": true
+    },
+    {
+      "round": 11,
+      "matchNumber": 1973,
+      "homeTeam": "Afera Volley",
+      "awayTeam": "Volleyboars",
+      "isFinished": false,
+      "timeStr": "20:00",
+      "date": "2026-11-15T20:00:00",
+      "dateStr": "15 listopada 2026, Niedziela",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584361/"
+    },
+    {
+      "round": 13,
+      "matchNumber": 1996,
+      "homeTeam": "Coco Jumbo",
+      "awayTeam": "Afera Volley",
+      "isFinished": false,
+      "timeStr": "12:30",
+      "date": "2026-11-29T12:30:00",
+      "dateStr": "29 listopada 2026, Niedziela",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584384/"
+    },
+    {
+      "round": 13,
+      "matchNumber": 1997,
+      "homeTeam": "Czelendż",
+      "awayTeam": "Angels ZTP",
+      "isFinished": false,
+      "timeStr": "17:00",
+      "date": "2026-11-29T17:00:00",
+      "dateStr": "29 listopada 2026, Niedziela",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584385/",
+      "isAngels": true
+    },
+    {
+      "round": 16,
+      "matchNumber": 2036,
+      "homeTeam": "Gladiatorzy BUD-WENT",
+      "awayTeam": "Volleyboars",
+      "isFinished": false,
+      "timeStr": "12:30",
+      "date": "2026-12-13T12:30:00",
+      "dateStr": "13 grudnia 2026, Niedziela",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584428/"
+    },
+    {
+      "round": 16,
+      "matchNumber": 2037,
+      "homeTeam": "Angels ZTP",
+      "awayTeam": "Afera Volley",
+      "isFinished": false,
+      "timeStr": "15:30",
+      "date": "2026-12-13T15:30:00",
+      "dateStr": "13 grudnia 2026, Niedziela",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584423/",
+      "isAngels": true
+    },
+    {
+      "round": 16,
+      "matchNumber": 2035,
+      "homeTeam": "Koty Broniszewice",
+      "awayTeam": "Coco Jumbo",
+      "isFinished": false,
+      "timeStr": "17:00",
+      "date": "2026-12-13T17:00:00",
+      "dateStr": "13 grudnia 2026, Niedziela",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584422/"
+    },
+    {
+      "round": 18,
+      "matchNumber": 2057,
+      "homeTeam": "Koty Broniszewice",
+      "awayTeam": "Gladiatorzy BUD-WENT",
+      "isFinished": false,
+      "timeStr": "18:30",
+      "date": "2026-12-20T18:30:00",
+      "dateStr": "20 grudnia 2026, Niedziela",
+      "url": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584443/"
+    }
+  ],
+  "leagueTable": [
+    {
+      "id": "t_glad",
+      "position": 1,
+      "teamName": "Gladiatorzy BUD-WENT",
+      "teamUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/teams/2237370-178/",
+      "points": 8,
+      "matchesPlayed": 3,
+      "matchesWon": 3,
+      "matchesLost": 0,
+      "setsWon": 9,
+      "setsLost": 2,
+      "pointsWon": 258,
+      "pointsLost": 218,
+      "setRatio": 4.5,
+      "pointRatio": 1.1835,
+      "w3_0": 2,
+      "w3_1": 0,
+      "w3_2": 1,
+      "p2_3": 0,
+      "p1_3": 0,
+      "p0_3": 0,
+      "form": [
+        "W",
+        "W",
+        "W"
+      ]
+    },
+    {
+      "id": "t_angels",
+      "position": 2,
+      "teamName": "Angels ZTP",
+      "teamUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/teams/2237343-52/",
+      "points": 7,
+      "matchesPlayed": 3,
+      "matchesWon": 2,
+      "matchesLost": 1,
+      "setsWon": 8,
+      "setsLost": 3,
+      "pointsWon": 252,
+      "pointsLost": 227,
+      "setRatio": 2.6667,
+      "pointRatio": 1.1101,
+      "w3_0": 2,
+      "w3_1": 0,
+      "w3_2": 0,
+      "p2_3": 1,
+      "p1_3": 0,
+      "p0_3": 0,
+      "form": [
+        "W",
+        "P",
+        "W"
+      ]
+    },
+    {
+      "id": "t_afera",
+      "position": 3,
+      "teamName": "Afera Volley",
+      "teamUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/teams/2237344-34/",
+      "points": 6,
+      "matchesPlayed": 3,
+      "matchesWon": 2,
+      "matchesLost": 1,
+      "setsWon": 6,
+      "setsLost": 3,
+      "pointsWon": 214,
+      "pointsLost": 172,
+      "setRatio": 2,
+      "pointRatio": 1.2442,
+      "w3_0": 2,
+      "w3_1": 0,
+      "w3_2": 0,
+      "p2_3": 0,
+      "p1_3": 0,
+      "p0_3": 1,
+      "form": [
+        "P",
+        "W",
+        "W"
+      ]
+    },
+    {
+      "id": "t_coco",
+      "position": 4,
+      "teamName": "Coco Jumbo",
+      "teamUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/teams/2237363-177/",
+      "points": 6,
+      "matchesPlayed": 3,
+      "matchesWon": 2,
+      "matchesLost": 1,
+      "setsWon": 6,
+      "setsLost": 4,
+      "pointsWon": 224,
+      "pointsLost": 216,
+      "setRatio": 1.5,
+      "pointRatio": 1.037,
+      "w3_0": 1,
+      "w3_1": 1,
+      "w3_2": 0,
+      "p2_3": 0,
+      "p1_3": 0,
+      "p0_3": 1,
+      "form": [
+        "W",
+        "W",
+        "P"
+      ]
+    },
+    {
+      "id": "t_boars",
+      "position": 5,
+      "teamName": "Volleyboars",
+      "teamUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/teams/2237367-63/",
+      "points": 6,
+      "matchesPlayed": 4,
+      "matchesWon": 2,
+      "matchesLost": 2,
+      "setsWon": 6,
+      "setsLost": 7,
+      "pointsWon": 303,
+      "pointsLost": 293,
+      "setRatio": 0.8571,
+      "pointRatio": 1.0341,
+      "w3_0": 1,
+      "w3_1": 1,
+      "w3_2": 0,
+      "p2_3": 0,
+      "p1_3": 0,
+      "p0_3": 2,
+      "form": [
+        "W",
+        "P",
+        "W",
+        "P"
+      ]
+    },
+    {
+      "id": "t_koty",
+      "position": 6,
+      "teamName": "Koty Broniszewice",
+      "teamUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/teams/2311843-225/",
+      "points": 3,
+      "matchesPlayed": 4,
+      "matchesWon": 1,
+      "matchesLost": 3,
+      "setsWon": 3,
+      "setsLost": 9,
+      "pointsWon": 247,
+      "pointsLost": 290,
+      "setRatio": 0.3333,
+      "pointRatio": 0.8517,
+      "w3_0": 1,
+      "w3_1": 0,
+      "w3_2": 0,
+      "p2_3": 0,
+      "p1_3": 0,
+      "p0_3": 3,
+      "form": [
+        "P",
+        "P",
+        "P",
+        "W"
+      ]
+    },
+    {
+      "id": "t_czelendz",
+      "position": 7,
+      "teamName": "Czelendż",
+      "teamUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/teams/2237346-129/",
+      "points": 0,
+      "matchesPlayed": 4,
+      "matchesWon": 0,
+      "matchesLost": 4,
+      "setsWon": 2,
+      "setsLost": 12,
+      "pointsWon": 270,
+      "pointsLost": 352,
+      "setRatio": 0.1667,
+      "pointRatio": 0.767,
+      "w3_0": 0,
+      "w3_1": 0,
+      "w3_2": 0,
+      "p2_3": 0,
+      "p1_3": 2,
+      "p0_3": 2,
+      "form": [
+        "P",
+        "P",
+        "P",
+        "P"
+      ]
     }
   ]
 }
