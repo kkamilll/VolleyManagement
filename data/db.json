@@ -344,9 +344,121 @@
   ],
   "events": [
     {
+      "id": "evt_turniej_1",
+      "title": "Ogólnopolski Turniej Niepodległości",
+      "type": "TURNIEJ",
+      "date": "2026-11-21T09:00:00",
+      "endDate": "2026-11-21T19:00:00",
+      "location": "Arena Ursynów, ul. Pileckiego 122, Warszawa",
+      "opponent": "8 zaproszonych drużyn (m.in. KPS Radom, AZS Politechnika, Volley Kraków)",
+      "description": "Turniej jednodniowy z pucharami. Faza grupowa (2 grupy po 4 zespoły) + faza pucharowa (1/4, 1/2 i Finał).",
+      "costPerPerson": 50,
+      "attendees": [
+        {
+          "userId": "usr_trener",
+          "userName": "Hubert Obara",
+          "userRole": "TRENER",
+          "userNumber": 12,
+          "position": "Sztab trenerski",
+          "status": "BEDE",
+          "updatedAt": "2026-11-12T10:00:00Z"
+        }
+      ],
+      "result": {
+        "teamSetsWon": 10,
+        "opponentSetsWon": 3,
+        "sets": [],
+        "tournamentRank": "🥇 1. Miejsce / Złoty Puchar",
+        "notes": "Fantastyczna postawa całego zespołu! Wygrana faza grupowa, pewny ćwierćfinał i dramatyczny finał w tie-breaku."
+      },
+      "tournamentMatches": [
+        {
+          "id": "tm_1",
+          "phase": "FAZA_GRUPOWA",
+          "round": "Grupa A - Mecz 1",
+          "teamA": "Angels ZTP",
+          "teamB": "KPS Radom",
+          "scoreA": 2,
+          "scoreB": 0,
+          "setScores": "21:16, 21:18",
+          "time": "09:30 · Boisko A",
+          "isFinished": true,
+          "notes": "Pewne otwarcie turnieju, mocna zagrywka."
+        },
+        {
+          "id": "tm_2",
+          "phase": "FAZA_GRUPOWA",
+          "round": "Grupa A - Mecz 2",
+          "teamA": "Angels ZTP",
+          "teamB": "Volley Kraków",
+          "scoreA": 2,
+          "scoreB": 1,
+          "setScores": "21:19, 18:21, 15:12",
+          "time": "11:15 · Boisko B",
+          "isFinished": true,
+          "notes": "Zwycięski tie-break w końcówce."
+        },
+        {
+          "id": "tm_3",
+          "phase": "FAZA_GRUPOWA",
+          "round": "Grupa A - Mecz 3",
+          "teamA": "Angels ZTP",
+          "teamB": "Siatkarz Wieluń",
+          "scoreA": 2,
+          "scoreB": 0,
+          "setScores": "21:14, 21:15",
+          "time": "13:00 · Boisko A",
+          "isFinished": true,
+          "notes": "Komplet 3 zwycięstw i 1. miejsce w Grupie A!"
+        },
+        {
+          "id": "tm_4",
+          "phase": "1_4_FINALU",
+          "round": "Ćwierćfinał (1/4)",
+          "teamA": "Angels ZTP",
+          "teamB": "Sparta Warszawa",
+          "scoreA": 2,
+          "scoreB": 0,
+          "setScores": "25:21, 25:19",
+          "time": "14:45 · Boisko Główne",
+          "isFinished": true,
+          "notes": "Awans do półfinału (strefa medalowa)."
+        },
+        {
+          "id": "tm_5",
+          "phase": "1_2_FINALU",
+          "round": "Półfinał (1/2)",
+          "teamA": "Angels ZTP",
+          "teamB": "AZS Politechnika",
+          "scoreA": 2,
+          "scoreB": 1,
+          "setScores": "23:25, 25:22, 15:13",
+          "time": "16:30 · Boisko Główne",
+          "isFinished": true,
+          "notes": "Mecz turnieju! Obrona piłki meczowej i wejście do FINAŁU!"
+        },
+        {
+          "id": "tm_6",
+          "phase": "FINAL",
+          "round": "Wielki Finał Turnieju",
+          "teamA": "Angels ZTP",
+          "teamB": "Trefl II",
+          "scoreA": 2,
+          "scoreB": 1,
+          "setScores": "25:23, 22:25, 15:12",
+          "time": "18:15 · Boisko Główne",
+          "isFinished": true,
+          "notes": "🏆 Zwycięstwo w turnieju i Złoty Puchar!"
+        }
+      ],
+      "createdById": "usr_trener",
+      "createdByName": "Hubert Obara",
+      "createdAt": "2026-11-04T12:00:00Z"
+    },
+    {
       "id": "evt_next_1",
       "title": "Trening techniczno-taktyczny LALS",
-      "type": "TURNIEJ",
+      "type": "TRENING",
       "status": "ZAKONCZONY",
       "date": "2026-11-08T19:00:00.000Z",
       "location": "Hala OSiR Luboń, ul. Kołłątaja 2",

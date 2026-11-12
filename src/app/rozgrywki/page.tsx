@@ -70,7 +70,9 @@ import {
   LeaguePhase,
   LeaguePhoto,
   VolleyballSet,
-  TacticalPlay
+  TacticalPlay,
+  TournamentMatch,
+  TournamentPhase
 } from '@/lib/types';
 import { recognizeTextFromImage } from '@/lib/ocr';
 import { parseVolleyStationTable, parseVolleyStationSchedule } from '@/lib/volleystation-parser';
@@ -79,6 +81,35 @@ type TabType = 'sparingi' | 'liga' | 'turnieje';
 type LigaSubTab = 'tabela' | 'wyniki' | 'statystyki' | 'zdjecia';
 type SparingSubTab = 'mecze' | 'zdjecia';
 type TurniejSubTab = 'drabinki' | 'zdjecia';
+
+const TOURNAMENT_PHASES: { id: TournamentPhase; label: string; badge: string; icon: string }[] = [
+  { id: 'FAZA_GRUPOWA', label: 'Faza Grupowa', badge: 'bg-sky-50 text-sky-800 border-sky-300', icon: '🏐' },
+  { id: '1_16_FINALU', label: '1/16 Finału', badge: 'bg-indigo-50 text-indigo-800 border-indigo-200', icon: '⚔️' },
+  { id: '1_8_FINALU', label: '1/8 Finału', badge: 'bg-purple-50 text-purple-800 border-purple-200', icon: '⚔️' },
+  { id: '1_4_FINALU', label: '1/4 Finału (Ćwierćfinał)', badge: 'bg-violet-50 text-violet-800 border-violet-300', icon: '🛡️' },
+  { id: '1_2_FINALU', label: '1/2 Finału (Półfinał)', badge: 'bg-amber-50 text-amber-800 border-amber-300', icon: '🔥' },
+  { id: 'O_3_MIEJSCE', label: 'Mecz o 3. miejsce', badge: 'bg-orange-50 text-orange-800 border-orange-300', icon: '🥉' },
+  { id: 'FINAL', label: 'Wielki Finał', badge: 'bg-amber-100 text-amber-900 border-amber-400 font-black', icon: '🥇' },
+  { id: 'INNA', label: 'Mecz Klasyfikacyjny / Inny', badge: 'bg-slate-100 text-slate-700 border-slate-300', icon: '📋' }
+];
+
+const getPhaseBadge = (phase?: string) => {
+  const p = TOURNAMENT_PHASES.find(tp => tp.id === phase);
+  if (p) {
+    return (
+      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10.5px] font-black border ${p.badge}`}>
+        <span>{p.icon}</span>
+        <span>{p.label}</span>
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+      <span>🏐</span>
+      <span>{phase || 'Mecz turniejowy'}</span>
+    </span>
+  );
+};
 
 function RozgrywkiContent() {
   const { user } = useAuth();
@@ -215,6 +246,148 @@ function RozgrywkiContent() {
   const [eventDescription, setEventDescription] = useState('');
   const [eventCost, setEventCost] = useState('0');
   const [submittingEvent, setSubmittingEvent] = useState(false);
+
+  // Tournament Match & Phase states
+  const [tournamentPhaseFilter, setTournamentPhaseFilter] = useState<Record<string, string>>({});
+  const [showAddTournamentMatchModal, setShowAddTournamentMatchModal] = useState(false);
+  const [selectedTournamentForMatch, setSelectedTournamentForMatch] = useState<EventItem | null>(null);
+  const [matchFormPhase, setMatchFormPhase] = useState<TournamentPhase>('FAZA_GRUPOWA');
+  const [matchFormRound, setMatchFormRound] = useState('');
+  const [matchFormTeamA, setMatchFormTeamA] = useState('Angels ZTP');
+  const [matchFormTeamB, setMatchFormTeamB] = useState('');
+  const [matchFormScoreA, setMatchFormScoreA] = useState('2');
+  const [matchFormScoreB, setMatchFormScoreB] = useState('0');
+  const [matchFormSetScores, setMatchFormSetScores] = useState('');
+  const [matchFormTime, setMatchFormTime] = useState('');
+  const [matchFormIsFinished, setMatchFormIsFinished] = useState(false);
+  const [matchFormNotes, setMatchFormNotes] = useState('');
+  const [editingMatchId, setEditingMatchId] = useState<string | null>(null);
+  const [savingMatch, setSavingMatch] = useState(false);
+  const [showTournamentRankModal, setShowTournamentRankModal] = useState<EventItem | null>(null);
+
+  const handleOpenAddMatch = (event: EventItem) => {
+    setSelectedTournamentForMatch(event);
+    setEditingMatchId(null);
+    setMatchFormPhase('FAZA_GRUPOWA');
+    setMatchFormRound(`Mecz ${(event.tournamentMatches || []).length + 1}`);
+    setMatchFormTeamA('Angels ZTP');
+    setMatchFormTeamB('');
+    setMatchFormScoreA('2');
+    setMatchFormScoreB('0');
+    setMatchFormSetScores('');
+    setMatchFormTime('');
+    setMatchFormIsFinished(false);
+    setMatchFormNotes('');
+    setShowAddTournamentMatchModal(true);
+  };
+
+  const handleOpenEditMatch = (event: EventItem, match: TournamentMatch) => {
+    setSelectedTournamentForMatch(event);
+    setEditingMatchId(match.id);
+    setMatchFormPhase((match.phase as TournamentPhase) || 'FAZA_GRUPOWA');
+    setMatchFormRound(match.round || '');
+    setMatchFormTeamA(match.teamA || 'Angels ZTP');
+    setMatchFormTeamB(match.teamB || '');
+    setMatchFormScoreA(match.scoreA !== undefined ? String(match.scoreA) : '2');
+    setMatchFormScoreB(match.scoreB !== undefined ? String(match.scoreB) : '0');
+    setMatchFormSetScores(match.setScores || '');
+    setMatchFormTime(match.time || '');
+    setMatchFormIsFinished(Boolean(match.isFinished));
+    setMatchFormNotes(match.notes || '');
+    setShowAddTournamentMatchModal(true);
+  };
+
+  const handleSaveTournamentMatch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedTournamentForMatch) return;
+    setSavingMatch(true);
+    try {
+      const existingMatches = [...(selectedTournamentForMatch.tournamentMatches || [])];
+      const matchData: TournamentMatch = {
+        id: editingMatchId || `tm_${Date.now()}`,
+        phase: matchFormPhase,
+        round: matchFormRound.trim() || 'Mecz turniejowy',
+        teamA: matchFormTeamA.trim() || 'Angels ZTP',
+        teamB: matchFormTeamB.trim() || 'Przeciwnik',
+        scoreA: matchFormScoreA !== '' ? Number(matchFormScoreA) : undefined,
+        scoreB: matchFormScoreB !== '' ? Number(matchFormScoreB) : undefined,
+        setScores: matchFormSetScores.trim(),
+        time: matchFormTime.trim(),
+        isFinished: matchFormIsFinished,
+        notes: matchFormNotes.trim()
+      };
+
+      let updatedMatches: TournamentMatch[];
+      if (editingMatchId) {
+        updatedMatches = existingMatches.map(m => m.id === editingMatchId ? matchData : m);
+      } else {
+        updatedMatches = [...existingMatches, matchData];
+      }
+
+      const res = await fetch('/api/events', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedTournamentForMatch.id,
+          tournamentMatches: updatedMatches
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Błąd zapisu meczu');
+      }
+
+      setEvents(prev => prev.map(ev => ev.id === selectedTournamentForMatch.id ? { ...ev, tournamentMatches: updatedMatches } : ev));
+      setShowAddTournamentMatchModal(false);
+    } catch (err: any) {
+      alert(err.message || 'Nie udało się zapisać meczu turniejowego');
+    } finally {
+      setSavingMatch(false);
+    }
+  };
+
+  const handleDeleteTournamentMatch = async (event: EventItem, matchId: string) => {
+    if (!confirm('Czy na pewno chcesz usunąć ten mecz z turnieju?')) return;
+    try {
+      const updatedMatches = (event.tournamentMatches || []).filter(m => m.id !== matchId);
+      const res = await fetch('/api/events', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: event.id,
+          tournamentMatches: updatedMatches
+        })
+      });
+      if (res.ok) {
+        setEvents(prev => prev.map(ev => ev.id === event.id ? { ...ev, tournamentMatches: updatedMatches } : ev));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleQuickSetTournamentRank = async (event: EventItem, rank: string) => {
+    try {
+      const updatedResult = {
+        ...(event.result || { teamSetsWon: 0, opponentSetsWon: 0, sets: [] }),
+        tournamentRank: rank
+      };
+      const res = await fetch('/api/events', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: event.id,
+          result: updatedResult
+        })
+      });
+      if (res.ok) {
+        setEvents(prev => prev.map(ev => ev.id === event.id ? { ...ev, result: updatedResult } : ev));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   // League Modals
   const [showAddPhotoModal, setShowAddPhotoModal] = useState(false);
@@ -3842,10 +4015,25 @@ function RozgrywkiContent() {
                 const isFinished = Boolean(event.result);
                 const isExpanded = Boolean(expandedTournaments[event.id]);
 
+                const matches = event.tournamentMatches || [];
+                const totalMatches = matches.length;
+                const finishedMatches = matches.filter(m => m.isFinished);
+                const wins = finishedMatches.filter(m => (m.scoreA ?? 0) > (m.scoreB ?? 0)).length;
+                const losses = finishedMatches.filter(m => (m.scoreA ?? 0) < (m.scoreB ?? 0)).length;
+                const setsWon = finishedMatches.reduce((acc, m) => acc + (m.scoreA || 0), 0);
+                const setsLost = finishedMatches.reduce((acc, m) => acc + (m.scoreB || 0), 0);
+
+                const currentPhaseFilter = tournamentPhaseFilter[event.id] || 'ALL';
+                const filteredMatches = currentPhaseFilter === 'ALL'
+                  ? matches
+                  : matches.filter(m => m.phase === currentPhaseFilter);
+
+                const availablePhases = TOURNAMENT_PHASES.filter(ph => matches.some(m => m.phase === ph.id));
+
                 return (
                   <div
                     key={event.id}
-                    className="bg-white border border-purple-200 rounded-3xl overflow-hidden shadow-sm transition-all duration-300"
+                    className="bg-white border border-slate-200 hover:border-purple-300 rounded-3xl overflow-hidden shadow-sm transition-all duration-300"
                   >
                     {/* Zwijany Nagłówek Turnieju */}
                     <div
@@ -3854,35 +4042,40 @@ function RozgrywkiContent() {
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-purple-500/20 text-purple-300 border border-purple-500/40">
-                            TURNIEJ
+                          <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-black uppercase bg-purple-50 text-purple-800 border border-purple-200">
+                            🏆 TURNIEJ
                           </span>
                           {isFinished ? (
-                            <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-200 flex items-center gap-1">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-black uppercase bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1">
                               <CheckCircle2 className="w-3 h-3" /> Rozegrany
                             </span>
                           ) : (
-                            <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-black uppercase bg-amber-50 text-amber-800 border border-amber-300 animate-pulse">
                               Zgłoszenia otwarte
+                            </span>
+                          )}
+                          {totalMatches > 0 && (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                              {totalMatches} {totalMatches === 1 ? 'mecz' : totalMatches < 5 ? 'mecze' : 'meczów'}
                             </span>
                           )}
                         </div>
 
-                        <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-purple-300 transition tracking-tight truncate">
+                        <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-purple-700 transition tracking-tight truncate">
                           {event.title}
                         </h3>
 
                         <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 mt-2">
-                          <span className="flex items-center gap-1.5 text-slate-600">
-                            <Calendar className="w-4 h-4 text-purple-400" />
-                            {new Date(event.date).toLocaleDateString('pl-PL')}
+                          <span className="flex items-center gap-1.5 text-slate-700 font-medium">
+                            <Calendar className="w-4 h-4 text-purple-600" />
+                            {new Date(event.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' })}
                           </span>
-                          <span className="flex items-center gap-1.5 text-slate-600">
-                            <MapPin className="w-4 h-4 text-rose-400" />
+                          <span className="flex items-center gap-1.5 text-slate-700 font-medium">
+                            <MapPin className="w-4 h-4 text-rose-500" />
                             {event.location}
                           </span>
                           {event.costPerPerson && (
-                            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 border border-slate-200 text-slate-600">
+                            <span className="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-slate-100 border border-slate-200 text-slate-700">
                               💰 {event.costPerPerson} zł / os.
                             </span>
                           )}
@@ -3891,25 +4084,25 @@ function RozgrywkiContent() {
 
                       {/* Prawa strona nagłówka turnieju: Wynik/Puchar, Liczba zgłoszonych, Chevron */}
                       <div className="flex items-center justify-between lg:justify-end gap-3 shrink-0 pt-2 lg:pt-0 border-t border-slate-200 lg:border-t-0">
-                        {isFinished && event.result && (
-                          <div className="text-right px-3 py-1.5 rounded-xl bg-purple-950/60 border border-purple-200">
-                            <span className="text-sm font-black text-purple-200 block">
-                              🏆 {event.result.tournamentRank || 'Podium'}
+                        {event.result?.tournamentRank && (
+                          <div className="text-right px-3 py-1.5 rounded-2xl bg-purple-50 border border-purple-200 shadow-2xs">
+                            <span className="text-xs sm:text-sm font-black text-purple-900 block leading-tight">
+                              {event.result.tournamentRank}
                             </span>
-                            <span className="text-[9px] font-black text-purple-400 uppercase tracking-widest block">
-                              Wynik
+                            <span className="text-[9px] font-black text-purple-700 uppercase tracking-widest block">
+                              Miejsce końcowe
                             </span>
                           </div>
                         )}
 
-                        <span className="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-600 flex items-center gap-1.5">
-                          <Users className="w-3.5 h-3.5 text-purple-400" />
+                        <span className="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                          <Users className="w-3.5 h-3.5 text-purple-600" />
                           <span>{yesCount} chętnych</span>
                         </span>
 
                         <div
-                          className={`w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 transition-all duration-200 ${
-                            isExpanded ? 'rotate-180 bg-purple-500/10 text-purple-400 border-purple-500/40' : 'group-hover:text-slate-900 group-hover:border-slate-300'
+                          className={`w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 transition-all duration-200 ${
+                            isExpanded ? 'rotate-180 bg-purple-50 text-purple-700 border-purple-300' : 'group-hover:text-slate-900 group-hover:border-slate-300'
                           }`}
                         >
                           <ChevronDown className="w-4 h-4" />
@@ -3919,95 +4112,360 @@ function RozgrywkiContent() {
 
                     {/* Rozwijana Zawartość Turnieju */}
                     {isExpanded && (
-                      <div className="p-6 sm:p-7 border-t border-slate-200 space-y-6 animate-fadeIn">
-                        {canManage && (
-                          <div className="flex items-center justify-between gap-2 pb-4 border-b border-slate-200">
-                            <span className="text-xs font-black uppercase text-slate-500 tracking-wider">
-                              Zarządzanie Turniejem:
+                      <div className="p-5 sm:p-7 border-t border-slate-200 space-y-6 animate-fadeIn bg-white">
+                        {/* Pasek Podsumowania Turnieju */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 p-3.5 rounded-2xl bg-purple-50/50 border border-purple-100 text-xs">
+                          <div>
+                            <span className="text-[10px] font-bold text-purple-800 uppercase block">Mecze Turnieju</span>
+                            <span className="text-base font-black text-slate-900">
+                              {finishedMatches.length} / {totalMatches} <span className="text-xs font-normal text-slate-500">rozegranych</span>
                             </span>
-                            <div className="flex items-center gap-2">
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-bold text-purple-800 uppercase block">Bilans Spotkań</span>
+                            <span className="text-base font-black text-slate-900">
+                              <span className="text-emerald-700">{wins}W</span> - <span className="text-rose-700">{losses}P</span>
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-bold text-purple-800 uppercase block">Bilans Setów</span>
+                            <span className="text-base font-black text-slate-900 font-mono">
+                              {setsWon} : {setsLost}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-bold text-purple-800 uppercase block">Puchar / Osiągnięcie</span>
+                            <span className="text-xs font-black text-purple-950 truncate block mt-0.5">
+                              {event.result?.tournamentRank || 'W trakcie / Do ustalenia'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Pasek Narzędzi Zarządzania Sztabu */}
+                        {canManage && (
+                          <div className="flex flex-wrap items-center justify-between gap-2.5 pb-4 border-b border-slate-100">
+                            <span className="text-xs font-black uppercase text-slate-500 tracking-wider">
+                              Panel Sztabu Turnieju:
+                            </span>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <button
+                                onClick={() => handleOpenAddMatch(event)}
+                                className="px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-purple-600 hover:bg-purple-500 text-white shadow-sm transition flex items-center gap-1.5"
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                                + Dodaj Mecz Turnieju
+                              </button>
+                              <button
+                                onClick={() => setShowTournamentRankModal(event)}
+                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition flex items-center gap-1"
+                              >
+                                <Trophy className="w-3.5 h-3.5 text-amber-600" />
+                                <span>Ustaw Miejsce Końcowe</span>
+                              </button>
                               <button
                                 onClick={() => openResultModal(event)}
-                                className="px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-100 hover:bg-slate-100 text-purple-400 border border-purple-200 transition"
+                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition"
                               >
-                                Wpisz wynik & miejsce
+                                Pełny Protokół Wyniku
                               </button>
                             </div>
                           </div>
                         )}
 
-                    {/* Step 1: Ankieta zgłoszeń na turniej */}
-                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-black uppercase text-slate-900 tracking-wider">
-                          1. Deklaracja udziału ({yesCount} chętnych)
-                        </span>
-                        {user && (
-                          user.role === 'TRENER' ? (
-                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-purple-500/10 border border-purple-200 text-purple-300 text-xs font-bold">
-                              <Flame className="w-3.5 h-3.5 text-purple-400" />
-                              <span>Sztab trenerski (Prowadzący)</span>
+                        {/* Step 1: Ankieta zgłoszeń na turniej */}
+                        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                          <div className="flex items-center justify-between flex-wrap gap-2">
+                            <div>
+                              <span className="text-xs font-black uppercase text-slate-900 tracking-wider block">
+                                1. Deklaracja udziału ({yesCount} chętnych zawodników)
+                              </span>
+                              <span className="text-[11px] text-slate-500">
+                                Dyspozycyjność składu Angels ZTP na cały turniej
+                              </span>
+                            </div>
+                            {user && (
+                              user.role === 'TRENER' ? (
+                                <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-purple-50 border border-purple-200 text-purple-800 text-xs font-bold">
+                                  <Flame className="w-3.5 h-3.5 text-purple-600" />
+                                  <span>Sztab trenerski (Prowadzący turniej)</span>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => handleAttendance(event.id, 'BEDE')}
+                                    className={`px-3 py-1 rounded-xl text-xs font-black transition ${
+                                      myAttendance?.status === 'BEDE'
+                                        ? 'bg-emerald-600 text-white shadow-sm'
+                                        : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+                                    }`}
+                                  >
+                                    ✓ Jadę na turniej
+                                  </button>
+                                  <button
+                                    onClick={() => handleAttendance(event.id, 'NIE_BEDE')}
+                                    className={`px-3 py-1 rounded-xl text-xs font-black transition ${
+                                      myAttendance?.status === 'NIE_BEDE'
+                                        ? 'bg-rose-600 text-white shadow-sm'
+                                        : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+                                    }`}
+                                  >
+                                    ✕ Nie jadę
+                                  </button>
+                                </div>
+                              )
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Step 2: Harmonogram & Mecze Turnieju (Faza grupowa, 1/8, 1/4, 1/2, Finał) */}
+                        <div className="p-5 rounded-3xl bg-slate-50 border border-slate-200 space-y-4">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-black uppercase text-slate-900 tracking-wider">
+                                  2. Mecze Turnieju & Drabinka ({totalMatches})
+                                </span>
+                                {finishedMatches.length > 0 && (
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">
+                                    Bilans: {wins}W - {losses}P ({setsWon}:{setsLost} sety)
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-slate-500 mt-0.5">
+                                Faza grupowa, ćwierćfinały (1/4), półfinały (1/2), mecz o 3. miejsce oraz finał
+                              </p>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              {canManage && (
+                                <button
+                                  onClick={() => handleOpenAddMatch(event)}
+                                  className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                                >
+                                  <Plus className="w-3.5 h-3.5" />
+                                  <span>+ Dodaj mecz turnieju</span>
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Filtry Faz (Wszystkie, Faza grupowa, 1/4, 1/2, Finał) */}
+                          {totalMatches > 0 && (
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <button
+                                onClick={() => setTournamentPhaseFilter(prev => ({ ...prev, [event.id]: 'ALL' }))}
+                                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${
+                                  currentPhaseFilter === 'ALL'
+                                    ? 'bg-slate-900 text-white shadow-xs'
+                                    : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                                }`}
+                              >
+                                Wszystkie ({totalMatches})
+                              </button>
+                              {availablePhases.map(ph => {
+                                const count = matches.filter(m => m.phase === ph.id).length;
+                                if (count === 0) return null;
+                                return (
+                                  <button
+                                    key={ph.id}
+                                    onClick={() => setTournamentPhaseFilter(prev => ({ ...prev, [event.id]: ph.id }))}
+                                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1 ${
+                                      currentPhaseFilter === ph.id
+                                        ? 'bg-purple-600 text-white shadow-xs'
+                                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                                    }`}
+                                  >
+                                    <span>{ph.icon}</span>
+                                    <span>{ph.label}</span>
+                                    <span className="opacity-75 font-mono text-[10px]">({count})</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
+
+                          {/* Lista Kafelków Meczowych */}
+                          {filteredMatches.length === 0 ? (
+                            <div className="py-8 px-4 rounded-2xl bg-white border border-slate-200 text-center">
+                              <Trophy className="w-8 h-8 text-purple-300 mx-auto mb-2" />
+                              <p className="text-xs font-bold text-slate-700">
+                                Brak wprowadzonych spotkań {currentPhaseFilter !== 'ALL' ? 'w tej fazie' : 'w tym turnieju'}.
+                              </p>
+                              <p className="text-[11px] text-slate-400 mt-0.5">
+                                Sztab może wprowadzić harmonogram meczów grupowych oraz fazy pucharowej.
+                              </p>
+                              {canManage && (
+                                <button
+                                  onClick={() => handleOpenAddMatch(event)}
+                                  className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 text-xs font-bold transition"
+                                >
+                                  <Plus className="w-3.5 h-3.5" />
+                                  <span>Wprowadź pierwszy mecz turnieju</span>
+                                </button>
+                              )}
                             </div>
                           ) : (
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => handleAttendance(event.id, 'BEDE')}
-                                className={`px-3 py-1 rounded-xl text-xs font-black ${
-                                  myAttendance?.status === 'BEDE' ? 'bg-emerald-500 text-slate-950' : 'bg-slate-100 text-emerald-400'
-                                }`}
-                              >
-                                Jadę na turniej
-                              </button>
-                              <button
-                                onClick={() => handleAttendance(event.id, 'NIE_BEDE')}
-                                className={`px-3 py-1 rounded-xl text-xs font-black ${
-                                  myAttendance?.status === 'NIE_BEDE' ? 'bg-rose-500 text-slate-900' : 'bg-slate-100 text-rose-400'
-                                }`}
-                              >
-                                Nie jadę
-                              </button>
-                            </div>
-                          )
-                        )}
-                      </div>
-                    </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                              {filteredMatches.map(match => {
+                                const isWin = match.isFinished && (match.scoreA ?? 0) > (match.scoreB ?? 0);
+                                const isLoss = match.isFinished && (match.scoreA ?? 0) < (match.scoreB ?? 0);
 
-                    {/* Step 3: Wynik turnieju & Puchar */}
-                    {isFinished && event.result && (
-                      <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-200 space-y-2">
-                        <span className="text-xs font-black uppercase text-purple-300 tracking-wider block">
-                          3. Wynik Turnieju & Miejsce
-                        </span>
-                        <div className="text-lg font-black text-slate-900">
-                          🏆 {event.result.tournamentRank || 'Podium'}
-                        </div>
-                        {event.result.notes && <p className="text-xs text-slate-600">{event.result.notes}</p>}
-                      </div>
-                    )}
+                                return (
+                                  <div
+                                    key={match.id}
+                                    className="p-4 rounded-2xl bg-white border border-slate-200 hover:border-purple-300 shadow-sm transition space-y-3"
+                                  >
+                                    {/* Header meczu */}
+                                    <div className="flex items-center justify-between gap-2">
+                                      <div className="flex items-center gap-1.5 flex-wrap">
+                                        {getPhaseBadge(match.phase)}
+                                        <span className="text-xs font-black text-slate-700">{match.round}</span>
+                                      </div>
 
-                    {/* Auto-Linked Tactical Snapshots to Tournament */}
-                    {(() => {
-                      const linked = tactics.filter(t => t.eventId === event.id);
-                      if (linked.length === 0) return null;
-                      return (
-                        <div className="p-4 rounded-2xl bg-sky-950/20 border border-sky-200 space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-black uppercase text-sky-400 flex items-center gap-1.5">
-                              <Compass className="w-3.5 h-3.5" />
-                              📸 Zrzut Taktyczny na Turniej: {linked[0].title}
-                            </span>
-                            <a href={`/taktyka?eventId=${event.id}&tacticId=${linked[0].id}`} className="text-xs text-sky-400 font-bold hover:underline">
-                              Otwórz w Tablicy →
-                            </a>
-                          </div>
-                          {linked[0].drawingData && (
-                            <div className="aspect-[21/9] bg-slate-100 rounded-xl overflow-hidden border border-slate-200 max-h-36">
-                              <img src={linked[0].drawingData} alt={linked[0].title} className="w-full h-full object-contain" />
+                                      {match.isFinished ? (
+                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${
+                                          isWin
+                                            ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                                            : 'bg-rose-50 text-rose-800 border-rose-300'
+                                        }`}>
+                                          {isWin ? '✓ Zwycięstwo' : 'Porażka'}
+                                        </span>
+                                      ) : (
+                                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold text-slate-500 bg-slate-100 border border-slate-200">
+                                          Zaplanowany
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    {/* Drużyny i Wynik */}
+                                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+                                      <div className="space-y-1">
+                                        <div className="flex items-center gap-2">
+                                          <span className={`text-xs font-black ${isWin ? 'text-slate-900' : 'text-slate-700'}`}>
+                                            {match.teamA}
+                                          </span>
+                                          {match.teamA.includes('Angels') && (
+                                            <span className="text-[9px] px-1 rounded bg-sky-100 text-sky-800 font-bold border border-sky-200">
+                                              MY
+                                            </span>
+                                          )}
+                                        </div>
+                                        <div className="text-xs font-bold text-slate-600">
+                                          {match.teamB}
+                                        </div>
+                                      </div>
+
+                                      {/* Wynik w setach */}
+                                      <div className="text-right">
+                                        {match.isFinished ? (
+                                          <div>
+                                            <span className="font-mono text-lg font-black text-slate-900 tracking-wider">
+                                              {match.scoreA ?? 0} : {match.scoreB ?? 0}
+                                            </span>
+                                            {match.setScores && (
+                                              <div className="text-[10px] font-mono text-slate-500">
+                                                ({match.setScores})
+                                              </div>
+                                            )}
+                                          </div>
+                                        ) : (
+                                          <span className="text-xs font-bold text-slate-400">vs</span>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    {/* Informacje dodatkowe / time / notatki */}
+                                    {(match.time || match.notes) && (
+                                      <div className="flex items-center justify-between text-[11px] text-slate-500">
+                                        {match.time && (
+                                          <span className="flex items-center gap-1 text-slate-600">
+                                            <Clock className="w-3 h-3 text-purple-500" />
+                                            <span>{match.time}</span>
+                                          </span>
+                                        )}
+                                        {match.notes && (
+                                          <span className="italic truncate max-w-[200px]" title={match.notes}>
+                                            💬 {match.notes}
+                                          </span>
+                                        )}
+                                      </div>
+                                    )}
+
+                                    {/* Narzędzia sztabu */}
+                                    {canManage && (
+                                      <div className="pt-2 border-t border-slate-100 flex items-center justify-end gap-1.5">
+                                        <button
+                                          onClick={() => handleOpenEditMatch(event, match)}
+                                          className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1"
+                                        >
+                                          <Edit2 className="w-3 h-3" />
+                                          <span>Edytuj</span>
+                                        </button>
+                                        <button
+                                          onClick={() => handleDeleteTournamentMatch(event, match.id)}
+                                          className="p-1 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition"
+                                          title="Usuń mecz z turnieju"
+                                        >
+                                          <Trash2 className="w-3.5 h-3.5" />
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
                             </div>
                           )}
                         </div>
-                      );
-                    })()}
+
+                        {/* Step 3: Wynik turnieju & Puchar */}
+                        <div className="p-4 rounded-2xl bg-purple-50/60 border border-purple-200 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-black uppercase text-purple-900 tracking-wider block">
+                              3. Wynik Turnieju & Miejsce Końcowe
+                            </span>
+                            {canManage && (
+                              <button
+                                onClick={() => setShowTournamentRankModal(event)}
+                                className="text-xs font-bold text-purple-700 hover:text-purple-900 underline"
+                              >
+                                {event.result?.tournamentRank ? 'Zmień miejsce' : '+ Wpisz miejsce końcowe'}
+                              </button>
+                            )}
+                          </div>
+                          <div className="text-lg font-black text-slate-900 flex items-center gap-2">
+                            <span>🏆</span>
+                            <span>{event.result?.tournamentRank || 'W trakcie / Brak wpisanego miejsca'}</span>
+                          </div>
+                          {event.result?.notes && (
+                            <p className="text-xs text-slate-600 leading-relaxed bg-white p-2.5 rounded-xl border border-purple-100">
+                              {event.result.notes}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Auto-Linked Tactical Snapshots to Tournament */}
+                        {(() => {
+                          const linked = tactics.filter(t => t.eventId === event.id);
+                          if (linked.length === 0) return null;
+                          return (
+                            <div className="p-4 rounded-2xl bg-sky-50 border border-sky-200 space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-black uppercase text-sky-800 flex items-center gap-1.5">
+                                  <Compass className="w-3.5 h-3.5 text-sky-600" />
+                                  <span>📸 Zrzut Taktyczny na Turniej: {linked[0].title}</span>
+                                </span>
+                                <a href={`/taktyka?eventId=${event.id}&tacticId=${linked[0].id}`} className="text-xs text-sky-700 font-bold hover:underline">
+                                  Otwórz w Tablicy →
+                                </a>
+                              </div>
+                              {linked[0].drawingData && (
+                                <div className="aspect-[21/9] bg-white rounded-xl overflow-hidden border border-slate-200 max-h-36">
+                                  <img src={linked[0].drawingData} alt={linked[0].title} className="w-full h-full object-contain" />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                     )}
                   </div>
@@ -6541,6 +6999,285 @@ Punkty
                     </>
                   )}
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* MODAL DODAWANIA / EDYCJI MECZU TURNIEJOWEGO */}
+      {showAddTournamentMatchModal && selectedTournamentForMatch && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-lg shadow-2xl text-slate-800 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <h3 className="text-base font-black text-slate-900 uppercase tracking-tight">
+                  {editingMatchId ? 'Edytuj Mecz Turniejowy' : 'Dodaj Mecz do Turnieju'}
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5 truncate max-w-sm">
+                  {selectedTournamentForMatch.title}
+                </p>
+              </div>
+              <button
+                onClick={() => setShowAddTournamentMatchModal(false)}
+                className="p-1.5 rounded-xl bg-slate-100 text-slate-400 hover:text-slate-800 transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveTournamentMatch} className="space-y-3.5">
+              {/* Faza i Runda */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                    Faza turnieju *
+                  </label>
+                  <select
+                    value={matchFormPhase}
+                    onChange={e => setMatchFormPhase(e.target.value as TournamentPhase)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-purple-500 font-medium"
+                  >
+                    {TOURNAMENT_PHASES.map(ph => (
+                      <option key={ph.id} value={ph.id}>
+                        {ph.icon} {ph.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                    Oznaczenie rundy / meczu *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="np. Grupa A - Mecz 1, Ćwierćfinał 1/4"
+                    value={matchFormRound}
+                    onChange={e => setMatchFormRound(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+              </div>
+
+              {/* Drużyny */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                    Drużyna A (np. Angels ZTP) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={matchFormTeamA}
+                    onChange={e => setMatchFormTeamA(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                    Przeciwnik / Drużyna B *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="np. KPS Radom, Sparta Warszawa"
+                    value={matchFormTeamB}
+                    onChange={e => setMatchFormTeamB(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+              </div>
+
+              {/* Godzina i Boisko */}
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                  Godzina meczu / Boisko
+                </label>
+                <input
+                  type="text"
+                  placeholder="np. 11:30 · Boisko B"
+                  value={matchFormTime}
+                  onChange={e => setMatchFormTime(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              {/* Wynik meczu */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-800">Wynik spotkania (w setach)</span>
+                  <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-slate-700">
+                    <input
+                      type="checkbox"
+                      checked={matchFormIsFinished}
+                      onChange={e => setMatchFormIsFinished(e.target.checked)}
+                      className="rounded border-slate-300 text-purple-600 focus:ring-0"
+                    />
+                    <span>Mecz zakończony</span>
+                  </label>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1">
+                      Sety: {matchFormTeamA || 'Drużyna A'}
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      max={5}
+                      value={matchFormScoreA}
+                      onChange={e => setMatchFormScoreA(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl p-2 text-center text-sm font-bold text-slate-900 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1">
+                      Sety: {matchFormTeamB || 'Drużyna B'}
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      max={5}
+                      value={matchFormScoreB}
+                      onChange={e => setMatchFormScoreB(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl p-2 text-center text-sm font-bold text-slate-900 font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 mb-1">
+                    Punkty w małych setach (opcjonalnie)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="np. 21:18, 19:21, 15:11"
+                    value={matchFormSetScores}
+                    onChange={e => setMatchFormSetScores(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl p-2 text-xs font-mono text-slate-900"
+                  />
+                </div>
+              </div>
+
+              {/* Notatki / MVP */}
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                  Notatki / MVP meczu
+                </label>
+                <input
+                  type="text"
+                  placeholder="np. MVP: Bartek Wójcik, świetny serwis w końcówce tie-breaka"
+                  value={matchFormNotes}
+                  onChange={e => setMatchFormNotes(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-purple-500"
+                />
+              </div>
+
+              {/* Przyciski */}
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowAddTournamentMatchModal(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-800 transition"
+                >
+                  Anuluj
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingMatch}
+                  className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-purple-600 hover:bg-purple-500 text-white shadow-md transition disabled:opacity-50"
+                >
+                  {savingMatch ? 'Zapisywanie...' : (editingMatchId ? 'Zapisz zmiany' : 'Dodaj mecz')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL SZYBKIEGO WYBORU MIEJSCA KOŃCOWEGO TURNIEJU */}
+      {showTournamentRankModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-md shadow-2xl text-slate-800 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <h3 className="text-base font-black text-slate-900 uppercase">
+                  Miejsce Końcowe w Turnieju
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5 truncate max-w-xs">
+                  {showTournamentRankModal.title}
+                </p>
+              </div>
+              <button
+                onClick={() => setShowTournamentRankModal(null)}
+                className="p-1.5 rounded-xl bg-slate-100 text-slate-400 hover:text-slate-800 transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <label className="block text-xs font-bold text-slate-600">
+                Wybierz gotowy wynik lub wpisz własny:
+              </label>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {[
+                  '🥇 1. Miejsce / Złoty Puchar',
+                  '🥈 2. Miejsce / Finał',
+                  '🥉 3. Miejsce / Brąz',
+                  '4. Miejsce / Półfinał',
+                  'Ćwierćfinał (1/4 Finału)',
+                  'Faza Grupowa'
+                ].map(rank => (
+                  <button
+                    key={rank}
+                    type="button"
+                    onClick={() => {
+                      handleQuickSetTournamentRank(showTournamentRankModal, rank);
+                      setShowTournamentRankModal(null);
+                    }}
+                    className={`p-3 rounded-2xl border text-xs font-bold text-left transition ${
+                      showTournamentRankModal.result?.tournamentRank === rank
+                        ? 'bg-purple-50 text-purple-900 border-purple-300 ring-2 ring-purple-200'
+                        : 'bg-slate-50 hover:bg-purple-50 hover:text-purple-900 hover:border-purple-200 border-slate-200 text-slate-800'
+                    }`}
+                  >
+                    {rank}
+                  </button>
+                ))}
+              </div>
+
+              {/* Opcja wpisania własnego miejsca */}
+              <div className="pt-2 border-t border-slate-100">
+                <label className="block text-[11px] font-bold text-slate-500 mb-1">
+                  Własna nazwa osiągnięcia / miejsca:
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="np. 5. miejsce (Puchar Pocieszenia)"
+                    defaultValue={showTournamentRankModal.result?.tournamentRank || ''}
+                    id="custom-tournament-rank-input"
+                    className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-purple-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const input = document.getElementById('custom-tournament-rank-input') as HTMLInputElement;
+                      if (input && input.value.trim()) {
+                        handleQuickSetTournamentRank(showTournamentRankModal, input.value.trim());
+                        setShowTournamentRankModal(null);
+                      }
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition shadow-sm"
+                  >
+                    Zapisz
+                  </button>
+                </div>
               </div>
             </div>
           </div>

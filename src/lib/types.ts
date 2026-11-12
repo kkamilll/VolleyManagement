@@ -123,14 +123,28 @@ export interface StartingLineup {
   reserves?: string[];
 }
 
+export type TournamentPhase =
+  | 'FAZA_GRUPOWA'
+  | '1_16_FINALU'
+  | '1_8_FINALU'
+  | '1_4_FINALU'
+  | '1_2_FINALU'
+  | 'O_3_MIEJSCE'
+  | 'FINAL'
+  | 'INNA';
+
 export interface TournamentMatch {
   id: string;
+  phase?: TournamentPhase | string;
   round: string;
   teamA: string;
   teamB: string;
   scoreA?: number;
   scoreB?: number;
+  setScores?: string; // np. "21:18, 19:21, 15:11"
   time?: string;
+  isFinished?: boolean;
+  notes?: string;
 }
 
 export interface EventResult {
