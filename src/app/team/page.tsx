@@ -234,52 +234,6 @@ export default function TeamPage() {
         </div>
       </div>
 
-      {/* Official Team Photo Hero Card */}
-      <div className="cyber-card rounded-3xl overflow-hidden shadow-2xl relative group border-sky-500/30 hover:border-sky-400/60 transition-all duration-300">
-        <div className="relative aspect-[16/10] sm:aspect-[21/9] w-full max-h-[460px] overflow-hidden bg-slate-950">
-          <img
-            src="/angels_team.jpg"
-            alt="Angels ZTP - Oficjalne Zdjęcie Drużyny"
-            className="w-full h-full object-cover object-center group-hover:scale-[1.02] transition duration-500"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050811] via-transparent to-black/30 pointer-events-none" />
-          
-          <div className="absolute top-4 left-4 flex flex-wrap items-center gap-2">
-            <span className="px-3 py-1 rounded-xl bg-slate-950/80 backdrop-blur-md border border-sky-400/50 text-xs font-black text-sky-300 uppercase tracking-wider flex items-center gap-1.5 shadow-lg">
-              <img src="/lals_logo.png" alt="LALS" className="w-4 h-4 rounded-full" />
-              Lubońska Amatorska Liga Siatkówki (LALS)
-            </span>
-            <span className="px-2.5 py-1 rounded-xl bg-slate-950/80 backdrop-blur-md border border-amber-500/40 text-xs font-bold text-amber-300 uppercase tracking-wider">
-              Sezon 2026/2027
-            </span>
-          </div>
-
-          <div className="absolute bottom-4 left-4 right-4 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-xl sm:text-3xl font-black text-white uppercase tracking-tight drop-shadow-lg font-athletic">
-                  ANGELS ZTP
-                </h2>
-                <span className="px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-black uppercase">
-                  1. Miejsce w Lidze
-                </span>
-              </div>
-              <p className="text-xs sm:text-sm text-slate-200 drop-shadow mt-1">
-                Oficjalna kadra zespołu Angels ZTP • Sponsor główny: <strong className="text-amber-300 font-bold">ARPOL</strong>
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 shrink-0">
-              <a
-                href="/rozgrywki?tab=liga"
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-400 to-cyan-400 hover:from-sky-300 hover:to-cyan-300 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-lg shadow-sky-500/30 flex items-center gap-1.5 font-athletic"
-              >
-                <span>Tabela LALS &rarr;</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Staff Section */}
       <div>
