@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, Suspense } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useSeasonArchive } from '@/lib/season-archive-context';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -1440,20 +1441,16 @@ function RozgrywkiContent() {
                 <Calendar className="w-3.5 h-3.5" />
                 Mecze & Protokoły ({sparringsList.length})
               </button>
-              <button
-                onClick={() => setSparingSubTab('zdjecia')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
-                  sparingSubTab === 'zdjecia'
-                    ? 'bg-amber-500 text-slate-950 shadow-md'
-                    : 'text-slate-400 hover:text-white'
-                }`}
+              <Link
+                href="/galeria"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/80 transition"
               >
-                <Camera className="w-3.5 h-3.5" />
-                Zdjęcia ze Sparingów ({sparingOnlyPhotos.length})
-              </button>
+                <Camera className="w-3.5 h-3.5 text-amber-400" />
+                <span>Galeria zdjęć ➔</span>
+              </Link>
             </div>
 
-            {canManage && sparingSubTab === 'mecze' && (
+            {canManage && (
               <button
                 onClick={() => {
                   setEventTypeToCreate('SPARING');
@@ -2020,17 +2017,13 @@ function RozgrywkiContent() {
                 <BarChart3 className="w-3.5 h-3.5" />
                 Statystyki & VolleyStation
               </button>
-              <button
-                onClick={() => setLigaSubTab('zdjecia')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
-                  ligaSubTab === 'zdjecia'
-                    ? 'bg-sky-500 text-slate-950 shadow-md'
-                    : 'text-slate-400 hover:text-white'
-                }`}
+              <Link
+                href="/galeria"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/80 transition"
               >
-                <Camera className="w-3.5 h-3.5" />
-                Zdjęcia Ligowe ({leagueOnlyPhotos.length})
-              </button>
+                <Camera className="w-3.5 h-3.5 text-sky-400" />
+                <span>Galeria zdjęć ➔</span>
+              </Link>
             </div>
 
             {canManage && (
@@ -3324,20 +3317,16 @@ function RozgrywkiContent() {
                 <Award className="w-3.5 h-3.5" />
                 Turnieje & Drabinki ({tournamentsList.length})
               </button>
-              <button
-                onClick={() => setTurniejSubTab('zdjecia')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
-                  turniejSubTab === 'zdjecia'
-                    ? 'bg-purple-500 text-white shadow-md'
-                    : 'text-slate-400 hover:text-white'
-                }`}
+              <Link
+                href="/galeria"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/80 transition"
               >
-                <Camera className="w-3.5 h-3.5" />
-                Zdjęcia z Turniejów ({tournamentOnlyPhotos.length})
-              </button>
+                <Camera className="w-3.5 h-3.5 text-purple-400" />
+                <span>Galeria zdjęć ➔</span>
+              </Link>
             </div>
 
-            {canManage && turniejSubTab === 'drabinki' && (
+            {canManage && (
               <button
                 onClick={() => {
                   setEventTypeToCreate('TURNIEJ');

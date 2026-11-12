@@ -28,7 +28,10 @@ import {
   Menu,
   Smartphone,
   Download,
-  FolderArchive
+  FolderArchive,
+  Camera,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { Announcement } from '@/lib/types';
 
@@ -36,6 +39,34 @@ export default function Navbar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const { isArchiveMode, activeSeason } = useSeasonArchive();
+
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('angels_theme') as 'light' | 'dark' | null;
+      const initial = saved || 'light';
+      setTheme(initial);
+      if (initial === 'light') {
+        document.documentElement.classList.add('theme-light');
+      } else {
+        document.documentElement.classList.remove('theme-light');
+      }
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const next = theme === 'light' ? 'dark' : 'light';
+    setTheme(next);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('angels_theme', next);
+      if (next === 'light') {
+        document.documentElement.classList.add('theme-light');
+      } else {
+        document.documentElement.classList.remove('theme-light');
+      }
+    }
+  };
 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
@@ -301,6 +332,18 @@ export default function Navbar() {
               Taktyka
             </a>
 
+            <a
+              href="/galeria"
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-bold transition ${
+                pathname === '/galeria'
+                  ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+              }`}
+            >
+              <Camera className="w-4 h-4 text-sky-400" />
+              Galeria
+            </a>
+
             {(user?.role === 'KIEROWNIK' || user?.role === 'TRENER' || user?.isCaptain || user?.permissions?.isAdmin) && (
               <a
                 href="/admin"
@@ -342,6 +385,20 @@ export default function Navbar() {
             >
               <Smartphone className="w-4 h-4 text-sky-400" />
               <span className="hidden lg:inline text-[11px]">Aplikacja</span>
+            </button>
+
+            {/* Szybki przełącznik motywu (Jasny / Ciemny) */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 sm:p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition flex items-center justify-center"
+              title={theme === 'light' ? 'Przełącz na ciemny motyw' : 'Przełącz na jasny, świeży motyw'}
+              aria-label="Zmień motyw"
+            >
+              {theme === 'light' ? (
+                <Moon className="w-4 h-4 text-indigo-400" />
+              ) : (
+                <Sun className="w-4 h-4 text-amber-400" />
+              )}
             </button>
 
             {/* Notifications Bell */}
@@ -671,6 +728,42 @@ export default function Navbar() {
             <Target className="w-4 h-4 text-sky-400" />
             <span>Tablica Taktyczna</span>
           </a>
+
+          <a
+            href="/galeria"
+            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold ${
+              pathname === '/galeria' ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-900'
+            }`}
+          >
+            <Camera className="w-4 h-4 text-sky-400" />
+            <span>Galeria Zdjęć</span>
+          </a>
+
+          {/* Szybki przełącznik motywu w menu mobilnym */}
+          <button
+            onClick={() => {
+              toggleTheme();
+              setIsMobileMenuOpen(false);
+            }}
+            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold bg-slate-900 border border-slate-700/80 text-slate-200 hover:bg-slate-800 transition"
+          >
+            <span className="flex items-center gap-2">
+              {theme === 'light' ? (
+                <>
+                  <Moon className="w-4 h-4 text-indigo-400" />
+                  <span>Przełącz na ciemny motyw</span>
+                </>
+              ) : (
+                <>
+                  <Sun className="w-4 h-4 text-amber-400" />
+                  <span>Przełącz na jasny motyw</span>
+                </>
+              )}
+            </span>
+            <span className="text-[10px] uppercase font-bold text-slate-400">
+              {theme === 'light' ? 'Jasny' : 'Ciemny'}
+            </span>
+          </button>
 
           {(user?.role === 'KIEROWNIK' || user?.role === 'TRENER' || user?.permissions?.isAdmin) && (
             <a

@@ -287,6 +287,9 @@ function TacticsContent() {
   const { isArchiveMode } = useSeasonArchive();
   const canEdit = !isArchiveMode && Boolean(user && (user.role === 'TRENER' || user.role === 'KIEROWNIK' || user.isCaptain));
 
+  // Section switcher for mobile ergonomics (Tablica / Playbook / Materiały / Forum)
+  const [tacticsSection, setTacticsSection] = useState<'board' | 'playbook' | 'materials' | 'forum'>('board');
+
   // Tactical board state
   const courtContainerRef = useRef<HTMLDivElement | null>(null);
   const [rotation, setRotation] = useState<RotationCode>('P1');
@@ -1518,6 +1521,57 @@ function TacticsContent() {
         </Link>
       </div>
 
+      {/* 4 Clean Tactical View Switchers - No Text Overload */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <button
+          onClick={() => setTacticsSection('board')}
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition shrink-0 ${
+            tacticsSection === 'board'
+              ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/20'
+              : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+          }`}
+        >
+          <Compass className="w-3.5 h-3.5" />
+          <span>Tablica & Boisko</span>
+        </button>
+        <button
+          onClick={() => setTacticsSection('playbook')}
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition shrink-0 ${
+            tacticsSection === 'playbook'
+              ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+              : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+          }`}
+        >
+          <Target className="w-3.5 h-3.5" />
+          <span>Playbook ({tactics.length})</span>
+        </button>
+        <button
+          onClick={() => setTacticsSection('materials')}
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition shrink-0 ${
+            tacticsSection === 'materials'
+              ? 'bg-rose-500 text-white shadow-md shadow-rose-500/20'
+              : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+          }`}
+        >
+          <FileText className="w-3.5 h-3.5" />
+          <span>Materiały PDF ({materials.length})</span>
+        </button>
+        <button
+          onClick={() => setTacticsSection('forum')}
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition shrink-0 ${
+            tacticsSection === 'forum'
+              ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+              : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+          }`}
+        >
+          <MessageSquare className="w-3.5 h-3.5" />
+          <span>Dyskusja ({selectedTactic?.posts?.length || 0})</span>
+        </button>
+      </div>
+
+      {tacticsSection === 'board' && (
+        <>
+
       {/* Dedicated Tactical Context Switcher Bar */}
       <div className="p-3.5 sm:p-4 rounded-3xl bg-[#0b0e14] border border-slate-800 shadow-xl space-y-3">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -2614,8 +2668,11 @@ function TacticsContent() {
           })}
         </div>
       </div>
+      </>
+      )}
 
       {/* SEKCJA 3: BAZA ZAPISANYCH ZRZUTÓW TAKTYCZNYCH (PLAYBOOK) */}
+      {tacticsSection === 'playbook' && (
       <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
           <div className="flex items-center gap-2.5">
@@ -2751,8 +2808,10 @@ function TacticsContent() {
           </div>
         )}
       </div>
+      )}
 
       {/* SEKCJA 4: SUGESTIE & DYSKUSJA TAKTYCZNA ZESPOŁU */}
+      {tacticsSection === 'forum' && (
       <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
           <div className="flex items-center gap-2.5">
@@ -2915,8 +2974,10 @@ function TacticsContent() {
           )}
         </div>
       </div>
+      )}
 
       {/* DEDYKOWANA SEKCJA: MATERIAŁY TAKTYCZNE, PDF & GRAFIKI ROZSZERZONE */}
+      {tacticsSection === 'materials' && (
       <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800/80">
           <div>
@@ -3139,6 +3200,7 @@ function TacticsContent() {
           </div>
         )}
       </div>
+      )}
 
       {/* Modal: Dodaj Materiał Taktyczny (PDF / Grafika) */}
       {showAddMaterialModal && (

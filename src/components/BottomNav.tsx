@@ -15,7 +15,8 @@ import {
   Smartphone,
   MoreHorizontal,
   X,
-  ChevronRight
+  ChevronRight,
+  Camera
 } from 'lucide-react';
 
 export default function BottomNav() {
@@ -131,6 +132,26 @@ export default function BottomNav() {
                 <div>
                   <div className="text-xs font-black uppercase text-white">Kadra Drużyny</div>
                   <div className="text-[10px] text-slate-400">Skład, pozycje i radar</div>
+                </div>
+              </a>
+
+              <a
+                href="/galeria"
+                onClick={() => setShowMoreMenu(false)}
+                className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${pathname === '/galeria'
+                    ? 'bg-purple-500/20 border-purple-500/50 text-purple-300'
+                    : 'bg-slate-900/80 border-slate-800 text-slate-200 hover:border-purple-500/40'
+                  }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center">
+                    <Camera className="w-4 h-4" />
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
+                </div>
+                <div>
+                  <div className="text-xs font-black uppercase text-white">Galeria Zdjęć</div>
+                  <div className="text-[10px] text-slate-400">Zdjęcia meczowe i pucharowe</div>
                 </div>
               </a>
 
