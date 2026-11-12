@@ -381,7 +381,7 @@
       "id": "evt_next_1",
       "title": "Trening techniczno-taktyczny LALS",
       "type": "TURNIEJ",
-      "status": "ZAPLANOWANY",
+      "status": "ZAKONCZONY",
       "date": "2026-11-08T19:00:00.000Z",
       "location": "Hala OSiR Luboń, ul. Kołłątaja 2",
       "description": "Przygotowanie do meczu na szczycie. Doskonalenie systemu 5-1 i obrony w strefach 5 i 1.",
@@ -435,17 +435,43 @@
       "createdById": "usr_trener",
       "createdByName": "Hubert",
       "createdAt": "2026-11-04T12:00:00Z",
-      "costPerPerson": 0
+      "costPerPerson": 0,
+      "result": {
+        "teamSetsWon": 3,
+        "opponentSetsWon": 1,
+        "sets": [
+          {
+            "setNumber": 1,
+            "teamScore": 25,
+            "opponentScore": 21
+          },
+          {
+            "setNumber": 2,
+            "teamScore": 25,
+            "opponentScore": 19
+          },
+          {
+            "setNumber": 3,
+            "teamScore": 22,
+            "opponentScore": 25
+          },
+          {
+            "setNumber": 4,
+            "teamScore": 25,
+            "opponentScore": 18
+          }
+        ]
+      }
     },
     {
-      "id": "evt_next_2",
-      "title": "Mecz ligowy LALS: Angels ZTP vs KS Metro Poznań",
+      "id": "evt_lals_1972",
+      "title": "Mecz ligowy LALS: Angels ZTP vs Coco Jumbo",
       "type": "MECZ",
-      "status": "ZAPLANOWANY",
-      "date": "2026-11-14T18:30",
+      "status": "ANKIETA",
+      "date": "2026-11-15T18:30",
       "location": "Hala Luboń",
-      "opponent": "KS Metro Poznań",
-      "description": "8. Kolejka Lubońskiej Amatorskiej Ligi Siatkówki. Zbiórka o 17:45 w czarnych kompletach VIGO.",
+      "opponent": "Coco Jumbo",
+      "description": "Runda 11, Mecz nr 1972. Zbiórka o 17:45 w strojach meczowych VIGO. Raport VolleyStation: https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584360/",
       "attendees": [
         {
           "userId": "usr_kierownik",
@@ -481,24 +507,51 @@
       "actualAttendees": [],
       "createdById": "usr_trener",
       "createdByName": "Hubert",
-      "createdAt": "2026-11-04T14:00:00Z",
-      "liveScore": {
-        "currentSet": 2,
-        "teamCurrentScore": 0,
-        "opponentCurrentScore": 0,
-        "teamSetsWon": 1,
-        "opponentSetsWon": 0,
-        "finishedSets": [
-          {
-            "setNumber": 1,
-            "teamScore": 25,
-            "opponentScore": 0
-          }
-        ],
-        "isServingTeam": true,
-        "isLive": true,
-        "updatedAt": "2026-11-06T09:52:02.176Z"
-      }
+      "createdAt": "2026-11-12T20:00:00Z"
+    },
+    {
+      "id": "evt_lals_1997",
+      "title": "Mecz ligowy LALS: Czelendż vs Angels ZTP",
+      "type": "MECZ",
+      "status": "ANKIETA",
+      "date": "2026-11-29T17:00",
+      "location": "Wyjazd",
+      "opponent": "Czelendż",
+      "description": "Runda 13, Mecz nr 1997. Godzina 17:00. Raport VolleyStation: https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584385/",
+      "attendees": [
+        {
+          "userId": "usr_zawodnik_2",
+          "userName": "Kamil Pujanek",
+          "userRole": "ZAWODNIK",
+          "status": "BEDE"
+        }
+      ],
+      "actualAttendees": [],
+      "createdById": "usr_trener",
+      "createdByName": "Hubert",
+      "createdAt": "2026-11-12T20:00:00Z"
+    },
+    {
+      "id": "evt_lals_2037",
+      "title": "Mecz ligowy LALS: Angels ZTP vs Afera Volley",
+      "type": "MECZ",
+      "status": "ANKIETA",
+      "date": "2026-12-13T15:30",
+      "location": "Hala Luboń",
+      "opponent": "Afera Volley",
+      "description": "Runda 16, Mecz nr 2037. Godzina 15:30. Hit kolejki LALS! Raport VolleyStation: https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584423/",
+      "attendees": [
+        {
+          "userId": "usr_zawodnik_2",
+          "userName": "Kamil Pujanek",
+          "userRole": "ZAWODNIK",
+          "status": "BEDE"
+        }
+      ],
+      "actualAttendees": [],
+      "createdById": "usr_trener",
+      "createdByName": "Hubert",
+      "createdAt": "2026-11-12T20:00:00Z"
     },
     {
       "id": "evt_past_1",

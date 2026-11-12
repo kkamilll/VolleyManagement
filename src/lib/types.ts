@@ -215,6 +215,8 @@ export interface VolleyStationScheduleMatch {
   awayTeam: string;
   homeSetsWon?: number;
   awaySetsWon?: number;
+  isFinished?: boolean;
+  timeStr?: string;
   url: string;
   matchId?: string;
   date?: string;

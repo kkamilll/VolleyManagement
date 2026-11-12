@@ -73,7 +73,7 @@ import {
   TacticalPlay
 } from '@/lib/types';
 import { recognizeTextFromImage } from '@/lib/ocr';
-import { parseVolleyStationTable } from '@/lib/volleystation-parser';
+import { parseVolleyStationTable, parseVolleyStationSchedule } from '@/lib/volleystation-parser';
 
 type TabType = 'sparingi' | 'liga' | 'turnieje';
 type LigaSubTab = 'tabela' | 'wyniki' | 'statystyki' | 'zdjecia';
@@ -1349,9 +1349,59 @@ function RozgrywkiContent() {
       return;
     }
 
-    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
     const matchesList: any[] = [];
     const fixturesList: any[] = [];
+
+    // 1. Spróbuj oficjalnego parsera terminarza VolleyStation (obsługuje [Runda: ...], daty po polsku, godziny po południu)
+    const vsSchedule = parseVolleyStationSchedule(text);
+    if (vsSchedule.length > 0) {
+      vsSchedule.forEach(sm => {
+        const isAngelsHome = sm.homeTeam.toLowerCase().includes('angel');
+        const isAngelsAway = sm.awayTeam.toLowerCase().includes('angel');
+        const isAngels = isAngelsHome || isAngelsAway;
+
+        const opponent = isAngelsHome ? sm.awayTeam : (isAngelsAway ? sm.homeTeam : `${sm.homeTeam} vs ${sm.awayTeam}`);
+        const isHome = isAngelsHome;
+        const timeStr = sm.timeStr || '18:00';
+        const dateIso = sm.date || new Date().toISOString();
+
+        if (sm.isFinished && sm.homeSetsWon !== undefined && sm.awaySetsWon !== undefined) {
+          const ourSets = isAngelsAway ? sm.awaySetsWon : sm.homeSetsWon;
+          const oppSets = isAngelsAway ? sm.homeSetsWon : sm.awaySetsWon;
+          matchesList.push({
+            opponent,
+            date: dateIso,
+            isHome,
+            matchType: 'Mecz ligowy',
+            teamSetsWon: ourSets,
+            opponentSetsWon: oppSets,
+            sets: [
+              { setNumber: 1, teamScore: ourSets > oppSets ? 25 : 21, opponentScore: ourSets > oppSets ? 21 : 25 }
+            ],
+            notes: `Runda ${sm.round}, Nr ${sm.matchNumber}. Raport VolleyStation: ${sm.url}`
+          });
+        } else {
+          fixturesList.push({
+            title: isAngels ? `Mecz ligowy LALS vs ${opponent}` : `${sm.homeTeam} vs ${sm.awayTeam}`,
+            opponent: isAngels ? opponent : `${sm.homeTeam} vs ${sm.awayTeam}`,
+            date: dateIso,
+            time: timeStr,
+            round: sm.round,
+            matchNumber: sm.matchNumber,
+            url: sm.url,
+            isHome,
+            location: isHome ? 'Hala Luboń (Domowa)' : 'Wyjazd',
+            description: `Oficjalny mecz LALS (Runda ${sm.round}, Nr ${sm.matchNumber}). Godzina ${timeStr}`
+          });
+        }
+      });
+
+      setParsedMatchesToImport(matchesList);
+      setParsedFixturesToImport(fixturesList);
+      return;
+    }
+
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
     const currentYear = new Date().getFullYear();
 
     lines.forEach(line => {
@@ -5080,7 +5130,10 @@ function RozgrywkiContent() {
                       setRawScheduleInput(e.target.value);
                       handleParseScheduleText(e.target.value);
                     }}
-                    placeholder={`14.11.2026 19:30 Angels ZTP vs Gladiatorzy 3:1 (25:21, 23:25, 25:18, 25:20)\n21.11.2026 18:00 Angels ZTP vs Volleyboars`}
+                    placeholder={`Obsługuje bezpośrednie wklejenie z VolleyStation, np.:
+15 listopada 2026, Niedziela
+[Runda: 11Nr 1972AAngels ZTP6:30 po południuCCoco Jumbo](https://...)
+(lub tradycyjnie: 15.11.2026 18:30 Angels ZTP vs Coco Jumbo)`}
                     className="w-full rounded-xl bg-slate-950 border border-slate-700 p-3 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500 resize-y"
                   />
                   <div className="flex justify-end">

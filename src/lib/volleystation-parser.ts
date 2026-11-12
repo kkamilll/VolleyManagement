@@ -49,12 +49,33 @@ export function parsePolishDate(dateStr: string): string | null {
   if (monthIdx === undefined) return null;
 
   const d = new Date(Date.UTC(year, monthIdx, day, 18, 0, 0));
-  return d.toISOString();
+  return `${year}-${String(monthIdx + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}T18:00:00`;
+}
+
+export function normalizeTime(timeRaw: string): string {
+  let cleaned = timeRaw.trim().toLowerCase();
+  const isPm = cleaned.includes('po południu') || cleaned.includes('po poludniu') || cleaned.includes('pm');
+  const isAm = cleaned.includes('rano') || cleaned.includes('przed południem') || cleaned.includes('am');
+
+  const timeMatch = cleaned.match(/(\d{1,2}):(\d{2})/);
+  if (!timeMatch) return '18:00';
+
+  let h = parseInt(timeMatch[1], 10);
+  const m = timeMatch[2];
+
+  if (isPm) {
+    if (h < 12) h += 12;
+  } else if (isAm) {
+    if (h === 12) h = 0;
+  }
+
+  return `${String(h).padStart(2, '0')}:${m}`;
 }
 
 /**
  * Parses schedule lines copied from VolleyStation, e.g.:
  * [Runda: 7Nr 1926GGladiatorzy BUD-WENT3:2AAngels ZTP](https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583864/)
+ * [Runda: 11Nr 1972AAngels ZTP6:30 po południuCCoco Jumbo](https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584360/)
  * 18 października 2026, Niedziela
  */
 export function parseVolleyStationSchedule(raw: string): VolleyStationScheduleMatch[] {
@@ -76,7 +97,8 @@ export function parseVolleyStationSchedule(raw: string): VolleyStationScheduleMa
       // Also back-propagate date to any recently matched items that didn't have a date
       for (let back = results.length - 1; back >= 0; back--) {
         if (!results[back].date) {
-          results[back].date = parsedDate;
+          const mTime = results[back].timeStr || '18:00';
+          results[back].date = `${parsedDate.slice(0, 10)}T${mTime}:00`;
           results[back].dateStr = line;
         } else {
           break;
@@ -86,33 +108,63 @@ export function parseVolleyStationSchedule(raw: string): VolleyStationScheduleMa
     }
 
     // Match all markdown links in this line
-    // Regex matches: [Runda: 7Nr 1926GGladiatorzy BUD-WENT3:2AAngels ZTP](https://...)
-    const scheduleRegex = /\[Runda:\s*(\d+)\s*Nr\s*(\d+)(.*?)\s*(\d+)\s*:\s*(\d+)\s*(.*?)\]\((https?:\/\/[^\)]+)\)/g;
+    const scheduleRegex = /\[Runda:\s*(\d+)\s*Nr\s*(\d+)(.*?)\]\((https?:\/\/[^\)]+)\)/g;
     let match: RegExpExecArray | null;
 
     while ((match = scheduleRegex.exec(line)) !== null) {
       const round = parseInt(match[1], 10);
       const matchNumber = parseInt(match[2], 10);
-      const homeRaw = match[3];
-      const homeScore = parseInt(match[4], 10);
-      const awayScore = parseInt(match[5], 10);
-      const awayRaw = match[6];
-      const url = match[7];
+      const content = match[3].trim();
+      const url = match[4].trim();
 
       // Extract matchId from url
       const urlMatch = url.match(/\/matches\/(\d+)/);
       const matchId = urlMatch ? urlMatch[1] : `vs_${matchNumber}`;
+
+      // Check if content has a finished score (e.g. 3:2, 3:0, 1:3) or a time (e.g. "6:30 po południu", "18:30")
+      const scoreMatch = content.match(/^(.*?)\s*([0-3])\s*:\s*([0-3])\s*(.*?)$/);
+      const timeMatch = content.match(/^(.*?)\s*(\d{1,2}:\d{2}(?:\s*(?:po południu|po poludniu|przed południem|rano|am|pm))?)\s*(.*?)$/i);
+
+      let homeRaw = '';
+      let awayRaw = '';
+      let isFinished = false;
+      let homeSetsWon: number | undefined = undefined;
+      let awaySetsWon: number | undefined = undefined;
+      let timeStr = '18:00';
+
+      if (scoreMatch && !content.includes('po południu') && !content.includes(':00') && !content.includes(':30')) {
+        homeRaw = scoreMatch[1];
+        homeSetsWon = parseInt(scoreMatch[2], 10);
+        awaySetsWon = parseInt(scoreMatch[3], 10);
+        awayRaw = scoreMatch[4];
+        isFinished = true;
+      } else if (timeMatch) {
+        homeRaw = timeMatch[1];
+        timeStr = normalizeTime(timeMatch[2]);
+        awayRaw = timeMatch[3];
+        isFinished = false;
+      } else {
+        homeRaw = content;
+        awayRaw = 'Przeciwnik';
+      }
+
+      let matchDateIso = currentPendingDateIso;
+      if (currentPendingDateIso) {
+        matchDateIso = `${currentPendingDateIso.slice(0, 10)}T${timeStr}:00`;
+      }
 
       results.push({
         round,
         matchNumber,
         homeTeam: cleanTeamName(homeRaw),
         awayTeam: cleanTeamName(awayRaw),
-        homeSetsWon: homeScore,
-        awaySetsWon: awayScore,
+        homeSetsWon,
+        awaySetsWon,
+        isFinished,
+        timeStr,
         url,
         matchId,
-        date: currentPendingDateIso,
+        date: matchDateIso,
         dateStr: currentPendingDateStr
       });
     }

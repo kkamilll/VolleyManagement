@@ -130,6 +130,33 @@ export async function POST(request: Request) {
           db.matches.unshift(newMatch);
           createdCount++;
         }
+
+        // Jeśli mecz jest zaplanowany (przyszły mecz z terminarza), dodaj go również do kalendarza wydarzeń zespołu (db.events)
+        if (!sm.isFinished && (isAngelsHome || isAngelsAway)) {
+          if (!db.events) db.events = [];
+          const eventExists = db.events.find(e => 
+            e.type === 'MECZ' && 
+            e.opponent?.toLowerCase().includes(opponent.toLowerCase()) && 
+            e.date.slice(0, 10) === matchDate.slice(0, 10)
+          );
+          if (!eventExists) {
+            db.events.push({
+              id: `evt_lals_${sm.matchNumber || Date.now()}`,
+              title: `Mecz ligowy LALS vs ${opponent}`,
+              type: 'MECZ',
+              status: 'ANKIETA',
+              date: matchDate,
+              location: isHome ? 'Hala Luboń (Domowa)' : 'Wyjazd',
+              opponent,
+              description: `Runda ${sm.round}, Nr ${sm.matchNumber}. Godzina ${sm.timeStr || '18:00'}. Raport VolleyStation: ${sm.url}`,
+              attendees: [],
+              actualAttendees: [],
+              createdById: user.id,
+              createdByName: user.name,
+              createdAt: new Date().toISOString()
+            });
+          }
+        }
       });
 
       if (!db.announcements) db.announcements = [];
