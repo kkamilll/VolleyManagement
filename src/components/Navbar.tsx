@@ -211,8 +211,8 @@ export default function Navbar() {
       <div className="w-full">
         <div className="max-w-[2000px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 flex items-center justify-between h-16">
           {/* Logo & Brand with Angels ZTP Logo */}
-          <div className="flex items-center gap-3">
-            <a href="/" className="flex items-center gap-3 group">
+          <div className="flex items-center gap-3 shrink-0">
+            <a href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
               <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#090d16] p-0.5 shadow-lg shadow-sky-500/20 border border-sky-500/40 group-hover:border-sky-400 group-hover:shadow-sky-500/40 transition overflow-hidden shrink-0 flex items-center justify-center">
                 <img 
                   src="/logo.jpg" 
@@ -220,11 +220,11 @@ export default function Navbar() {
                   className="w-full h-full object-cover rounded-[10px]"
                 />
               </div>
-              <div className="flex flex-col">
-                <span className="font-black text-base sm:text-lg tracking-wider text-white uppercase drop-shadow font-athletic text-gradient-cyan">
+              <div className="flex flex-col shrink-0 leading-tight">
+                <span className="font-black text-base sm:text-lg tracking-wider uppercase drop-shadow font-athletic text-gradient-cyan whitespace-nowrap">
                   ANGELS ZTP
                 </span>
-                <span className="hidden xs:inline-block text-[9px] sm:text-[10px] font-bold text-sky-400 tracking-widest uppercase">
+                <span className="hidden sm:inline-block text-[9px] sm:text-[10px] font-bold text-sky-500 dark:text-sky-400 tracking-widest uppercase whitespace-nowrap">
                   VOLLEYBALL TEAM
                 </span>
               </div>
@@ -232,10 +232,10 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
+          <nav className="hidden md:flex items-center space-x-1 lg:space-x-1.5 shrink-0">
             <a
               href="/"
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-bold transition ${
+              className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname === '/'
                   ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
@@ -247,7 +247,7 @@ export default function Navbar() {
 
             <a
               href="/events"
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-bold transition ${
+              className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname.startsWith('/events')
                   ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
@@ -258,10 +258,10 @@ export default function Navbar() {
             </a>
 
             {/* Rozgrywki with dropdown */}
-            <div className="relative group">
+            <div className="relative group shrink-0">
               <a
                 href="/rozgrywki"
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-bold transition ${
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                   pathname.startsWith('/rozgrywki')
                     ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
                     : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
@@ -302,7 +302,7 @@ export default function Navbar() {
 
             <a
               href="/fees"
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-bold transition ${
+              className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname === '/fees'
                   ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
@@ -314,7 +314,7 @@ export default function Navbar() {
 
             <a
               href="/team"
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-bold transition ${
+              className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname === '/team'
                   ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
@@ -326,7 +326,7 @@ export default function Navbar() {
 
             <a
               href="/taktyka"
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-bold transition ${
+              className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname === '/taktyka' || pathname.startsWith('/coach')
                   ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
@@ -338,7 +338,7 @@ export default function Navbar() {
 
             <a
               href="/trening"
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-bold transition ${
+              className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname === '/trening'
                   ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
@@ -350,7 +350,7 @@ export default function Navbar() {
 
             <a
               href="/galeria"
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-bold transition ${
+              className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname === '/galeria'
                   ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
@@ -363,7 +363,7 @@ export default function Navbar() {
             {(user?.role === 'KIEROWNIK' || user?.role === 'TRENER' || user?.isCaptain || user?.permissions?.isAdmin) && (
               <a
                 href="/admin"
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-bold transition ${
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                   pathname === '/admin'
                     ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-sm shadow-amber-500/20'
                     : 'text-amber-400/90 hover:text-amber-300 hover:bg-slate-800/60'
