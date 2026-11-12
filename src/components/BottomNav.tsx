@@ -68,25 +68,25 @@ export default function BottomNav() {
       {/* Mobile Bottom Sheet Drawer for "Klub / Więcej" */}
       {showMoreMenu && (
         <div
-          className="md:hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex flex-col justify-end animate-fadeIn"
+          className="md:hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex flex-col justify-end animate-fadeIn"
           onClick={() => setShowMoreMenu(false)}
         >
           <div
-            className="bg-[#0b0e14] border-t border-slate-800 rounded-t-3xl p-5 shadow-2xl max-h-[80vh] overflow-y-auto space-y-3 pb-[max(2rem,calc(env(safe-area-inset-bottom)+1.5rem))]"
+            className="bg-white border-t border-slate-200 rounded-t-3xl p-5 shadow-2xl max-h-[80vh] overflow-y-auto space-y-3 pb-[max(2rem,calc(env(safe-area-inset-bottom)+1.5rem))] text-slate-800"
             onClick={e => e.stopPropagation()}
           >
             {/* Sheet Handle & Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <div className="flex items-center gap-2.5">
-                <img src="/logo.jpg" alt="Angels ZTP" className="w-7 h-7 rounded-lg object-cover border border-slate-700" />
+                <img src="/logo.jpg" alt="Angels ZTP" className="w-8 h-8 rounded-xl object-cover border border-slate-200 shadow-sm" />
                 <div>
-                  <h3 className="text-xs font-black text-white uppercase tracking-wider font-athletic">Angels ZTP</h3>
-                  <p className="text-[10px] text-slate-400 font-bold">Wszystkie moduły i narzędzia</p>
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider font-athletic">Angels ZTP</h3>
+                  <p className="text-[10px] text-slate-500 font-bold">Wszystkie moduły i narzędzia</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowMoreMenu(false)}
-                className="p-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
+                className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-500 hover:text-slate-800 transition"
                 aria-label="Zamknij"
               >
                 <X className="w-4 h-4" />
@@ -98,60 +98,63 @@ export default function BottomNav() {
               <a
                 href="/fees"
                 onClick={() => setShowMoreMenu(false)}
-                className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${pathname === '/fees'
-                    ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
-                    : 'bg-slate-900/80 border-slate-800 text-slate-200 hover:border-emerald-500/40'
-                  }`}
+                className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${
+                  pathname === '/fees'
+                    ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-sm'
+                    : 'bg-slate-50/80 border-slate-200 text-slate-700 hover:bg-emerald-50/50 hover:border-emerald-200'
+                }`}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
                     <CreditCard className="w-4 h-4" />
                   </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
                 </div>
                 <div>
-                  <div className="text-xs font-black uppercase text-white">Składki & BLIK</div>
-                  <div className="text-[10px] text-slate-400">Skarbiec i opłaty</div>
+                  <div className="text-xs font-black uppercase text-slate-900">Składki & BLIK</div>
+                  <div className="text-[10px] text-slate-500">Skarbiec i opłaty</div>
                 </div>
               </a>
 
               <a
                 href="/team"
                 onClick={() => setShowMoreMenu(false)}
-                className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${pathname === '/team'
-                    ? 'bg-sky-500/20 border-sky-500/50 text-sky-300'
-                    : 'bg-slate-900/80 border-slate-800 text-slate-200 hover:border-sky-500/40'
-                  }`}
+                className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${
+                  pathname === '/team'
+                    ? 'bg-sky-50 border-sky-300 text-sky-800 shadow-sm'
+                    : 'bg-slate-50/80 border-slate-200 text-slate-700 hover:bg-sky-50/50 hover:border-sky-200'
+                }`}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <div className="w-8 h-8 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center">
                     <Users className="w-4 h-4" />
                   </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
                 </div>
                 <div>
-                  <div className="text-xs font-black uppercase text-white">Kadra Drużyny</div>
-                  <div className="text-[10px] text-slate-400">Skład, pozycje i radar</div>
+                  <div className="text-xs font-black uppercase text-slate-900">Kadra Drużyny</div>
+                  <div className="text-[10px] text-slate-500">Skład, pozycje i radar</div>
                 </div>
               </a>
 
               <a
                 href="/galeria"
                 onClick={() => setShowMoreMenu(false)}
-                className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${pathname === '/galeria'
-                    ? 'bg-purple-500/20 border-purple-500/50 text-purple-300'
-                    : 'bg-slate-900/80 border-slate-800 text-slate-200 hover:border-purple-500/40'
-                  }`}
+                className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${
+                  pathname === '/galeria'
+                    ? 'bg-purple-50 border-purple-300 text-purple-800 shadow-sm'
+                    : 'bg-slate-50/80 border-slate-200 text-slate-700 hover:bg-purple-50/50 hover:border-purple-200'
+                }`}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <div className="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
                     <Camera className="w-4 h-4" />
                   </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
                 </div>
                 <div>
-                  <div className="text-xs font-black uppercase text-white">Galeria Zdjęć</div>
-                  <div className="text-[10px] text-slate-400">Zdjęcia meczowe i pucharowe</div>
+                  <div className="text-xs font-black uppercase text-slate-900">Galeria Zdjęć</div>
+                  <div className="text-[10px] text-slate-500">Zdjęcia meczowe i pucharowe</div>
                 </div>
               </a>
 
@@ -159,20 +162,21 @@ export default function BottomNav() {
                 <a
                   href="/admin"
                   onClick={() => setShowMoreMenu(false)}
-                  className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${pathname === '/admin'
-                      ? 'bg-amber-500/20 border-amber-500/50 text-amber-300'
-                      : 'bg-slate-900/80 border-slate-800 text-slate-200 hover:border-amber-500/40'
-                    }`}
+                  className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${
+                    pathname === '/admin'
+                      ? 'bg-amber-50 border-amber-300 text-amber-800 shadow-sm'
+                      : 'bg-slate-50/80 border-slate-200 text-slate-700 hover:bg-amber-50/50 hover:border-amber-200'
+                  }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
                       <Shield className="w-4 h-4" />
                     </div>
-                    <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
                   </div>
                   <div>
-                    <div className="text-xs font-black uppercase text-white">Admin Klubowy</div>
-                    <div className="text-[10px] text-slate-400">Uprawnienia i finanse</div>
+                    <div className="text-xs font-black uppercase text-slate-900">Admin Klubowy</div>
+                    <div className="text-[10px] text-slate-500">Uprawnienia i finanse</div>
                   </div>
                 </a>
               )}
@@ -181,20 +185,21 @@ export default function BottomNav() {
                 <a
                   href="/coach"
                   onClick={() => setShowMoreMenu(false)}
-                  className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${pathname === '/coach'
-                      ? 'bg-sky-500/20 border-sky-500/50 text-sky-300'
-                      : 'bg-slate-900/80 border-slate-800 text-slate-200 hover:border-sky-500/40'
-                    }`}
+                  className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${
+                    pathname === '/coach'
+                      ? 'bg-sky-50 border-sky-300 text-sky-800 shadow-sm'
+                      : 'bg-slate-50/80 border-slate-200 text-slate-700 hover:bg-sky-50/50 hover:border-sky-200'
+                  }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <div className="w-8 h-8 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center">
                       <Flame className="w-4 h-4" />
                     </div>
-                    <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
                   </div>
                   <div>
-                    <div className="text-xs font-black uppercase text-white">Centrum Trenera</div>
-                    <div className="text-[10px] text-slate-400">Zarządzanie meczem</div>
+                    <div className="text-xs font-black uppercase text-slate-900">Centrum Trenera</div>
+                    <div className="text-[10px] text-slate-500">Zarządzanie meczem</div>
                   </div>
                 </a>
               )}
@@ -206,18 +211,18 @@ export default function BottomNav() {
                 setShowMoreMenu(false);
                 window.dispatchEvent(new CustomEvent('open-pwa-install'));
               }}
-              className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-sky-300 hover:bg-sky-500/20 transition text-xs font-bold"
+              className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-sky-800 hover:bg-sky-100 transition text-xs font-bold"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
                   <Smartphone className="w-4 h-4" />
                 </div>
                 <div className="text-left">
-                  <div className="font-black text-white uppercase text-xs">Zainstaluj na telefonie</div>
-                  <div className="text-[10px] text-sky-300/80">Dodaj do ekranu głównego (PWA)</div>
+                  <div className="font-black text-slate-900 uppercase text-xs">Zainstaluj na telefonie</div>
+                  <div className="text-[10px] text-sky-700">Dodaj do ekranu głównego (PWA)</div>
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-sky-400" />
+              <ChevronRight className="w-4 h-4 text-sky-600" />
             </button>
           </div>
         </div>
@@ -225,7 +230,7 @@ export default function BottomNav() {
 
       {/* Main Fixed Bottom Navigation Bar */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#050811]/90 backdrop-blur-2xl border-t border-sky-500/20 shadow-[0_-10px_30px_rgba(0,0,0,0.8)] px-2 pt-1.5 pb-[max(0.5rem,calc(env(safe-area-inset-bottom)+0.25rem))]"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_20px_rgba(15,23,42,0.06)] px-2 pt-1.5 pb-[max(0.5rem,calc(env(safe-area-inset-bottom)+0.25rem))]"
         aria-label="Nawigacja mobilna"
       >
         <div className="grid grid-cols-5 items-center">
@@ -239,19 +244,22 @@ export default function BottomNav() {
                   key={item.label}
                   type="button"
                   onClick={() => setShowMoreMenu(!showMoreMenu)}
-                  className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition group relative ${active ? 'text-cyan-400' : 'text-slate-400 hover:text-slate-200'
-                    }`}
+                  className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition group relative ${
+                    active ? 'text-sky-600' : 'text-slate-500 hover:text-slate-900'
+                  }`}
                 >
-                  <div className={`p-1.5 rounded-xl transition ${active ? 'bg-cyan-500/20 text-cyan-300 shadow-sm shadow-cyan-500/30' : 'group-hover:bg-slate-800/50'
-                    }`}>
+                  <div className={`p-1.5 rounded-xl transition ${
+                    active ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm' : 'group-hover:bg-slate-100'
+                  }`}>
                     <Icon className="w-5 h-5" />
                   </div>
-                  <span className={`text-[10px] tracking-tight mt-0.5 ${active ? 'font-black text-white' : 'font-semibold'
-                    }`}>
+                  <span className={`text-[10px] tracking-tight mt-0.5 ${
+                    active ? 'font-black text-sky-700' : 'font-semibold'
+                  }`}>
                     {item.label}
                   </span>
                   {active && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 absolute bottom-0 shadow-md shadow-cyan-400" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-sky-600 absolute bottom-0" />
                   )}
                 </button>
               );
@@ -261,19 +269,22 @@ export default function BottomNav() {
               <a
                 key={item.label}
                 href={item.href}
-                className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition group relative ${active ? 'text-cyan-400' : 'text-slate-400 hover:text-slate-200'
-                  }`}
+                className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition group relative ${
+                  active ? 'text-sky-600' : 'text-slate-500 hover:text-slate-900'
+                }`}
               >
-                <div className={`p-1.5 rounded-xl transition ${active ? 'bg-cyan-500/20 text-cyan-300 shadow-sm shadow-cyan-500/30' : 'group-hover:bg-slate-800/50'
-                  }`}>
+                <div className={`p-1.5 rounded-xl transition ${
+                  active ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm' : 'group-hover:bg-slate-100'
+                }`}>
                   <Icon className="w-5 h-5" />
                 </div>
-                <span className={`text-[10px] tracking-tight mt-0.5 ${active ? 'font-black text-white' : 'font-semibold'
-                  }`}>
+                <span className={`text-[10px] tracking-tight mt-0.5 ${
+                  active ? 'font-black text-sky-700' : 'font-semibold'
+                }`}>
                   {item.label}
                 </span>
                 {active && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 absolute bottom-0 shadow-md shadow-cyan-400" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-sky-600 absolute bottom-0" />
                 )}
               </a>
             );

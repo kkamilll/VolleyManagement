@@ -651,18 +651,18 @@ function EventsAttendanceContent() {
   return (
     <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 pt-6 sm:pt-8 pb-20 md:pb-16 space-y-6 sm:space-y-8">
       {/* 1. Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 shrink-0 shadow-sm">
             <Calendar className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight font-athletic">
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight font-athletic">
                 Terminarz & Frekwencja
               </h1>
               {isCoach && (
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-sky-500/10 text-sky-400 border border-sky-500/30">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-sky-50 text-sky-700 border border-sky-200">
                   Tryb Trenera
                 </span>
               )}
@@ -672,14 +672,14 @@ function EventsAttendanceContent() {
 
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Przełącznik widoku: Lista vs Kalendarz */}
-          <div className="flex items-center bg-[#0b0e14] border border-slate-800 rounded-xl p-1 shadow-inner">
+          <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-1 shadow-sm">
             <button
               type="button"
               onClick={() => setViewMode('list')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
                 viewMode === 'list'
-                  ? 'bg-amber-500 text-slate-950 shadow-md'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-white text-slate-900 shadow-sm border border-slate-200'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <ClipboardList className="w-3.5 h-3.5" />
@@ -690,8 +690,8 @@ function EventsAttendanceContent() {
               onClick={() => setViewMode('calendar')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
                 viewMode === 'calendar'
-                  ? 'bg-amber-500 text-slate-950 shadow-md'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-white text-slate-900 shadow-sm border border-slate-200'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Calendar className="w-3.5 h-3.5" />
@@ -702,7 +702,7 @@ function EventsAttendanceContent() {
           {canManage && (
             <button
               onClick={() => setShowCreateModal(true)}
-              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition flex items-center gap-1.5 shadow-lg shadow-amber-500/20"
+              className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider transition flex items-center gap-1.5 shadow-sm"
             >
               <Plus className="w-4 h-4 stroke-[3]" />
               <span>Nowa Jednostka</span>
@@ -715,21 +715,21 @@ function EventsAttendanceContent() {
       <div className="space-y-6">
 
         {/* Collapsible Filters Bar */}
-          <div className="bg-[#0b0e14] border border-slate-800 rounded-2xl p-3 shadow-md">
+          <div className="bg-white border border-slate-200 rounded-2xl p-3 shadow-sm text-slate-800">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setShowFilters(!showFilters)}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
                     showFilters || activeFiltersCount > 0
-                      ? 'bg-amber-500/10 text-amber-300 border-amber-500/40'
-                      : 'bg-slate-900 text-slate-300 border-slate-800 hover:text-white'
+                      ? 'bg-sky-50 text-sky-800 border-sky-300 shadow-sm'
+                      : 'bg-slate-50 text-slate-700 border-slate-200 hover:text-slate-900'
                   }`}
                 >
-                  <Filter className="w-3.5 h-3.5 text-amber-400" />
+                  <Filter className="w-3.5 h-3.5 text-sky-600" />
                   <span>Filtry</span>
                   {activeFiltersCount > 0 && (
-                    <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 font-black text-[10px]">
+                    <span className="px-1.5 py-0.2 rounded-full bg-sky-600 text-white font-black text-[10px]">
                       {activeFiltersCount}
                     </span>
                   )}
@@ -743,7 +743,7 @@ function EventsAttendanceContent() {
                       setFilterTime('ALL');
                       setSearchQuery('');
                     }}
-                    className="text-[11px] font-bold text-slate-400 hover:text-rose-400 transition underline underline-offset-2 ml-1"
+                    className="text-[11px] font-bold text-slate-500 hover:text-rose-600 transition underline underline-offset-2 ml-1"
                   >
                     Wyczyść filtry
                   </button>
@@ -758,22 +758,22 @@ function EventsAttendanceContent() {
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   placeholder="Szukaj jednostki..."
-                  className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                  className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
                 />
               </div>
             </div>
 
             {/* Collapsible Panel */}
             {showFilters && (
-              <div className="pt-3 mt-3 border-t border-slate-800/80 flex flex-wrap items-center gap-3">
+              <div className="pt-3 mt-3 border-t border-slate-200 flex flex-wrap items-center gap-3">
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="text-[11px] font-bold text-slate-400 mr-1">Typ:</span>
+                  <span className="text-[11px] font-bold text-slate-500 mr-1">Typ:</span>
                   {[
-                    { id: 'ALL', label: 'Wszystkie', activeClass: 'bg-amber-500 text-slate-950 font-black shadow-sm' },
-                    { id: 'TRENING', label: '🏐 Treningi', activeClass: 'bg-emerald-500 text-slate-950 font-black shadow-sm shadow-emerald-500/20' },
-                    { id: 'SPARING', label: '⚔️ Sparingi', activeClass: 'bg-amber-500 text-slate-950 font-black shadow-sm shadow-amber-500/20' },
-                    { id: 'MECZ_LALS', label: '🔵 Mecze LALS', activeClass: 'bg-sky-500 text-slate-950 font-black shadow-sm shadow-sky-500/20' },
-                    { id: 'TURNIEJ', label: '🏆 Turnieje', activeClass: 'bg-purple-500 text-white font-black shadow-sm shadow-purple-500/20' }
+                    { id: 'ALL', label: 'Wszystkie', activeClass: 'bg-sky-600 text-white font-black shadow-sm' },
+                    { id: 'TRENING', label: '🏐 Treningi', activeClass: 'bg-emerald-600 text-white font-black shadow-sm' },
+                    { id: 'SPARING', label: '⚔️ Sparingi', activeClass: 'bg-amber-600 text-white font-black shadow-sm' },
+                    { id: 'MECZ_LALS', label: '🔵 Mecze LALS', activeClass: 'bg-sky-600 text-white font-black shadow-sm' },
+                    { id: 'TURNIEJ', label: '🏆 Turnieje', activeClass: 'bg-purple-600 text-white font-black shadow-sm' }
                   ].map(t => (
                     <button
                       key={t.id}
@@ -781,7 +781,7 @@ function EventsAttendanceContent() {
                       className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
                         filterType === t.id
                           ? t.activeClass
-                          : 'bg-slate-900 text-slate-300 hover:text-white border border-slate-800'
+                          : 'bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 hover:bg-slate-100'
                       }`}
                     >
                       {t.label}
@@ -789,10 +789,10 @@ function EventsAttendanceContent() {
                   ))}
                 </div>
 
-                <div className="h-4 w-px bg-slate-800 hidden sm:block" />
+                <div className="h-4 w-px bg-slate-200 hidden sm:block" />
 
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="text-[11px] font-bold text-slate-400 mr-1">Czas:</span>
+                  <span className="text-[11px] font-bold text-slate-500 mr-1">Czas:</span>
                   {[
                     { id: 'ALL', label: 'Wszystkie' },
                     { id: 'UPCOMING', label: 'Nadchodzące' },
@@ -803,8 +803,8 @@ function EventsAttendanceContent() {
                       onClick={() => setFilterTime(t.id as any)}
                       className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
                         filterTime === t.id
-                          ? 'bg-sky-500 text-slate-950 font-black shadow-sm'
-                          : 'bg-slate-900 text-slate-300 hover:text-white border border-slate-800'
+                          ? 'bg-sky-600 text-white font-black shadow-sm'
+                          : 'bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 hover:bg-slate-100'
                       }`}
                     >
                       {t.label}
@@ -819,18 +819,18 @@ function EventsAttendanceContent() {
           {viewMode === 'calendar' ? (
             <div className="space-y-6">
               {/* Calendar Card */}
-              <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xl space-y-6">
+              <div className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-6 shadow-sm space-y-6 text-slate-800">
                 {/* Month Navigation Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800/80">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                    <div className="w-10 h-10 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 shadow-sm">
                       <Calendar className="w-5 h-5" />
                     </div>
                     <div>
-                      <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase">
-                        {monthNamesPl[calendarMonth]} <span className="text-cyan-400">{calendarYear}</span>
+                      <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase">
+                        {monthNamesPl[calendarMonth]} <span className="text-sky-600">{calendarYear}</span>
                       </h2>
-                      <p className="text-xs text-slate-400">Kliknij na dowolny dzień, aby sprawdzić lub zadeklarować obecność</p>
+                      <p className="text-xs text-slate-500">Kliknij na dowolny dzień, aby sprawdzić lub zadeklarować obecność</p>
                     </div>
                   </div>
 
@@ -838,7 +838,7 @@ function EventsAttendanceContent() {
                     <button
                       type="button"
                       onClick={() => setCalendarDate(new Date(calendarYear, calendarMonth - 1, 1))}
-                      className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition"
+                      className="p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 transition shadow-sm"
                       title="Poprzedni miesiąc"
                     >
                       <ChevronLeft className="w-4 h-4" />
@@ -850,14 +850,14 @@ function EventsAttendanceContent() {
                         setCalendarDate(now);
                         setSelectedCalendarDate(now.toISOString().slice(0, 10));
                       }}
-                      className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-300 hover:text-white hover:border-slate-700 transition"
+                      className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 transition shadow-sm"
                     >
                       Dziś
                     </button>
                     <button
                       type="button"
                       onClick={() => setCalendarDate(new Date(calendarYear, calendarMonth + 1, 1))}
-                      className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition"
+                      className="p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 transition shadow-sm"
                       title="Następny miesiąc"
                     >
                       <ChevronRight className="w-4 h-4" />
@@ -871,7 +871,7 @@ function EventsAttendanceContent() {
                     <div
                       key={dName}
                       className={`py-2 text-[11px] sm:text-xs font-black uppercase tracking-wider rounded-lg ${
-                        idx >= 5 ? 'text-cyan-400/80 bg-cyan-950/20' : 'text-slate-400 bg-slate-900/50'
+                        idx >= 5 ? 'text-sky-700 bg-sky-50' : 'text-slate-600 bg-slate-100/80'
                       }`}
                     >
                       {dName}
@@ -891,30 +891,30 @@ function EventsAttendanceContent() {
                         onClick={() => setSelectedCalendarDate(day.dateString)}
                         className={`min-h-[70px] sm:min-h-[96px] p-1.5 sm:p-2 rounded-xl text-left transition flex flex-col justify-between border relative group ${
                           isSelected
-                            ? 'border-cyan-400 bg-cyan-950/30 shadow-lg shadow-cyan-500/10 ring-1 ring-cyan-400/50'
+                            ? 'border-sky-500 bg-sky-50 shadow-sm ring-1 ring-sky-400'
                             : day.isToday
-                            ? 'border-amber-500/60 bg-amber-950/15'
+                            ? 'border-amber-400 bg-amber-50/50'
                             : day.isCurrentMonth
-                            ? 'border-slate-800/80 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/80'
-                            : 'border-slate-900/40 bg-slate-950/30 opacity-40 hover:opacity-75'
+                            ? 'border-slate-200 bg-white hover:border-sky-300 hover:bg-slate-50 shadow-sm'
+                            : 'border-slate-100 bg-slate-50/50 opacity-40 hover:opacity-75'
                         }`}
                       >
                         <div className="flex items-center justify-between w-full">
                           <span
                             className={`text-xs sm:text-sm font-bold ${
                               isSelected
-                                ? 'text-cyan-300 font-black'
+                                ? 'text-sky-700 font-black'
                                 : day.isToday
                                 ? 'w-6 h-6 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs'
                                 : day.isCurrentMonth
-                                ? 'text-slate-200'
-                                : 'text-slate-500'
+                                ? 'text-slate-800'
+                                : 'text-slate-400'
                             }`}
                           >
                             {day.dayNumber}
                           </span>
                           {hasEvents && (
-                            <span className="w-2 h-2 rounded-full bg-cyan-400 sm:hidden"></span>
+                            <span className="w-2 h-2 rounded-full bg-sky-600 sm:hidden"></span>
                           )}
                         </div>
 
@@ -923,12 +923,12 @@ function EventsAttendanceContent() {
                           {day.events.slice(0, 2).map(evt => {
                             const badgeColor =
                               evt.type === 'TRENING'
-                                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                                 : evt.type === 'MECZ'
-                                ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
+                                ? 'bg-sky-50 text-sky-800 border-sky-200'
                                 : evt.type === 'SPARING'
-                                ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
-                                : 'bg-purple-500/20 text-purple-300 border-purple-500/30';
+                                ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                : 'bg-purple-50 text-purple-800 border-purple-200';
                             return (
                               <div
                                 key={evt.id}
@@ -951,35 +951,35 @@ function EventsAttendanceContent() {
                 </div>
 
                 {/* Legend */}
-                <div className="flex flex-wrap items-center justify-center gap-4 pt-3 border-t border-slate-800/60 text-xs text-slate-400">
+                <div className="flex flex-wrap items-center justify-center gap-4 pt-3 border-t border-slate-200 text-xs text-slate-500">
                   <span className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                     <span>Trening</span>
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
                     <span>Mecz Ligowy LALS</span>
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
                     <span>Sparing</span>
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-purple-400"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
                     <span>Turniej</span>
                   </span>
                 </div>
               </div>
 
               {/* Selected Day Event Drawer */}
-              <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+              <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4 text-slate-800">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
                   <div>
-                    <h3 className="text-lg font-black text-white uppercase tracking-tight flex items-center gap-2">
+                    <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
                       <span>Wydarzenia w dniu:</span>
-                      <span className="text-cyan-400">{selectedCalendarDate}</span>
+                      <span className="text-sky-600">{selectedCalendarDate}</span>
                     </h3>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-slate-500">
                       {selectedDayEvents.length === 0
                         ? 'Brak zaplanowanych jednostek w tym terminie.'
                         : `Znaleziono jednostek: ${selectedDayEvents.length}`}
@@ -992,7 +992,7 @@ function EventsAttendanceContent() {
                         setNewEventDate(`${selectedCalendarDate}T19:30`);
                         setShowCreateModal(true);
                       }}
-                      className="px-3.5 py-1.5 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/25 text-xs font-black uppercase tracking-wider transition flex items-center gap-1.5 w-fit"
+                      className="px-3.5 py-1.5 rounded-xl bg-sky-50 border border-sky-200 text-sky-700 hover:bg-sky-100 text-xs font-black uppercase tracking-wider transition flex items-center gap-1.5 w-fit shadow-sm"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>Zaplanuj na ten dzień</span>
@@ -1002,8 +1002,8 @@ function EventsAttendanceContent() {
 
                 {selectedDayEvents.length === 0 ? (
                   <div className="py-8 text-center space-y-2">
-                    <p className="text-sm text-slate-400">W tym dniu drużyna ma wolne od oficjalnych jednostek.</p>
-                    <p className="text-xs text-slate-600">Kliknij inny dzień na siatce kalendarza, aby podejrzeć szczegóły i obecności.</p>
+                    <p className="text-sm text-slate-500">W tym dniu drużyna ma wolne od oficjalnych jednostek.</p>
+                    <p className="text-xs text-slate-400">Kliknij inny dzień na siatce kalendarza, aby podejrzeć szczegóły i obecności.</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -1014,63 +1014,63 @@ function EventsAttendanceContent() {
                       return (
                         <div
                           key={event.id}
-                          className="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 hover:border-cyan-500/40 transition space-y-4"
+                          className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-sky-300 transition space-y-4 shadow-sm text-slate-800"
                         >
                           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
                                 <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider border ${
                                   event.type === 'TRENING'
-                                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                                     : event.type === 'MECZ'
-                                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+                                    ? 'bg-sky-50 text-sky-800 border-sky-200'
                                     : event.type === 'SPARING'
-                                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                                    : 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                                    ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                    : 'bg-purple-50 text-purple-800 border-purple-200'
                                 }`}>
                                   {event.type}
                                 </span>
-                                <span className="text-xs text-slate-400 flex items-center gap-1">
-                                  <Clock className="w-3 h-3 text-cyan-400" />
+                                <span className="text-xs text-slate-500 flex items-center gap-1">
+                                  <Clock className="w-3 h-3 text-sky-600" />
                                   {event.date.slice(11, 16)}
                                 </span>
                               </div>
-                              <h4 className="text-base font-black text-white">
+                              <h4 className="text-base font-black text-slate-900">
                                 {event.title} {event.opponent ? `• rywal: ${event.opponent}` : ''}
                               </h4>
                               {event.location && (
-                                <p className="text-xs text-slate-400 flex items-center gap-1.5">
-                                  <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                                <p className="text-xs text-slate-500 flex items-center gap-1.5">
+                                  <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
                                   <span>{event.location}</span>
                                 </p>
                               )}
                             </div>
 
                             <div className="flex items-center gap-2 self-start">
-                              <span className="px-3 py-1 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-slate-300">
-                                Obecnych graczy: <strong className="text-emerald-400">{yesAttendees.length}</strong>
+                              <span className="px-3 py-1 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 shadow-sm">
+                                Obecnych graczy: <strong className="text-emerald-700 font-mono">{yesAttendees.length}</strong>
                               </span>
                             </div>
                           </div>
 
                           {/* Szybka deklaracja obecności */}
-                          <div className="pt-3 border-t border-slate-800/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div className="flex items-center gap-2 text-xs">
-                              <span className="text-slate-400 font-bold">Twoja obecność:</span>
+                              <span className="text-slate-500 font-bold">Twoja obecność:</span>
                               {myAttendance?.status === 'BEDE' ? (
-                                <span className="text-emerald-400 font-black flex items-center gap-1">
+                                <span className="text-emerald-700 font-black flex items-center gap-1">
                                   <CheckCircle2 className="w-3.5 h-3.5" /> Będę
                                 </span>
                               ) : myAttendance?.status === 'NIEPEWNE' ? (
-                                <span className="text-amber-400 font-black flex items-center gap-1">
+                                <span className="text-amber-700 font-black flex items-center gap-1">
                                   <HelpCircle className="w-3.5 h-3.5" /> Niepewne
                                 </span>
                               ) : myAttendance?.status === 'NIE_BEDE' ? (
-                                <span className="text-rose-400 font-black flex items-center gap-1">
+                                <span className="text-rose-600 font-black flex items-center gap-1">
                                   <XCircle className="w-3.5 h-3.5" /> Nie będę
                                 </span>
                               ) : (
-                                <span className="text-slate-500 italic">Brak deklaracji</span>
+                                <span className="text-slate-400 italic">Brak deklaracji</span>
                               )}
                             </div>
 
@@ -1081,8 +1081,8 @@ function EventsAttendanceContent() {
                                 onClick={() => handleAttendance(event.id, 'BEDE')}
                                 className={`px-3 py-1.5 rounded-xl text-xs font-black transition border ${
                                   myAttendance?.status === 'BEDE'
-                                    ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md'
-                                    : 'bg-emerald-950/30 text-emerald-300 border-emerald-500/30 hover:bg-emerald-950/70'
+                                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                                    : 'bg-slate-50 text-emerald-800 border-slate-200 hover:bg-emerald-50'
                                 }`}
                               >
                                 Będę 👍
@@ -1093,8 +1093,8 @@ function EventsAttendanceContent() {
                                 onClick={() => handleAttendance(event.id, 'NIEPEWNE')}
                                 className={`px-3 py-1.5 rounded-xl text-xs font-black transition border ${
                                   myAttendance?.status === 'NIEPEWNE'
-                                    ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md'
-                                    : 'bg-amber-950/30 text-amber-300 border-amber-500/30 hover:bg-amber-950/70'
+                                    ? 'bg-amber-600 text-white border-amber-600 shadow-sm'
+                                    : 'bg-slate-50 text-amber-800 border-slate-200 hover:bg-amber-50'
                                 }`}
                               >
                                 Niepewne 🤔
@@ -1105,8 +1105,8 @@ function EventsAttendanceContent() {
                                 onClick={() => handleAttendance(event.id, 'NIE_BEDE')}
                                 className={`px-3 py-1.5 rounded-xl text-xs font-black transition border ${
                                   myAttendance?.status === 'NIE_BEDE'
-                                    ? 'bg-rose-500 text-white border-rose-400 shadow-md'
-                                    : 'bg-rose-950/30 text-rose-300 border-rose-500/30 hover:bg-rose-950/70'
+                                    ? 'bg-rose-600 text-white border-rose-600 shadow-sm'
+                                    : 'bg-slate-50 text-rose-800 border-slate-200 hover:bg-rose-50'
                                 }`}
                               >
                                 Nie będę 👎
@@ -1117,7 +1117,7 @@ function EventsAttendanceContent() {
                                   setViewMode('list');
                                   setExpandedEventId(event.id);
                                 }}
-                                className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition"
+                                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition border border-slate-200 shadow-sm"
                               >
                                 Szczegóły & Skład →
                               </button>
@@ -1136,9 +1136,9 @@ function EventsAttendanceContent() {
               {loading ? (
                 <div className="py-20 text-center text-slate-500 text-sm">Ładowanie terminarza...</div>
               ) : filteredEvents.length === 0 ? (
-                <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-12 text-center space-y-3">
-                  <Calendar className="w-10 h-10 text-slate-600 mx-auto" />
-                  <h3 className="text-base font-bold text-slate-300">Brak jednostek w wybranym filtrze</h3>
+                <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center space-y-3 shadow-sm text-slate-800">
+                  <Calendar className="w-10 h-10 text-slate-400 mx-auto" />
+                  <h3 className="text-base font-bold text-slate-800">Brak jednostek w wybranym filtrze</h3>
                   <p className="text-xs text-slate-500">Zmień filtry powyżej lub dodaj nową jednostkę treningową.</p>
                 </div>
               ) : (
@@ -1170,76 +1170,76 @@ function EventsAttendanceContent() {
                   expandedBorder: string;
                 }> = {
                   TRENING: {
-                    cardBorder: 'border-emerald-500/35 hover:border-emerald-500/60',
+                    cardBorder: 'border-emerald-200 hover:border-emerald-400',
                     cardBg: isExpanded 
-                      ? 'bg-gradient-to-b from-emerald-950/40 via-[#091512] to-[#070d0b]' 
-                      : 'bg-gradient-to-r from-emerald-950/35 via-[#091512]/90 to-[#070b0e]/95 hover:from-emerald-950/45',
+                      ? 'bg-emerald-50/20' 
+                      : 'bg-white hover:bg-emerald-50/10',
                     leftAccent: 'border-l-[6px] border-l-emerald-500',
-                    dateBoxBg: 'bg-emerald-950/70',
-                    dateBoxBorder: 'border-emerald-500/40 group-hover:border-emerald-400/70',
-                    dateDayText: 'text-emerald-400',
-                    dateClockText: 'text-emerald-100',
-                    clockIconColor: 'text-emerald-400',
-                    badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm shadow-emerald-950/50',
-                    titleHover: 'group-hover:text-emerald-300',
-                    actionBtn: 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/40',
-                    glow: 'shadow-lg shadow-emerald-950/20 hover:shadow-emerald-950/40',
-                    expandedBg: 'bg-[#050f0c]',
-                    expandedBorder: 'border-emerald-500/30',
+                    dateBoxBg: 'bg-emerald-50',
+                    dateBoxBorder: 'border-emerald-200 group-hover:border-emerald-300',
+                    dateDayText: 'text-emerald-700 font-bold',
+                    dateClockText: 'text-emerald-950 font-black',
+                    clockIconColor: 'text-emerald-600',
+                    badge: 'bg-emerald-50 text-emerald-800 border-emerald-300 shadow-sm',
+                    titleHover: 'group-hover:text-emerald-700',
+                    actionBtn: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-300',
+                    glow: 'shadow-sm hover:shadow-md',
+                    expandedBg: 'bg-slate-50',
+                    expandedBorder: 'border-emerald-200',
                   },
                   SPARING: {
-                    cardBorder: 'border-amber-500/40 hover:border-amber-500/70',
+                    cardBorder: 'border-amber-200 hover:border-amber-400',
                     cardBg: isExpanded 
-                      ? 'bg-gradient-to-b from-amber-950/40 via-[#18120a] to-[#0c0906]' 
-                      : 'bg-gradient-to-r from-amber-950/35 via-[#161008]/90 to-[#0a080d]/95 hover:from-amber-950/45',
+                      ? 'bg-amber-50/20' 
+                      : 'bg-white hover:bg-amber-50/10',
                     leftAccent: 'border-l-[6px] border-l-amber-500',
-                    dateBoxBg: 'bg-amber-950/70',
-                    dateBoxBorder: 'border-amber-500/40 group-hover:border-amber-400/70',
-                    dateDayText: 'text-amber-400',
-                    dateClockText: 'text-amber-100',
-                    clockIconColor: 'text-amber-400',
-                    badge: 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm shadow-amber-950/50',
-                    titleHover: 'group-hover:text-amber-300',
-                    actionBtn: 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/40',
-                    glow: 'shadow-lg shadow-amber-950/20 hover:shadow-amber-950/40',
-                    expandedBg: 'bg-[#100a05]',
-                    expandedBorder: 'border-amber-500/30',
+                    dateBoxBg: 'bg-amber-50',
+                    dateBoxBorder: 'border-amber-200 group-hover:border-amber-300',
+                    dateDayText: 'text-amber-700 font-bold',
+                    dateClockText: 'text-amber-950 font-black',
+                    clockIconColor: 'text-amber-600',
+                    badge: 'bg-amber-50 text-amber-800 border-amber-300 shadow-sm',
+                    titleHover: 'group-hover:text-amber-700',
+                    actionBtn: 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-300',
+                    glow: 'shadow-sm hover:shadow-md',
+                    expandedBg: 'bg-slate-50',
+                    expandedBorder: 'border-amber-200',
                   },
                   TURNIEJ: {
-                    cardBorder: 'border-purple-500/40 hover:border-purple-500/70',
+                    cardBorder: 'border-purple-200 hover:border-purple-400',
                     cardBg: isExpanded 
-                      ? 'bg-gradient-to-b from-purple-950/40 via-[#140b20] to-[#0a0614]' 
-                      : 'bg-gradient-to-r from-purple-950/35 via-[#130b1e]/90 to-[#07060d]/95 hover:from-purple-950/45',
+                      ? 'bg-purple-50/20' 
+                      : 'bg-white hover:bg-purple-50/10',
                     leftAccent: 'border-l-[6px] border-l-purple-500',
-                    dateBoxBg: 'bg-purple-950/70',
-                    dateBoxBorder: 'border-purple-500/40 group-hover:border-purple-400/70',
-                    dateDayText: 'text-purple-400',
-                    dateClockText: 'text-purple-100',
-                    clockIconColor: 'text-purple-400',
-                    badge: 'bg-purple-500/20 text-purple-300 border-purple-500/40 shadow-sm shadow-purple-950/50',
-                    titleHover: 'group-hover:text-purple-300',
-                    actionBtn: 'bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border-purple-500/40',
-                    glow: 'shadow-lg shadow-purple-950/20 hover:shadow-purple-950/40',
-                    expandedBg: 'bg-[#0f0718]',
-                    expandedBorder: 'border-purple-500/30',
+                    dateBoxBg: 'bg-purple-50',
+                    dateBoxBorder: 'border-purple-200 group-hover:border-purple-300',
+                    dateDayText: 'text-purple-700 font-bold',
+                    dateClockText: 'text-purple-950 font-black',
+                    clockIconColor: 'text-purple-600',
+                    badge: 'bg-purple-50 text-purple-800 border-purple-300 shadow-sm',
+                    titleHover: 'group-hover:text-purple-700',
+                    actionBtn: 'bg-purple-50 hover:bg-purple-100 text-purple-800 border-purple-300',
+                    glow: 'shadow-sm hover:shadow-md',
+                    expandedBg: 'bg-slate-50',
+                    expandedBorder: 'border-purple-200',
                   },
                   MECZ: {
-                    cardBorder: 'border-sky-500/40 hover:border-sky-500/70',
+                    cardBorder: 'border-sky-200 hover:border-sky-400',
                     cardBg: isExpanded 
-                      ? 'bg-gradient-to-b from-sky-950/40 via-[#0a1424] to-[#060a12]' 
-                      : 'bg-gradient-to-r from-sky-950/35 via-[#081220]/90 to-[#06090e]/95 hover:from-sky-950/45',
+                      ? 'bg-sky-50/20' 
+                      : 'bg-white hover:bg-sky-50/10',
                     leftAccent: 'border-l-[6px] border-l-sky-500',
-                    dateBoxBg: 'bg-sky-950/70',
-                    dateBoxBorder: 'border-sky-500/40 group-hover:border-sky-400/70',
-                    dateDayText: 'text-sky-400',
-                    dateClockText: 'text-sky-100',
-                    clockIconColor: 'text-sky-400',
-                    badge: 'bg-sky-500/20 text-sky-300 border-sky-500/40 shadow-sm shadow-sky-950/50',
-                    titleHover: 'group-hover:text-sky-300',
-                    actionBtn: 'bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border-sky-500/40',
-                    glow: 'shadow-lg shadow-sky-950/20 hover:shadow-sky-950/40',
-                    expandedBg: 'bg-[#060e18]',
-                    expandedBorder: 'border-sky-500/30',
+                    dateBoxBg: 'bg-sky-50',
+                    dateBoxBorder: 'border-sky-200 group-hover:border-sky-300',
+                    dateDayText: 'text-sky-700 font-bold',
+                    dateClockText: 'text-sky-950 font-black',
+                    clockIconColor: 'text-sky-600',
+                    badge: 'bg-sky-50 text-sky-800 border-sky-300 shadow-sm',
+                    titleHover: 'group-hover:text-sky-700',
+                    actionBtn: 'bg-sky-50 hover:bg-sky-100 text-sky-800 border-sky-300',
+                    glow: 'shadow-sm hover:shadow-md',
+                    expandedBg: 'bg-slate-50',
+                    expandedBorder: 'border-sky-200',
                   }
                 };
 
@@ -1336,13 +1336,13 @@ function EventsAttendanceContent() {
                             )}
                           </div>
 
-                          <h3 className={`text-base sm:text-lg font-black text-white ${theme.titleHover} transition truncate`}>
+                          <h3 className={`text-base sm:text-lg font-black text-slate-900 ${theme.titleHover} transition truncate`}>
                             {displayTitle}
                           </h3>
 
-                          <div className="flex items-center gap-3 text-xs text-slate-400 truncate">
-                            <span className="flex items-center gap-1 truncate text-slate-400">
-                              <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                          <div className="flex items-center gap-3 text-xs text-slate-500 truncate">
+                            <span className="flex items-center gap-1 truncate">
+                              <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
                               <span className="truncate">{event.location}</span>
                             </span>
                           </div>
@@ -1350,7 +1350,7 @@ function EventsAttendanceContent() {
                       </div>
 
                       {/* Dolny pasek pod kreską: grafika LALS po lewej na poziomie oddaj głos */}
-                      <div className="flex flex-wrap items-center justify-between gap-2.5 shrink-0 pt-2.5 border-t border-slate-800/70">
+                      <div className="flex flex-wrap items-center justify-between gap-2.5 shrink-0 pt-2.5 border-t border-slate-200">
                         {/* Lewa strona pod kreską: przejście do rozgrywek oraz do taktyki (spójny układ dla każdego typu) */}
                         <div className="flex flex-wrap items-center gap-2">
                           {isLeagueMatch ? (
@@ -1358,15 +1358,15 @@ function EventsAttendanceContent() {
                               <Link
                                 href="/rozgrywki?tab=liga"
                                 onClick={e => e.stopPropagation()}
-                                className="inline-flex items-center gap-2 px-2.5 py-1 rounded-xl bg-sky-950/80 hover:bg-sky-900/60 text-sky-300 border border-sky-500/40 text-xs font-bold transition shadow-sm group/lals"
+                                className="inline-flex items-center gap-2 px-2.5 py-1 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-300 text-xs font-bold transition shadow-sm group/lals"
                                 title="Przejdź do oficjalnego meczu i tabeli LALS w rozgrywkach"
                               >
                                 <img
                                   src="/lals_logo.png"
                                   alt="LALS"
-                                  className="w-4 h-4 rounded-full object-contain shrink-0 ring-1 ring-sky-400/50 p-0.5 bg-sky-950"
+                                  className="w-4 h-4 rounded-full object-contain shrink-0 ring-1 ring-sky-300 p-0.5 bg-white"
                                 />
-                                <span className="font-bold text-white group-hover/lals:text-sky-300 transition">
+                                <span className="font-bold text-sky-900 group-hover/lals:text-sky-700 transition">
                                   Mecz LALS
                                 </span>
                               </Link>
@@ -1374,10 +1374,10 @@ function EventsAttendanceContent() {
                               <Link
                                 href={`/taktyka?eventId=${event.id}&type=MECZ_LIGOWY`}
                                 onClick={e => e.stopPropagation()}
-                                className="px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-sky-500/20 text-slate-300 hover:text-sky-300 border border-slate-800 hover:border-sky-500/40 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
+                                className="px-2.5 py-1 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-sky-800 border border-slate-200 hover:border-sky-300 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
                                 title="Otwórz odprawę taktyczną na ten mecz ligowy"
                               >
-                                <Target className="w-3.5 h-3.5 text-sky-400" />
+                                <Target className="w-3.5 h-3.5 text-sky-600" />
                                 <span>Taktyka</span>
                               </Link>
                             </>
@@ -1386,11 +1386,11 @@ function EventsAttendanceContent() {
                               <Link
                                 href="/rozgrywki?tab=sparingi"
                                 onClick={e => e.stopPropagation()}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-950/80 hover:bg-amber-900/60 text-amber-300 border border-amber-500/40 text-xs font-bold transition shadow-sm group/spar"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 text-xs font-bold transition shadow-sm group/spar"
                                 title="Przejdź do protokołu i sparingów w rozgrywkach"
                               >
-                                <Swords className="w-3.5 h-3.5 text-amber-400" />
-                                <span className="font-bold text-white group-hover/spar:text-amber-300 transition">
+                                <Swords className="w-3.5 h-3.5 text-amber-600" />
+                                <span className="font-bold text-amber-900 group-hover/spar:text-amber-700 transition">
                                   Sparing
                                 </span>
                               </Link>
@@ -1398,10 +1398,10 @@ function EventsAttendanceContent() {
                               <Link
                                 href={`/taktyka?eventId=${event.id}&type=SPARING`}
                                 onClick={e => e.stopPropagation()}
-                                className="px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-amber-500/20 text-slate-300 hover:text-amber-300 border border-slate-800 hover:border-amber-500/40 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
+                                className="px-2.5 py-1 rounded-xl bg-slate-50 hover:bg-amber-50 text-slate-700 hover:text-amber-800 border border-slate-200 hover:border-amber-300 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
                                 title="Otwórz założenia sparingowe i taktykę"
                               >
-                                <Target className="w-3.5 h-3.5 text-amber-400" />
+                                <Target className="w-3.5 h-3.5 text-amber-600" />
                                 <span>Taktyka</span>
                               </Link>
                             </>
@@ -1410,11 +1410,11 @@ function EventsAttendanceContent() {
                               <Link
                                 href="/rozgrywki?tab=turnieje"
                                 onClick={e => e.stopPropagation()}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-950/80 hover:bg-purple-900/60 text-purple-300 border border-purple-500/40 text-xs font-bold transition shadow-sm group/turn"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-300 text-xs font-bold transition shadow-sm group/turn"
                                 title="Przejdź do modułu turniejowego i drabinki w rozgrywkach"
                               >
-                                <Trophy className="w-3.5 h-3.5 text-purple-400" />
-                                <span className="font-bold text-white group-hover/turn:text-purple-300 transition">
+                                <Trophy className="w-3.5 h-3.5 text-purple-600" />
+                                <span className="font-bold text-purple-900 group-hover/turn:text-purple-700 transition">
                                   Turniej
                                 </span>
                               </Link>
@@ -1422,10 +1422,10 @@ function EventsAttendanceContent() {
                               <Link
                                 href={`/taktyka?eventId=${event.id}&type=TURNIEJ`}
                                 onClick={e => e.stopPropagation()}
-                                className="px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-purple-500/20 text-slate-300 hover:text-purple-300 border border-slate-800 hover:border-purple-500/40 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
+                                className="px-2.5 py-1 rounded-xl bg-slate-50 hover:bg-purple-50 text-slate-700 hover:text-purple-800 border border-slate-200 hover:border-purple-300 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
                                 title="Otwórz założenia turniejowe i taktykę"
                               >
-                                <Target className="w-3.5 h-3.5 text-purple-400" />
+                                <Target className="w-3.5 h-3.5 text-purple-600" />
                                 <span>Taktyka</span>
                               </Link>
                             </>
@@ -1434,19 +1434,19 @@ function EventsAttendanceContent() {
                               <Link
                                 href={`/trening?eventId=${event.id}`}
                                 onClick={e => e.stopPropagation()}
-                                className="px-2.5 py-1 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
+                                className="px-2.5 py-1 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
                                 title="Otwórz pełną rozpiskę treningową i ćwiczenia"
                               >
-                                <Volleyball className="w-3.5 h-3.5 text-emerald-400" />
+                                <Volleyball className="w-3.5 h-3.5 text-emerald-600" />
                                 <span>Rozpiska Treningu</span>
                               </Link>
                               <Link
                                 href={`/taktyka?eventId=${event.id}&type=TRENING`}
                                 onClick={e => e.stopPropagation()}
-                                className="px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
+                                className="px-2.5 py-1 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
                                 title="Otwórz tablicę taktyczną dla tego treningu"
                               >
-                                <Target className="w-3.5 h-3.5 text-sky-400" />
+                                <Target className="w-3.5 h-3.5 text-sky-600" />
                                 <span>Tablica</span>
                               </Link>
                             </div>
@@ -1459,17 +1459,17 @@ function EventsAttendanceContent() {
                             <span
                               className={`px-2.5 py-1 rounded-xl text-[11px] font-bold border ${
                                 myAttendance.status === 'BEDE'
-                                  ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40 shadow-sm'
+                                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300 shadow-sm'
                                   : myAttendance.status === 'NIEPEWNE'
-                                  ? 'bg-amber-500/15 text-amber-300 border-amber-500/40'
-                                  : 'bg-rose-500/15 text-rose-300 border-rose-500/40'
+                                  ? 'bg-amber-50 text-amber-800 border-amber-300'
+                                  : 'bg-rose-50 text-rose-800 border-rose-300'
                               }`}
                             >
                               {myAttendance.status === 'BEDE' ? '✓ Będę' : myAttendance.status === 'NIEPEWNE' ? '? Niepewny' : '✗ Nieobecny'}
                             </span>
                           ) : (
-                            <span className="px-2.5 py-1 rounded-xl text-[11px] font-bold bg-amber-500/10 border border-amber-500/30 text-amber-300 flex items-center gap-1">
-                              <Lock className="w-3 h-3 text-amber-400" />
+                            <span className="px-2.5 py-1 rounded-xl text-[11px] font-bold bg-amber-50 border border-amber-200 text-amber-800 flex items-center gap-1">
+                              <Lock className="w-3 h-3 text-amber-600" />
                               <span>Oddaj głos</span>
                             </span>
                           )}
@@ -1482,7 +1482,7 @@ function EventsAttendanceContent() {
                                 e.stopPropagation();
                                 openEditModal(event);
                               }}
-                              className="p-2 rounded-xl bg-slate-900 hover:bg-amber-500/20 text-slate-400 hover:text-amber-400 border border-slate-800 transition"
+                              className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-800 border border-slate-200 transition shadow-sm"
                               title="Edytuj jednostkę"
                             >
                               <Edit3 className="w-4 h-4" />
@@ -1491,8 +1491,8 @@ function EventsAttendanceContent() {
 
                           {/* Expand / Collapse Chevron */}
                           <div
-                            className={`w-8 h-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 transition-all duration-200 ${
-                              isExpanded ? 'rotate-180 bg-amber-500/10 text-amber-400 border-amber-500/40' : 'group-hover:text-white group-hover:border-slate-700'
+                            className={`w-8 h-8 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 transition-all duration-200 ${
+                              isExpanded ? 'rotate-180 bg-sky-50 text-sky-700 border-sky-300' : 'group-hover:text-slate-800 group-hover:bg-slate-100'
                             }`}
                           >
                             <ChevronDown className="w-4 h-4" />
@@ -1506,14 +1506,14 @@ function EventsAttendanceContent() {
                       <div className={`p-5 sm:p-7 ${theme.expandedBg} border-t ${theme.expandedBorder} space-y-6 animate-fadeIn`}>
                         {/* Top Management Controls (for coach / manager) */}
                         {canManage && (
-                          <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800/70">
-                            <div className="text-xs text-slate-400">
-                              <span className="font-bold text-white uppercase tracking-wider text-[11px]">Zarządzanie Jednostką:</span>
+                          <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-200">
+                            <div className="text-xs text-slate-500">
+                              <span className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">Zarządzanie Jednostką:</span>
                             </div>
                             <div className="flex flex-wrap items-center gap-2">
                               <button
                                 onClick={() => openEditModal(event)}
-                                className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-amber-500/20"
+                                className="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs transition flex items-center gap-1.5 shadow-sm"
                               >
                                 <Edit3 className="w-3.5 h-3.5 stroke-[2.5]" />
                                 <span>Edytuj parametry</span>
@@ -1521,7 +1521,7 @@ function EventsAttendanceContent() {
 
                               <button
                                 onClick={() => handleDeleteEvent(event.id, event.title)}
-                                className="p-2 rounded-xl bg-slate-900 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-slate-800 transition"
+                                className="p-2 rounded-xl bg-slate-50 hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 transition shadow-sm"
                                 title="Usuń jednostkę"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -1532,30 +1532,30 @@ function EventsAttendanceContent() {
 
                         {/* Oficjalny Banner Meczowy LALS */}
                         {isLeagueMatch && (
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-sky-950/70 via-[#0a1728] to-[#070e1a] border border-sky-400/40 shadow-xl">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-sky-50 border border-sky-200 shadow-sm text-slate-800">
                             <div className="flex items-center gap-3.5">
                               <img
                                 src="/lals_logo.png"
                                 alt="Oficjalne Logo LALS"
-                                className="w-12 h-12 rounded-full object-contain shrink-0 shadow-lg ring-2 ring-sky-400/50 p-0.5 bg-sky-950"
+                                className="w-12 h-12 rounded-full object-contain shrink-0 shadow-sm ring-1 ring-sky-300 p-0.5 bg-white"
                               />
                               <div>
                                 <div className="flex items-center gap-2">
-                                  <h4 className="text-xs font-black uppercase text-white tracking-wider">
+                                  <h4 className="text-xs font-black uppercase text-slate-900 tracking-wider">
                                     Lubońska Amatorska Liga Siatkówki (LALS)
                                   </h4>
-                                  <span className="px-2 py-0.5 rounded text-[9px] font-black uppercase bg-sky-500/20 text-sky-300 border border-sky-500/40">
+                                  <span className="px-2 py-0.5 rounded text-[9px] font-black uppercase bg-sky-100 text-sky-800 border border-sky-200">
                                     Mecz Ligowy
                                   </span>
                                 </div>
-                                <p className="text-[11px] text-slate-300 mt-0.5">
+                                <p className="text-[11px] text-slate-600 mt-0.5">
                                   Oficjalny pojedynek ligowy. Po meczu sprawdź tabelę punktową, sety i statystyki w module Rozgrywki.
                                 </p>
                               </div>
                             </div>
                             <Link
                               href="/rozgrywki"
-                              className="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shrink-0 shadow-md shadow-sky-500/25"
+                              className="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs transition flex items-center gap-1.5 shrink-0 shadow-sm"
                             >
                               <span>Tabela & Wyniki LALS</span>
                               <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -1564,29 +1564,29 @@ function EventsAttendanceContent() {
                         )}
 
                         {/* SECTION 1: CZYTELNA ANKIETA OBECNOŚCI DLA WSZYSTKICH (ZAWODNICY + TRENER + SZTAB) */}
-                        <div className="p-5 rounded-2xl bg-[#0c1016] border border-slate-800/90 space-y-4 shadow-xl">
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800/70">
+                        <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-4 shadow-sm text-slate-800">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
                             <div className="space-y-0.5">
                               <div className="flex items-center gap-2">
-                                <Users className="w-4 h-4 text-amber-400" />
-                                <h4 className="text-xs font-black uppercase text-white tracking-wider">
+                                <Users className="w-4 h-4 text-sky-600" />
+                                <h4 className="text-xs font-black uppercase text-slate-900 tracking-wider">
                                   Ankieta Dostępności na Jednostce
                                 </h4>
                               </div>
-                              <p className="text-[11px] text-slate-400">
+                              <p className="text-[11px] text-slate-500">
                                 Obecność zaznaczają <strong>wszyscy (zawodnicy, trener i sztab)</strong>. Zadeklaruj status, aby odblokować taktykę i założenia.
                               </p>
                             </div>
 
                             {/* Current user vote status badge */}
                             {myAttendance ? (
-                              <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-bold">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                              <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shadow-sm">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                                 <span>Twój wybór: <strong>{myAttendance.status === 'BEDE' ? 'Będę na jednostce' : myAttendance.status === 'NIEPEWNE' ? 'Status: Niepewny' : 'Nie będę obecny'}</strong></span>
                               </div>
                             ) : (
-                              <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-bold animate-pulse">
-                                <Lock className="w-3.5 h-3.5 text-amber-400" />
+                              <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold animate-pulse">
+                                <Lock className="w-3.5 h-3.5 text-amber-600" />
                                 <span>Wymagany głos w ankiecie!</span>
                               </div>
                             )}
@@ -1594,8 +1594,8 @@ function EventsAttendanceContent() {
 
                           {/* 3 Large, modern voting cards */}
                           {isArchiveMode ? (
-                            <div className="p-4 rounded-2xl bg-purple-950/30 border border-purple-500/30 text-purple-200 text-xs font-bold flex items-center justify-center gap-2">
-                              <Lock className="w-4 h-4 text-amber-400" />
+                            <div className="p-4 rounded-2xl bg-purple-50 border border-purple-200 text-purple-900 text-xs font-bold flex items-center justify-center gap-2 shadow-sm">
+                              <Lock className="w-4 h-4 text-amber-600" />
                               <span>Tryb archiwalny: Deklarowanie i zmiana obecności są zablokowane (Tylko do odczytu)</span>
                             </div>
                           ) : (
@@ -1607,22 +1607,22 @@ function EventsAttendanceContent() {
                               onClick={() => handleAttendance(event.id, 'BEDE')}
                               className={`p-3.5 rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between gap-2 group ${
                                 myAttendance?.status === 'BEDE'
-                                  ? 'bg-emerald-500/20 border-emerald-400 text-white shadow-lg shadow-emerald-500/15 ring-2 ring-emerald-500/40'
-                                  : 'bg-slate-900/70 border-slate-800 text-slate-300 hover:border-emerald-500/40 hover:bg-slate-900'
+                                  ? 'bg-emerald-50 border-emerald-400 text-emerald-950 shadow-sm ring-2 ring-emerald-400'
+                                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-emerald-300 hover:bg-emerald-50/40'
                               }`}
                             >
                               <div className="flex items-center justify-between">
                                 <span className="text-xs font-black uppercase tracking-wide flex items-center gap-1.5">
-                                  <CheckCircle2 className={`w-4 h-4 ${myAttendance?.status === 'BEDE' ? 'text-emerald-400' : 'text-slate-400 group-hover:text-emerald-400'}`} />
+                                  <CheckCircle2 className={`w-4 h-4 ${myAttendance?.status === 'BEDE' ? 'text-emerald-600' : 'text-slate-400 group-hover:text-emerald-600'}`} />
                                   Będę na 100%
                                 </span>
                                 {myAttendance?.status === 'BEDE' && (
-                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-emerald-500 text-slate-950">
+                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-emerald-600 text-white">
                                     Wybrano
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[11px] text-slate-400 group-hover:text-slate-300">
+                              <p className="text-[11px] text-slate-500 group-hover:text-slate-700">
                                 Potwierdzam gotowość do udziału na hali.
                               </p>
                             </button>
@@ -1634,22 +1634,22 @@ function EventsAttendanceContent() {
                               onClick={() => handleAttendance(event.id, 'NIEPEWNE')}
                               className={`p-3.5 rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between gap-2 group ${
                                 myAttendance?.status === 'NIEPEWNE'
-                                  ? 'bg-amber-500/20 border-amber-400 text-white shadow-lg shadow-amber-500/15 ring-2 ring-amber-500/40'
-                                  : 'bg-slate-900/70 border-slate-800 text-slate-300 hover:border-amber-500/40 hover:bg-slate-900'
+                                  ? 'bg-amber-50 border-amber-400 text-amber-950 shadow-sm ring-2 ring-amber-400'
+                                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-amber-300 hover:bg-amber-50/40'
                               }`}
                             >
                               <div className="flex items-center justify-between">
                                 <span className="text-xs font-black uppercase tracking-wide flex items-center gap-1.5">
-                                  <HelpCircle className={`w-4 h-4 ${myAttendance?.status === 'NIEPEWNE' ? 'text-amber-400' : 'text-slate-400 group-hover:text-amber-400'}`} />
+                                  <HelpCircle className={`w-4 h-4 ${myAttendance?.status === 'NIEPEWNE' ? 'text-amber-600' : 'text-slate-400 group-hover:text-amber-600'}`} />
                                   Niepewny / Być może
                                 </span>
                                 {myAttendance?.status === 'NIEPEWNE' && (
-                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-500 text-slate-950">
+                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-600 text-white">
                                     Wybrano
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[11px] text-slate-400 group-hover:text-slate-300">
+                              <p className="text-[11px] text-slate-500 group-hover:text-slate-700">
                                 Dam znać przed zbiórką (np. praca / korek).
                               </p>
                             </button>
@@ -1661,22 +1661,22 @@ function EventsAttendanceContent() {
                               onClick={() => handleAttendance(event.id, 'NIE_BEDE')}
                               className={`p-3.5 rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between gap-2 group ${
                                 myAttendance?.status === 'NIE_BEDE'
-                                  ? 'bg-rose-500/20 border-rose-400 text-white shadow-lg shadow-rose-500/15 ring-2 ring-rose-500/40'
-                                  : 'bg-slate-900/70 border-slate-800 text-slate-300 hover:border-rose-500/40 hover:bg-slate-900'
+                                  ? 'bg-rose-50 border-rose-400 text-rose-950 shadow-sm ring-2 ring-rose-400'
+                                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-rose-300 hover:bg-rose-50/40'
                               }`}
                             >
                               <div className="flex items-center justify-between">
                                 <span className="text-xs font-black uppercase tracking-wide flex items-center gap-1.5">
-                                  <XCircle className={`w-4 h-4 ${myAttendance?.status === 'NIE_BEDE' ? 'text-rose-400' : 'text-slate-400 group-hover:text-rose-400'}`} />
+                                  <XCircle className={`w-4 h-4 ${myAttendance?.status === 'NIE_BEDE' ? 'text-rose-600' : 'text-slate-400 group-hover:text-rose-600'}`} />
                                   Nie będę obecny
                                 </span>
                                 {myAttendance?.status === 'NIE_BEDE' && (
-                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-rose-500 text-white">
+                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-rose-600 text-white">
                                     Wybrano
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[11px] text-slate-400 group-hover:text-slate-300">
+                              <p className="text-[11px] text-slate-500 group-hover:text-slate-700">
                                 Zgłaszam nieobecność (zwolnienie / wyjazd).
                               </p>
                             </button>
@@ -1687,8 +1687,8 @@ function EventsAttendanceContent() {
                           {!isArchiveMode && (
                           <div className="pt-1">
                             {expandedNoteEventId === event.id ? (
-                              <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2 animate-fadeIn">
-                                <label className="block text-[11px] font-bold text-slate-300">
+                              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2 animate-fadeIn">
+                                <label className="block text-[11px] font-bold text-slate-700">
                                   Notatka dla trenera (np. będę 15 min później, wychodzę o 21:00):
                                 </label>
                                 <div className="flex gap-2">
@@ -1697,7 +1697,7 @@ function EventsAttendanceContent() {
                                     value={attendanceNotes[event.id] || ''}
                                     onChange={e => setAttendanceNotes({ ...attendanceNotes, [event.id]: e.target.value })}
                                     placeholder="Wpisz treść notatki..."
-                                    className="flex-1 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-amber-400"
+                                    className="flex-1 px-3 py-1.5 rounded-xl bg-white border border-slate-300 text-xs text-slate-800 focus:outline-none focus:border-sky-500"
                                   />
                                   <button
                                     type="button"
@@ -1707,14 +1707,14 @@ function EventsAttendanceContent() {
                                       }
                                       setExpandedNoteEventId(null);
                                     }}
-                                    className="px-3 py-1.5 rounded-xl bg-sky-500 text-slate-950 font-bold text-xs hover:bg-sky-400 transition"
+                                    className="px-3 py-1.5 rounded-xl bg-sky-600 text-white font-bold text-xs hover:bg-sky-500 transition shadow-sm"
                                   >
                                     Zapisz
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => setExpandedNoteEventId(null)}
-                                    className="px-2.5 py-1.5 rounded-xl bg-slate-800 text-slate-400 text-xs hover:text-white"
+                                    className="px-2.5 py-1.5 rounded-xl bg-slate-200 text-slate-700 text-xs hover:bg-slate-300"
                                   >
                                     ✕
                                   </button>
@@ -1729,7 +1729,7 @@ function EventsAttendanceContent() {
                                     setAttendanceNotes({ ...attendanceNotes, [event.id]: myAttendance.note });
                                   }
                                 }}
-                                className="text-[11px] text-slate-400 hover:text-amber-400 font-bold transition flex items-center gap-1"
+                                className="text-[11px] text-slate-500 hover:text-sky-700 font-bold transition flex items-center gap-1"
                               >
                                 <span>💬 {myAttendance?.note ? `Twoja notatka: "${myAttendance.note}" (kliknij aby edytować)` : '+ Dodaj notatkę do deklaracji'}</span>
                               </button>
@@ -1737,7 +1737,7 @@ function EventsAttendanceContent() {
                           </div>
                           )}
 
-                          {/* TABELA OBECNOŚCI & DEKLARACJI ZAWODNIKÓW (ZAMIAST ZBIORU PIGUŁEK OBOK SIEBIE) */}
+                          {/* TABELA OBECNOŚCI & DEKLARACJI ZAWODNIKÓW */}
                           {(() => {
                             const activeTableFilter = attendanceTableFilter[event.id] || 'ALL';
                             const declaredMap = new Map(event.attendees.map(a => [a.userId, a]));
@@ -1797,16 +1797,16 @@ function EventsAttendanceContent() {
                             const countBrak = participantsList.filter(p => p.status === 'BRAK').length;
 
                             return (
-                              <div className="space-y-3 pt-3 border-t border-slate-800/70">
+                              <div className="space-y-3 pt-3 border-t border-slate-100">
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                                   <div className="space-y-0.5">
                                     <div className="flex items-center gap-2">
-                                      <Users className="w-4 h-4 text-sky-400" />
-                                      <h5 className="text-xs font-black uppercase text-white tracking-wider">
+                                      <Users className="w-4 h-4 text-sky-600" />
+                                      <h5 className="text-xs font-black uppercase text-slate-900 tracking-wider">
                                         Tabela Składu & Frekwencji na Jednostce
                                       </h5>
                                     </div>
-                                    <p className="text-[11px] text-slate-400">
+                                    <p className="text-[11px] text-slate-500">
                                       Szczegółowy wykaz każdego zawodnika: numer, pozycja boiskowa, status deklaracji oraz informacja o obecności na hali.
                                     </p>
                                   </div>
@@ -1818,8 +1818,8 @@ function EventsAttendanceContent() {
                                       onClick={() => setAttendanceTableFilter(prev => ({ ...prev, [event.id]: 'ALL' }))}
                                       className={`px-2.5 py-1 rounded-xl text-xs font-bold transition border ${
                                         activeTableFilter === 'ALL'
-                                          ? 'bg-sky-500 text-slate-950 border-sky-400 font-black shadow-sm'
-                                          : 'bg-slate-900/90 text-slate-300 border-slate-800 hover:text-white'
+                                          ? 'bg-sky-600 text-white border-sky-600 font-black shadow-sm'
+                                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                                       }`}
                                     >
                                       Wszyscy ({participantsList.length})
@@ -1830,8 +1830,8 @@ function EventsAttendanceContent() {
                                       onClick={() => setAttendanceTableFilter(prev => ({ ...prev, [event.id]: 'BEDE' }))}
                                       className={`px-2.5 py-1 rounded-xl text-xs font-bold transition border ${
                                         activeTableFilter === 'BEDE'
-                                          ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-black shadow-sm'
-                                          : 'bg-emerald-950/40 text-emerald-300 border-emerald-500/30 hover:bg-emerald-950/70'
+                                          ? 'bg-emerald-600 text-white border-emerald-600 font-black shadow-sm'
+                                          : 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
                                       }`}
                                     >
                                       ✓ Obecni ({countBede})
@@ -1843,8 +1843,8 @@ function EventsAttendanceContent() {
                                         onClick={() => setAttendanceTableFilter(prev => ({ ...prev, [event.id]: 'NIEPEWNE' }))}
                                         className={`px-2.5 py-1 rounded-xl text-xs font-bold transition border ${
                                           activeTableFilter === 'NIEPEWNE'
-                                            ? 'bg-amber-500 text-slate-950 border-amber-400 font-black shadow-sm'
-                                            : 'bg-amber-950/40 text-amber-300 border-amber-500/30 hover:bg-amber-950/70'
+                                            ? 'bg-amber-600 text-white border-amber-600 font-black shadow-sm'
+                                            : 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100'
                                         }`}
                                       >
                                         ? Niepewni ({countNiepewne})
@@ -1857,8 +1857,8 @@ function EventsAttendanceContent() {
                                         onClick={() => setAttendanceTableFilter(prev => ({ ...prev, [event.id]: 'NIE_BEDE' }))}
                                         className={`px-2.5 py-1 rounded-xl text-xs font-bold transition border ${
                                           activeTableFilter === 'NIE_BEDE'
-                                            ? 'bg-rose-500 text-white border-rose-400 font-black shadow-sm'
-                                            : 'bg-rose-950/40 text-rose-300 border-rose-500/30 hover:bg-rose-950/70'
+                                            ? 'bg-rose-600 text-white border-rose-600 font-black shadow-sm'
+                                            : 'bg-rose-50 text-rose-800 border-rose-200 hover:bg-rose-100'
                                         }`}
                                       >
                                         ✗ Nieobecni ({countNieBede})
@@ -1871,8 +1871,8 @@ function EventsAttendanceContent() {
                                         onClick={() => setAttendanceTableFilter(prev => ({ ...prev, [event.id]: 'BRAK' }))}
                                         className={`px-2.5 py-1 rounded-xl text-xs font-bold transition border ${
                                           activeTableFilter === 'BRAK'
-                                            ? 'bg-slate-400 text-slate-950 border-slate-300 font-black shadow-sm'
-                                            : 'bg-slate-900/60 text-slate-400 border-slate-800 hover:text-slate-300'
+                                            ? 'bg-slate-700 text-white border-slate-700 font-black shadow-sm'
+                                            : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
                                         }`}
                                       >
                                         ⏳ Brak odpowiedzi ({countBrak})
@@ -1882,10 +1882,10 @@ function EventsAttendanceContent() {
                                 </div>
 
                                 {/* Responsywna Tabela */}
-                                <div className="overflow-x-auto rounded-2xl border border-slate-800/90 bg-[#070b10] shadow-xl">
+                                <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
                                   <table className="w-full text-left border-collapse text-xs">
                                     <thead>
-                                      <tr className="border-b border-slate-800 bg-slate-950/90 text-[11px] font-black uppercase tracking-wider text-slate-400">
+                                      <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-black uppercase tracking-wider text-slate-600">
                                         <th className="py-2.5 px-3 w-12 text-center">Nr</th>
                                         <th className="py-2.5 px-3">Zawodnik / Członek Sztabu</th>
                                         <th className="py-2.5 px-3">Pozycja Boiskowa</th>
@@ -1893,50 +1893,41 @@ function EventsAttendanceContent() {
                                         <th className="py-2.5 px-3">Notatka / Komentarz</th>
                                       </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-slate-800/60">
+                                    <tbody className="divide-y divide-slate-100">
                                       {sortedTableParticipants.length === 0 ? (
                                         <tr>
-                                          <td colSpan={5} className="py-8 text-center text-slate-500 italic">
+                                          <td colSpan={5} className="py-8 text-center text-slate-400 italic">
                                             Brak osób w wybranym filtrze tabeli.
                                           </td>
                                         </tr>
                                       ) : (
                                         sortedTableParticipants.map((p) => {
-                                          const rowHighlight =
-                                            p.status === 'BEDE'
-                                              ? 'hover:bg-emerald-950/20'
-                                              : p.status === 'NIEPEWNE'
-                                              ? 'hover:bg-amber-950/20'
-                                              : p.status === 'NIE_BEDE'
-                                              ? 'hover:bg-rose-950/20 opacity-80'
-                                              : 'hover:bg-slate-900/30 opacity-60';
-
                                           return (
-                                            <tr key={p.userId} className={`transition-colors ${rowHighlight}`}>
+                                            <tr key={p.userId} className="hover:bg-slate-50 transition-colors">
                                               {/* Nr koszulki */}
                                               <td className="py-2.5 px-3 text-center">
                                                 {p.number ? (
-                                                  <span className="inline-block px-1.5 py-0.5 rounded font-mono font-black text-[11px] bg-slate-900 border border-slate-800 text-amber-400">
+                                                  <span className="inline-block px-1.5 py-0.5 rounded font-mono font-black text-[11px] bg-slate-100 border border-slate-200 text-slate-800">
                                                     #{p.number}
                                                   </span>
                                                 ) : (
-                                                  <span className="text-slate-600 font-mono text-[11px]">—</span>
+                                                  <span className="text-slate-400 font-mono text-[11px]">—</span>
                                                 )}
                                               </td>
 
                                               {/* Imię i Nazwisko */}
                                               <td className="py-2.5 px-3">
                                                 <div className="flex items-center gap-2">
-                                                  <span className="font-bold text-white text-xs">
+                                                  <span className="font-bold text-slate-900 text-xs">
                                                     {p.name}
                                                   </span>
                                                   {p.isStaff && (
-                                                    <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                                                    <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-sky-50 text-sky-700 border border-sky-200">
                                                       {p.role === 'TRENER' ? 'Trener' : 'Kierownik'}
                                                     </span>
                                                   )}
                                                   {p.userId === user?.id && (
-                                                    <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                                    <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-800 border border-amber-300">
                                                       Ty
                                                     </span>
                                                   )}
@@ -1953,22 +1944,22 @@ function EventsAttendanceContent() {
                                               {/* Deklaracja w ankiecie */}
                                               <td className="py-2.5 px-3">
                                                 {p.status === 'BEDE' ? (
-                                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 shadow-sm">
-                                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-sm">
+                                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                                                     <span>Będę na 100%</span>
                                                   </span>
                                                 ) : p.status === 'NIEPEWNE' ? (
-                                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/40">
-                                                    <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
+                                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-300">
+                                                    <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
                                                     <span>Niepewny</span>
                                                   </span>
                                                 ) : p.status === 'NIE_BEDE' ? (
-                                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-bold bg-rose-500/15 text-rose-300 border border-rose-500/40">
-                                                    <XCircle className="w-3.5 h-3.5 text-rose-400" />
+                                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-bold bg-rose-50 text-rose-800 border border-rose-300">
+                                                    <XCircle className="w-3.5 h-3.5 text-rose-600" />
                                                     <span>Nieobecny</span>
                                                   </span>
                                                 ) : (
-                                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-medium bg-slate-900 text-slate-500 border border-slate-800">
+                                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-medium bg-slate-100 text-slate-500 border border-slate-200">
                                                     <span>Brak odpowiedzi</span>
                                                   </span>
                                                 )}
@@ -1977,11 +1968,11 @@ function EventsAttendanceContent() {
                                               {/* Notatka */}
                                               <td className="py-2.5 px-3">
                                                 {p.note ? (
-                                                  <span className="text-[11px] text-amber-200/90 italic bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 inline-block max-w-[220px] truncate" title={p.note}>
+                                                  <span className="text-[11px] text-amber-800 italic bg-amber-50 px-2 py-0.5 rounded border border-amber-200 inline-block max-w-[220px] truncate" title={p.note}>
                                                     💬 {p.note}
                                                   </span>
                                                 ) : (
-                                                  <span className="text-slate-600 text-xs">—</span>
+                                                  <span className="text-slate-400 text-xs">—</span>
                                                 )}
                                               </td>
                                             </tr>
@@ -1996,17 +1987,17 @@ function EventsAttendanceContent() {
                           })()}
                         </div>
 
-                        {/* SECTION 2: WSKAŹNIK IDEALNEGO SKŁADU NA TRENING (14 GRACZY: 4P, 4Ś, 2A, 2R, 2L) */}
-                        <div className="p-5 rounded-2xl bg-[#0a0f18] border border-slate-800 space-y-4 shadow-xl">
+                        {/* SECTION 2: WSKAŹNIK IDEALNEGO SKŁADU NA TRENING */}
+                        <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-4 shadow-sm text-slate-800">
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <div className="space-y-0.5">
                               <div className="flex items-center gap-2">
-                                <Layers className="w-4 h-4 text-sky-400" />
-                                <h4 className="text-xs font-black uppercase text-white tracking-wider">
+                                <Layers className="w-4 h-4 text-sky-600" />
+                                <h4 className="text-xs font-black uppercase text-slate-900 tracking-wider">
                                   Bilans Pozycji na Treningu (Idealnie: 14 Graczy do Gry 6x6)
                                 </h4>
                               </div>
-                              <p className="text-[11px] text-slate-400">
+                              <p className="text-[11px] text-slate-500">
                                 Cel do rozegrania pełnego meczu treningowego z dwiema szóstkami: <strong>4 Przyjmujących, 4 Środkowych, 2 Atakujących, 2 Rozgrywających, 2 Libero</strong>.
                               </p>
                             </div>
@@ -2014,8 +2005,8 @@ function EventsAttendanceContent() {
                             <div className="flex items-center gap-2 shrink-0">
                               <span className={`px-3 py-1 rounded-xl text-xs font-mono font-black border ${
                                 posBalance.isFull
-                                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm'
-                                  : 'bg-slate-900 text-slate-300 border-slate-800'
+                                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300 shadow-sm'
+                                  : 'bg-slate-50 text-slate-700 border-slate-200'
                               }`}>
                                 {posBalance.totalConfirmed} / 14 potwierdzonych
                               </span>
@@ -2033,13 +2024,13 @@ function EventsAttendanceContent() {
                                   key={p.code}
                                   className={`p-3 rounded-2xl border transition flex flex-col justify-between gap-2 ${
                                     isComplete
-                                      ? 'bg-emerald-950/25 border-emerald-500/40 text-white'
-                                      : 'bg-slate-900/60 border-slate-800/80 text-slate-300'
+                                      ? 'bg-emerald-50/60 border-emerald-300 text-slate-900 shadow-sm'
+                                      : 'bg-slate-50 border-slate-200 text-slate-700'
                                   }`}
                                 >
                                   <div>
                                     <div className="flex items-center justify-between mb-1">
-                                      <span className="text-xs font-black uppercase tracking-wider text-slate-200">
+                                      <span className="text-xs font-black uppercase tracking-wider text-slate-800">
                                         {p.name}
                                       </span>
                                       <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded border ${p.badgeBg}`}>
@@ -2048,7 +2039,7 @@ function EventsAttendanceContent() {
                                     </div>
 
                                     <div className="flex items-baseline gap-1">
-                                      <span className="text-xl font-mono font-black text-white">
+                                      <span className="text-xl font-mono font-black text-slate-900">
                                         {p.confirmed.length}
                                       </span>
                                       <span className="text-xs text-slate-500 font-mono">
@@ -2057,13 +2048,13 @@ function EventsAttendanceContent() {
                                     </div>
                                   </div>
 
-                                  <div className="text-[11px] pt-1 border-t border-slate-800/60">
+                                  <div className="text-[11px] pt-1 border-t border-slate-200">
                                     {isComplete ? (
-                                      <span className="text-emerald-400 font-bold flex items-center gap-1">
+                                      <span className="text-emerald-700 font-bold flex items-center gap-1">
                                         <Check className="w-3 h-3" /> Komplet
                                       </span>
                                     ) : (
-                                      <span className="text-amber-400 font-bold">
+                                      <span className="text-amber-700 font-bold">
                                         Brakuje: {missingCount}
                                       </span>
                                     )}
@@ -2071,9 +2062,9 @@ function EventsAttendanceContent() {
 
                                   {/* Confirmed list on this position */}
                                   {p.confirmed.length > 0 && (
-                                    <div className="text-[10px] text-slate-400 space-y-0.5 truncate">
+                                    <div className="text-[10px] text-slate-600 space-y-0.5 truncate">
                                       {p.confirmed.map(c => (
-                                        <div key={c.id} className="truncate text-slate-300">
+                                        <div key={c.id} className="truncate">
                                           • {c.number ? `#${c.number} ` : ''}{c.name}
                                         </div>
                                       ))}
@@ -2087,8 +2078,8 @@ function EventsAttendanceContent() {
                           {/* Summary Banner */}
                           <div className={`p-3 rounded-xl border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 ${
                             posBalance.isFull
-                              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-                              : 'bg-slate-900/80 border-slate-800 text-slate-300'
+                              ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
+                              : 'bg-slate-50 border-slate-200 text-slate-700'
                           }`}>
                             <span className="font-medium">
                               {posBalance.isFull
@@ -2098,24 +2089,24 @@ function EventsAttendanceContent() {
                           </div>
                         </div>
 
-                        {/* SECTION 3: ZAŁOŻENIA TAKTYCZNE & PRZEKIEROWANIA (VOTE-TO-UNLOCK GATE) */}
-                        <div className="p-5 rounded-2xl bg-[#0c1016] border border-slate-800/90 space-y-4 shadow-xl">
-                          <div className="flex items-center justify-between pb-3 border-b border-slate-800/70">
+                        {/* SECTION 3: ZAŁOŻENIA TAKTYCZNE */}
+                        <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-4 shadow-sm text-slate-800">
+                          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                             <div className="flex items-center gap-2">
-                              <Target className="w-4 h-4 text-sky-400" />
-                              <h4 className="text-xs font-black uppercase text-white tracking-wider">
+                              <Target className="w-4 h-4 text-sky-600" />
+                              <h4 className="text-xs font-black uppercase text-slate-900 tracking-wider">
                                 Założenia Taktyczne & Przekierowanie do Modułów
                               </h4>
                             </div>
 
                             {isUnlocked ? (
-                              <span className="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-                                <Unlock className="w-3 h-3 text-emerald-400" />
+                              <span className="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1 shadow-sm">
+                                <Unlock className="w-3 h-3 text-emerald-600" />
                                 Odblokowane (Głos oddany)
                               </span>
                             ) : (
-                              <span className="px-2.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1">
-                                <Lock className="w-3 h-3 text-amber-400" />
+                              <span className="px-2.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-300 flex items-center gap-1">
+                                <Lock className="w-3 h-3 text-amber-600" />
                                 Zablokowane do czasu głosu
                               </span>
                             )}
@@ -2123,21 +2114,21 @@ function EventsAttendanceContent() {
 
                           {/* IF NOT UNLOCKED: SHOW LOCK BANNER (GATE) */}
                           {!isUnlocked ? (
-                            <div className="relative rounded-2xl overflow-hidden border border-amber-500/30 bg-[#090d14] p-6 text-center space-y-3">
-                              <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 mx-auto shadow-lg shadow-amber-500/10 animate-bounce">
+                            <div className="relative rounded-2xl overflow-hidden border border-amber-300 bg-amber-50/60 p-6 text-center space-y-3">
+                              <div className="w-12 h-12 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-700 mx-auto shadow-sm animate-bounce">
                                 <Lock className="w-6 h-6" />
                               </div>
-                              <h5 className="text-base font-black text-white uppercase tracking-tight">
+                              <h5 className="text-base font-black text-slate-900 uppercase tracking-tight">
                                 Założenia taktyczne i playbook są ukryte
                               </h5>
-                              <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                              <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
                                 Aby zobaczyć założenia taktyczne trenera, schematy gry oraz przejść do tablicy playbooka, <strong>musisz najpierw oddać głos w ankiecie powyżej</strong> (wystarczy kliknąć: <em>Będę</em>, <em>Niepewny</em> lub <em>Nie będę</em>).
                               </p>
                               {canManage && (
                                 <button
                                   type="button"
                                   onClick={() => setStaffBypassLock(prev => ({ ...prev, [event.id]: true }))}
-                                  className="text-[11px] text-sky-400 hover:underline font-bold pt-1 block mx-auto"
+                                  className="text-[11px] text-sky-600 hover:underline font-bold pt-1 block mx-auto"
                                 >
                                   Omiń blokadę (Podgląd sztabowy)
                                 </button>
@@ -2147,14 +2138,14 @@ function EventsAttendanceContent() {
                             /* IF UNLOCKED: SHOW FULL DETAILS AND DIRECT MODULE REDIRECTS */
                             <div className="space-y-4 animate-fadeIn">
                               {/* Event Description & Assumptions */}
-                              <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5 text-xs text-slate-300">
-                                <div className="text-[10px] font-black uppercase text-amber-400 tracking-wider">
+                              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs text-slate-700">
+                                <div className="text-[10px] font-black uppercase text-amber-700 tracking-wider">
                                   Plan & Wytyczne Trenerskie:
                                 </div>
                                 {event.description ? (
-                                  <p className="leading-relaxed text-slate-200 whitespace-pre-line">{event.description}</p>
+                                  <p className="leading-relaxed text-slate-800 whitespace-pre-line">{event.description}</p>
                                 ) : (
-                                  <p className="italic text-slate-500">Brak dodatkowych wytycznych tekstowych. Sprawdź tablicę taktyczną poniżej.</p>
+                                  <p className="italic text-slate-400">Brak dodatkowych wytycznych tekstowych. Sprawdź tablicę taktyczną poniżej.</p>
                                 )}
                               </div>
 
@@ -2166,11 +2157,11 @@ function EventsAttendanceContent() {
                                 if (linkedTactics.length === 0) return null;
                                 return (
                                   <div className="space-y-2 pt-1 pb-2">
-                                    <div className="text-[10px] font-black uppercase tracking-wider text-amber-400 flex items-center justify-between">
+                                    <div className="text-[10px] font-black uppercase tracking-wider text-amber-800 flex items-center justify-between">
                                       <span>📸 Zapisane Zrzuty Taktyczne do tej Jednostki ({linkedTactics.length}):</span>
                                       <Link
                                         href={`/taktyka?eventId=${event.id}&type=${isLeagueMatch ? 'MECZ_LIGOWY' : event.type}`}
-                                        className="text-[11px] text-sky-400 hover:text-white font-bold flex items-center gap-1"
+                                        className="text-[11px] text-sky-600 hover:underline font-bold flex items-center gap-1"
                                       >
                                         <span>Otwórz tablicę</span>
                                         <ArrowRight className="w-3.5 h-3.5" />
@@ -2178,26 +2169,26 @@ function EventsAttendanceContent() {
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                       {linkedTactics.map(tac => (
-                                        <div key={tac.id} className="p-3 bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-2xl space-y-2 transition shadow-md">
+                                        <div key={tac.id} className="p-3 bg-white border border-slate-200 hover:border-sky-300 rounded-2xl space-y-2 transition shadow-sm">
                                           <div className="flex items-center justify-between">
-                                            <span className="font-black text-xs text-white truncate max-w-[200px]">{tac.title}</span>
-                                            <span className="px-2 py-0.5 rounded text-[9px] font-mono font-black uppercase bg-slate-800 text-amber-300 border border-slate-700 shrink-0">
+                                            <span className="font-black text-xs text-slate-900 truncate max-w-[200px]">{tac.title}</span>
+                                            <span className="px-2 py-0.5 rounded text-[9px] font-mono font-black uppercase bg-slate-100 text-slate-700 border border-slate-200 shrink-0">
                                               {tac.rotation} • {tac.phase}
                                             </span>
                                           </div>
                                           {tac.drawingData && (
-                                            <div className="aspect-[16/9] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 max-h-28">
+                                            <div className="aspect-[16/9] bg-white rounded-xl overflow-hidden border border-slate-200 max-h-28">
                                               <img src={tac.drawingData} alt={tac.title} className="w-full h-full object-contain" />
                                             </div>
                                           )}
                                           {tac.description && (
-                                            <p className="text-[11px] text-slate-300 leading-snug line-clamp-2">
+                                            <p className="text-[11px] text-slate-600 leading-snug line-clamp-2">
                                               {tac.description}
                                             </p>
                                           )}
                                           <Link
                                             href={`/taktyka?eventId=${event.id}&tacticId=${tac.id}`}
-                                            className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-400 hover:text-sky-300 pt-1"
+                                            className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-600 hover:underline pt-1"
                                           >
                                             <span>Załaduj ten zrzut na tablicę</span>
                                             <ArrowRight className="w-3 h-3" />
@@ -2215,38 +2206,38 @@ function EventsAttendanceContent() {
                                   <>
                                     <Link
                                       href={`/taktyka?eventId=${event.id}&type=MECZ_LIGOWY`}
-                                      className="p-4 rounded-2xl border border-sky-500/40 bg-gradient-to-br from-sky-950/40 to-slate-900/90 hover:border-sky-400 text-white transition-all flex items-center justify-between group shadow-lg"
+                                      className="p-4 rounded-2xl border border-sky-200 bg-sky-50/50 hover:border-sky-300 text-slate-800 transition-all flex items-center justify-between group shadow-sm"
                                     >
                                       <div className="space-y-1">
                                         <div className="flex items-center gap-2">
-                                          <div className="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center p-0.5">
+                                          <div className="w-7 h-7 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center p-0.5">
                                             <img src="/lals_logo.png" alt="LALS" className="w-5 h-5 rounded-full object-contain" />
                                           </div>
-                                          <span className="text-xs font-black uppercase tracking-wider text-sky-300">
+                                          <span className="text-xs font-black uppercase tracking-wider text-sky-800">
                                             Odprawa Taktyczna LALS
                                           </span>
                                         </div>
-                                        <p className="text-[11px] text-slate-400">
+                                        <p className="text-[11px] text-slate-500">
                                           Rywal: {cleanOpponent || 'Przeciwnik'} • Serwis w strefę 1/5 & schemat bloku.
                                         </p>
                                       </div>
-                                      <ArrowRight className="w-5 h-5 text-sky-400 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
+                                      <ArrowRight className="w-5 h-5 text-sky-600 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
                                     </Link>
 
                                     <Link
                                       href="/rozgrywki"
-                                      className="p-4 rounded-2xl border border-slate-700/60 bg-gradient-to-br from-slate-900/80 to-slate-950/90 hover:border-slate-500 text-white transition-all flex items-center justify-between group shadow-lg"
+                                      className="p-4 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 text-slate-800 transition-all flex items-center justify-between group shadow-sm"
                                     >
                                       <div className="space-y-1">
                                         <div className="flex items-center gap-2">
-                                          <div className="w-7 h-7 rounded-lg bg-slate-800 text-amber-400 flex items-center justify-center">
+                                          <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-200">
                                             <Trophy className="w-4 h-4" />
                                           </div>
-                                          <span className="text-xs font-black uppercase tracking-wider text-slate-200">
+                                          <span className="text-xs font-black uppercase tracking-wider text-slate-900">
                                             Tabela & Wyniki LALS
                                           </span>
                                         </div>
-                                        <p className="text-[11px] text-slate-400">
+                                        <p className="text-[11px] text-slate-500">
                                           Aktualna tabela Lubońskiej Amatorskiej Ligi Siatkówki i bilans setów.
                                         </p>
                                       </div>
@@ -2257,80 +2248,80 @@ function EventsAttendanceContent() {
                                   <>
                                     <Link
                                       href={`/taktyka?eventId=${event.id}&type=TRENING`}
-                                      className="p-4 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/30 to-slate-900/90 hover:border-emerald-400 text-white transition-all flex items-center justify-between group shadow-lg"
+                                      className="p-4 rounded-2xl border border-emerald-200 bg-emerald-50/50 hover:border-emerald-300 text-slate-800 transition-all flex items-center justify-between group shadow-sm"
                                     >
                                       <div className="space-y-1">
                                         <div className="flex items-center gap-2">
-                                          <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                                          <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
                                             <Target className="w-4 h-4" />
                                           </div>
-                                          <span className="text-xs font-black uppercase tracking-wider text-emerald-300">
+                                          <span className="text-xs font-black uppercase tracking-wider text-emerald-800">
                                             Tablica Taktyczna & Schematy 5-1
                                           </span>
                                         </div>
-                                        <p className="text-[11px] text-slate-400">
+                                        <p className="text-[11px] text-slate-500">
                                           Zadania dla pozycji, zgranie szóstki i wstawienie potwierdzonych graczy.
                                         </p>
                                       </div>
-                                      <ArrowRight className="w-5 h-5 text-emerald-400 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
+                                      <ArrowRight className="w-5 h-5 text-emerald-600 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
                                     </Link>
 
                                     <Link
                                       href={`/trening?eventId=${event.id}`}
-                                      className="p-4 rounded-2xl border border-sky-500/40 bg-gradient-to-br from-sky-950/30 to-slate-900/90 hover:border-sky-400 text-white transition-all flex items-center justify-between group shadow-lg"
+                                      className="p-4 rounded-2xl border border-sky-200 bg-sky-50/50 hover:border-sky-300 text-slate-800 transition-all flex items-center justify-between group shadow-sm"
                                     >
                                       <div className="space-y-1">
                                         <div className="flex items-center gap-2">
-                                          <div className="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center">
+                                          <div className="w-7 h-7 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center">
                                             <Volleyball className="w-4 h-4" />
                                           </div>
-                                          <span className="text-xs font-black uppercase tracking-wider text-sky-300">
+                                          <span className="text-xs font-black uppercase tracking-wider text-sky-800">
                                             Rozpiska Treningowa & Ćwiczenia
                                           </span>
                                         </div>
-                                        <p className="text-[11px] text-slate-400">
+                                        <p className="text-[11px] text-slate-500">
                                           Rysunki ćwiczeń na boisku, grafiki, wideo, cele jednostki i wnioski trenera.
                                         </p>
                                       </div>
-                                      <ArrowRight className="w-5 h-5 text-sky-400 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
+                                      <ArrowRight className="w-5 h-5 text-sky-600 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
                                     </Link>
                                   </>
                                 ) : event.type === 'SPARING' ? (
                                   <>
                                     <Link
                                       href={`/taktyka?eventId=${event.id}&type=SPARING`}
-                                      className="p-4 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-950/30 to-slate-900/90 hover:border-amber-400 text-white transition-all flex items-center justify-between group shadow-lg"
+                                      className="p-4 rounded-2xl border border-amber-200 bg-amber-50/50 hover:border-amber-300 text-slate-800 transition-all flex items-center justify-between group shadow-sm"
                                     >
                                       <div className="space-y-1">
                                         <div className="flex items-center gap-2">
-                                          <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                                          <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
                                             <Swords className="w-4 h-4" />
                                           </div>
-                                          <span className="text-xs font-black uppercase tracking-wider text-amber-300">
+                                          <span className="text-xs font-black uppercase tracking-wider text-amber-800">
                                             Plan Taktyczny na Sparing
                                           </span>
                                         </div>
-                                        <p className="text-[11px] text-slate-400">
+                                        <p className="text-[11px] text-slate-500">
                                           Rywal: {event.opponent || 'Przeciwnik'} • Założenia na blok i test szóstki.
                                         </p>
                                       </div>
-                                      <ArrowRight className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
+                                      <ArrowRight className="w-5 h-5 text-amber-600 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
                                     </Link>
 
                                     <Link
                                       href="/rozgrywki"
-                                      className="p-4 rounded-2xl border border-slate-700/60 bg-gradient-to-br from-slate-900/80 to-slate-950/90 hover:border-slate-500 text-white transition-all flex items-center justify-between group shadow-lg"
+                                      className="p-4 rounded-2xl border border-slate-200 bg-white hover:border-amber-300 text-slate-800 transition-all flex items-center justify-between group shadow-sm"
                                     >
                                       <div className="space-y-1">
                                         <div className="flex items-center gap-2">
-                                          <div className="w-7 h-7 rounded-lg bg-slate-800 text-amber-400 flex items-center justify-center">
+                                          <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-200">
                                             <Trophy className="w-4 h-4" />
                                           </div>
-                                          <span className="text-xs font-black uppercase tracking-wider text-slate-200">
+                                          <span className="text-xs font-black uppercase tracking-wider text-slate-900">
                                             Centrum Rozgrywek & Wyniki
                                           </span>
                                         </div>
-                                        <p className="text-[11px] text-slate-400">
+                                        <p className="text-[11px] text-slate-500">
                                           Protokoły meczowe, tabele i historia sparingów zespołu.
                                         </p>
                                       </div>
@@ -2341,38 +2332,38 @@ function EventsAttendanceContent() {
                                   <>
                                     <Link
                                       href="/rozgrywki"
-                                      className="p-4 rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-950/30 to-slate-900/90 hover:border-purple-400 text-white transition-all flex items-center justify-between group shadow-lg"
+                                      className="p-4 rounded-2xl border border-purple-200 bg-purple-50/50 hover:border-purple-300 text-slate-800 transition-all flex items-center justify-between group shadow-sm"
                                     >
                                       <div className="space-y-1">
                                         <div className="flex items-center gap-2">
-                                          <div className="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center">
+                                          <div className="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center">
                                             <Trophy className="w-4 h-4" />
                                           </div>
-                                          <span className="text-xs font-black uppercase tracking-wider text-purple-300">
+                                          <span className="text-xs font-black uppercase tracking-wider text-purple-800">
                                             Moduł Turniejowy & Drabinka
                                           </span>
                                         </div>
-                                        <p className="text-[11px] text-slate-400">
+                                        <p className="text-[11px] text-slate-500">
                                           Faza grupowa, terminarz spotkań turniejowych i wyniki na żywo.
                                         </p>
                                       </div>
-                                      <ArrowRight className="w-5 h-5 text-purple-400 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
+                                      <ArrowRight className="w-5 h-5 text-purple-600 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
                                     </Link>
 
                                     <Link
                                       href={`/taktyka?eventId=${event.id}&type=TURNIEJ`}
-                                      className="p-4 rounded-2xl border border-slate-700/60 bg-gradient-to-br from-slate-900/80 to-slate-950/90 hover:border-slate-500 text-white transition-all flex items-center justify-between group shadow-lg"
+                                      className="p-4 rounded-2xl border border-slate-200 bg-white hover:border-purple-300 text-slate-800 transition-all flex items-center justify-between group shadow-sm"
                                     >
                                       <div className="space-y-1">
                                         <div className="flex items-center gap-2">
-                                          <div className="w-7 h-7 rounded-lg bg-slate-800 text-sky-400 flex items-center justify-center">
+                                          <div className="w-7 h-7 rounded-lg bg-slate-100 text-sky-700 flex items-center justify-center">
                                             <Target className="w-4 h-4" />
                                           </div>
-                                          <span className="text-xs font-black uppercase tracking-wider text-slate-200">
+                                          <span className="text-xs font-black uppercase tracking-wider text-slate-900">
                                             Taktyka & Zestawienie Turniejowe
                                           </span>
                                         </div>
-                                        <p className="text-[11px] text-slate-400">
+                                        <p className="text-[11px] text-slate-500">
                                           Rotacja zawodników i dyspozycja na cały turniej.
                                         </p>
                                       </div>
@@ -2395,15 +2386,15 @@ function EventsAttendanceContent() {
 
           {/* Pagination Controls for Events */}
           {totalEventsPages > 1 && (
-            <div className="bg-[#0b0e14] border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">
-              <div className="text-xs text-slate-400">
-                Wyświetlanie <strong className="text-white">{(eventsPage - 1) * EVENTS_PER_PAGE + 1}–{Math.min(eventsPage * EVENTS_PER_PAGE, filteredEvents.length)}</strong> z <strong className="text-white">{filteredEvents.length}</strong> jednostek
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm text-slate-800">
+              <div className="text-xs text-slate-500">
+                Wyświetlanie <strong className="text-slate-900">{(eventsPage - 1) * EVENTS_PER_PAGE + 1}–{Math.min(eventsPage * EVENTS_PER_PAGE, filteredEvents.length)}</strong> z <strong className="text-slate-900">{filteredEvents.length}</strong> jednostek
               </div>
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => setEventsPage(p => Math.max(1, p - 1))}
                   disabled={eventsPage === 1}
-                  className="px-2.5 py-1.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1 text-xs font-bold"
+                  className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1 text-xs font-bold"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                   <span>Poprzednia</span>
@@ -2415,8 +2406,8 @@ function EventsAttendanceContent() {
                       onClick={() => setEventsPage(p)}
                       className={`w-7 h-7 rounded-xl text-xs font-bold transition border ${
                         eventsPage === p
-                          ? 'bg-amber-500 text-slate-950 border-amber-400 font-black shadow-md'
-                          : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+                          ? 'bg-sky-600 text-white border-sky-600 font-black shadow-sm'
+                          : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
                       {p}
@@ -2426,7 +2417,7 @@ function EventsAttendanceContent() {
                 <button
                   onClick={() => setEventsPage(p => Math.min(totalEventsPages, p + 1))}
                   disabled={eventsPage === totalEventsPages}
-                  className="px-2.5 py-1.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1 text-xs font-bold"
+                  className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1 text-xs font-bold"
                 >
                   <span>Następna</span>
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -2443,16 +2434,16 @@ function EventsAttendanceContent() {
 
           {/* MODAL 2: Nowa Jednostka (Trening / Sparing / Turniej) */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-6 sm:p-7 w-full max-w-lg shadow-2xl space-y-4">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
-              <h3 className="text-base font-black uppercase text-white flex items-center gap-2">
-                <Plus className="w-5 h-5 text-amber-400" />
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-lg shadow-2xl space-y-4 text-slate-800">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+              <h3 className="text-base font-black uppercase text-slate-900 flex items-center gap-2">
+                <Plus className="w-5 h-5 text-sky-600" />
                 Zaplanuj Nową Jednostkę
               </h3>
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="text-slate-400 hover:text-white font-black"
+                className="text-slate-400 hover:text-slate-700 font-black"
               >
                 ✕
               </button>
@@ -2461,7 +2452,7 @@ function EventsAttendanceContent() {
             <form onSubmit={handleCreateEvent} className="space-y-4 text-xs">
               {/* Type selection */}
               <div>
-                <label className="block text-slate-400 font-bold mb-1">Typ jednostki</label>
+                <label className="block text-slate-600 font-bold mb-1">Typ jednostki</label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {[
                     { id: 'TRENING', label: '🏐 Trening' },
@@ -2475,8 +2466,8 @@ function EventsAttendanceContent() {
                       onClick={() => setNewEventType(t.id as EventType)}
                       className={`py-2 px-3 rounded-xl font-bold transition border ${
                         newEventType === t.id
-                          ? 'bg-amber-500 text-slate-950 border-amber-500 font-black'
-                          : 'bg-slate-900 text-slate-300 border-slate-800'
+                          ? 'bg-sky-600 text-white border-sky-600 font-black shadow-sm'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
                       {t.label}
@@ -2488,7 +2479,7 @@ function EventsAttendanceContent() {
               {/* Title & Presets */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-slate-400 font-bold">Tytuł jednostki</label>
+                  <label className="text-slate-600 font-bold">Tytuł jednostki</label>
                   {newEventType === 'TRENING' && (
                     <div className="flex gap-1">
                       {['Przyjęcie & blok', 'System 5-1', 'Motoryka'].map(preset => (
@@ -2496,7 +2487,7 @@ function EventsAttendanceContent() {
                           type="button"
                           key={preset}
                           onClick={() => setNewEventTitle(`Trening: ${preset}`)}
-                          className="text-[10px] text-amber-400 hover:underline"
+                          className="text-[10px] text-sky-600 hover:underline font-bold"
                         >
                           +{preset}
                         </button>
@@ -2515,7 +2506,7 @@ function EventsAttendanceContent() {
                               setNewEventLocation('Hala OSiR Luboń, ul. Kołłątaja 2');
                             }
                           }}
-                          className="text-[10px] text-sky-400 hover:underline"
+                          className="text-[10px] text-sky-600 hover:underline font-bold"
                         >
                           +{preset}
                         </button>
@@ -2529,20 +2520,20 @@ function EventsAttendanceContent() {
                   placeholder={newEventType === 'TRENING' ? 'np. Trening techniczno-taktyczny' : 'np. Sparing kontrolny'}
                   value={newEventTitle}
                   onChange={e => setNewEventTitle(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-amber-400"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
                 />
               </div>
 
               {/* Opponent (if Sparing, Tournament, or Match) */}
               {(newEventType === 'SPARING' || newEventType === 'TURNIEJ' || newEventType === 'MECZ') && (
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">Rywal / Zaproszone zespoły</label>
+                  <label className="block text-slate-600 font-bold mb-1">Rywal / Zaproszone zespoły</label>
                   <input
                     type="text"
                     placeholder="np. KS Metro Warszawa, Trefl Gdańsk II"
                     value={newEventOpponent}
                     onChange={e => setNewEventOpponent(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-amber-400"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
                   />
                 </div>
               )}
@@ -2550,67 +2541,67 @@ function EventsAttendanceContent() {
               {/* Date & Time */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">Data i godzina</label>
+                  <label className="block text-slate-600 font-bold mb-1">Data i godzina</label>
                   <input
                     type="datetime-local"
                     required
                     value={newEventDate}
                     onChange={e => setNewEventDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-none focus:border-amber-400"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">Lokalizacja (Hala)</label>
+                  <label className="block text-slate-600 font-bold mb-1">Lokalizacja (Hala)</label>
                   <input
                     type="text"
                     required
                     value={newEventLocation}
                     onChange={e => setNewEventLocation(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-none focus:border-amber-400"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white"
                   />
                 </div>
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-slate-400 font-bold mb-1">Założenia / Opis jednostki</label>
+                <label className="block text-slate-600 font-bold mb-1">Założenia / Opis jednostki</label>
                 <textarea
                   rows={2}
                   placeholder="Cele treningowe, plan taktyczny lub wytyczne zbiórki..."
                   value={newEventDescription}
                   onChange={e => setNewEventDescription(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-amber-400"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
                 />
               </div>
 
               {/* Cost (Tournament only) */}
               {newEventType === 'TURNIEJ' && (
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">Koszt wpisowego na zawodnika (zł)</label>
+                  <label className="block text-slate-600 font-bold mb-1">Koszt wpisowego na zawodnika (zł)</label>
                   <input
                     type="number"
                     min="0"
                     placeholder="np. 50"
                     value={newEventCost}
                     onChange={e => setNewEventCost(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white placeholder-slate-600 focus:outline-none focus:border-amber-400"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
                   />
                 </div>
               )}
 
               {/* Actions */}
-              <div className="flex justify-end gap-3 pt-3 border-t border-slate-800">
+              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 font-bold text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl bg-slate-100 border border-slate-200 font-bold text-slate-700 hover:bg-slate-200"
                 >
                   Anuluj
                 </button>
                 <button
                   type="submit"
                   disabled={creating}
-                  className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-lg shadow-amber-500/20"
+                  className="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black shadow-sm"
                 >
                   {creating ? 'Zapisywanie...' : 'Utwórz jednostkę'}
                 </button>
@@ -2622,16 +2613,16 @@ function EventsAttendanceContent() {
 
       {/* MODAL 2b: Edycja Istniejącej Jednostki */}
       {editingEvent && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-6 sm:p-7 w-full max-w-lg shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
-              <h3 className="text-base font-black uppercase text-white flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-amber-400" />
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-lg shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto text-slate-800">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+              <h3 className="text-base font-black uppercase text-slate-900 flex items-center gap-2">
+                <Edit3 className="w-5 h-5 text-sky-600" />
                 Edycja Jednostki
               </h3>
               <button
                 onClick={() => setEditingEvent(null)}
-                className="text-slate-400 hover:text-white font-black text-lg"
+                className="text-slate-400 hover:text-slate-700 font-black text-lg"
               >
                 ✕
               </button>
@@ -2640,7 +2631,7 @@ function EventsAttendanceContent() {
             <form onSubmit={handleSaveEditEvent} className="space-y-4 text-xs">
               {/* Typ jednostki */}
               <div>
-                <label className="block text-slate-400 font-bold mb-1">Typ jednostki</label>
+                <label className="block text-slate-600 font-bold mb-1">Typ jednostki</label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {[
                     { id: 'TRENING', label: '🏐 Trening' },
@@ -2654,8 +2645,8 @@ function EventsAttendanceContent() {
                       onClick={() => setEditType(t.id as EventType)}
                       className={`py-2 px-3 rounded-xl font-bold transition border ${
                         editType === t.id
-                          ? 'bg-amber-500 text-slate-950 border-amber-500 font-black'
-                          : 'bg-slate-900 text-slate-300 border-slate-800'
+                          ? 'bg-sky-600 text-white border-sky-600 font-black shadow-sm'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
                       {t.label}
@@ -2666,26 +2657,26 @@ function EventsAttendanceContent() {
 
               {/* Tytuł jednostki */}
               <div>
-                <label className="block text-slate-400 font-bold mb-1">Tytuł jednostki</label>
+                <label className="block text-slate-600 font-bold mb-1">Tytuł jednostki</label>
                 <input
                   type="text"
                   required
                   value={editTitle}
                   onChange={e => setEditTitle(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-none focus:border-amber-400"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white"
                 />
               </div>
 
               {/* Rywal (opcjonalny dla sparingu, meczu i turnieju) */}
               {(editType === 'SPARING' || editType === 'TURNIEJ' || editType === 'MECZ') && (
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">Rywal / Przeciwnik</label>
+                  <label className="block text-slate-600 font-bold mb-1">Rywal / Przeciwnik</label>
                   <input
                     type="text"
                     value={editOpponent}
                     onChange={e => setEditOpponent(e.target.value)}
                     placeholder="np. KS Sobieski Poznań"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-none focus:border-amber-400"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white"
                   />
                 </div>
               )}
@@ -2693,21 +2684,21 @@ function EventsAttendanceContent() {
               {/* Data i Godzina oraz Miejsce */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">Data i godzina</label>
+                  <label className="block text-slate-600 font-bold mb-1">Data i godzina</label>
                   <input
                     type="datetime-local"
                     required
                     value={editDate}
                     onChange={e => setEditDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-none focus:border-amber-400"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">Status jednostki</label>
+                  <label className="block text-slate-600 font-bold mb-1">Status jednostki</label>
                   <select
                     value={editStatus}
                     onChange={e => setEditStatus(e.target.value as EventStatus)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-none focus:border-amber-400"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white"
                   >
                     <option value="ANKIETA">Ankieta w toku (Głosowanie zawodników)</option>
                     <option value="WERYFIKACJA">Weryfikacja obecności</option>
@@ -2717,54 +2708,54 @@ function EventsAttendanceContent() {
               </div>
 
               <div>
-                <label className="block text-slate-400 font-bold mb-1">Hala / Lokalizacja</label>
+                <label className="block text-slate-600 font-bold mb-1">Hala / Lokalizacja</label>
                 <input
                   type="text"
                   required
                   value={editLocation}
                   onChange={e => setEditLocation(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-none focus:border-amber-400"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white"
                 />
               </div>
 
               {/* Koszt składki */}
               <div>
-                <label className="block text-slate-400 font-bold mb-1">Składka / Koszt od zawodnika (zł, 0 jeśli bez opłaty)</label>
+                <label className="block text-slate-600 font-bold mb-1">Składka / Koszt od zawodnika (zł, 0 jeśli bez opłaty)</label>
                 <input
                   type="number"
                   min="0"
                   value={editCost}
                   onChange={e => setEditCost(e.target.value)}
                   placeholder="0"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-none focus:border-amber-400"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white"
                 />
               </div>
 
               {/* Opis / Założenia */}
               <div>
-                <label className="block text-slate-400 font-bold mb-1">Założenia / Opis jednostki</label>
+                <label className="block text-slate-600 font-bold mb-1">Założenia / Opis jednostki</label>
                 <textarea
                   rows={2}
                   value={editDescription}
                   onChange={e => setEditDescription(e.target.value)}
                   placeholder="Plan taktyczny, cele treningowe, zbiórka..."
-                  className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-white focus:outline-none focus:border-amber-400"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white"
                 />
               </div>
 
               {/* Actions */}
-              <div className="flex justify-end gap-3 pt-3 border-t border-slate-800">
+              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setEditingEvent(null)}
-                  className="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 font-bold text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl bg-slate-100 border border-slate-200 font-bold text-slate-700 hover:bg-slate-200"
                 >
                   Anuluj
                 </button>
                 <button
                   type="submit"
                   disabled={savingEdit}
-                  className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-lg shadow-amber-500/20"
+                  className="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black shadow-sm"
                 >
                   {savingEdit ? 'Zapisywanie...' : 'Zapisz zmiany'}
                 </button>
@@ -2776,22 +2767,22 @@ function EventsAttendanceContent() {
 
       {/* MODAL 3: Coach Note Editor on Player */}
       {editingPlayerNote && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-6 w-full max-w-md shadow-2xl space-y-4">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
-              <h3 className="text-sm font-black uppercase text-white flex items-center gap-2">
-                <Shield className="w-4 h-4 text-sky-400" />
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-md shadow-2xl space-y-4 text-slate-800">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+              <h3 className="text-sm font-black uppercase text-slate-900 flex items-center gap-2">
+                <Shield className="w-4 h-4 text-sky-600" />
                 Notatka Trenera: {editingPlayerNote.name}
               </h3>
               <button
                 onClick={() => setEditingPlayerNote(null)}
-                className="text-slate-400 hover:text-white font-black"
+                className="text-slate-400 hover:text-slate-700 font-black"
               >
                 ✕
               </button>
             </div>
 
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500">
               Wpisz uwagi dotyczące frekwencji, zaangażowania lub usprawiedliwionych nieobecności zawodnika.
             </p>
 
@@ -2800,19 +2791,19 @@ function EventsAttendanceContent() {
               value={editingPlayerNote.note}
               onChange={e => setEditingPlayerNote({ ...editingPlayerNote, note: e.target.value })}
               placeholder="np. Zgłasza delegacje służbowe, wzorowa punktualność, gotowość do gry..."
-              className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white focus:outline-none focus:border-sky-400"
+              className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white"
             />
 
-            <div className="flex justify-end gap-3 pt-2">
+            <div className="flex justify-end gap-3 pt-2 border-t border-slate-100">
               <button
                 onClick={() => setEditingPlayerNote(null)}
-                className="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-400 hover:text-white"
+                className="px-4 py-2 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-200"
               >
                 Anuluj
               </button>
               <button
                 onClick={handleSaveCoachNote}
-                className="px-5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black"
+                className="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-black shadow-sm"
               >
                 Zapisz notatkę
               </button>

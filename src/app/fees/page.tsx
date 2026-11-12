@@ -757,17 +757,17 @@ function FeesContent() {
           )}
 
           {/* Table Container */}
-          <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5 text-slate-800">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
               <div>
-                <div className="inline-flex items-center gap-2 text-sky-400 text-xs font-black uppercase tracking-wider mb-1">
+                <div className="inline-flex items-center gap-2 text-sky-600 text-xs font-black uppercase tracking-wider mb-1">
                   <FileSpreadsheet className="w-4 h-4" />
                   Rejestr Składek Zawodników
                 </div>
-                <h2 className="text-xl font-black text-white uppercase tracking-tight">
+                <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">
                   Tabela Składek
                 </h2>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-slate-500 mt-0.5">
                   Szczegółowy rejestr wpłat każdego zawodnika, nadpłat oraz statusu księgowania.
                 </p>
               </div>
@@ -778,14 +778,14 @@ function FeesContent() {
                   onClick={() => setShowFilters(!showFilters)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
                     showFilters || activeFiltersCount > 0
-                      ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/40'
-                      : 'bg-slate-900 text-slate-300 border-slate-700 hover:text-white'
+                      ? 'bg-sky-50 text-sky-800 border-sky-300 shadow-sm'
+                      : 'bg-slate-50 text-slate-700 border-slate-200 hover:text-slate-900'
                   }`}
                 >
-                  <Filter className="w-3.5 h-3.5 text-emerald-400" />
+                  <Filter className="w-3.5 h-3.5 text-sky-600" />
                   <span>Filtry</span>
                   {activeFiltersCount > 0 && (
-                    <span className="px-1.5 py-0.2 rounded-full bg-emerald-500 text-slate-950 font-black text-[10px]">
+                    <span className="px-1.5 py-0.2 rounded-full bg-sky-600 text-white font-black text-[10px]">
                       {activeFiltersCount}
                     </span>
                   )}
@@ -799,7 +799,7 @@ function FeesContent() {
                       setFilterStatus('ALL');
                       setSearchPlayer('');
                     }}
-                    className="text-[11px] font-bold text-slate-400 hover:text-rose-400 transition underline underline-offset-2 ml-1"
+                    className="text-[11px] font-bold text-slate-500 hover:text-rose-600 transition underline underline-offset-2 ml-1"
                   >
                     Wyczyść filtry
                   </button>
@@ -809,7 +809,7 @@ function FeesContent() {
 
             {/* Collapsible Filters Panel */}
             {showFilters && (
-              <div className="px-6 pb-4 pt-1 border-b border-slate-800/80 flex flex-wrap items-center gap-2.5">
+              <div className="px-6 pb-4 pt-1 border-b border-slate-200 flex flex-wrap items-center gap-2.5">
                 <div className="relative">
                   <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
                   <input
@@ -817,7 +817,7 @@ function FeesContent() {
                     placeholder="Szukaj zawodnika..."
                     value={searchPlayer}
                     onChange={e => setSearchPlayer(e.target.value)}
-                    className="bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
+                    className="bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
                   />
                 </div>
 
@@ -977,12 +977,12 @@ function FeesContent() {
         <div className="space-y-6">
           {/* Summary Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xl relative overflow-hidden">
-              <div className="flex items-center justify-between text-slate-400 mb-2">
+            <div className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-sm relative overflow-hidden text-slate-800">
+              <div className="flex items-center justify-between text-slate-500 mb-2">
                 <span className="text-[11px] font-black uppercase tracking-wider">Suma Przychodów</span>
-                <ArrowUpRight className="w-4 h-4 text-emerald-400" />
+                <ArrowUpRight className="w-4 h-4 text-emerald-600" />
               </div>
-              <div className="text-xl sm:text-2xl font-black text-emerald-400 font-mono">
+              <div className="text-xl sm:text-2xl font-black text-emerald-700 font-mono">
                 +{summary?.totalRevenues ?? summary?.totalCollected ?? 0} zł
               </div>
               <span className="text-[10px] text-slate-500 font-medium truncate block">
@@ -990,12 +990,12 @@ function FeesContent() {
               </span>
             </div>
 
-            <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xl relative overflow-hidden">
-              <div className="flex items-center justify-between text-slate-400 mb-2">
+            <div className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-sm relative overflow-hidden text-slate-800">
+              <div className="flex items-center justify-between text-slate-500 mb-2">
                 <span className="text-[11px] font-black uppercase tracking-wider">Suma Wydatków</span>
-                <ArrowDownRight className="w-4 h-4 text-rose-400" />
+                <ArrowDownRight className="w-4 h-4 text-rose-600" />
               </div>
-              <div className="text-xl sm:text-2xl font-black text-rose-400 font-mono">
+              <div className="text-xl sm:text-2xl font-black text-rose-600 font-mono">
                 -{summary?.totalExpenses || 0} zł
               </div>
               <span className="text-[10px] text-slate-500 font-medium truncate block">
@@ -1003,15 +1003,15 @@ function FeesContent() {
               </span>
             </div>
 
-            <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xl relative overflow-hidden">
-              <div className="flex items-center justify-between text-slate-400 mb-2">
+            <div className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-sm relative overflow-hidden text-slate-800">
+              <div className="flex items-center justify-between text-slate-500 mb-2">
                 <span className="text-[11px] font-black uppercase tracking-wider">Saldo Kasy Zespołu</span>
-                <Wallet className="w-4 h-4 text-amber-400" />
+                <Wallet className="w-4 h-4 text-amber-600" />
               </div>
               <div className={`text-xl sm:text-2xl font-black font-mono ${
                 ((summary?.totalRevenues || 0) - (summary?.totalExpenses || 0)) >= 0
-                  ? 'text-amber-400'
-                  : 'text-rose-400'
+                  ? 'text-amber-700'
+                  : 'text-rose-600'
               }`}>
                 {((summary?.totalRevenues || 0) - (summary?.totalExpenses || 0))} zł
               </div>
@@ -1020,12 +1020,12 @@ function FeesContent() {
               </span>
             </div>
 
-            <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xl relative overflow-hidden">
-              <div className="flex items-center justify-between text-slate-400 mb-2">
+            <div className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-sm relative overflow-hidden text-slate-800">
+              <div className="flex items-center justify-between text-slate-500 mb-2">
                 <span className="text-[11px] font-black uppercase tracking-wider">Skarbiec (Nadpłaty)</span>
-                <Coins className="w-4 h-4 text-sky-400" />
+                <Coins className="w-4 h-4 text-sky-600" />
               </div>
-              <div className="text-xl sm:text-2xl font-black text-sky-400 font-mono">
+              <div className="text-xl sm:text-2xl font-black text-sky-700 font-mono">
                 {treasury?.balance || 0} zł
               </div>
               <span className="text-[10px] text-slate-500 font-medium truncate block">
@@ -1035,17 +1035,17 @@ function FeesContent() {
           </div>
 
           {/* Table Container */}
-          <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5 text-slate-800">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
               <div>
-                <div className="inline-flex items-center gap-2 text-amber-400 text-xs font-black uppercase tracking-wider mb-1">
+                <div className="inline-flex items-center gap-2 text-amber-600 text-xs font-black uppercase tracking-wider mb-1">
                   <Coins className="w-4 h-4" />
                   Księga Finansowa & Przepływy
                 </div>
-                <h2 className="text-xl font-black text-white uppercase tracking-tight">
+                <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">
                   Tabela Wydatków i Przychodów
                 </h2>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-slate-500 mt-0.5">
                   Ewidencja wszystkich kosztów (hala, sędziowie, sprzęt) oraz wpływów (sponsorzy, nagrody, darowizny).
                 </p>
               </div>
@@ -1282,31 +1282,31 @@ function FeesContent() {
               return (
                 <div
                   key={pay.id}
-                  className={`bg-[#0c1016] border rounded-3xl p-5 transition flex flex-col justify-between shadow-xl ${
-                    isPaid ? 'border-emerald-500/40' : isOverdue ? 'border-rose-500/60 bg-rose-950/10' : 'border-amber-500/40'
+                  className={`bg-white border rounded-3xl p-5 transition flex flex-col justify-between shadow-sm text-slate-800 ${
+                    isPaid ? 'border-emerald-200' : isOverdue ? 'border-rose-300 bg-rose-50/20' : 'border-amber-200'
                   }`}
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-slate-800 text-slate-300 border border-slate-700">
+                      <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-slate-100 text-slate-700 border border-slate-200">
                         {fee?.type || 'SKŁADKA'}
                       </span>
                       <span className={`px-2.5 py-0.5 rounded-full text-xs font-black ${
-                        isPaid ? 'bg-emerald-500/20 text-emerald-300' : isOverdue ? 'bg-rose-500/20 text-rose-300' : 'bg-amber-500/20 text-amber-300'
+                        isPaid ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : isOverdue ? 'bg-rose-50 text-rose-800 border border-rose-200' : 'bg-amber-50 text-amber-800 border border-amber-200'
                       }`}>
                         {pay.status}
                       </span>
                     </div>
 
-                    <h3 className="text-base font-black text-white line-clamp-1">{fee?.title || 'Składka'}</h3>
-                    {fee?.description && <p className="text-xs text-slate-400 mt-1 line-clamp-2">{fee.description}</p>}
+                    <h3 className="text-base font-black text-slate-900 line-clamp-1">{fee?.title || 'Składka'}</h3>
+                    {fee?.description && <p className="text-xs text-slate-500 mt-1 line-clamp-2">{fee.description}</p>}
 
-                    <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
-                      <span className="text-slate-400">Termin: {fee?.dueDate}</span>
+                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                      <span className="text-slate-500">Termin: {fee?.dueDate}</span>
                       <div className="text-right">
-                        <span className="text-xl font-black text-white font-mono">{pay.amount} zł</span>
+                        <span className="text-xl font-black text-slate-900 font-mono">{pay.amount} zł</span>
                         {pay.overpayment && pay.overpayment > 0 && (
-                          <span className="block text-[10px] text-sky-400 font-bold">
+                          <span className="block text-[10px] text-sky-700 font-bold">
                             (w tym +{pay.overpayment} zł do skarbca)
                           </span>
                         )}
@@ -1317,10 +1317,10 @@ function FeesContent() {
                   <div className="mt-5">
                     {isPaid ? (
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] text-slate-400">Opłacono: {pay.paymentMethod}</span>
+                        <span className="text-[11px] text-slate-500">Opłacono: {pay.paymentMethod}</span>
                         <button
                           onClick={() => openReceipt(pay, fee)}
-                          className="text-xs text-sky-400 hover:underline flex items-center gap-1 font-bold"
+                          className="text-xs text-sky-600 hover:underline flex items-center gap-1 font-bold"
                         >
                           <Receipt className="w-3.5 h-3.5" /> Potwierdzenie
                         </button>
@@ -1328,7 +1328,7 @@ function FeesContent() {
                     ) : (
                       <button
                         onClick={() => handleOpenPaymentModal(pay)}
-                        className="w-full py-2.5 px-4 rounded-xl font-black text-xs uppercase tracking-wider bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 text-slate-950 shadow-lg shadow-sky-500/20 transition flex items-center justify-center gap-2"
+                        className="w-full py-2.5 px-4 rounded-xl font-black text-xs uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white shadow-sm transition flex items-center justify-center gap-2"
                       >
                         <Smartphone className="w-4 h-4" />
                         Opłać składkę (BLIK / Przelew)
@@ -1344,19 +1344,19 @@ function FeesContent() {
 
       {/* Payment Modal with Flexible Amount */}
       {paymentModalOpen && selectedPayment && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-6 sm:p-7 w-full max-w-md shadow-2xl relative">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-md shadow-2xl relative text-slate-800">
             <button
               onClick={() => setPaymentModalOpen(false)}
-              className="absolute top-5 right-5 text-slate-400 hover:text-white"
+              className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"
             >
               <X className="w-5 h-5" />
             </button>
 
             {!paymentSuccess ? (
               <div>
-                <div className="flex items-center gap-3 pb-4 border-b border-slate-800 mb-5">
-                  <div className="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center font-black border border-sky-500/40">
+                <div className="flex items-center gap-3 pb-4 border-b border-slate-100 mb-5">
+                  <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-black border border-sky-200">
                     <Smartphone className="w-5 h-5" />
                   </div>
                   <div>
@@ -1489,23 +1489,23 @@ function FeesContent() {
 
       {/* Modal: Dodaj Wydatek / Przychód */}
       {showExpenseModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-2xl relative">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
-              <h3 className="text-base font-black text-white uppercase flex items-center gap-2">
-                <Coins className="w-5 h-5 text-amber-400" />
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-2xl relative text-slate-800">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+              <h3 className="text-base font-black text-slate-900 uppercase flex items-center gap-2">
+                <Coins className="w-5 h-5 text-amber-600" />
                 <span>Nowa Operacja Finansowa</span>
               </h3>
-              <button onClick={() => setShowExpenseModal(false)} className="text-slate-400 hover:text-white">✕</button>
+              <button onClick={() => setShowExpenseModal(false)} className="text-slate-400 hover:text-slate-700">✕</button>
             </div>
 
             <form onSubmit={handleCreateTransaction} className="space-y-4">
               {/* Type Switcher */}
               <div>
-                <label className="block text-xs font-black uppercase text-slate-300 mb-1.5">
+                <label className="block text-xs font-black uppercase text-slate-600 mb-1.5">
                   Typ operacji *
                 </label>
-                <div className="flex rounded-2xl bg-slate-900 p-1 border border-slate-800">
+                <div className="flex rounded-2xl bg-slate-100 p-1 border border-slate-200">
                   <button
                     type="button"
                     onClick={() => {
@@ -1514,8 +1514,8 @@ function FeesContent() {
                     }}
                     className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition flex items-center justify-center gap-1.5 ${
                       transactionType === 'EXPENSE'
-                        ? 'bg-rose-500 text-white shadow-md shadow-rose-500/20'
-                        : 'text-slate-400 hover:text-white'
+                        ? 'bg-rose-600 text-white shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     <ArrowDownRight className="w-4 h-4" />
@@ -1529,8 +1529,8 @@ function FeesContent() {
                     }}
                     className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition flex items-center justify-center gap-1.5 ${
                       transactionType === 'INCOME'
-                        ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
-                        : 'text-slate-400 hover:text-white'
+                        ? 'bg-emerald-600 text-white shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     <ArrowUpRight className="w-4 h-4" />
@@ -1540,7 +1540,7 @@ function FeesContent() {
               </div>
 
               <div>
-                <label className="block text-xs font-black uppercase text-slate-300 mb-1">
+                <label className="block text-xs font-black uppercase text-slate-600 mb-1">
                   {transactionType === 'EXPENSE' ? 'Cel / Tytuł wydatku *' : 'Źródło / Tytuł przychodu *'}
                 </label>
                 <input
@@ -1549,91 +1549,49 @@ function FeesContent() {
                   placeholder={transactionType === 'EXPENSE' ? 'np. Wynajem hali Luboń, zakup piłek Mikasa...' : 'np. Wsparcie sponsora Dark Angel, zbiórka na turniej...'}
                   value={expenseTitle}
                   onChange={e => setExpenseTitle(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-400"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-black uppercase text-slate-300 mb-1">Kwota (zł) *</label>
+                  <label className="block text-xs font-black uppercase text-slate-600 mb-1">Kwota (zł) *</label>
                   <input
                     type="number"
                     required
+                    min="1"
                     placeholder="np. 250"
                     value={expenseAmount}
                     onChange={e => setExpenseAmount(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white font-mono font-black focus:outline-none focus:border-amber-400"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 font-mono font-bold focus:outline-none focus:border-sky-500 focus:bg-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-black uppercase text-slate-300 mb-1">Kategoria</label>
-                  <select
-                    value={expenseCategory}
-                    onChange={e => setExpenseCategory(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-400"
-                  >
-                    {transactionType === 'EXPENSE' ? (
-                      <>
-                        <option value="HALA">🏢 Wynajem hali</option>
-                        <option value="SEDZIOWIE">⚖️ Opłaty sędziowskie</option>
-                        <option value="SPRZET">🏐 Sprzęt & Piłki</option>
-                        <option value="TURNIEJ">🏆 Wpisowe turniejowe</option>
-                        <option value="WODA_ODZYWKI">💧 Woda & Napoje</option>
-                        <option value="INNE">📦 Inne klubowe</option>
-                      </>
-                    ) : (
-                      <>
-                        <option value="SPONSOR">🤝 Wsparcie sponsorskie</option>
-                        <option value="DAROWIZNA">🎁 Darowizna / Zbiórka</option>
-                        <option value="NAGRODA">🥇 Nagroda turniejowa</option>
-                        <option value="SKLADKI">💳 Wpłaty ze składek</option>
-                        <option value="ZWROT">🔄 Zwrot / Refundacja</option>
-                        <option value="INNE">💵 Inny przychód</option>
-                      </>
-                    )}
-                  </select>
+                  <label className="block text-xs font-black uppercase text-slate-600 mb-1">Data *</label>
+                  <input
+                    type="date"
+                    required
+                    value={expenseDate}
+                    onChange={e => setExpenseDate(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white"
+                  />
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-black uppercase text-slate-300 mb-1">Data operacji</label>
-                <input
-                  type="date"
-                  value={expenseDate}
-                  onChange={e => setExpenseDate(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-400"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-black uppercase text-slate-300 mb-1">Opis / Szczegóły dokumentu</label>
-                <textarea
-                  rows={2}
-                  value={expenseDesc}
-                  onChange={e => setExpenseDesc(e.target.value)}
-                  placeholder="Numer paragonu/faktury, umowa sponsorska, specyfikacja..."
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-400"
-                />
               </div>
 
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowExpenseModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200"
                 >
                   Anuluj
                 </button>
                 <button
                   type="submit"
                   disabled={submittingExpense}
-                  className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
-                    transactionType === 'INCOME'
-                      ? 'bg-emerald-500 hover:bg-emerald-400 text-slate-950'
-                      : 'bg-rose-500 hover:bg-rose-400 text-white'
-                  }`}
+                  className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm"
                 >
-                  {submittingExpense ? 'Zapisywanie...' : transactionType === 'INCOME' ? 'Zatwierdź Przychód' : 'Zatwierdź Wydatek'}
+                  {submittingExpense ? 'Zapisywanie...' : 'Zapisz operację'}
                 </button>
               </div>
             </form>
@@ -1643,45 +1601,45 @@ function FeesContent() {
 
       {/* Modal: Nowa Składka */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl w-full max-w-lg p-6 shadow-2xl relative">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-5">
-              <h3 className="text-base font-black text-white uppercase">Nowa Składka Klubowa</h3>
-              <button onClick={() => setShowCreateModal(false)} className="text-slate-400 hover:text-white">✕</button>
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-lg p-6 shadow-2xl relative text-slate-800">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+              <h3 className="text-base font-black text-slate-900 uppercase">Nowa Składka Klubowa</h3>
+              <button onClick={() => setShowCreateModal(false)} className="text-slate-400 hover:text-slate-700">✕</button>
             </div>
 
             <form onSubmit={handleCreateFee} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Tytuł składki *</label>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Tytuł składki *</label>
                 <input
                   type="text"
                   required
                   placeholder="np. Składka klubowa - Grudzień 2026"
                   value={newTitle}
                   onChange={e => setNewTitle(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Kwota bazowa (zł) *</label>
+                  <label className="block text-xs font-bold text-slate-600 mb-1">Kwota bazowa (zł) *</label>
                   <input
                     type="number"
                     required
                     value={newAmount}
                     onChange={e => setNewAmount(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white font-mono font-black"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 font-mono font-black focus:outline-none focus:border-sky-500 focus:bg-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Termin *</label>
+                  <label className="block text-xs font-bold text-slate-600 mb-1">Termin *</label>
                   <input
                     type="date"
                     required
                     value={newDueDate}
                     onChange={e => setNewDueDate(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white"
                   />
                 </div>
               </div>
@@ -1690,14 +1648,14 @@ function FeesContent() {
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200"
                 >
                   Anuluj
                 </button>
                 <button
                   type="submit"
                   disabled={submittingFee}
-                  className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition"
+                  className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm"
                 >
                   Utwórz składkę
                 </button>
@@ -1709,60 +1667,60 @@ function FeesContent() {
 
       {/* Modal: Potwierdzenie Wpłaty */}
       {receiptModalOpen && receiptData && (
-        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0b0e14] text-slate-100 rounded-3xl w-full max-w-md p-6 shadow-2xl relative border border-slate-800">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white text-slate-800 rounded-3xl w-full max-w-md p-6 shadow-2xl relative border border-slate-200">
             <button
               onClick={() => setReceiptModalOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 p-1"
             >
               ✕
             </button>
 
-            <div className="text-center pb-4 border-b border-slate-800">
+            <div className="text-center pb-4 border-b border-slate-100">
               <span className="text-3xl">🏐</span>
-              <h2 className="text-lg font-black text-white uppercase tracking-wider mt-1">ANGELS ZTP</h2>
-              <p className="text-[10px] text-sky-400 uppercase tracking-widest font-bold">Oficjalne Potwierdzenie Wpłaty</p>
+              <h2 className="text-lg font-black text-slate-900 uppercase tracking-wider mt-1">ANGELS ZTP</h2>
+              <p className="text-[10px] text-sky-700 uppercase tracking-widest font-bold">Oficjalne Potwierdzenie Wpłaty</p>
             </div>
 
             <div className="py-4 space-y-3 text-xs">
               <div className="flex justify-between">
-                <span className="text-slate-400">Tytuł:</span>
-                <strong className="text-right text-white">{receiptData.fee?.title || 'Składka klubowa'}</strong>
+                <span className="text-slate-500">Tytuł:</span>
+                <strong className="text-right text-slate-900">{receiptData.fee?.title || 'Składka klubowa'}</strong>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Zawodnik:</span>
-                <strong className="text-white">{receiptData.payment?.userName}</strong>
+                <span className="text-slate-500">Zawodnik:</span>
+                <strong className="text-slate-900">{receiptData.payment?.userName}</strong>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Kwota uregulowana:</span>
-                <strong className="text-lg text-emerald-400 font-mono font-black">{receiptData.payment?.amount} PLN</strong>
+                <span className="text-slate-500">Kwota uregulowana:</span>
+                <strong className="text-lg text-emerald-700 font-mono font-black">{receiptData.payment?.amount} PLN</strong>
               </div>
               {receiptData.payment?.overpayment > 0 && (
-                <div className="flex justify-between text-sky-400">
+                <div className="flex justify-between text-sky-700">
                   <span>W tym nadpłata do skarbca:</span>
                   <strong className="font-mono">+{receiptData.payment.overpayment} PLN</strong>
                 </div>
               )}
               <div className="flex justify-between">
-                <span className="text-slate-400">Metoda płatności:</span>
-                <strong className="text-amber-400">{receiptData.payment?.paymentMethod || 'BLIK'}</strong>
+                <span className="text-slate-500">Metoda płatności:</span>
+                <strong className="text-amber-700">{receiptData.payment?.paymentMethod || 'BLIK'}</strong>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Numer transakcji:</span>
-                <span className="font-mono text-slate-300">{receiptData.payment?.transactionId}</span>
+                <span className="text-slate-500">Numer transakcji:</span>
+                <span className="font-mono text-slate-600">{receiptData.payment?.transactionId}</span>
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-800 text-center">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 text-xs font-bold mb-3">
-                <CheckCircle className="w-4 h-4" /> ROZLICZONE W SKARBCU
+            <div className="pt-4 border-t border-slate-100 text-center">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold mb-3">
+                <CheckCircle className="w-4 h-4 text-emerald-600" /> ROZLICZONE W SKARBCU
               </div>
             </div>
 
             <div className="mt-4 flex gap-2">
               <button
                 onClick={() => window.print()}
-                className="flex-1 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-2 border border-slate-700"
+                className="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-2 border border-slate-200 shadow-sm"
               >
                 <Printer className="w-4 h-4" /> Drukuj
               </button>
@@ -1773,34 +1731,34 @@ function FeesContent() {
 
       {/* Modal: Przypomnienie o składkach */}
       {showReminderModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-6 sm:p-7 w-full max-w-lg shadow-2xl relative">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-lg shadow-2xl relative text-slate-800 space-y-4">
             <button
               onClick={() => setShowReminderModal(false)}
-              className="absolute top-5 right-5 text-slate-400 hover:text-white"
+              className="absolute top-5 right-5 text-slate-400 hover:text-slate-700"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="flex items-center gap-3 pb-4 border-b border-slate-800 mb-5">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-black border border-amber-500/40">
+            <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-black border border-amber-200">
                 <BellRing className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-black text-white uppercase">Przypomnij o Składkach</h3>
-                <p className="text-xs text-slate-400">Wyślij gotowy komunikat do zalegających graczy</p>
+                <h3 className="text-base font-black text-slate-900 uppercase">Przypomnij o Składkach</h3>
+                <p className="text-xs text-slate-500">Wyślij gotowy komunikat do zalegających graczy</p>
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3 text-xs">
               <div>
-                <label className="block text-xs font-black uppercase text-slate-300 mb-1">
-                  Wybierz składkę do rozliczenia:
+                <label className="block text-[11px] font-black uppercase text-slate-500 mb-1">
+                  Wybierz składkę do przypomnienia
                 </label>
                 <select
                   value={reminderFeeId}
                   onChange={e => setReminderFeeId(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-800 font-bold focus:outline-none focus:border-sky-500"
                 >
                   <option value="ALL">Wszystkie aktywne składki</option>
                   {fees.map(f => (
@@ -1809,67 +1767,39 @@ function FeesContent() {
                 </select>
               </div>
 
-              {/* Summary Stats */}
-              {(() => {
-                const { uniqueNames, totalDue } = getPendingData();
-                return (
-                  <div className="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-center justify-between text-xs">
-                    <div>
-                      <span className="text-slate-400">Oczekujących zawodników:</span>
-                      <strong className="block text-white font-mono text-sm">{uniqueNames.length} osób</strong>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-slate-400">Łączna kwota zaległości:</span>
-                      <strong className="block text-amber-400 font-mono text-base font-black">{totalDue} zł</strong>
-                    </div>
-                  </div>
-                );
-              })()}
-
               <div>
-                <label className="block text-xs font-black uppercase text-slate-300 mb-1">
-                  Treść powiadomienia (możesz edytować przed wysyłką):
+                <label className="block text-[11px] font-black uppercase text-slate-500 mb-1">
+                  Treść komunikatu (możesz edytować)
                 </label>
                 <textarea
                   rows={6}
                   value={customReminderText || generateReminderMsg()}
                   onChange={e => setCustomReminderText(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-2xl p-3 text-xs text-slate-200 font-mono focus:outline-none focus:border-amber-400"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-800 font-mono focus:outline-none focus:border-sky-500"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => {
                     const text = customReminderText || generateReminderMsg();
                     navigator.clipboard.writeText(text);
                     setCopiedReminder(true);
-                    setTimeout(() => setCopiedReminder(false), 2500);
+                    setTimeout(() => setCopiedReminder(false), 2000);
                   }}
-                  className="py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700 transition"
+                  className="w-full sm:w-auto px-4 py-2 rounded-xl border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center justify-center gap-1.5"
                 >
-                  {copiedReminder ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4 text-sky-400" />}
-                  {copiedReminder ? 'Skopiowano!' : 'Kopiuj treść'}
+                  {copiedReminder ? '✓ Skopiowano do schowka' : '📋 Kopiuj na WhatsApp / SMS'}
                 </button>
-
-                <a
-                  href={`https://wa.me/?text=${encodeURIComponent(customReminderText || generateReminderMsg())}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md transition text-center"
-                >
-                  <ExternalLink className="w-4 h-4" /> WhatsApp
-                </a>
 
                 <button
                   type="button"
-                  disabled={postingAnnouncement}
                   onClick={handlePublishReminderAnnouncement}
-                  className="py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md transition"
+                  disabled={postingAnnouncement}
+                  className="w-full sm:w-auto px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition shadow-sm"
                 >
-                  <BellRing className="w-4 h-4" />
-                  {postingAnnouncement ? 'Publikowanie...' : 'Na Tablicę'}
+                  {postingAnnouncement ? 'Publikowanie...' : '📢 Opublikuj na Tablicy'}
                 </button>
               </div>
             </div>

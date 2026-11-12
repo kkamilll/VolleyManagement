@@ -208,14 +208,14 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[#050811]/90 backdrop-blur-2xl text-white shadow-2xl border-b border-sky-500/20">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md text-slate-800 shadow-sm border-b border-slate-200">
       {/* Main Navbar */}
       <div className="w-full">
         <div className="max-w-[2000px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 flex items-center justify-between h-16">
           {/* Logo & Brand with Angels ZTP Logo */}
           <div className="flex items-center gap-3 shrink-0">
             <a href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#090d16] p-0.5 shadow-lg shadow-sky-500/20 border border-sky-500/40 group-hover:border-sky-400 group-hover:shadow-sky-500/40 transition overflow-hidden shrink-0 flex items-center justify-center">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white p-0.5 shadow-sm border border-slate-200 group-hover:border-sky-400 group-hover:shadow-md transition overflow-hidden shrink-0 flex items-center justify-center">
                 <img 
                   src="/logo.jpg" 
                   alt="Angels ZTP Logo" 
@@ -223,10 +223,10 @@ export default function Navbar() {
                 />
               </div>
               <div className="flex flex-col shrink-0 leading-tight">
-                <span className="font-black text-base sm:text-lg tracking-wider uppercase drop-shadow font-athletic text-gradient-cyan whitespace-nowrap">
+                <span className="font-black text-base sm:text-lg tracking-wider uppercase font-athletic text-slate-900 group-hover:text-sky-600 transition whitespace-nowrap">
                   ANGELS ZTP
                 </span>
-                <span className="hidden sm:inline-block text-[9px] sm:text-[10px] font-bold text-sky-500 dark:text-sky-400 tracking-widest uppercase whitespace-nowrap">
+                <span className="hidden sm:inline-block text-[9px] sm:text-[10px] font-bold text-sky-600 tracking-widest uppercase whitespace-nowrap">
                   VOLLEYBALL TEAM
                 </span>
               </div>
@@ -239,11 +239,11 @@ export default function Navbar() {
               href="/"
               className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname === '/'
-                  ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              <LayoutDashboard className="w-4 h-4 text-sky-400" />
+              <LayoutDashboard className="w-4 h-4 text-sky-600" />
               Pulpit
             </a>
 
@@ -251,11 +251,11 @@ export default function Navbar() {
               href="/events"
               className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname.startsWith('/events')
-                  ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              <Calendar className="w-4 h-4 text-amber-400" />
+              <Calendar className="w-4 h-4 text-amber-600" />
               <span>Terminarz</span>
             </a>
 
@@ -265,37 +265,37 @@ export default function Navbar() {
                 href="/rozgrywki"
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                   pathname.startsWith('/rozgrywki')
-                    ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                    ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
-                <Volleyball className="w-4 h-4 text-amber-400" />
+                <Volleyball className="w-4 h-4 text-amber-600" />
                 <span>Rozgrywki</span>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition" />
               </a>
 
               {/* Submenu Dropdown */}
               <div className="absolute left-0 top-full pt-1.5 hidden group-hover:block z-50">
-                <div className="w-56 bg-[#090d16] border border-sky-500/30 rounded-2xl shadow-2xl p-1.5 space-y-0.5 backdrop-blur-2xl">
+                <div className="w-56 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 space-y-0.5">
                   <a
                     href="/rozgrywki?tab=sparingi"
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-200 hover:text-amber-300 hover:bg-slate-800/80 transition"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-amber-700 hover:bg-amber-50 transition"
                   >
-                    <Calendar className="w-4 h-4 text-amber-400" />
+                    <Calendar className="w-4 h-4 text-amber-500" />
                     <span>Sparingi</span>
                   </a>
                   <a
                     href="/rozgrywki?tab=liga"
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-200 hover:text-sky-300 hover:bg-slate-800/80 transition"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-sky-700 hover:bg-sky-50 transition"
                   >
                     <img src="/lals_logo.png" alt="LALS" className="w-4 h-4 rounded-full object-contain" />
                     <span>Liga LALS & Tabela</span>
                   </a>
                   <a
                     href="/rozgrywki?tab=turnieje"
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-200 hover:text-purple-300 hover:bg-slate-800/80 transition"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-purple-700 hover:bg-purple-50 transition"
                   >
-                    <Trophy className="w-4 h-4 text-purple-400" />
+                    <Trophy className="w-4 h-4 text-purple-500" />
                     <span>Turnieje</span>
                   </a>
                 </div>
@@ -306,11 +306,11 @@ export default function Navbar() {
               href="/fees"
               className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname === '/fees'
-                  ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              <CreditCard className="w-4 h-4 text-emerald-400" />
+              <CreditCard className="w-4 h-4 text-emerald-600" />
               Składki
             </a>
 
@@ -318,11 +318,11 @@ export default function Navbar() {
               href="/team"
               className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname === '/team'
-                  ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              <Users className="w-4 h-4 text-slate-300" />
+              <Users className="w-4 h-4 text-slate-600" />
               Kadra
             </a>
 
@@ -332,44 +332,44 @@ export default function Navbar() {
                 href="/taktyka"
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                   pathname.startsWith('/taktyka') || pathname.startsWith('/trening') || pathname.startsWith('/coach')
-                    ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                    ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
-                <Target className="w-4 h-4 text-sky-400" />
+                <Target className="w-4 h-4 text-sky-600" />
                 <span>Taktyka & Trening</span>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition" />
               </a>
 
               {/* Submenu Dropdown */}
               <div className="absolute left-0 top-full pt-1.5 hidden group-hover:block z-50">
-                <div className="w-60 bg-[#090d16] border border-sky-500/30 rounded-2xl shadow-2xl p-1.5 space-y-0.5 backdrop-blur-2xl">
+                <div className="w-60 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 space-y-0.5">
                   <a
                     href="/taktyka?tab=board"
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-200 hover:text-sky-300 hover:bg-slate-800/80 transition"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-sky-700 hover:bg-sky-50 transition"
                   >
-                    <Compass className="w-4 h-4 text-sky-400" />
+                    <Compass className="w-4 h-4 text-sky-500" />
                     <span>Tablica Taktyczna (5-1)</span>
                   </a>
                   <a
                     href="/taktyka?tab=playbook"
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-200 hover:text-amber-300 hover:bg-slate-800/80 transition"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-amber-700 hover:bg-amber-50 transition"
                   >
-                    <Target className="w-4 h-4 text-amber-400" />
+                    <Target className="w-4 h-4 text-amber-500" />
                     <span>Baza Wariantów (Playbook)</span>
                   </a>
                   <a
                     href="/taktyka?tab=training"
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-200 hover:text-emerald-300 hover:bg-slate-800/80 transition"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 transition"
                   >
-                    <Volleyball className="w-4 h-4 text-emerald-400" />
+                    <Volleyball className="w-4 h-4 text-emerald-500" />
                     <span>Plany Treningowe & Warsztat</span>
                   </a>
                   <a
                     href="/taktyka?tab=debrief"
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-200 hover:text-purple-300 hover:bg-slate-800/80 transition"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-purple-700 hover:bg-purple-50 transition"
                   >
-                    <FileText className="w-4 h-4 text-purple-400" />
+                    <FileText className="w-4 h-4 text-purple-500" />
                     <span>Odprawa & Wnioski Trenera</span>
                   </a>
                 </div>
@@ -380,11 +380,11 @@ export default function Navbar() {
               href="/galeria"
               className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname === '/galeria'
-                  ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              <Camera className="w-4 h-4 text-sky-400" />
+              <Camera className="w-4 h-4 text-sky-600" />
               Galeria
             </a>
 
@@ -393,11 +393,11 @@ export default function Navbar() {
                 href="/admin"
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                   pathname === '/admin'
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-sm shadow-amber-500/20'
-                    : 'text-amber-400/90 hover:text-amber-300 hover:bg-slate-800/60'
+                    ? 'bg-amber-50 text-amber-800 border border-amber-300 shadow-sm'
+                    : 'text-amber-700 hover:text-amber-900 hover:bg-amber-50'
                 }`}
               >
-                <Shield className="w-4 h-4 text-amber-400" />
+                <Shield className="w-4 h-4 text-amber-600" />
                 <span>Admin</span>
               </a>
             )}
@@ -422,14 +422,14 @@ export default function Navbar() {
             {/* Szybki przełącznik motywu (Jasny / Ciemny) */}
             <button
               onClick={toggleTheme}
-              className="p-2 sm:p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition flex items-center justify-center"
-              title={theme === 'light' ? 'Przełącz na ciemny motyw' : 'Przełącz na jasny, świeży motyw'}
+              className="p-2 sm:p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 transition flex items-center justify-center"
+              title={theme === 'light' ? 'Przełącz na ciemny motyw' : 'Przełącz na jasny motyw'}
               aria-label="Zmień motyw"
             >
               {theme === 'light' ? (
-                <Moon className="w-4 h-4 text-indigo-400" />
+                <Moon className="w-4 h-4 text-slate-700" />
               ) : (
-                <Sun className="w-4 h-4 text-amber-400" />
+                <Sun className="w-4 h-4 text-amber-500" />
               )}
             </button>
 
@@ -437,12 +437,12 @@ export default function Navbar() {
             <div className="relative">
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="relative p-2 sm:p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition"
+                className="relative p-2 sm:p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 transition"
                 title="Powiadomienia"
               >
                 <Bell className="w-4 h-4" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-sky-500 text-slate-950 rounded-full text-[9px] sm:text-[10px] font-black flex items-center justify-center animate-pulse shadow-md">
+                  <span className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-sky-600 text-white rounded-full text-[9px] sm:text-[10px] font-black flex items-center justify-center animate-pulse shadow-md">
                     {unreadCount}
                   </span>
                 )}
@@ -450,18 +450,18 @@ export default function Navbar() {
 
               {/* Notifications Dropdown Drawer */}
               {showNotifications && (
-                <div className="fixed sm:absolute right-3 sm:right-0 top-16 sm:top-full mt-2 w-[calc(100vw-1.5rem)] max-w-sm sm:w-[420px] bg-[#090d16] border border-slate-800 rounded-3xl shadow-2xl p-4 z-50 backdrop-blur-2xl">
+                <div className="fixed sm:absolute right-3 sm:right-0 top-16 sm:top-full mt-2 w-[calc(100vw-1.5rem)] max-w-sm sm:w-[420px] bg-white border border-slate-200 rounded-3xl shadow-2xl p-4 z-50 text-slate-800">
                   {/* Header */}
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-200">
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center">
+                      <div className="w-7 h-7 rounded-lg bg-sky-50 text-sky-700 border border-sky-200 flex items-center justify-center">
                         <Bell className="w-4 h-4" />
                       </div>
                       <div>
-                        <h4 className="text-xs font-black uppercase text-white tracking-wider">
+                        <h4 className="text-xs font-black uppercase text-slate-900 tracking-wider">
                           Powiadomienia
                         </h4>
-                        <span className="text-[10px] text-slate-400 font-medium">
+                        <span className="text-[10px] text-slate-500 font-medium">
                           {unreadCount > 0 ? `${unreadCount} nieprzeczytanych` : 'Wszystko odczytane'}
                         </span>
                       </div>
@@ -471,14 +471,14 @@ export default function Navbar() {
                       {user && unreadCount > 0 && (
                         <button
                           onClick={handleMarkAllAsRead}
-                          className="text-[10px] text-sky-400 hover:text-sky-300 font-bold underline transition"
+                          className="text-[10px] text-sky-600 hover:text-sky-800 font-bold underline transition"
                         >
                           Odczytaj wszystkie
                         </button>
                       )}
                       <button
                         onClick={() => setShowNotifications(false)}
-                        className="p-1 text-slate-400 hover:text-white rounded-lg bg-slate-900 border border-slate-800"
+                        className="p-1 text-slate-400 hover:text-slate-800 rounded-lg hover:bg-slate-100 transition"
                         aria-label="Zamknij powiadomienia"
                       >
                         <X className="w-3.5 h-3.5" />
@@ -488,13 +488,13 @@ export default function Navbar() {
 
                   {/* Browser Push Notification Permission Banner */}
                   {browserNotificationPerm !== 'granted' && (
-                    <div className="mt-2.5 p-2.5 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-between gap-2 shadow-sm">
-                      <div className="text-[11px] text-sky-200">
+                    <div className="mt-2.5 p-2.5 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-between gap-2 shadow-sm">
+                      <div className="text-[11px] text-sky-900">
                         🔔 <strong>Włącz powiadomienia</strong> push na telefonie.
                       </div>
                       <button
                         onClick={requestBrowserNotifications}
-                        className="px-2.5 py-1 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-[10px] uppercase shrink-0 transition shadow-sm"
+                        className="px-2.5 py-1 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-[10px] uppercase shrink-0 transition shadow-sm"
                       >
                         Włącz
                       </button>
@@ -504,10 +504,10 @@ export default function Navbar() {
                   {/* List of Announcements */}
                   <div className="mt-3 max-h-[380px] overflow-y-auto space-y-3 pr-1">
                     {announcements.length === 0 ? (
-                      <div className="py-8 text-center text-slate-500 space-y-1">
-                        <Bell className="w-8 h-8 text-slate-700 mx-auto mb-2" />
-                        <p className="text-xs font-bold text-slate-400">Brak nowych komunikatów</p>
-                        <p className="text-[11px] text-slate-600">Nowe ogłoszenia sztabu pojawią się tutaj.</p>
+                      <div className="py-8 text-center text-slate-400 space-y-1">
+                        <Bell className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                        <p className="text-xs font-bold text-slate-600">Brak nowych komunikatów</p>
+                        <p className="text-[11px] text-slate-400">Nowe ogłoszenia sztabu pojawią się tutaj.</p>
                       </div>
                     ) : (
                       announcements.map((ann) => {
@@ -525,15 +525,15 @@ export default function Navbar() {
                               }
                             }}
                             className={`p-3.5 rounded-2xl border transition-all duration-200 space-y-2.5 ${
-                              ann.link ? 'cursor-pointer' : ''
+                              ann.link ? 'cursor-pointer hover:shadow-md' : ''
                             } ${
                               !isRead
                                 ? isUrgent
-                                  ? 'bg-rose-950/40 border-l-[5px] border-l-rose-500 border-rose-500/40 shadow-lg shadow-rose-950/20'
+                                  ? 'bg-rose-50/70 border-l-[5px] border-l-rose-500 border-rose-200 shadow-sm'
                                   : isImportant
-                                  ? 'bg-amber-950/35 border-l-[5px] border-l-amber-500 border-amber-500/40 shadow-lg shadow-amber-950/20'
-                                  : 'bg-slate-900 border-l-[5px] border-l-sky-500 border-slate-700 shadow-md'
-                                : 'bg-slate-950/70 border-slate-800/80 opacity-70 hover:opacity-100 hover:border-slate-700'
+                                  ? 'bg-amber-50/70 border-l-[5px] border-l-amber-500 border-amber-200 shadow-sm'
+                                  : 'bg-white border-l-[5px] border-l-sky-500 border-slate-200 shadow-sm'
+                                : 'bg-slate-50 border-slate-200 opacity-70 hover:opacity-100'
                             }`}
                           >
                             {/* Card Top: Priority Badge + NEW / READ status + Date */}
@@ -550,26 +550,26 @@ export default function Navbar() {
                                     WAŻNY
                                   </span>
                                 ) : (
-                                  <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-sky-500/20 text-sky-300 border border-sky-500/40 flex items-center gap-1">
-                                    <Bell className="w-3 h-3 text-sky-400" />
+                                  <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-sky-50 text-sky-700 border border-sky-200 flex items-center gap-1">
+                                    <Bell className="w-3 h-3 text-sky-600" />
                                     INFORMACJA
                                   </span>
                                 )}
 
-                                <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1">
-                                  <Clock className="w-3 h-3 text-slate-500" />
+                                <span className="text-[10px] font-mono text-slate-500 flex items-center gap-1">
+                                  <Clock className="w-3 h-3 text-slate-400" />
                                   {new Date(ann.createdAt).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })}
                                 </span>
                               </div>
 
                               <div>
                                 {!isRead ? (
-                                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-sky-500 text-slate-950 shadow-sm flex items-center gap-1 animate-pulse">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-950" />
+                                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-sky-600 text-white shadow-sm flex items-center gap-1 animate-pulse">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-white" />
                                     NOWE
                                   </span>
                                 ) : (
-                                  <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+                                  <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
                                     <CheckCircle2 className="w-3 h-3" /> Odczytano
                                   </span>
                                 )}
@@ -578,31 +578,31 @@ export default function Navbar() {
 
                             {/* Card Title & Content */}
                             <div>
-                              <h5 className="text-xs sm:text-sm font-black text-white leading-snug">
+                              <h5 className="text-xs sm:text-sm font-black text-slate-900 leading-snug">
                                 {ann.title}
                               </h5>
-                              <p className="text-xs text-slate-200 mt-1.5 leading-relaxed bg-black/40 p-2.5 rounded-xl border border-white/5">
+                              <p className="text-xs text-slate-600 mt-1.5 leading-relaxed bg-slate-50 p-2.5 rounded-xl border border-slate-200">
                                 {ann.content}
                               </p>
                             </div>
 
                             {/* Card Footer */}
-                            <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-                              <span className="text-slate-400 text-[10.5px]">
-                                Od: <strong className="text-slate-200">{ann.createdByName}</strong>
+                            <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-[11px]">
+                              <span className="text-slate-500 text-[10.5px]">
+                                Od: <strong className="text-slate-800">{ann.createdByName}</strong>
                               </span>
 
                               <div className="flex items-center gap-2">
                                 {user && !isRead && (
                                   <button
                                     onClick={(e) => handleMarkAsRead(ann.id, e)}
-                                    className="px-2 py-0.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold transition flex items-center gap-1"
+                                    className="px-2 py-0.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 text-[10px] font-bold transition flex items-center gap-1"
                                   >
                                     <CheckCircle2 className="w-3 h-3" /> Potwierdź
                                   </button>
                                 )}
                                 {ann.link && (
-                                  <span className="text-sky-400 hover:text-sky-300 font-bold flex items-center gap-0.5 text-xs">
+                                  <span className="text-sky-600 hover:text-sky-800 font-bold flex items-center gap-0.5 text-xs">
                                     <span>Otwórz</span>
                                     <ArrowRight className="w-3 h-3" />
                                   </span>
@@ -618,7 +618,7 @@ export default function Navbar() {
                   <a
                     href="/#komunikaty"
                     onClick={() => setShowNotifications(false)}
-                    className="block text-center mt-3 pt-2 text-xs font-bold text-sky-400 hover:text-sky-300 border-t border-slate-800"
+                    className="block text-center mt-3 pt-2 text-xs font-bold text-sky-600 hover:text-sky-800 border-t border-slate-200"
                   >
                     Wszystkie ogłoszenia i ankiety ➔
                   </a>
@@ -630,9 +630,9 @@ export default function Navbar() {
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="hidden lg:flex flex-col items-end text-right">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-extrabold text-white">{user.name}</span>
+                    <span className="text-xs font-black text-slate-900">{user.name}</span>
                     {user.number && (
-                      <span className="bg-slate-800 text-bone text-[11px] px-1.5 py-0.2 rounded font-mono font-black border border-slate-700">
+                      <span className="bg-slate-100 text-slate-800 text-[11px] px-1.5 py-0.2 rounded font-mono font-black border border-slate-200">
                         #{user.number}
                       </span>
                     )}
@@ -642,13 +642,13 @@ export default function Navbar() {
                   </div>
                 </div>
 
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center font-black text-white text-xs sm:text-sm">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center font-black text-slate-800 text-xs sm:text-sm">
                   {user.name.charAt(0)}
                 </div>
 
                 <button
                   onClick={logout}
-                  className="p-2 text-slate-400 hover:text-rose-400 hover:bg-slate-800/80 rounded-xl transition"
+                  className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition"
                   title="Wyloguj"
                 >
                   <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -658,13 +658,13 @@ export default function Navbar() {
               <div className="flex items-center gap-1.5">
                 <a
                   href="/login"
-                  className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 text-slate-200 border border-slate-700"
+                  className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-sm transition"
                 >
                   Logowanie
                 </a>
                 <a
                   href="/register"
-                  className="hidden xs:inline-flex px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-500 text-white shadow-md transition"
+                  className="hidden xs:inline-flex px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-500 text-white shadow-sm transition"
                 >
                   Dołącz
                 </a>
@@ -674,7 +674,7 @@ export default function Navbar() {
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-300 hover:text-white"
+              className="md:hidden p-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 transition"
               aria-label="Menu"
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -685,99 +685,99 @@ export default function Navbar() {
 
       {/* Mobile Navigation Drawer */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-[#0c1016] border-b border-slate-800 px-4 pt-3 pb-5 space-y-2 animate-fadeIn shadow-2xl">
+        <div className="md:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-5 space-y-2 animate-fadeIn shadow-xl text-slate-800">
           <a
             href="/"
-            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold ${
-              pathname === '/' ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-900'
+            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
+              pathname === '/' ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'text-slate-700 hover:bg-slate-100'
             }`}
           >
-            <LayoutDashboard className="w-4 h-4 text-sky-400" />
+            <LayoutDashboard className="w-4 h-4 text-sky-600" />
             <span>Pulpit</span>
           </a>
 
           <a
             href="/events"
-            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold ${
-              pathname.startsWith('/events') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-900'
+            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
+              pathname.startsWith('/events') ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'text-slate-700 hover:bg-slate-100'
             }`}
           >
-            <Calendar className="w-4 h-4 text-amber-400" />
+            <Calendar className="w-4 h-4 text-amber-600" />
             <span>Terminarz & Frekwencja</span>
           </a>
 
-          <div className="pt-1 pb-1 border-y border-slate-800/80 space-y-1">
-            <span className="text-[10px] font-black uppercase text-slate-500 px-3 tracking-wider">Rozgrywki</span>
+          <div className="pt-1 pb-1 border-y border-slate-200 space-y-1">
+            <span className="text-[10px] font-black uppercase text-slate-400 px-3 tracking-wider">Rozgrywki</span>
             <a
               href="/rozgrywki?tab=sparingi"
-              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:bg-slate-900"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-800 transition"
             >
-              <Calendar className="w-4 h-4 text-amber-400" />
+              <Calendar className="w-4 h-4 text-amber-500" />
               <span>1. Sparingi</span>
             </a>
             <a
               href="/rozgrywki?tab=liga"
-              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:bg-slate-900"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-800 transition"
             >
               <img src="/lals_logo.png" alt="LALS" className="w-4 h-4 rounded-full object-contain" />
               <span>2. Liga LALS & Tabela</span>
             </a>
             <a
               href="/rozgrywki?tab=turnieje"
-              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:bg-slate-900"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-purple-50 hover:text-purple-800 transition"
             >
-              <Trophy className="w-4 h-4 text-purple-400" />
+              <Trophy className="w-4 h-4 text-purple-500" />
               <span>3. Turnieje</span>
             </a>
           </div>
 
           <a
             href="/fees"
-            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold ${
-              pathname === '/fees' ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-900'
+            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
+              pathname === '/fees' ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'text-slate-700 hover:bg-slate-100'
             }`}
           >
-            <CreditCard className="w-4 h-4 text-emerald-400" />
+            <CreditCard className="w-4 h-4 text-emerald-600" />
             <span>Składki i Płatności (BLIK)</span>
           </a>
 
           <a
             href="/team"
-            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold ${
-              pathname === '/team' ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-900'
+            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
+              pathname === '/team' ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'text-slate-700 hover:bg-slate-100'
             }`}
           >
-            <Users className="w-4 h-4 text-slate-300" />
+            <Users className="w-4 h-4 text-slate-600" />
             <span>Kadra Drużyny</span>
           </a>
 
           <a
             href="/taktyka"
-            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold ${
-              pathname === '/taktyka' || pathname.startsWith('/coach') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-900'
+            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
+              pathname === '/taktyka' || pathname.startsWith('/coach') ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'text-slate-700 hover:bg-slate-100'
             }`}
           >
-            <Target className="w-4 h-4 text-sky-400" />
+            <Target className="w-4 h-4 text-sky-600" />
             <span>Tablica Taktyczna</span>
           </a>
 
           <a
             href="/trening"
-            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold ${
-              pathname === '/trening' ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-900'
+            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
+              pathname === '/trening' ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'text-slate-700 hover:bg-slate-100'
             }`}
           >
-            <Volleyball className="w-4 h-4 text-emerald-400" />
+            <Volleyball className="w-4 h-4 text-emerald-600" />
             <span>Warsztat & Treningi</span>
           </a>
 
           <a
             href="/galeria"
-            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold ${
-              pathname === '/galeria' ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-900'
+            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
+              pathname === '/galeria' ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'text-slate-700 hover:bg-slate-100'
             }`}
           >
-            <Camera className="w-4 h-4 text-sky-400" />
+            <Camera className="w-4 h-4 text-sky-600" />
             <span>Galeria Zdjęć</span>
           </a>
 
@@ -787,22 +787,22 @@ export default function Navbar() {
               toggleTheme();
               setIsMobileMenuOpen(false);
             }}
-            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold bg-slate-900 border border-slate-700/80 text-slate-200 hover:bg-slate-800 transition"
+            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 transition"
           >
             <span className="flex items-center gap-2">
               {theme === 'light' ? (
                 <>
-                  <Moon className="w-4 h-4 text-indigo-400" />
+                  <Moon className="w-4 h-4 text-slate-700" />
                   <span>Przełącz na ciemny motyw</span>
                 </>
               ) : (
                 <>
-                  <Sun className="w-4 h-4 text-amber-400" />
+                  <Sun className="w-4 h-4 text-amber-500" />
                   <span>Przełącz na jasny motyw</span>
                 </>
               )}
             </span>
-            <span className="text-[10px] uppercase font-bold text-slate-400">
+            <span className="text-[10px] uppercase font-bold text-slate-500">
               {theme === 'light' ? 'Jasny' : 'Ciemny'}
             </span>
           </button>
@@ -810,11 +810,11 @@ export default function Navbar() {
           {(user?.role === 'KIEROWNIK' || user?.role === 'TRENER' || user?.permissions?.isAdmin) && (
             <a
               href="/admin"
-              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold ${
-                pathname === '/admin' ? 'bg-amber-500/20 text-amber-300' : 'text-amber-400 hover:bg-slate-900'
+              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
+                pathname === '/admin' ? 'bg-amber-50 text-amber-800 border border-amber-300' : 'text-amber-700 hover:bg-amber-50'
               }`}
             >
-              <Shield className="w-4 h-4 text-amber-400" />
+              <Shield className="w-4 h-4 text-amber-600" />
               <span>Centrum Administracji</span>
             </a>
           )}
@@ -825,13 +825,13 @@ export default function Navbar() {
               setIsMobileMenuOpen(false);
               window.dispatchEvent(new CustomEvent('open-pwa-install'));
             }}
-            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold bg-sky-500/10 border border-sky-500/30 text-sky-300 hover:bg-sky-500/20 transition mt-2"
+            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold bg-sky-50 border border-sky-200 text-sky-800 hover:bg-sky-100 transition mt-2"
           >
             <span className="flex items-center gap-2">
-              <Smartphone className="w-4 h-4 text-sky-400" />
+              <Smartphone className="w-4 h-4 text-sky-600" />
               <span>Zainstaluj aplikację na telefonie</span>
             </span>
-            <Download className="w-3.5 h-3.5 text-sky-400" />
+            <Download className="w-3.5 h-3.5 text-sky-600" />
           </button>
         </div>
       )}

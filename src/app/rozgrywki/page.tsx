@@ -1753,7 +1753,7 @@ function RozgrywkiContent() {
       ? 'bg-sky-500 hover:bg-sky-400 text-slate-950 shadow-sky-500/20'
       : isAmber
       ? 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-amber-500/20'
-      : 'bg-purple-500 hover:bg-purple-400 text-white shadow-purple-500/20';
+      : 'bg-purple-500 hover:bg-purple-400 text-slate-900 shadow-purple-500/20';
 
     const iconColor = isSky ? 'text-sky-400' : isAmber ? 'text-amber-400' : 'text-purple-400';
 
@@ -1761,11 +1761,11 @@ function RozgrywkiContent() {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h3 className="text-lg font-black text-white uppercase tracking-tight flex items-center gap-2">
+            <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
               <Camera className={`w-5 h-5 ${iconColor}`} />
               {title}
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               {subtitle}
             </p>
           </div>
@@ -1782,10 +1782,10 @@ function RozgrywkiContent() {
         </div>
 
         {photos.length === 0 ? (
-          <div className="p-12 text-center rounded-3xl bg-[#0b0e14] border border-slate-800 space-y-3">
+          <div className="p-12 text-center rounded-3xl bg-white border border-slate-200 space-y-3">
             <Camera className="w-10 h-10 text-slate-600 mx-auto" />
-            <h4 className="text-base font-bold text-white">Brak zdjęć w tej galerii</h4>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <h4 className="text-base font-bold text-slate-900">Brak zdjęć w tej galerii</h4>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
               {emptyText}
             </p>
           </div>
@@ -1799,9 +1799,9 @@ function RozgrywkiContent() {
                 <div
                   key={photo.id}
                   onClick={() => setSelectedPhotoPreview(photo)}
-                  className="bg-[#0b0e14] border border-slate-800 rounded-3xl overflow-hidden shadow-2xl group cursor-pointer hover:border-slate-700 transition flex flex-col justify-between"
+                  className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm group cursor-pointer hover:border-slate-300 transition flex flex-col justify-between"
                 >
-                  <div className="relative aspect-video overflow-hidden bg-slate-900">
+                  <div className="relative aspect-video overflow-hidden bg-slate-100">
                     <img
                       src={photo.url}
                       alt={photo.title}
@@ -1816,29 +1816,29 @@ function RozgrywkiContent() {
                           ? 'bg-purple-950/90 text-purple-300 border-purple-500/40'
                           : isS
                           ? 'bg-amber-950/90 text-amber-300 border-amber-500/40'
-                          : 'bg-sky-950/90 text-sky-300 border-sky-500/40'
+                          : 'bg-sky-950/90 text-sky-300 border-sky-200'
                       }`}>
                         {isT ? '🏆 Turniej' : isS ? '⚔️ Sparing' : '🏐 Mecz LALS'}
                       </span>
 
                       {photo.seriesTitle && (
-                        <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-black/70 text-slate-200 border border-white/10 backdrop-blur-sm truncate max-w-[150px]">
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-black/70 text-slate-700 border border-white/10 backdrop-blur-sm truncate max-w-[150px]">
                           📁 {photo.seriesTitle}
                         </span>
                       )}
                     </div>
 
-                    <div className="absolute bottom-3 left-3 right-3 text-white">
+                    <div className="absolute bottom-3 left-3 right-3 text-slate-900">
                       <span className="text-[10px] font-bold uppercase text-amber-300 tracking-wider block truncate">
                         {photo.matchName || (isT ? 'Turniej Siatkarski' : isS ? 'Sparing Kontrolny' : 'Mecz Ligowy LALS')}
                       </span>
-                      <h4 className="text-sm font-black text-white line-clamp-1">{photo.title}</h4>
+                      <h4 className="text-sm font-black text-slate-900 line-clamp-1">{photo.title}</h4>
                     </div>
                   </div>
 
-                  <div className="p-4 space-y-2 text-xs text-slate-400">
-                    {photo.caption && <p className="text-slate-300 leading-snug line-clamp-2">{photo.caption}</p>}
-                    <div className="flex justify-between items-center pt-2 border-t border-slate-800/80 text-[10px] text-slate-500 font-mono">
+                  <div className="p-4 space-y-2 text-xs text-slate-500">
+                    {photo.caption && <p className="text-slate-600 leading-snug line-clamp-2">{photo.caption}</p>}
+                    <div className="flex justify-between items-center pt-2 border-t border-slate-200 text-[10px] text-slate-500 font-mono">
                       <span>{photo.date}</span>
                       <span className="truncate max-w-[140px]">{photo.uploadedBy}</span>
                     </div>
@@ -1851,15 +1851,15 @@ function RozgrywkiContent() {
 
         {/* Photos Pagination */}
         {totalPhotosPages > 1 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-[#0b0e14] border border-slate-800 rounded-2xl shadow-lg">
-            <span className="text-xs text-slate-400 font-medium">
-              Wyświetlanie <span className="text-white font-bold">{((photosPage - 1) * PHOTOS_PER_PAGE) + 1}</span>–<span className="text-white font-bold">{Math.min(photosPage * PHOTOS_PER_PAGE, photos.length)}</span> z <span className="text-white font-bold">{photos.length}</span> zdjęć
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-white border border-slate-200 rounded-2xl shadow-lg">
+            <span className="text-xs text-slate-500 font-medium">
+              Wyświetlanie <span className="text-slate-900 font-bold">{((photosPage - 1) * PHOTOS_PER_PAGE) + 1}</span>–<span className="text-slate-900 font-bold">{Math.min(photosPage * PHOTOS_PER_PAGE, photos.length)}</span> z <span className="text-slate-900 font-bold">{photos.length}</span> zdjęć
             </span>
             <div className="flex items-center gap-1.5">
               <button
                 onClick={() => setPhotosPage(p => Math.max(1, p - 1))}
                 disabled={photosPage === 1}
-                className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition"
+                className="p-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed transition"
                 title="Poprzednia strona"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -1874,9 +1874,9 @@ function RozgrywkiContent() {
                         ? isSky
                           ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/20'
                           : isPurple
-                          ? 'bg-purple-500 text-white shadow-md shadow-purple-500/20'
+                          ? 'bg-purple-500 text-slate-900 shadow-md shadow-purple-500/20'
                           : 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                        : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                        : 'bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-900'
                     }`}
                   >
                     {idx + 1}
@@ -1886,7 +1886,7 @@ function RozgrywkiContent() {
               <button
                 onClick={() => setPhotosPage(p => Math.min(totalPhotosPages, p + 1))}
                 disabled={photosPage === totalPhotosPages}
-                className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition"
+                className="p-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed transition"
                 title="Następna strona"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -1901,42 +1901,81 @@ function RozgrywkiContent() {
   return (
     <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 pt-6 sm:pt-8 pb-24 md:pb-16 space-y-6 sm:space-y-8">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-sky-500/20">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-sky-500/15 border border-sky-500/40 flex items-center justify-center text-sky-400 shrink-0 glow-cyan">
+          <div className="w-11 h-11 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 shrink-0 shadow-sm">
             <Volleyball className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight font-athletic text-gradient-cyan">
+            <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight font-athletic text-slate-900">
               Rozgrywki & Mecze
             </h1>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500">
               Oficjalne mecze ligowe LALS, sparingi przedsezonowe i turnieje siatkarskie
             </p>
           </div>
         </div>
+
+        {/* 3 Main Rozgrywki Navigation Segment Pills */}
+        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200">
+          <button
+            onClick={() => setActiveTab('liga')}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+              activeTab === 'liga'
+                ? 'bg-sky-600 text-slate-900 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+            }`}
+          >
+            <img src="/lals_logo.png" alt="LALS" className="w-3.5 h-3.5 rounded-full object-contain" />
+            <span>Liga LALS</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('sparingi')}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+              activeTab === 'sparingi'
+                ? 'bg-amber-500 text-slate-950 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+            }`}
+          >
+            <Calendar className="w-3.5 h-3.5" />
+            <span>Sparingi</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('turnieje')}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+              activeTab === 'turnieje'
+                ? 'bg-purple-600 text-slate-900 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+            }`}
+          >
+            <Trophy className="w-3.5 h-3.5" />
+            <span>Turnieje</span>
+          </button>
+        </div>
       </div>
 
       {/* Collapsible Filters Bar */}
-      <div className="cyber-card rounded-2xl p-3 sm:p-4 border border-sky-500/20 shadow-xl">
+      <div className="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
                 showFilters || activeFiltersCount > 0
-                  ? 'bg-sky-500/10 text-sky-300 border-sky-500/40'
-                  : 'bg-slate-900 text-slate-300 border-slate-800 hover:text-white'
+                  ? 'bg-sky-50 text-sky-800 border-sky-300'
+                  : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
               }`}
             >
-              <Filter className="w-3.5 h-3.5 text-sky-400" />
+              <Filter className="w-3.5 h-3.5 text-sky-600" />
               <span>Filtry</span>
               {activeFiltersCount > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full bg-sky-500 text-slate-950 font-black text-[10px]">
+                <span className="px-1.5 py-0.2 rounded-full bg-sky-600 text-slate-900 font-black text-[10px]">
                   {activeFiltersCount}
                 </span>
               )}
-              <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${showFilters ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${showFilters ? 'rotate-180' : ''}`} />
             </button>
 
             {activeFiltersCount > 0 && (
@@ -1945,7 +1984,7 @@ function RozgrywkiContent() {
                   setStatusFilter('ALL');
                   setSearchQuery('');
                 }}
-                className="text-[11px] font-bold text-slate-400 hover:text-rose-400 transition underline underline-offset-2 ml-1"
+                className="text-[11px] font-bold text-slate-500 hover:text-rose-600 transition underline underline-offset-2 ml-1"
               >
                 Wyczyść filtry
               </button>
@@ -1953,20 +1992,20 @@ function RozgrywkiContent() {
           </div>
 
           <div className="relative w-full sm:w-64">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Szukaj meczu / rywala..."
-              className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
+              className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
             />
           </div>
         </div>
 
         {showFilters && (
-          <div className="pt-3 mt-3 border-t border-slate-800/80 flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] font-bold text-slate-400 mr-1">Status:</span>
+          <div className="pt-3 mt-3 border-t border-slate-100 flex flex-wrap items-center gap-1.5">
+            <span className="text-[11px] font-bold text-slate-500 mr-1">Status:</span>
             {[
               { id: 'ALL', label: 'Wszystkie' },
               { id: 'UPCOMING', label: 'Nadchodzące' },
@@ -1975,10 +2014,10 @@ function RozgrywkiContent() {
               <button
                 key={s.id}
                 onClick={() => setStatusFilter(s.id as any)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition border ${
                   statusFilter === s.id
-                    ? 'bg-sky-500 text-slate-950 font-black shadow-sm'
-                    : 'bg-slate-900 text-slate-300 hover:text-white border border-slate-800'
+                    ? 'bg-sky-600 text-slate-900 font-black border-sky-600 shadow-sm'
+                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border-slate-200'
                 }`}
               >
                 {s.label}
@@ -1992,14 +2031,14 @@ function RozgrywkiContent() {
       {activeTab === 'sparingi' && (
         <div className="space-y-6">
           {/* Sparing Subtabs (Mecze & Protokoły, Zdjęcia ze Sparingów) */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-800">
-            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-900 border border-slate-800">
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-200">
+            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200">
               <button
                 onClick={() => setSparingSubTab('mecze')}
                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                   sparingSubTab === 'mecze'
-                    ? 'bg-amber-500 text-slate-950 shadow-md'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-amber-500 text-slate-950 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <Calendar className="w-3.5 h-3.5" />
@@ -2007,9 +2046,9 @@ function RozgrywkiContent() {
               </button>
               <Link
                 href="/galeria"
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/80 transition"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white/60 transition"
               >
-                <Camera className="w-3.5 h-3.5 text-amber-400" />
+                <Camera className="w-3.5 h-3.5 text-amber-500" />
                 <span>Galeria zdjęć ➔</span>
               </Link>
             </div>
@@ -2021,7 +2060,7 @@ function RozgrywkiContent() {
                   setEventTitle('Sparing kontrolny');
                   setShowAddEventModal(true);
                 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-lg shadow-amber-500/20"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm"
               >
                 <Plus className="w-4 h-4" />
                 Utwórz Sparing
@@ -2037,7 +2076,7 @@ function RozgrywkiContent() {
                   setPhotoSeriesList([]);
                   setShowAddPhotoModal(true);
                 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-lg shadow-amber-500/20"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm"
               >
                 <Camera className="w-4 h-4" />
                 + Dodaj Zdjęcia ze Sparingów
@@ -2051,7 +2090,7 @@ function RozgrywkiContent() {
           {/* Sparing Cards List */}
           <div className="space-y-6">
             {sparringsList.length === 0 ? (
-              <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-8 text-center text-slate-400">
+              <div className="bg-white border border-slate-200 rounded-3xl p-8 text-center text-slate-500">
                 Brak zaplanowanych sparingów. Kliknij "Utwórz Sparing" powyżej.
               </div>
             ) : (
@@ -2067,12 +2106,12 @@ function RozgrywkiContent() {
                 return (
                   <div
                     key={event.id}
-                    className="bg-[#0b0e14] border border-amber-500/30 rounded-3xl overflow-hidden shadow-2xl transition-all duration-300"
+                    className="bg-white border border-amber-200 rounded-3xl overflow-hidden shadow-sm transition-all duration-300"
                   >
                     {/* Zwijany Nagłówek Karty Sparingowej */}
                     <div
                       onClick={() => toggleSparring(event.id)}
-                      className="p-5 sm:p-6 cursor-pointer flex flex-col lg:flex-row lg:items-center justify-between gap-4 select-none hover:bg-slate-900/50 transition group"
+                      className="p-5 sm:p-6 cursor-pointer flex flex-col lg:flex-row lg:items-center justify-between gap-4 select-none hover:bg-slate-50 transition group"
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1.5 flex-wrap">
@@ -2080,7 +2119,7 @@ function RozgrywkiContent() {
                             SPARING
                           </span>
                           {isFinished ? (
-                            <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
+                            <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-200 flex items-center gap-1">
                               <CheckCircle2 className="w-3 h-3" /> Zakończony
                             </span>
                           ) : (
@@ -2095,15 +2134,15 @@ function RozgrywkiContent() {
                             </span>
                           )}
                         </div>
-                        <h3 className="text-xl sm:text-2xl font-black text-white group-hover:text-amber-400 transition tracking-tight truncate">
+                        <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-amber-400 transition tracking-tight truncate">
                           {event.title} {event.opponent ? `vs ${event.opponent}` : ''}
                         </h3>
-                        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 mt-2">
-                          <span className="flex items-center gap-1.5 text-slate-300">
+                        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 mt-2">
+                          <span className="flex items-center gap-1.5 text-slate-600">
                             <Clock className="w-4 h-4 text-sky-400" />
                             {new Date(event.date).toLocaleString('pl-PL', { dateStyle: 'long', timeStyle: 'short' })}
                           </span>
-                          <span className="flex items-center gap-1.5 text-slate-300">
+                          <span className="flex items-center gap-1.5 text-slate-600">
                             <MapPin className="w-4 h-4 text-rose-400" />
                             {event.location}
                           </span>
@@ -2111,26 +2150,26 @@ function RozgrywkiContent() {
                       </div>
 
                       {/* Prawa strona nagłówka: Wynik, Licznik obecnych i Przełącznik Chevron */}
-                      <div className="flex items-center justify-between lg:justify-end gap-3 shrink-0 pt-2 lg:pt-0 border-t border-slate-800/60 lg:border-t-0">
+                      <div className="flex items-center justify-between lg:justify-end gap-3 shrink-0 pt-2 lg:pt-0 border-t border-slate-200 lg:border-t-0">
                         {isFinished && event.result && (
-                          <div className="text-right px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-800">
+                          <div className="text-right px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200">
                             <span className="text-lg font-mono font-black text-emerald-400 block leading-tight">
                               {event.result.teamSetsWon} : {event.result.opponentSetsWon}
                             </span>
-                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">
+                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block">
                               Wynik
                             </span>
                           </div>
                         )}
 
-                        <span className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                        <span className="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-600 flex items-center gap-1.5">
                           <Users className="w-3.5 h-3.5 text-amber-400" />
                           <span>{yesCount} obecnych</span>
                         </span>
 
                         <div
-                          className={`w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 transition-all duration-200 ${
-                            isExpanded ? 'rotate-180 bg-amber-500/10 text-amber-400 border-amber-500/40' : 'group-hover:text-white group-hover:border-slate-700'
+                          className={`w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 transition-all duration-200 ${
+                            isExpanded ? 'rotate-180 bg-amber-500/10 text-amber-400 border-amber-500/40' : 'group-hover:text-slate-900 group-hover:border-slate-300'
                           }`}
                         >
                           <ChevronDown className="w-4 h-4" />
@@ -2140,17 +2179,17 @@ function RozgrywkiContent() {
 
                     {/* Rozwijana Zawartość Karty Sparingowej */}
                     {isExpanded && (
-                      <div className="p-6 sm:p-7 border-t border-slate-800/80 space-y-6 animate-fadeIn">
+                      <div className="p-6 sm:p-7 border-t border-slate-200 space-y-6 animate-fadeIn">
                         {/* Coach & Captain Management Controls */}
                         {canManage && (
-                          <div className="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-800/60">
-                            <span className="text-xs font-black uppercase text-slate-400 tracking-wider">
+                          <div className="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-200">
+                            <span className="text-xs font-black uppercase text-slate-500 tracking-wider">
                               Zarządzanie Sparingiem:
                             </span>
                             <div className="flex flex-wrap items-center gap-2">
                               <button
                                 onClick={() => setShareModalEvent(event)}
-                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition flex items-center gap-1.5"
+                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-200 transition flex items-center gap-1.5"
                                 title="Wygeneruj i skopiuj gotowy raport na WhatsApp / Messenger"
                               >
                                 <Share2 className="w-3.5 h-3.5 text-emerald-400" />
@@ -2159,7 +2198,7 @@ function RozgrywkiContent() {
 
                               <button
                                 onClick={() => handleOpenAutoLineup(event)}
-                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition flex items-center gap-1.5"
+                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-200 transition flex items-center gap-1.5"
                                 title="Automatycznie wygeneruj wyjściową szóstkę"
                               >
                                 <Zap className="w-3.5 h-3.5 text-amber-400" />
@@ -2168,7 +2207,7 @@ function RozgrywkiContent() {
 
                               <button
                                 onClick={() => handleOpenLiveScorekeeper(event)}
-                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/30 transition flex items-center gap-1.5"
+                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-200 transition flex items-center gap-1.5"
                                 title="Opcjonalnie: klikaj punkt po punkcie na żywo w trakcie sparingu"
                               >
                                 <Radio className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
@@ -2178,7 +2217,7 @@ function RozgrywkiContent() {
                               {isFinished && (
                                 <button
                                   onClick={() => setSocialModalEvent(event)}
-                                  className="px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 transition flex items-center gap-1.5"
+                                  className="px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-200 transition flex items-center gap-1.5"
                                   title="Wygeneruj post do Social Mediów"
                                 >
                                   <Award className="w-3.5 h-3.5 text-purple-400" />
@@ -2188,7 +2227,7 @@ function RozgrywkiContent() {
 
                               <button
                                 onClick={() => openResultModal(event)}
-                                className="px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-900 hover:bg-slate-800 text-amber-400 border border-amber-500/30 transition flex items-center gap-1.5"
+                                className="px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-100 hover:bg-slate-100 text-amber-400 border border-amber-200 transition flex items-center gap-1.5"
                                 title="Wpisz wynik po sparingu (bez klikania każdego punktu)"
                               >
                                 <Trophy className="w-3.5 h-3.5" />
@@ -2199,13 +2238,13 @@ function RozgrywkiContent() {
                         )}
 
                     {/* Step 1: Ankieta Dostępności (RSVP) */}
-                    <div className="p-4 rounded-2xl bg-[#0c1016] border border-slate-800 space-y-3">
+                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black text-xs flex items-center justify-center">
                             1
                           </span>
-                          <h4 className="text-xs font-black uppercase text-white tracking-wider">
+                          <h4 className="text-xs font-black uppercase text-slate-900 tracking-wider">
                             Ankieta Dostępności Zawodników
                           </h4>
                         </div>
@@ -2213,7 +2252,7 @@ function RozgrywkiContent() {
                         {/* Player Vote Buttons OR Coach Banner */}
                         {user && (
                           user.role === 'TRENER' ? (
-                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-300 text-xs font-bold">
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-500/10 border border-sky-200 text-sky-300 text-xs font-bold">
                               <Flame className="w-3.5 h-3.5 text-sky-400" />
                               <span>Sztab trenerski (Obecność stała)</span>
                             </div>
@@ -2224,7 +2263,7 @@ function RozgrywkiContent() {
                                 className={`px-3 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1 ${
                                   myAttendance?.status === 'BEDE'
                                     ? 'bg-emerald-500 text-slate-950 shadow-md'
-                                    : 'bg-slate-900 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/10'
+                                    : 'bg-slate-100 text-emerald-400 border border-emerald-200 hover:bg-emerald-500/10'
                                 }`}
                               >
                                 <CheckCircle2 className="w-3.5 h-3.5" />
@@ -2235,7 +2274,7 @@ function RozgrywkiContent() {
                                 className={`px-3 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1 ${
                                   myAttendance?.status === 'NIEPEWNE'
                                     ? 'bg-amber-500 text-slate-950 shadow-md'
-                                    : 'bg-slate-900 text-amber-400 border border-amber-500/30 hover:bg-amber-500/10'
+                                    : 'bg-slate-100 text-amber-400 border border-amber-200 hover:bg-amber-500/10'
                                 }`}
                               >
                                 <HelpCircle className="w-3.5 h-3.5" />
@@ -2245,8 +2284,8 @@ function RozgrywkiContent() {
                                 onClick={() => handleAttendance(event.id, 'NIE_BEDE')}
                                 className={`px-3 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1 ${
                                   myAttendance?.status === 'NIE_BEDE'
-                                    ? 'bg-rose-500 text-white shadow-md'
-                                    : 'bg-slate-900 text-rose-400 border border-rose-500/30 hover:bg-rose-500/10'
+                                    ? 'bg-rose-500 text-slate-900 shadow-md'
+                                    : 'bg-slate-100 text-rose-400 border border-rose-200 hover:bg-rose-500/10'
                                 }`}
                               >
                                 <AlertCircle className="w-3.5 h-3.5" />
@@ -2271,14 +2310,14 @@ function RozgrywkiContent() {
                             key={a.userId}
                             className={`px-2 py-1 rounded-lg text-[11px] font-bold border flex items-center gap-1 ${
                               a.status === 'BEDE'
-                                ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+                                ? 'bg-emerald-500/10 text-emerald-300 border-emerald-200'
                                 : a.status === 'NIEPEWNE'
-                                ? 'bg-amber-500/10 text-amber-300 border-amber-500/30'
-                                : 'bg-rose-500/10 text-rose-300 border-rose-500/30'
+                                ? 'bg-amber-500/10 text-amber-300 border-amber-200'
+                                : 'bg-rose-500/10 text-rose-300 border-rose-200'
                             }`}
                           >
                             <span>{a.userName}</span>
-                            {a.note && <span className="text-[10px] text-slate-400">({a.note})</span>}
+                            {a.note && <span className="text-[10px] text-slate-500">({a.note})</span>}
                           </span>
                         ))}
                       </div>
@@ -2286,7 +2325,7 @@ function RozgrywkiContent() {
 
                     {/* Wyjściowa Szóstka Meczu */}
                     {event.lineup && (
-                      <div className="p-4 rounded-2xl bg-[#0c1016] border border-amber-500/30 space-y-2">
+                      <div className="p-4 rounded-2xl bg-slate-50 border border-amber-200 space-y-2">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black text-xs flex items-center justify-center">
@@ -2306,42 +2345,42 @@ function RozgrywkiContent() {
                           )}
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pt-1 text-xs">
-                          <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                          <div className="p-2 rounded-xl bg-slate-100 border border-slate-200">
                             <span className="text-[10px] text-slate-500 font-bold block">Rozgrywający (R)</span>
                             <span className="font-bold text-sky-300">{event.lineup.setter}</span>
                           </div>
-                          <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                          <div className="p-2 rounded-xl bg-slate-100 border border-slate-200">
                             <span className="text-[10px] text-slate-500 font-bold block">Atakujący (A)</span>
                             <span className="font-bold text-rose-300">{event.lineup.opposite}</span>
                           </div>
-                          <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                          <div className="p-2 rounded-xl bg-slate-100 border border-slate-200">
                             <span className="text-[10px] text-slate-500 font-bold block">Przyjmujący (P1, P2)</span>
                             <span className="font-bold text-emerald-300">{event.lineup.outsideHitters?.join(', ')}</span>
                           </div>
-                          <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                          <div className="p-2 rounded-xl bg-slate-100 border border-slate-200">
                             <span className="text-[10px] text-slate-500 font-bold block">Środkowi (Ś1, Ś2)</span>
                             <span className="font-bold text-purple-300">{event.lineup.middleBlockers?.join(', ')}</span>
                           </div>
-                          <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                          <div className="p-2 rounded-xl bg-slate-100 border border-slate-200">
                             <span className="text-[10px] text-slate-500 font-bold block">Libero (L)</span>
                             <span className="font-bold text-amber-300">{event.lineup.libero}</span>
                           </div>
-                          <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                          <div className="p-2 rounded-xl bg-slate-100 border border-slate-200">
                             <span className="text-[10px] text-slate-500 font-bold block">Rezerwowi</span>
-                            <span className="font-medium text-slate-400 truncate block">{event.lineup.reserves?.slice(0, 3).join(', ') || 'Brak'}</span>
+                            <span className="font-medium text-slate-500 truncate block">{event.lineup.reserves?.slice(0, 3).join(', ') || 'Brak'}</span>
                           </div>
                         </div>
                       </div>
                     )}
 
                     {/* Step 2: Wynik Sparingi (Score & Sets) */}
-                    <div className="p-4 rounded-2xl bg-[#0c1016] border border-slate-800 space-y-3">
+                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center">
                             2
                           </span>
-                          <h4 className="text-xs font-black uppercase text-white tracking-wider">
+                          <h4 className="text-xs font-black uppercase text-slate-900 tracking-wider">
                             Wynik Sparingi (Podsumowanie pomeczowe)
                           </h4>
                         </div>
@@ -2358,19 +2397,19 @@ function RozgrywkiContent() {
 
                       {isFinished ? (
                         <div className="space-y-4 pt-1">
-                          <div className="flex items-center gap-4 bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
+                          <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                             <div className="text-3xl font-black font-mono text-emerald-400">
                               {event.result!.teamSetsWon} : {event.result!.opponentSetsWon}
                             </div>
                             <div>
-                              <div className="text-xs font-bold text-slate-400 uppercase">
+                              <div className="text-xs font-bold text-slate-500 uppercase">
                                 Wyniki setów:
                               </div>
                               <div className="flex flex-wrap gap-2 mt-1">
                                 {event.result!.sets.map(s => (
                                   <span
                                     key={s.setNumber}
-                                    className="px-2 py-0.5 rounded-lg text-xs font-mono font-bold bg-slate-950 border border-slate-800 text-white"
+                                    className="px-2 py-0.5 rounded-lg text-xs font-mono font-bold bg-slate-50 border border-slate-200 text-slate-900"
                                   >
                                     Set {s.setNumber}: {s.teamScore}-{s.opponentScore}
                                   </span>
@@ -2387,7 +2426,7 @@ function RozgrywkiContent() {
                           )}
 
                           {event.result!.notes && (
-                            <p className="text-xs text-slate-300 italic bg-slate-900/40 p-3 rounded-xl border border-slate-800">
+                            <p className="text-xs text-slate-600 italic bg-slate-50 p-3 rounded-xl border border-slate-200">
                               💬 Wnioski pomeczowe: {event.result!.notes}
                             </p>
                           )}
@@ -2404,7 +2443,7 @@ function RozgrywkiContent() {
                       const linkedTactics = tactics.filter(t => t.eventId === event.id || t.matchId === event.id);
                       if (linkedTactics.length === 0) return null;
                       return (
-                        <div className="p-4 rounded-2xl bg-gradient-to-r from-sky-950/30 via-slate-900/60 to-[#0c1016] border border-sky-500/40 space-y-3">
+                        <div className="p-4 rounded-2xl bg-gradient-to-r from-sky-950/30 via-slate-900/60 to-[#0c1016] border border-sky-200 space-y-3">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               <Compass className="w-4 h-4 text-sky-400" />
@@ -2425,19 +2464,19 @@ function RozgrywkiContent() {
                             {linkedTactics.map(tac => {
                               const acceptedPosts = (tac.posts || []).filter(p => p.status === 'ZAAKCEPTOWANY');
                               return (
-                                <div key={tac.id} className="p-3 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-2.5">
+                                <div key={tac.id} className="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5">
                                   {tac.drawingData && (
-                                    <div className="aspect-[16/10] bg-slate-900 rounded-xl overflow-hidden border border-slate-800 relative">
+                                    <div className="aspect-[16/10] bg-slate-100 rounded-xl overflow-hidden border border-slate-200 relative">
                                       <img src={tac.drawingData} alt={tac.title} className="w-full h-full object-contain" />
-                                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-slate-950/90 text-[10px] font-black text-amber-400 border border-slate-700">
+                                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-slate-50 text-[10px] font-black text-amber-400 border border-slate-300">
                                         {tac.rotation} • {tac.phase}
                                       </div>
                                     </div>
                                   )}
                                   <div>
-                                    <h5 className="font-black text-xs text-white">{tac.title}</h5>
+                                    <h5 className="font-black text-xs text-slate-900">{tac.title}</h5>
                                     {tac.description && (
-                                      <p className="text-[11px] text-slate-300 mt-1 leading-snug">
+                                      <p className="text-[11px] text-slate-600 mt-1 leading-snug">
                                         {tac.description}
                                       </p>
                                     )}
@@ -2451,14 +2490,14 @@ function RozgrywkiContent() {
 
                                   {/* Accepted player posts */}
                                   {acceptedPosts.length > 0 && (
-                                    <div className="p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-500/30 space-y-1">
+                                    <div className="p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-200 space-y-1">
                                       <span className="text-[10px] font-black uppercase text-emerald-400 flex items-center gap-1">
                                         <Sparkles className="w-3 h-3 text-emerald-400" />
                                         Zaakceptowane uwagi zawodników do meczu:
                                       </span>
                                       {acceptedPosts.map(p => (
-                                        <div key={p.id} className="text-[11px] text-slate-300 pl-1">
-                                          • <strong className="text-white">{p.authorName}:</strong> {p.content}
+                                        <div key={p.id} className="text-[11px] text-slate-600 pl-1">
+                                          • <strong className="text-slate-900">{p.authorName}:</strong> {p.content}
                                         </div>
                                       ))}
                                     </div>
@@ -2480,15 +2519,15 @@ function RozgrywkiContent() {
 
           {/* Sparing Pagination Controls */}
           {totalSparringsPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-[#0b0e14] border border-slate-800 rounded-2xl shadow-lg">
-              <span className="text-xs text-slate-400 font-medium">
-                Wyświetlanie <span className="text-white font-bold">{((sparringsPage - 1) * SPARRINGS_PER_PAGE) + 1}</span>–<span className="text-white font-bold">{Math.min(sparringsPage * SPARRINGS_PER_PAGE, sparringsList.length)}</span> z <span className="text-white font-bold">{sparringsList.length}</span> sparingów
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-white border border-slate-200 rounded-2xl shadow-lg">
+              <span className="text-xs text-slate-500 font-medium">
+                Wyświetlanie <span className="text-slate-900 font-bold">{((sparringsPage - 1) * SPARRINGS_PER_PAGE) + 1}</span>–<span className="text-slate-900 font-bold">{Math.min(sparringsPage * SPARRINGS_PER_PAGE, sparringsList.length)}</span> z <span className="text-slate-900 font-bold">{sparringsList.length}</span> sparingów
               </span>
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => setSparringsPage(p => Math.max(1, p - 1))}
                   disabled={sparringsPage === 1}
-                  className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition"
+                  className="p-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed transition"
                   title="Poprzednia strona"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -2501,7 +2540,7 @@ function RozgrywkiContent() {
                       className={`min-w-[28px] h-7 px-2 rounded-lg text-xs font-black transition ${
                         sparringsPage === idx + 1
                           ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                          : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                          : 'bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-900'
                       }`}
                     >
                       {idx + 1}
@@ -2511,7 +2550,7 @@ function RozgrywkiContent() {
                 <button
                   onClick={() => setSparringsPage(p => Math.min(totalSparringsPages, p + 1))}
                   disabled={sparringsPage === totalSparringsPages}
-                  className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition"
+                  className="p-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed transition"
                   title="Następna strona"
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -2546,14 +2585,14 @@ function RozgrywkiContent() {
       {activeTab === 'liga' && (
         <div className="space-y-6">
           {/* Liga Subtabs (Tabela, Wyniki, Statystyki, Zdjęcia) */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-800">
-            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-900 border border-slate-800">
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-200">
+            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200">
               <button
                 onClick={() => setLigaSubTab('tabela')}
                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                   ligaSubTab === 'tabela'
-                    ? 'bg-sky-500 text-slate-950 shadow-md'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-sky-600 text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <Trophy className="w-3.5 h-3.5" />
@@ -2563,8 +2602,8 @@ function RozgrywkiContent() {
                 onClick={() => setLigaSubTab('wyniki')}
                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                   ligaSubTab === 'wyniki'
-                    ? 'bg-sky-500 text-slate-950 shadow-md'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-sky-600 text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <Volleyball className="w-3.5 h-3.5" />
@@ -2574,8 +2613,8 @@ function RozgrywkiContent() {
                 onClick={() => setLigaSubTab('statystyki')}
                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                   ligaSubTab === 'statystyki'
-                    ? 'bg-sky-500 text-slate-950 shadow-md'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-sky-600 text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <BarChart3 className="w-3.5 h-3.5" />
@@ -2583,9 +2622,9 @@ function RozgrywkiContent() {
               </button>
               <Link
                 href="/galeria"
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/80 transition"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white/60 transition"
               >
-                <Camera className="w-3.5 h-3.5 text-sky-400" />
+                <Camera className="w-3.5 h-3.5 text-sky-600" />
                 <span>Galeria zdjęć ➔</span>
               </Link>
             </div>
@@ -2597,15 +2636,15 @@ function RozgrywkiContent() {
                     <button
                       type="button"
                       onClick={() => setShowImportScheduleModal(true)}
-                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-800 hover:bg-slate-700 text-sky-300 border border-sky-500/30 transition shadow-sm"
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-50 hover:bg-slate-100 text-sky-800 border border-slate-200 transition shadow-sm"
                     >
-                      <Upload className="w-3.5 h-3.5 text-sky-400" />
+                      <Upload className="w-3.5 h-3.5 text-sky-600" />
                       <span>Import Terminarza / Wyników (Tekst / Zdjęcie)</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setShowAddMatchModal(true)}
-                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-sky-500 hover:bg-sky-400 text-slate-950 transition"
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-slate-900 transition shadow-sm"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       Dodaj Wynik Meczu
@@ -2621,7 +2660,7 @@ function RozgrywkiContent() {
                       setPhotoSeriesList([]);
                       setShowAddPhotoModal(true);
                     }}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-sky-500 hover:bg-sky-400 text-slate-950 transition shadow-md shadow-sky-500/20"
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-slate-900 transition shadow-sm"
                   >
                     <Camera className="w-3.5 h-3.5" />
                     + Dodaj Zdjęcia z Meczu LALS
@@ -2633,10 +2672,10 @@ function RozgrywkiContent() {
 
           {/* SubTab 1: TABELA LIGOWA */}
           {ligaSubTab === 'tabela' && (
-            <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-800/80">
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 shadow-sm space-y-5 text-slate-800">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-200">
                 <div className="flex items-center gap-3.5">
-                  <div className="w-14 h-14 rounded-full p-0.5 bg-slate-900 border border-sky-400/50 shadow-lg shrink-0 overflow-hidden">
+                  <div className="w-14 h-14 rounded-full p-0.5 bg-slate-50 border border-slate-200 shadow-sm shrink-0 overflow-hidden">
                     <img
                       src="/lals_logo.png"
                       alt="Logo LALS"
@@ -2645,14 +2684,14 @@ function RozgrywkiContent() {
                   </div>
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-lg sm:text-xl font-black text-white uppercase tracking-tight">
+                      <h3 className="text-lg sm:text-xl font-black text-slate-900 uppercase tracking-tight">
                         Lubońska Amatorska Liga Siatkówki (LALS)
                       </h3>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                      <span className="px-2 py-0.5 rounded-lg text-[10px] font-black uppercase bg-emerald-50 text-emerald-800 border border-emerald-300">
                         {currentLeaguePhase?.shortName || 'Faza I'}: {currentLeaguePhase?.advancementSpots === 3 ? 'Top 3 Awans' : 'Grupa Finałowa'}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-500 mt-0.5">
                       Oficjalne rozgrywki LALS • Klasyfikacja punktowa, bilans setów i małych punktów.
                     </p>
                   </div>
@@ -2662,9 +2701,9 @@ function RozgrywkiContent() {
                   {canManage && !isArchiveMode && (
                     <button
                       onClick={() => handleOpenEditTable(currentLeaguePhase?.id || 'faza_1')}
-                      className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-slate-200 hover:text-white transition flex items-center gap-1.5 shadow-md"
+                      className="px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 transition flex items-center gap-1.5 shadow-sm"
                     >
-                      <Edit3 className="w-3.5 h-3.5 text-sky-400" />
+                      <Edit3 className="w-3.5 h-3.5 text-sky-600" />
                       <span>Edytuj Tabelę</span>
                     </button>
                   )}
@@ -2673,19 +2712,19 @@ function RozgrywkiContent() {
                     href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-bold text-sky-400 hover:text-white transition flex items-center gap-1.5 self-start sm:self-auto shrink-0 shadow-md"
+                    className="px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-bold text-sky-700 transition flex items-center gap-1.5 self-start sm:self-auto shrink-0 shadow-sm"
                   >
-                    <ExternalLink className="w-3.5 h-3.5 text-sky-400" />
+                    <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
                     <span>Terminarz LALS w VolleyStation ↗</span>
                   </a>
                 </div>
               </div>
 
               {/* Dynamic Phase Switcher & Group Management Ribbon */}
-              <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800/90 flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-inner">
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-sm">
                 <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1 lg:pb-0 flex-wrap">
                   <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider shrink-0 mr-1 flex items-center gap-1">
-                    <Layers className="w-3 h-3 text-sky-400" /> Faza / Grupa:
+                    <Layers className="w-3 h-3 text-sky-600" /> Faza / Grupa:
                   </span>
                   {(leaguePhases.length > 0 ? leaguePhases : [
                     { id: 'faza_1', name: 'Faza I: Grupa Eliminacyjna', shortName: 'Faza I (Eliminacje)', advancementSpots: 3, advancementTargetName: 'Grupa Finałowa' },
@@ -2700,18 +2739,18 @@ function RozgrywkiContent() {
                         onClick={() => handleSwitchPhase(phase.id)}
                         className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-2 shrink-0 border ${
                           isSelected
-                            ? 'bg-sky-500/20 text-sky-300 border-sky-500/50 shadow-md shadow-sky-500/10 ring-1 ring-sky-500/30'
-                            : 'bg-slate-950 text-slate-400 hover:text-white border-slate-800'
+                            ? 'bg-sky-50 text-sky-800 border-sky-300 shadow-sm ring-1 ring-sky-300'
+                            : 'bg-white text-slate-600 hover:text-slate-900 border-slate-200 hover:bg-slate-100'
                         }`}
                       >
-                        <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-sky-400 animate-pulse' : 'bg-slate-600'}`}></span>
+                        <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-sky-600 animate-pulse' : 'bg-slate-400'}`}></span>
                         <span>{phase.shortName || phase.name}</span>
                         {spots > 0 ? (
-                          <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-600/40">
+                          <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">
                             Awans: {spots}
                           </span>
                         ) : (
-                          <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-950/80 text-amber-300 border border-amber-600/40">
+                          <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-50 text-amber-800 border border-amber-300">
                             Finał
                           </span>
                         )}
@@ -2720,19 +2759,19 @@ function RozgrywkiContent() {
                   })}
                 </div>
 
-                <div className="flex items-center gap-2 text-[11px] text-slate-400 shrink-0 flex-wrap">
+                <div className="flex items-center gap-2 text-[11px] text-slate-500 shrink-0 flex-wrap">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-slate-300 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">
-                      Drużyn w grupie: <strong className="text-white font-mono">{leagueTable.length}</strong>
+                    <span className="font-bold text-slate-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-sm">
+                      Drużyn w grupie: <strong className="text-slate-900 font-mono">{leagueTable.length}</strong>
                     </span>
 
                     {/* Przełącznik widoku tabeli */}
-                    <div className="flex items-center gap-1 bg-slate-950 p-0.5 rounded-xl border border-slate-800 text-xs">
+                    <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-xl border border-slate-200 text-xs">
                       <button
                         type="button"
                         onClick={() => setTableDetailedView(false)}
                         className={`px-2.5 py-1 rounded-lg font-bold transition text-xs ${
-                          !tableDetailedView ? 'bg-sky-500 text-slate-950 shadow-sm' : 'text-slate-400 hover:text-white'
+                          !tableDetailedView ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
                         }`}
                       >
                         Kompaktowa
@@ -2741,13 +2780,13 @@ function RozgrywkiContent() {
                         type="button"
                         onClick={() => setTableDetailedView(true)}
                         className={`px-2.5 py-1 rounded-lg font-bold transition text-xs flex items-center gap-1.5 ${
-                          tableDetailedView ? 'bg-sky-500 text-slate-950 shadow-sm' : 'text-slate-400 hover:text-white'
+                          tableDetailedView ? 'bg-sky-600 text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
                         }`}
                         title="Pełna tabela zgodna z oficjalnym systemem VolleyStation"
                       >
                         <span>Pełna VolleyStation</span>
                         <span className={`text-[9px] px-1 py-0.2 rounded font-mono font-black ${
-                          tableDetailedView ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-800 text-sky-400'
+                          tableDetailedView ? 'bg-white/20 text-slate-900' : 'bg-slate-200 text-slate-700'
                         }`}>
                           LIVE
                         </span>
@@ -2760,30 +2799,30 @@ function RozgrywkiContent() {
                       <button
                         type="button"
                         onClick={() => handleOpenConfigPhase(activeLeaguePhaseId)}
-                        className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1 border border-slate-700"
+                        className="px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold transition flex items-center gap-1 border border-slate-200 shadow-sm"
                         title="Zmień nazwę, awanse lub usuń tę fazę"
                       >
-                        <Settings className="w-3 h-3 text-sky-400" />
+                        <Settings className="w-3 h-3 text-sky-600" />
                         <span>Ustawienia Fazy</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => handleOpenSplitPhase(activeLeaguePhaseId)}
-                        className="px-2.5 py-1 rounded-lg bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 hover:text-purple-200 text-xs font-bold transition flex items-center gap-1 border border-purple-500/30"
+                        className="px-2.5 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-800 text-xs font-bold transition flex items-center gap-1 border border-purple-200 shadow-sm"
                         title="Automatycznie wydziel nową grupę (np. miejsca 1-4 lub 5-8) z przeniesieniem punktów"
                       >
-                        <GitFork className="w-3 h-3 text-purple-400" />
+                        <GitFork className="w-3 h-3 text-purple-600" />
                         <span>Podziel Grupę</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={handleOpenCreatePhase}
-                        className="px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 hover:text-emerald-200 text-xs font-bold transition flex items-center gap-1 border border-emerald-500/30"
+                        className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition flex items-center gap-1 border border-emerald-200 shadow-sm"
                         title="Dodaj nową fazę / grupę od zera"
                       >
-                        <Plus className="w-3 h-3 text-emerald-400" />
+                        <Plus className="w-3 h-3 text-emerald-600" />
                         <span>Nowa Faza</span>
                       </button>
                     </div>
@@ -2793,38 +2832,38 @@ function RozgrywkiContent() {
 
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left">
-                  <thead className="bg-slate-900 text-slate-400 uppercase font-black tracking-wider text-[10px] border-b border-slate-800">
+                  <thead className="bg-slate-50 text-slate-600 uppercase font-black tracking-wider text-[10px] border-b border-slate-200">
                     {tableDetailedView ? (
                       <>
                         <tr>
-                          <th rowSpan={2} className="py-2.5 px-3 border-r border-slate-800 text-center">Poz.</th>
-                          <th rowSpan={2} className="py-2.5 px-4 border-r border-slate-800">Drużyna</th>
-                          <th rowSpan={2} className="py-2.5 px-3 text-center font-black text-white border-r border-slate-800">Punkty</th>
-                          <th colSpan={3} className="py-1 px-2 text-center border-b border-r border-slate-800 bg-slate-950/40 text-slate-300 font-bold">Mecze</th>
-                          <th colSpan={3} className="py-1 px-2 text-center border-b border-r border-slate-800 bg-slate-950/40 text-slate-300 font-bold">Sety</th>
-                          <th colSpan={3} className="py-1 px-2 text-center border-b border-r border-slate-800 bg-slate-950/40 text-slate-300 font-bold">Punkty</th>
-                          <th colSpan={6} className="py-1 px-2 text-center border-b border-r border-slate-800 bg-slate-950/40 text-slate-300 font-bold">Wynik</th>
+                          <th rowSpan={2} className="py-2.5 px-3 border-r border-slate-200 text-center">Poz.</th>
+                          <th rowSpan={2} className="py-2.5 px-4 border-r border-slate-200">Drużyna</th>
+                          <th rowSpan={2} className="py-2.5 px-3 text-center font-black text-slate-900 border-r border-slate-200">Punkty</th>
+                          <th colSpan={3} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Mecze</th>
+                          <th colSpan={3} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Sety</th>
+                          <th colSpan={3} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Punkty</th>
+                          <th colSpan={6} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Wynik</th>
                           <th rowSpan={2} className="py-2.5 px-3 text-center">Forma</th>
                         </tr>
-                        <tr className="border-b border-slate-800 text-[9px]">
-                          <th className="py-1.5 px-2 text-center text-slate-400">Rozegr.</th>
-                          <th className="py-1.5 px-2 text-center text-emerald-400">Wygr.</th>
-                          <th className="py-1.5 px-2 text-center text-rose-400 border-r border-slate-800">Przegr.</th>
+                        <tr className="border-b border-slate-200 text-[9px]">
+                          <th className="py-1.5 px-2 text-center text-slate-500">Rozegr.</th>
+                          <th className="py-1.5 px-2 text-center text-emerald-700">Wygr.</th>
+                          <th className="py-1.5 px-2 text-center text-rose-600 border-r border-slate-200">Przegr.</th>
 
-                          <th className="py-1.5 px-2 text-center text-emerald-400">Wygr.</th>
-                          <th className="py-1.5 px-2 text-center text-rose-400">Przegr.</th>
-                          <th className="py-1.5 px-2 text-center text-sky-400 border-r border-slate-800">Stosunek</th>
+                          <th className="py-1.5 px-2 text-center text-emerald-700">Wygr.</th>
+                          <th className="py-1.5 px-2 text-center text-rose-600">Przegr.</th>
+                          <th className="py-1.5 px-2 text-center text-sky-700 border-r border-slate-200">Stosunek</th>
 
-                          <th className="py-1.5 px-2 text-center text-emerald-400">Wygr.</th>
-                          <th className="py-1.5 px-2 text-center text-rose-400">Przegr.</th>
-                          <th className="py-1.5 px-2 text-center text-sky-400 border-r border-slate-800">Stosunek</th>
+                          <th className="py-1.5 px-2 text-center text-emerald-700">Wygr.</th>
+                          <th className="py-1.5 px-2 text-center text-rose-600">Przegr.</th>
+                          <th className="py-1.5 px-2 text-center text-sky-700 border-r border-slate-200">Stosunek</th>
 
-                          <th className="py-1.5 px-1.5 text-center text-slate-300 font-mono">3-0</th>
-                          <th className="py-1.5 px-1.5 text-center text-slate-300 font-mono">3-1</th>
-                          <th className="py-1.5 px-1.5 text-center text-slate-300 font-mono">3-2</th>
-                          <th className="py-1.5 px-1.5 text-center text-slate-400 font-mono">2-3</th>
-                          <th className="py-1.5 px-1.5 text-center text-slate-400 font-mono">1-3</th>
-                          <th className="py-1.5 px-1.5 text-center text-slate-400 font-mono border-r border-slate-800">0-3</th>
+                          <th className="py-1.5 px-1.5 text-center text-slate-700 font-mono">3-0</th>
+                          <th className="py-1.5 px-1.5 text-center text-slate-700 font-mono">3-1</th>
+                          <th className="py-1.5 px-1.5 text-center text-slate-700 font-mono">3-2</th>
+                          <th className="py-1.5 px-1.5 text-center text-slate-500 font-mono">2-3</th>
+                          <th className="py-1.5 px-1.5 text-center text-slate-500 font-mono">1-3</th>
+                          <th className="py-1.5 px-1.5 text-center text-slate-500 font-mono border-r border-slate-200">0-3</th>
                         </tr>
                       </>
                     ) : (
@@ -2832,14 +2871,14 @@ function RozgrywkiContent() {
                         <th className="py-3 px-3">Poz.</th>
                         <th className="py-3 px-4">Drużyna</th>
                         <th className="py-3 px-2 text-center">Mecze</th>
-                        <th className="py-3 px-2 text-center font-black text-white">Punkty</th>
+                        <th className="py-3 px-2 text-center font-black text-slate-900">Punkty</th>
                         <th className="py-3 px-3 text-center">Sety (W:P)</th>
                         <th className="py-3 px-3 text-center">Małe Punkty</th>
                         <th className="py-3 px-4 text-center">Forma</th>
                       </tr>
                     )}
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60 font-mono">
+                  <tbody className="divide-y divide-slate-100 font-mono text-slate-800">
                     {leagueTable.map((team, idx) => {
                       const isAngels = team.teamName.toLowerCase().includes('angels');
                       const advSpots = currentLeaguePhase?.advancementSpots ?? 0;
@@ -2863,33 +2902,33 @@ function RozgrywkiContent() {
                       return (
                         <React.Fragment key={team.id || idx}>
                           <tr
-                            className={`hover:bg-slate-900/50 transition ${
-                              isAngels ? 'bg-sky-500/10 font-bold' : ''
-                            } ${isAdvancing ? 'bg-emerald-500/5' : ''}`}
+                            className={`hover:bg-slate-50 transition ${
+                              isAngels ? 'bg-sky-50 font-bold' : ''
+                            } ${isAdvancing && !isAngels ? 'bg-emerald-50/30' : ''}`}
                           >
                             <td className="py-3 px-3 text-center">
                               <span className={`w-6 h-6 rounded-lg inline-flex items-center justify-center font-black text-xs ${
                                 isAdvancing
-                                  ? 'bg-emerald-500 text-slate-950 shadow-sm shadow-emerald-500/30'
+                                  ? 'bg-emerald-600 text-slate-900 shadow-sm'
                                   : isGoldMedalist
                                   ? 'bg-amber-400 text-slate-950 font-black'
                                   : isMedalist && team.position === 2
-                                  ? 'bg-slate-300 text-slate-950'
+                                  ? 'bg-slate-200 text-slate-800 font-bold'
                                   : isMedalist && team.position === 3
-                                  ? 'bg-amber-700 text-white'
-                                  : 'bg-slate-800 text-slate-300'
+                                  ? 'bg-amber-100 text-amber-800 font-bold'
+                                  : 'bg-slate-100 text-slate-600 font-bold'
                               }`}>
                                 {team.position}
                               </span>
                             </td>
 
-                            <td className="py-3 px-4 font-sans font-black text-white text-sm flex items-center gap-2 flex-wrap">
+                            <td className="py-3 px-4 font-sans font-black text-slate-900 text-sm flex items-center gap-2 flex-wrap">
                               {team.teamUrl ? (
                                 <a
                                   href={team.teamUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="hover:underline hover:text-sky-400 transition flex items-center gap-1.5"
+                                  className="hover:underline hover:text-sky-600 transition flex items-center gap-1.5"
                                   title="Otwórz profil drużyny na VolleyStation"
                                 >
                                   <span>{team.teamName}</span>
@@ -2898,17 +2937,17 @@ function RozgrywkiContent() {
                                 <span>{team.teamName}</span>
                               )}
                               {isAngels && (
-                                <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-sky-500/20 text-sky-300 border border-sky-500/40">
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-sky-100 text-sky-800 border border-sky-300">
                                   Nasz Klub
                                 </span>
                               )}
                               {isAdvancing && (
-                                <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1">
                                   <span>🟢 Awans ({currentLeaguePhase?.advancementTargetName || 'Finał'})</span>
                                 </span>
                               )}
                               {isGoldMedalist && (
-                                <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-50 text-amber-800 border border-amber-300">
                                   🥇 Mistrz LALS
                                 </span>
                               )}
@@ -2916,39 +2955,39 @@ function RozgrywkiContent() {
 
                             {tableDetailedView ? (
                               <>
-                                <td className="py-3 px-3 text-center text-sm font-black text-amber-400 border-r border-slate-800">{team.points}</td>
+                                <td className="py-3 px-3 text-center text-sm font-black text-slate-900 border-r border-slate-200">{team.points}</td>
                                 
                                 {/* Mecze */}
-                                <td className="py-3 px-2 text-center text-slate-300">{team.matchesPlayed}</td>
-                                <td className="py-3 px-2 text-center text-emerald-400 font-bold">{mWon}</td>
-                                <td className="py-3 px-2 text-center text-rose-400 border-r border-slate-800">{mLost}</td>
+                                <td className="py-3 px-2 text-center text-slate-700">{team.matchesPlayed}</td>
+                                <td className="py-3 px-2 text-center text-emerald-700 font-bold">{mWon}</td>
+                                <td className="py-3 px-2 text-center text-rose-600 border-r border-slate-200">{mLost}</td>
 
                                 {/* Sety */}
-                                <td className="py-3 px-2 text-center text-emerald-400 font-bold">{team.setsWon}</td>
-                                <td className="py-3 px-2 text-center text-rose-400">{team.setsLost}</td>
-                                <td className="py-3 px-2 text-center text-sky-300 border-r border-slate-800">{setRatioStr}</td>
+                                <td className="py-3 px-2 text-center text-emerald-700 font-bold">{team.setsWon}</td>
+                                <td className="py-3 px-2 text-center text-rose-600">{team.setsLost}</td>
+                                <td className="py-3 px-2 text-center text-sky-700 border-r border-slate-200">{setRatioStr}</td>
 
                                 {/* Punkty */}
-                                <td className="py-3 px-2 text-center text-emerald-400">{team.pointsWon}</td>
-                                <td className="py-3 px-2 text-center text-rose-400">{team.pointsLost}</td>
-                                <td className="py-3 px-2 text-center text-sky-300 border-r border-slate-800">{pointRatioStr}</td>
+                                <td className="py-3 px-2 text-center text-emerald-700">{team.pointsWon}</td>
+                                <td className="py-3 px-2 text-center text-rose-600">{team.pointsLost}</td>
+                                <td className="py-3 px-2 text-center text-sky-700 border-r border-slate-200">{pointRatioStr}</td>
 
                                 {/* Wyniki */}
-                                <td className="py-3 px-1.5 text-center text-slate-300">{team.w3_0 ?? 0}</td>
-                                <td className="py-3 px-1.5 text-center text-slate-300">{team.w3_1 ?? 0}</td>
-                                <td className="py-3 px-1.5 text-center text-slate-300">{team.w3_2 ?? 0}</td>
-                                <td className="py-3 px-1.5 text-center text-slate-400">{team.p2_3 ?? 0}</td>
-                                <td className="py-3 px-1.5 text-center text-slate-400">{team.p1_3 ?? 0}</td>
-                                <td className="py-3 px-1.5 text-center text-slate-400 border-r border-slate-800">{team.p0_3 ?? 0}</td>
+                                <td className="py-3 px-1.5 text-center text-slate-700">{team.w3_0 ?? 0}</td>
+                                <td className="py-3 px-1.5 text-center text-slate-700">{team.w3_1 ?? 0}</td>
+                                <td className="py-3 px-1.5 text-center text-slate-700">{team.w3_2 ?? 0}</td>
+                                <td className="py-3 px-1.5 text-center text-slate-500">{team.p2_3 ?? 0}</td>
+                                <td className="py-3 px-1.5 text-center text-slate-500">{team.p1_3 ?? 0}</td>
+                                <td className="py-3 px-1.5 text-center text-slate-500 border-r border-slate-200">{team.p0_3 ?? 0}</td>
                               </>
                             ) : (
                               <>
-                                <td className="py-3.5 px-2 text-center text-slate-300">{team.matchesPlayed}</td>
-                                <td className="py-3.5 px-2 text-center text-sm font-black text-amber-400">{team.points}</td>
-                                <td className="py-3.5 px-3 text-center text-slate-300">
+                                <td className="py-3.5 px-2 text-center text-slate-700">{team.matchesPlayed}</td>
+                                <td className="py-3.5 px-2 text-center text-sm font-black text-slate-900">{team.points}</td>
+                                <td className="py-3.5 px-3 text-center text-slate-700">
                                   {team.setsWon} : {team.setsLost}
                                 </td>
-                                <td className="py-3.5 px-3 text-center text-slate-400">
+                                <td className="py-3.5 px-3 text-center text-slate-600">
                                   {team.pointsWon} : {team.pointsLost}
                                 </td>
                               </>
@@ -2960,7 +2999,7 @@ function RozgrywkiContent() {
                                   <span
                                     key={i}
                                     className={`w-4 h-4 rounded text-[9px] font-black flex items-center justify-center ${
-                                      f === 'W' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'
+                                      f === 'W' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
                                     }`}
                                   >
                                     {f}
@@ -2972,11 +3011,11 @@ function RozgrywkiContent() {
 
                           {/* Dynamiczna linia oddzielająca strefę awansu */}
                           {advSpots > 0 && team.position === advSpots && (
-                            <tr className="bg-emerald-950/30 border-y-2 border-emerald-500/40">
+                            <tr className="bg-emerald-50 border-y-2 border-emerald-300">
                               <td colSpan={tableDetailedView ? 19 : 7} className="py-2.5 px-4">
-                                <div className="flex items-center justify-between gap-3 text-xs font-black uppercase text-emerald-300">
+                                <div className="flex items-center justify-between gap-3 text-xs font-black uppercase text-emerald-800">
                                   <div className="flex items-center gap-2">
-                                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
                                     <span>▲ STREFA AWANSU: {advSpots} {advSpots === 1 ? 'DRUŻYNA AWANSUJE' : advSpots < 5 ? 'DRUŻYNY AWANSUJĄ' : 'DRUŻYN AWANSUJE'} DO: {currentLeaguePhase?.advancementTargetName || 'KOLEJNEJ FAZY'} ▲</span>
                                   </div>
                                   <span className="text-[10px] font-mono text-emerald-400/80 lowercase">
@@ -2994,8 +3033,8 @@ function RozgrywkiContent() {
               </div>
 
               {/* Informative Rules Footer */}
-              <div className="p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5 text-slate-300">
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 text-slate-600">
                   <Info className="w-4 h-4 text-sky-400 shrink-0" />
                   <span>
                     <strong>Format grupy:</strong> W tej grupie występuje <strong>{leagueTable.length} zespołów</strong>.{' '}
@@ -3024,7 +3063,7 @@ function RozgrywkiContent() {
           {ligaSubTab === 'wyniki' && (
             <div className="space-y-4">
               {/* Phase Filter for Matches */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-2xl bg-slate-900/80 border border-slate-800">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-2xl bg-white border border-slate-200 shadow-sm">
                 <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
                   <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider shrink-0 mr-1">
                     Filtruj wg Fazy:
@@ -3033,8 +3072,8 @@ function RozgrywkiContent() {
                     onClick={() => setSelectedPhaseFilter('ALL')}
                     className={`px-3 py-1 rounded-xl text-xs font-black transition shrink-0 ${
                       selectedPhaseFilter === 'ALL'
-                        ? 'bg-sky-500 text-slate-950 font-black shadow-sm'
-                        : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                        ? 'bg-sky-600 text-slate-900 shadow-sm'
+                        : 'bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200'
                     }`}
                   >
                     Wszystkie fazy ({matches.filter(m => m.matchType === 'Mecz ligowy').length})
@@ -3051,9 +3090,9 @@ function RozgrywkiContent() {
                         className={`px-3 py-1 rounded-xl text-xs font-black transition shrink-0 flex items-center gap-1.5 ${
                           selectedPhaseFilter === p.id
                             ? p.id === 'faza_1'
-                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shadow-sm'
-                              : 'bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-sm'
-                            : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                              ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-sm'
+                              : 'bg-amber-50 text-amber-800 border border-amber-300 shadow-sm'
+                            : 'bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200'
                         }`}
                       >
                         <span>{p.shortName || p.name}</span>
@@ -3063,13 +3102,13 @@ function RozgrywkiContent() {
                   })}
                 </div>
 
-                <div className="text-[11px] text-slate-400">
-                  Pokazano: <strong className="text-white font-mono">{leagueMatchesList.length}</strong> spotkań
+                <div className="text-[11px] text-slate-500">
+                  Pokazano: <strong className="text-slate-900 font-mono">{leagueMatchesList.length}</strong> spotkań
                 </div>
               </div>
 
               {leagueMatchesList.length === 0 ? (
-                <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-8 text-center text-slate-400">
+                <div className="bg-white border border-slate-200 rounded-3xl p-8 text-center text-slate-500 shadow-sm">
                   Brak meczów ligowych spełniających kryteria.
                 </div>
               ) : (
@@ -3080,53 +3119,53 @@ function RozgrywkiContent() {
                   return (
                     <div
                       key={match.id}
-                      className="bg-[#0b0e14] border border-sky-500/30 rounded-3xl overflow-hidden shadow-xl transition-all duration-300"
+                      className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm hover:border-sky-300 transition-all duration-200"
                     >
                       {/* Zwijany Nagłówek Meczu Ligowego */}
                       <div
                         onClick={() => toggleMatch(match.id)}
-                        className="p-5 sm:p-6 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 select-none hover:bg-slate-900/50 transition group"
+                        className="p-5 sm:p-6 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 select-none hover:bg-slate-50 transition group"
                       >
                         <div className="space-y-1.5 flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-sky-500/20 text-sky-300 border border-sky-500/40">
+                            <span className="px-2 py-0.5 rounded-lg text-[10px] font-black uppercase bg-sky-50 text-sky-800 border border-sky-200">
                               {match.isHome ? 'Mecz Domowy' : 'Wyjazd'}
                             </span>
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-sky-950 border border-sky-500/30 text-sky-300">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100 border border-slate-200 text-slate-700">
                               <img src="/lals_logo.png" alt="LALS" className="w-3.5 h-3.5 rounded-full object-contain" />
                               <span>LALS</span>
                             </span>
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                            <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border ${
                               match.leaguePhaseId === 'faza_2'
-                                ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
-                                : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                                ? 'bg-amber-50 text-amber-800 border-amber-300'
+                                : 'bg-emerald-50 text-emerald-800 border-emerald-300'
                             }`}>
                               {match.leaguePhaseId === 'faza_2' ? 'Faza II (Finałowa)' : 'Faza I (Eliminacje)'}
                             </span>
-                            <span className="text-xs text-slate-400">
+                            <span className="text-xs text-slate-500">
                               {new Date(match.date).toLocaleDateString('pl-PL')} • {match.location}
                             </span>
                           </div>
 
-                          <h3 className="text-lg sm:text-xl font-black text-white group-hover:text-sky-300 transition truncate">
+                          <h3 className="text-lg sm:text-xl font-black text-slate-900 group-hover:text-sky-600 transition truncate">
                             Angels ZTP vs {match.opponent}
                           </h3>
                         </div>
 
                         {/* Wynik i Chevron po prawej */}
-                        <div className="flex items-center justify-between md:justify-end gap-4 shrink-0 pt-2 md:pt-0 border-t border-slate-800/60 md:border-t-0">
+                        <div className="flex items-center justify-between md:justify-end gap-4 shrink-0 pt-2 md:pt-0 border-t border-slate-100 md:border-t-0">
                           <div className="text-right">
-                            <span className={`text-2xl sm:text-3xl font-black font-mono block leading-tight ${isWin ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            <span className={`text-2xl sm:text-3xl font-black font-mono block leading-tight ${isWin ? 'text-emerald-700' : 'text-rose-600'}`}>
                               {match.teamSetsWon} : {match.opponentSetsWon}
                             </span>
-                            <span className={`text-[10px] font-black uppercase tracking-widest ${isWin ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            <span className={`text-[10px] font-black uppercase tracking-widest ${isWin ? 'text-emerald-700' : 'text-rose-600'}`}>
                               {isWin ? 'ZWYCIĘSTWO' : 'PORAŻKA'}
                             </span>
                           </div>
 
                           <div
-                            className={`w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 transition-all duration-200 ${
-                              isExpanded ? 'rotate-180 bg-sky-500/10 text-sky-400 border-sky-500/40' : 'group-hover:text-white group-hover:border-slate-700'
+                            className={`w-9 h-9 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 transition-all duration-200 ${
+                              isExpanded ? 'rotate-180 bg-sky-50 text-sky-600 border-sky-300' : 'group-hover:text-slate-800 group-hover:bg-slate-100'
                             }`}
                           >
                             <ChevronDown className="w-4 h-4" />
@@ -3136,34 +3175,34 @@ function RozgrywkiContent() {
 
                       {/* Rozwijana zawartość meczu ligowego */}
                       {isExpanded && (
-                        <div className="p-5 sm:p-6 border-t border-slate-800/80 space-y-4 bg-[#080c14] animate-fadeIn">
+                        <div className="p-5 sm:p-6 border-t border-slate-100 space-y-4 bg-slate-50/50 animate-fadeIn">
                           {/* Sety */}
                           <div className="space-y-1.5">
-                            <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                            <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider">
                               Przebieg i Wyniki Setów:
                             </span>
                             <div className="flex flex-wrap gap-2">
                               {match.sets.map(s => (
                                 <span
                                   key={s.setNumber}
-                                  className="px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-slate-900 border border-slate-800 text-slate-200 shadow-sm"
+                                  className="px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-white border border-slate-200 text-slate-800 shadow-sm"
                                 >
-                                  Set {s.setNumber}: <strong className="text-white">{s.teamScore}</strong>:<strong className="text-white">{s.opponentScore}</strong>
+                                  Set {s.setNumber}: <strong className="text-slate-900">{s.teamScore}</strong>:<strong className="text-slate-900">{s.opponentScore}</strong>
                                 </span>
                               ))}
                             </div>
                           </div>
 
                           {match.mvp && (
-                            <div className="text-xs text-amber-300 font-bold flex items-center gap-2 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                              <Trophy className="w-4 h-4 text-amber-400 shrink-0" />
-                              <span>Najlepszy zawodnik meczu (MVP): <strong className="text-white">{match.mvp}</strong></span>
+                            <div className="text-xs text-amber-900 font-bold flex items-center gap-2 p-2.5 rounded-xl bg-amber-50 border border-amber-200">
+                              <Trophy className="w-4 h-4 text-amber-600 shrink-0" />
+                              <span>Najlepszy zawodnik meczu (MVP): <strong className="text-slate-900">{match.mvp}</strong></span>
                             </div>
                           )}
 
                           {match.notes && (
-                            <div className="text-xs text-slate-300 p-3 rounded-xl bg-slate-900/60 border border-slate-800">
-                              <span className="text-[10px] font-black uppercase text-slate-400 block mb-1">Raport meczowy i uwagi:</span>
+                            <div className="text-xs text-slate-600 p-3 rounded-xl bg-white border border-slate-200">
+                              <span className="text-[10px] font-black uppercase text-slate-500 block mb-1">Raport meczowy i uwagi:</span>
                               {match.notes}
                             </div>
                           )}
@@ -3173,18 +3212,18 @@ function RozgrywkiContent() {
                             const linked = tactics.filter(t => t.matchId === match.id);
                             if (linked.length === 0) return null;
                             return (
-                              <div className="pt-3 border-t border-slate-800 w-full space-y-2.5">
+                              <div className="pt-3 border-t border-slate-200 w-full space-y-2.5">
                                 <div className="flex items-center justify-between">
-                                  <span className="text-[11px] font-black uppercase text-sky-400 flex items-center gap-1.5">
+                                  <span className="text-[11px] font-black uppercase text-sky-700 flex items-center gap-1.5">
                                     <Compass className="w-3.5 h-3.5" />
                                     📸 Zrzut Taktyczny Trenera do tego Meczu: {linked[0].title}
                                   </span>
-                                  <a href={`/taktyka?matchId=${match.id}&tacticId=${linked[0].id}`} className="text-[11px] text-sky-400 font-bold hover:underline">
+                                  <a href={`/taktyka?matchId=${match.id}&tacticId=${linked[0].id}`} className="text-[11px] text-sky-600 font-bold hover:underline">
                                     Zobacz w tablicy →
                                   </a>
                                 </div>
                                 {linked[0].drawingData && (
-                                  <div className="aspect-[21/9] bg-slate-900 rounded-xl overflow-hidden border border-slate-800 max-h-36">
+                                  <div className="aspect-[21/9] bg-white rounded-xl overflow-hidden border border-slate-200 max-h-36 shadow-sm">
                                     <img src={linked[0].drawingData} alt={linked[0].title} className="w-full h-full object-contain" />
                                   </div>
                                 )}
@@ -3200,15 +3239,15 @@ function RozgrywkiContent() {
 
               {/* League Matches Pagination Controls */}
               {totalLeagueMatchesPages > 1 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-[#0b0e14] border border-slate-800 rounded-2xl shadow-lg">
-                  <span className="text-xs text-slate-400 font-medium">
-                    Wyświetlanie <span className="text-white font-bold">{((leagueMatchesPage - 1) * LEAGUE_MATCHES_PER_PAGE) + 1}</span>–<span className="text-white font-bold">{Math.min(leagueMatchesPage * LEAGUE_MATCHES_PER_PAGE, leagueMatchesList.length)}</span> z <span className="text-white font-bold">{leagueMatchesList.length}</span> meczów ligowych
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-white border border-slate-200 rounded-2xl shadow-lg">
+                  <span className="text-xs text-slate-500 font-medium">
+                    Wyświetlanie <span className="text-slate-900 font-bold">{((leagueMatchesPage - 1) * LEAGUE_MATCHES_PER_PAGE) + 1}</span>–<span className="text-slate-900 font-bold">{Math.min(leagueMatchesPage * LEAGUE_MATCHES_PER_PAGE, leagueMatchesList.length)}</span> z <span className="text-slate-900 font-bold">{leagueMatchesList.length}</span> meczów ligowych
                   </span>
                   <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => setLeagueMatchesPage(p => Math.max(1, p - 1))}
                       disabled={leagueMatchesPage === 1}
-                      className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition"
+                      className="p-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed transition"
                       title="Poprzednia strona"
                     >
                       <ChevronLeft className="w-4 h-4" />
@@ -3221,7 +3260,7 @@ function RozgrywkiContent() {
                           className={`min-w-[28px] h-7 px-2 rounded-lg text-xs font-black transition ${
                             leagueMatchesPage === idx + 1
                               ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/20'
-                              : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                              : 'bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-900'
                           }`}
                         >
                           {idx + 1}
@@ -3231,7 +3270,7 @@ function RozgrywkiContent() {
                     <button
                       onClick={() => setLeagueMatchesPage(p => Math.min(totalLeagueMatchesPages, p + 1))}
                       disabled={leagueMatchesPage === totalLeagueMatchesPages}
-                      className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition"
+                      className="p-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed transition"
                       title="Następna strona"
                     >
                       <ChevronRight className="w-4 h-4" />
@@ -3246,13 +3285,13 @@ function RozgrywkiContent() {
           {ligaSubTab === 'statystyki' && (
             <div className="space-y-6">
               {/* Header with Title and Actions */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 bg-[#0b0e14] border border-slate-800 rounded-3xl shadow-xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 bg-white border border-slate-200 rounded-3xl shadow-sm">
                 <div>
-                  <h3 className="text-lg sm:text-xl font-black text-white uppercase tracking-tight flex items-center gap-2">
+                  <h3 className="text-lg sm:text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
                     <BarChart3 className="w-5 h-5 text-sky-400" />
                     Statystyki VolleyStation & Liderzy Ligi
                   </h3>
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-xs text-slate-500 mt-1">
                     Oficjalne dane meczowe, protokoły punktowe i rankingi indywidualne z ligi LALS.
                   </p>
                 </div>
@@ -3273,7 +3312,7 @@ function RozgrywkiContent() {
                     href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
                     target="_blank"
                     rel="noreferrer"
-                    className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-sky-300 hover:text-white border border-slate-800 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
+                    className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-100 text-sky-300 hover:text-slate-900 border border-slate-200 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     <span>Terminarz LALS (VolleyStation) ↗</span>
@@ -3283,58 +3322,58 @@ function RozgrywkiContent() {
 
               {/* 4 Summary KPI Cards for Angels ZTP */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div className="p-4 rounded-2xl bg-[#0b0e14] border border-slate-800 shadow-lg">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-lg">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">Mecze w LALS</span>
+                    <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">Mecze w LALS</span>
                     <Volleyball className="w-4 h-4 text-sky-400" />
                   </div>
-                  <div className="text-2xl font-black text-white font-athletic">
+                  <div className="text-2xl font-black text-slate-900 font-athletic">
                     {leagueReports.length}
                   </div>
-                  <div className="text-[10px] text-slate-400 mt-0.5">
+                  <div className="text-[10px] text-slate-500 mt-0.5">
                     Zaimportowane protokoły
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#0b0e14] border border-slate-800 shadow-lg">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-lg">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">Lider Punktowy (ABS)</span>
+                    <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">Lider Punktowy (ABS)</span>
                     <Crown className="w-4 h-4 text-amber-400" />
                   </div>
                   <div className="text-xl sm:text-2xl font-black text-amber-400 truncate font-athletic">
                     {leaderboards?.angelsScorers?.[0]?.name || 'Brak danych'}
                   </div>
-                  <div className="text-[10px] text-slate-400 mt-0.5">
+                  <div className="text-[10px] text-slate-500 mt-0.5">
                     {leaderboards?.angelsScorers?.[0]
                       ? `${leaderboards.angelsScorers[0].totalPoints} pkt (${leaderboards.angelsScorers[0].matchesPlayed} mecze)`
                       : 'Zaimportuj protokoły'}
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#0b0e14] border border-slate-800 shadow-lg">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-lg">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">Król Bloku (Blk)</span>
+                    <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">Król Bloku (Blk)</span>
                     <Shield className="w-4 h-4 text-emerald-400" />
                   </div>
                   <div className="text-xl sm:text-2xl font-black text-emerald-400 truncate font-athletic">
                     {leaderboards?.angelsBlockers?.[0]?.name || 'Brak danych'}
                   </div>
-                  <div className="text-[10px] text-slate-400 mt-0.5">
+                  <div className="text-[10px] text-slate-500 mt-0.5">
                     {leaderboards?.angelsBlockers?.[0]
                       ? `${leaderboards.angelsBlockers[0].totalBlock} punktowych bloków`
                       : 'Brak danych'}
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#0b0e14] border border-slate-800 shadow-lg">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-lg">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[11px] font-black uppercase tracking-wider text-slate-400">As Serwisowy (Ser)</span>
+                    <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">As Serwisowy (Ser)</span>
                     <Zap className="w-4 h-4 text-rose-400" />
                   </div>
                   <div className="text-xl sm:text-2xl font-black text-rose-400 truncate font-athletic">
                     {leaderboards?.angelsServers?.[0]?.name || 'Brak danych'}
                   </div>
-                  <div className="text-[10px] text-slate-400 mt-0.5">
+                  <div className="text-[10px] text-slate-500 mt-0.5">
                     {leaderboards?.angelsServers?.[0]
                       ? `${leaderboards.angelsServers[0].totalServe} asów serwisowych`
                       : 'Brak danych'}
@@ -3344,23 +3383,23 @@ function RozgrywkiContent() {
 
               {/* Leaderboards Section (Liderzy Ligi / Zespołu) */}
               {leaderboards && (
-                <div className="p-5 sm:p-6 bg-[#0b0e14] border border-slate-800 rounded-3xl shadow-xl space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                <div className="p-5 sm:p-6 bg-white border border-slate-200 rounded-3xl shadow-sm space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
                     <div className="flex items-center gap-2">
                       <Trophy className="w-5 h-5 text-amber-400" />
-                      <h4 className="text-base font-black text-white uppercase tracking-tight">
+                      <h4 className="text-base font-black text-slate-900 uppercase tracking-tight">
                         Rankingi Indywidualne
                       </h4>
                     </div>
 
-                    <div className="flex items-center gap-1 p-1 bg-slate-900 border border-slate-800 rounded-xl text-xs">
+                    <div className="flex items-center gap-1 p-1 bg-slate-100 border border-slate-200 rounded-xl text-xs">
                       <button
                         type="button"
                         onClick={() => setLeaderboardScope('ANGELS')}
                         className={`px-3 py-1.5 rounded-lg font-bold transition ${
                           leaderboardScope === 'ANGELS'
                             ? 'bg-sky-500 text-slate-950 shadow'
-                            : 'text-slate-400 hover:text-white'
+                            : 'text-slate-500 hover:text-slate-900'
                         }`}
                       >
                         👼 Tylko Angels ZTP
@@ -3371,7 +3410,7 @@ function RozgrywkiContent() {
                         className={`px-3 py-1.5 rounded-lg font-bold transition ${
                           leaderboardScope === 'LIGA'
                             ? 'bg-amber-500 text-slate-950 shadow'
-                            : 'text-slate-400 hover:text-white'
+                            : 'text-slate-500 hover:text-slate-900'
                         }`}
                       >
                         🌐 Cała Liga LALS
@@ -3381,7 +3420,7 @@ function RozgrywkiContent() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                     {/* 1. Najwięcej Punktów */}
-                    <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-3">
+                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-black uppercase text-amber-400 flex items-center gap-1.5">
                           <Crown className="w-3.5 h-3.5" /> Punkty (ABS)
@@ -3389,10 +3428,10 @@ function RozgrywkiContent() {
                       </div>
                       <div className="space-y-1.5">
                         {((leaderboardScope === 'ANGELS' ? leaderboards.angelsScorers : leaderboards.topScorers) || []).slice(0, 5).map((p: any, idx: number) => (
-                          <div key={p.name} className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-slate-950/40 border border-slate-800/50">
+                          <div key={p.name} className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-slate-50 border border-slate-200">
                             <div className="flex items-center gap-2 truncate">
                               <span className={`w-4 text-center font-bold font-mono ${idx === 0 ? 'text-amber-400' : 'text-slate-500'}`}>{idx + 1}.</span>
-                              <span className="font-bold text-white truncate">{p.name}</span>
+                              <span className="font-bold text-slate-900 truncate">{p.name}</span>
                             </div>
                             <span className="font-mono font-black text-amber-400 shrink-0">{p.totalPoints} pkt</span>
                           </div>
@@ -3401,7 +3440,7 @@ function RozgrywkiContent() {
                     </div>
 
                     {/* 2. Punkty z Ataku */}
-                    <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-3">
+                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-black uppercase text-sky-400 flex items-center gap-1.5">
                           <Target className="w-3.5 h-3.5" /> Atak (Ata)
@@ -3409,10 +3448,10 @@ function RozgrywkiContent() {
                       </div>
                       <div className="space-y-1.5">
                         {((leaderboardScope === 'ANGELS' ? leaderboards.angelsAttackers : leaderboards.topAttackers) || []).slice(0, 5).map((p: any, idx: number) => (
-                          <div key={p.name} className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-slate-950/40 border border-slate-800/50">
+                          <div key={p.name} className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-slate-50 border border-slate-200">
                             <div className="flex items-center gap-2 truncate">
                               <span className={`w-4 text-center font-bold font-mono ${idx === 0 ? 'text-sky-400' : 'text-slate-500'}`}>{idx + 1}.</span>
-                              <span className="font-bold text-white truncate">{p.name}</span>
+                              <span className="font-bold text-slate-900 truncate">{p.name}</span>
                             </div>
                             <span className="font-mono font-black text-sky-400 shrink-0">{p.totalAttack} pkt</span>
                           </div>
@@ -3421,7 +3460,7 @@ function RozgrywkiContent() {
                     </div>
 
                     {/* 3. Bloki Punktowe */}
-                    <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-3">
+                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-black uppercase text-emerald-400 flex items-center gap-1.5">
                           <Shield className="w-3.5 h-3.5" /> Blok (Blk)
@@ -3429,10 +3468,10 @@ function RozgrywkiContent() {
                       </div>
                       <div className="space-y-1.5">
                         {((leaderboardScope === 'ANGELS' ? leaderboards.angelsBlockers : leaderboards.topBlockers) || []).slice(0, 5).map((p: any, idx: number) => (
-                          <div key={p.name} className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-slate-950/40 border border-slate-800/50">
+                          <div key={p.name} className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-slate-50 border border-slate-200">
                             <div className="flex items-center gap-2 truncate">
                               <span className={`w-4 text-center font-bold font-mono ${idx === 0 ? 'text-emerald-400' : 'text-slate-500'}`}>{idx + 1}.</span>
-                              <span className="font-bold text-white truncate">{p.name}</span>
+                              <span className="font-bold text-slate-900 truncate">{p.name}</span>
                             </div>
                             <span className="font-mono font-black text-emerald-400 shrink-0">{p.totalBlock} blk</span>
                           </div>
@@ -3441,7 +3480,7 @@ function RozgrywkiContent() {
                     </div>
 
                     {/* 4. Asy Serwisowe */}
-                    <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-3">
+                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-black uppercase text-rose-400 flex items-center gap-1.5">
                           <Zap className="w-3.5 h-3.5" /> Zagrywka (Ser)
@@ -3449,10 +3488,10 @@ function RozgrywkiContent() {
                       </div>
                       <div className="space-y-1.5">
                         {((leaderboardScope === 'ANGELS' ? leaderboards.angelsServers : leaderboards.topServers) || []).slice(0, 5).map((p: any, idx: number) => (
-                          <div key={p.name} className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-slate-950/40 border border-slate-800/50">
+                          <div key={p.name} className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-slate-50 border border-slate-200">
                             <div className="flex items-center gap-2 truncate">
                               <span className={`w-4 text-center font-bold font-mono ${idx === 0 ? 'text-rose-400' : 'text-slate-500'}`}>{idx + 1}.</span>
-                              <span className="font-bold text-white truncate">{p.name}</span>
+                              <span className="font-bold text-slate-900 truncate">{p.name}</span>
                             </div>
                             <span className="font-mono font-black text-rose-400 shrink-0">{p.totalServe} asów</span>
                           </div>
@@ -3466,17 +3505,17 @@ function RozgrywkiContent() {
               {/* Match Reports List (Protokoły Meczowe) */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between px-1">
-                  <h4 className="text-base font-black text-white uppercase tracking-tight flex items-center gap-2">
+                  <h4 className="text-base font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
                     <FileText className="w-4 h-4 text-sky-400" />
                     Protokoły Meczowe VolleyStation ({leagueReports.length})
                   </h4>
                 </div>
 
                 {leagueReports.length === 0 ? (
-                  <div className="p-12 text-center bg-[#0b0e14] border border-slate-800 rounded-3xl space-y-3">
+                  <div className="p-12 text-center bg-white border border-slate-200 rounded-3xl space-y-3">
                     <BarChart3 className="w-12 h-12 text-slate-600 mx-auto" />
-                    <h5 className="text-base font-bold text-white">Brak zapisanych protokołów</h5>
-                    <p className="text-xs text-slate-400 max-w-md mx-auto">
+                    <h5 className="text-base font-bold text-slate-900">Brak zapisanych protokołów</h5>
+                    <p className="text-xs text-slate-500 max-w-md mx-auto">
                       Użyj przycisku &quot;Importuj z VolleyStation&quot; powyżej, aby wkleić statystyki lub terminarz skopiowany bezpośrednio ze strony ligi.
                     </p>
                     {canManage && (
@@ -3501,40 +3540,40 @@ function RozgrywkiContent() {
                     return (
                       <div
                         key={rep.id}
-                        className="bg-[#0b0e14] border border-slate-800 rounded-3xl shadow-xl overflow-hidden transition"
+                        className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden transition"
                       >
                         {/* Header Row */}
                         <div
                           onClick={() => toggleReport(rep.id)}
-                          className="p-4 sm:p-5 cursor-pointer hover:bg-slate-900/50 transition flex flex-col md:flex-row md:items-center justify-between gap-3 select-none"
+                          className="p-4 sm:p-5 cursor-pointer hover:bg-slate-50 transition flex flex-col md:flex-row md:items-center justify-between gap-3 select-none"
                         >
                           <div className="flex items-center gap-3.5 min-w-0">
-                            <div className="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center shrink-0">
+                            <div className="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-200 flex items-center justify-center shrink-0">
                               <Volleyball className="w-5 h-5 text-sky-400" />
                             </div>
 
                             <div className="min-w-0 space-y-1">
                               <div className="flex flex-wrap items-center gap-2">
                                 {(rep.round || rep.matchNumber) && (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-black bg-slate-900 text-sky-400 border border-slate-800">
+                                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-black bg-slate-100 text-sky-400 border border-slate-200">
                                     {rep.round ? `Runda ${rep.round}` : ''} {rep.matchNumber ? `Nr ${rep.matchNumber}` : ''}
                                   </span>
                                 )}
-                                <span className="text-[11px] font-mono text-slate-400">
+                                <span className="text-[11px] font-mono text-slate-500">
                                   {new Date(rep.date).toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
                                 </span>
                                 {ourSets !== undefined && oppSets !== undefined && (
                                   <span className={`px-2 py-0.5 rounded text-[10px] font-black border ${
                                     isWin
-                                      ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                                      : 'bg-rose-500/15 text-rose-300 border-rose-500/30'
+                                      ? 'bg-emerald-500/15 text-emerald-300 border-emerald-200'
+                                      : 'bg-rose-500/15 text-rose-300 border-rose-200'
                                   }`}>
                                     {isWin ? '✓ Wygrana' : '✗ Przegrana'}
                                   </span>
                                 )}
                               </div>
 
-                              <h4 className="text-base font-black text-white truncate">
+                              <h4 className="text-base font-black text-slate-900 truncate">
                                 {rep.matchTitle}
                               </h4>
                             </div>
@@ -3544,26 +3583,26 @@ function RozgrywkiContent() {
                           <div className="flex flex-wrap items-center gap-2.5">
                             {/* Sets score breakdown */}
                             {rep.sets && rep.sets.length > 0 && (
-                              <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-slate-300 bg-slate-950 px-2.5 py-1 rounded-xl border border-slate-800">
+                              <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-slate-600 bg-slate-50 px-2.5 py-1 rounded-xl border border-slate-200">
                                 {rep.sets.map((s, idx) => (
                                   <span key={s.setNumber}>
                                     {idx > 0 && <span className="text-slate-600">, </span>}
-                                    <span className={s.homeScore > s.awayScore ? 'text-sky-300 font-black' : 'text-slate-400'}>{s.homeScore}</span>
-                                    :<span className={s.awayScore > s.homeScore ? 'text-sky-300 font-black' : 'text-slate-400'}>{s.awayScore}</span>
+                                    <span className={s.homeScore > s.awayScore ? 'text-sky-300 font-black' : 'text-slate-500'}>{s.homeScore}</span>
+                                    :<span className={s.awayScore > s.homeScore ? 'text-sky-300 font-black' : 'text-slate-500'}>{s.awayScore}</span>
                                   </span>
                                 ))}
                               </div>
                             )}
 
                             {rep.duration && (
-                              <span className="px-2 py-1 rounded-xl bg-slate-900 text-[10px] font-bold text-slate-400 border border-slate-800 flex items-center gap-1">
+                              <span className="px-2 py-1 rounded-xl bg-slate-100 text-[10px] font-bold text-slate-500 border border-slate-200 flex items-center gap-1">
                                 <Clock className="w-3 h-3 text-sky-400" />
                                 {rep.duration}
                               </span>
                             )}
 
                             {rep.mvp && (
-                              <span className="px-2 py-1 rounded-xl bg-amber-500/15 text-[10px] font-bold text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                              <span className="px-2 py-1 rounded-xl bg-amber-500/15 text-[10px] font-bold text-amber-300 border border-amber-200 flex items-center gap-1">
                                 <Crown className="w-3 h-3 text-amber-400" />
                                 {rep.mvp.name}
                               </span>
@@ -3575,7 +3614,7 @@ function RozgrywkiContent() {
                                 target="_blank"
                                 rel="noreferrer"
                                 onClick={e => e.stopPropagation()}
-                                className="p-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-sky-400 border border-slate-800 transition"
+                                className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-100 text-sky-400 border border-slate-200 transition"
                                 title="Otwórz oficjalny protokół w VolleyStation"
                               >
                                 <ExternalLink className="w-3.5 h-3.5" />
@@ -3589,14 +3628,14 @@ function RozgrywkiContent() {
                                   e.stopPropagation();
                                   handleDeleteReport(rep.id);
                                 }}
-                                className="p-1.5 rounded-xl bg-slate-900 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-slate-800 transition"
+                                className="p-1.5 rounded-xl bg-slate-100 hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 border border-slate-200 transition"
                                 title="Usuń ten raport"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             )}
 
-                            <div className="p-1 text-slate-400">
+                            <div className="p-1 text-slate-500">
                               <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                             </div>
                           </div>
@@ -3604,9 +3643,9 @@ function RozgrywkiContent() {
 
                         {/* Collapsible Detailed Stats Tables */}
                         {isExpanded && (
-                          <div className="p-4 sm:p-6 bg-slate-950/60 border-t border-slate-800 space-y-6 animate-fadeIn">
+                          <div className="p-4 sm:p-6 bg-slate-50 border-t border-slate-200 space-y-6 animate-fadeIn">
                             {/* Meta Bar: Sędzia, Widzowie, Czas */}
-                            <div className="flex flex-wrap items-center justify-between text-xs text-slate-400 pb-3 border-b border-slate-800/80 gap-2">
+                            <div className="flex flex-wrap items-center justify-between text-xs text-slate-500 pb-3 border-b border-slate-200 gap-2">
                               <div className="flex items-center gap-3">
                                 {rep.referee && <span>👔 <strong>Pierwszy sędzia:</strong> {rep.referee}</span>}
                                 {rep.spectators !== undefined && <span>👥 <strong>Widzów:</strong> {rep.spectators}</span>}
@@ -3629,12 +3668,12 @@ function RozgrywkiContent() {
                                     key={team.teamName || tIdx}
                                     className={`rounded-2xl border p-4 space-y-3 ${
                                       isAngels
-                                        ? 'bg-sky-950/20 border-sky-500/30 shadow-lg'
-                                        : 'bg-slate-900/40 border-slate-800'
+                                        ? 'bg-sky-950/20 border-sky-200 shadow-lg'
+                                        : 'bg-slate-50 border-slate-200'
                                     }`}
                                   >
-                                    <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
-                                      <h5 className="text-sm font-black text-white flex items-center gap-2">
+                                    <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+                                      <h5 className="text-sm font-black text-slate-900 flex items-center gap-2">
                                         {isAngels && <span className="w-2 h-2 rounded-full bg-sky-400" />}
                                         {team.teamName}
                                       </h5>
@@ -3645,7 +3684,7 @@ function RozgrywkiContent() {
 
                                     <div className="overflow-x-auto">
                                       <table className="w-full text-xs text-left">
-                                        <thead className="bg-slate-950/80 text-slate-400 uppercase font-black text-[9px] tracking-wider">
+                                        <thead className="bg-slate-50 text-slate-500 uppercase font-black text-[9px] tracking-wider">
                                           <tr>
                                             <th className="p-1.5 w-7 text-center">#</th>
                                             <th className="p-1.5">Zawodnik</th>
@@ -3657,25 +3696,25 @@ function RozgrywkiContent() {
                                         </thead>
                                         <tbody className="divide-y divide-slate-800/40 font-mono">
                                           {(team.players || []).map(p => (
-                                            <tr key={p.name} className="hover:bg-slate-900/60 transition">
+                                            <tr key={p.name} className="hover:bg-slate-50 transition">
                                               <td className="p-1.5 text-center text-sky-400 font-bold">{p.number}</td>
-                                              <td className="p-1.5 font-sans font-bold text-white truncate max-w-[140px]">
+                                              <td className="p-1.5 font-sans font-bold text-slate-900 truncate max-w-[140px]">
                                                 {p.name}
                                                 {rep.mvp?.name && rep.mvp.name.toLowerCase() === p.name.toLowerCase() && (
                                                   <span className="ml-1 text-[9px] text-amber-400 font-black">⭐ MVP</span>
                                                 )}
                                               </td>
                                               <td className="p-1.5 text-center font-black text-amber-400">{p.points}</td>
-                                              <td className="p-1.5 text-center text-slate-300">{p.attack}</td>
-                                              <td className="p-1.5 text-center text-slate-300">{p.block}</td>
-                                              <td className="p-1.5 text-center text-slate-300">{p.serve}</td>
+                                              <td className="p-1.5 text-center text-slate-600">{p.attack}</td>
+                                              <td className="p-1.5 text-center text-slate-600">{p.block}</td>
+                                              <td className="p-1.5 text-center text-slate-600">{p.serve}</td>
                                             </tr>
                                           ))}
                                         </tbody>
                                         {team.totals && (
-                                          <tfoot className="bg-slate-950/90 font-mono font-black text-white border-t border-slate-700">
+                                          <tfoot className="bg-slate-50 font-mono font-black text-slate-900 border-t border-slate-300">
                                             <tr>
-                                              <td colSpan={2} className="p-2 font-sans font-black uppercase text-[10px] text-slate-400">
+                                              <td colSpan={2} className="p-2 font-sans font-black uppercase text-[10px] text-slate-500">
                                                 Razem
                                               </td>
                                               <td className="p-2 text-center text-amber-400 font-black">{team.totals.points}</td>
@@ -3686,7 +3725,7 @@ function RozgrywkiContent() {
                                             {team.totals.opponentErrors !== undefined && (
                                               <tr>
                                                 <td colSpan={6} className="p-1.5 text-[10px] text-slate-500 font-sans text-right">
-                                                  Błędy przeciwnika: <strong className="text-slate-300">{team.totals.opponentErrors}</strong>
+                                                  Błędy przeciwnika: <strong className="text-slate-600">{team.totals.opponentErrors}</strong>
                                                 </td>
                                               </tr>
                                             )}
@@ -3735,14 +3774,14 @@ function RozgrywkiContent() {
       {activeTab === 'turnieje' && (
         <div className="space-y-6">
           {/* Turniej Subtabs (Drabinki & Wyniki, Zdjęcia z Turniejów) */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-800">
-            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-900 border border-slate-800">
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-200">
+            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200">
               <button
                 onClick={() => setTurniejSubTab('drabinki')}
                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                   turniejSubTab === 'drabinki'
-                    ? 'bg-purple-500 text-white shadow-md'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-purple-500 text-slate-900 shadow-md'
+                    : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
                 <Award className="w-3.5 h-3.5" />
@@ -3750,7 +3789,7 @@ function RozgrywkiContent() {
               </button>
               <Link
                 href="/galeria"
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/80 transition"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-100/80 transition"
               >
                 <Camera className="w-3.5 h-3.5 text-purple-400" />
                 <span>Galeria zdjęć ➔</span>
@@ -3780,7 +3819,7 @@ function RozgrywkiContent() {
                   setPhotoSeriesList([]);
                   setShowAddPhotoModal(true);
                 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-purple-500 hover:bg-purple-400 text-white transition shadow-lg shadow-purple-500/20"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-purple-500 hover:bg-purple-400 text-slate-900 transition shadow-lg shadow-purple-500/20"
               >
                 <Camera className="w-4 h-4" />
                 + Dodaj Zdjęcia z Turnieju
@@ -3793,7 +3832,7 @@ function RozgrywkiContent() {
 
           <div className="space-y-6">
             {tournamentsList.length === 0 ? (
-              <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-8 text-center text-slate-400">
+              <div className="bg-white border border-slate-200 rounded-3xl p-8 text-center text-slate-500">
                 Brak zaplanowanych turniejów.
               </div>
             ) : (
@@ -3806,12 +3845,12 @@ function RozgrywkiContent() {
                 return (
                   <div
                     key={event.id}
-                    className="bg-[#0b0e14] border border-purple-500/30 rounded-3xl overflow-hidden shadow-2xl transition-all duration-300"
+                    className="bg-white border border-purple-200 rounded-3xl overflow-hidden shadow-sm transition-all duration-300"
                   >
                     {/* Zwijany Nagłówek Turnieju */}
                     <div
                       onClick={() => toggleTournament(event.id)}
-                      className="p-5 sm:p-6 cursor-pointer flex flex-col lg:flex-row lg:items-center justify-between gap-4 select-none hover:bg-slate-900/50 transition group"
+                      className="p-5 sm:p-6 cursor-pointer flex flex-col lg:flex-row lg:items-center justify-between gap-4 select-none hover:bg-slate-50 transition group"
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1.5 flex-wrap">
@@ -3819,7 +3858,7 @@ function RozgrywkiContent() {
                             TURNIEJ
                           </span>
                           {isFinished ? (
-                            <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
+                            <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-200 flex items-center gap-1">
                               <CheckCircle2 className="w-3 h-3" /> Rozegrany
                             </span>
                           ) : (
@@ -3829,21 +3868,21 @@ function RozgrywkiContent() {
                           )}
                         </div>
 
-                        <h3 className="text-xl sm:text-2xl font-black text-white group-hover:text-purple-300 transition tracking-tight truncate">
+                        <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-purple-300 transition tracking-tight truncate">
                           {event.title}
                         </h3>
 
-                        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 mt-2">
-                          <span className="flex items-center gap-1.5 text-slate-300">
+                        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 mt-2">
+                          <span className="flex items-center gap-1.5 text-slate-600">
                             <Calendar className="w-4 h-4 text-purple-400" />
                             {new Date(event.date).toLocaleDateString('pl-PL')}
                           </span>
-                          <span className="flex items-center gap-1.5 text-slate-300">
+                          <span className="flex items-center gap-1.5 text-slate-600">
                             <MapPin className="w-4 h-4 text-rose-400" />
                             {event.location}
                           </span>
                           {event.costPerPerson && (
-                            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-900 border border-slate-800 text-slate-300">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 border border-slate-200 text-slate-600">
                               💰 {event.costPerPerson} zł / os.
                             </span>
                           )}
@@ -3851,9 +3890,9 @@ function RozgrywkiContent() {
                       </div>
 
                       {/* Prawa strona nagłówka turnieju: Wynik/Puchar, Liczba zgłoszonych, Chevron */}
-                      <div className="flex items-center justify-between lg:justify-end gap-3 shrink-0 pt-2 lg:pt-0 border-t border-slate-800/60 lg:border-t-0">
+                      <div className="flex items-center justify-between lg:justify-end gap-3 shrink-0 pt-2 lg:pt-0 border-t border-slate-200 lg:border-t-0">
                         {isFinished && event.result && (
-                          <div className="text-right px-3 py-1.5 rounded-xl bg-purple-950/60 border border-purple-500/30">
+                          <div className="text-right px-3 py-1.5 rounded-xl bg-purple-950/60 border border-purple-200">
                             <span className="text-sm font-black text-purple-200 block">
                               🏆 {event.result.tournamentRank || 'Podium'}
                             </span>
@@ -3863,14 +3902,14 @@ function RozgrywkiContent() {
                           </div>
                         )}
 
-                        <span className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                        <span className="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-600 flex items-center gap-1.5">
                           <Users className="w-3.5 h-3.5 text-purple-400" />
                           <span>{yesCount} chętnych</span>
                         </span>
 
                         <div
-                          className={`w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 transition-all duration-200 ${
-                            isExpanded ? 'rotate-180 bg-purple-500/10 text-purple-400 border-purple-500/40' : 'group-hover:text-white group-hover:border-slate-700'
+                          className={`w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 transition-all duration-200 ${
+                            isExpanded ? 'rotate-180 bg-purple-500/10 text-purple-400 border-purple-500/40' : 'group-hover:text-slate-900 group-hover:border-slate-300'
                           }`}
                         >
                           <ChevronDown className="w-4 h-4" />
@@ -3880,16 +3919,16 @@ function RozgrywkiContent() {
 
                     {/* Rozwijana Zawartość Turnieju */}
                     {isExpanded && (
-                      <div className="p-6 sm:p-7 border-t border-slate-800/80 space-y-6 animate-fadeIn">
+                      <div className="p-6 sm:p-7 border-t border-slate-200 space-y-6 animate-fadeIn">
                         {canManage && (
-                          <div className="flex items-center justify-between gap-2 pb-4 border-b border-slate-800/60">
-                            <span className="text-xs font-black uppercase text-slate-400 tracking-wider">
+                          <div className="flex items-center justify-between gap-2 pb-4 border-b border-slate-200">
+                            <span className="text-xs font-black uppercase text-slate-500 tracking-wider">
                               Zarządzanie Turniejem:
                             </span>
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={() => openResultModal(event)}
-                                className="px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-900 hover:bg-slate-800 text-purple-400 border border-purple-500/30 transition"
+                                className="px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-100 hover:bg-slate-100 text-purple-400 border border-purple-200 transition"
                               >
                                 Wpisz wynik & miejsce
                               </button>
@@ -3898,14 +3937,14 @@ function RozgrywkiContent() {
                         )}
 
                     {/* Step 1: Ankieta zgłoszeń na turniej */}
-                    <div className="p-4 rounded-2xl bg-[#0c1016] border border-slate-800 space-y-3">
+                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-black uppercase text-white tracking-wider">
+                        <span className="text-xs font-black uppercase text-slate-900 tracking-wider">
                           1. Deklaracja udziału ({yesCount} chętnych)
                         </span>
                         {user && (
                           user.role === 'TRENER' ? (
-                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-bold">
+                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-purple-500/10 border border-purple-200 text-purple-300 text-xs font-bold">
                               <Flame className="w-3.5 h-3.5 text-purple-400" />
                               <span>Sztab trenerski (Prowadzący)</span>
                             </div>
@@ -3914,7 +3953,7 @@ function RozgrywkiContent() {
                               <button
                                 onClick={() => handleAttendance(event.id, 'BEDE')}
                                 className={`px-3 py-1 rounded-xl text-xs font-black ${
-                                  myAttendance?.status === 'BEDE' ? 'bg-emerald-500 text-slate-950' : 'bg-slate-900 text-emerald-400'
+                                  myAttendance?.status === 'BEDE' ? 'bg-emerald-500 text-slate-950' : 'bg-slate-100 text-emerald-400'
                                 }`}
                               >
                                 Jadę na turniej
@@ -3922,7 +3961,7 @@ function RozgrywkiContent() {
                               <button
                                 onClick={() => handleAttendance(event.id, 'NIE_BEDE')}
                                 className={`px-3 py-1 rounded-xl text-xs font-black ${
-                                  myAttendance?.status === 'NIE_BEDE' ? 'bg-rose-500 text-white' : 'bg-slate-900 text-rose-400'
+                                  myAttendance?.status === 'NIE_BEDE' ? 'bg-rose-500 text-slate-900' : 'bg-slate-100 text-rose-400'
                                 }`}
                               >
                                 Nie jadę
@@ -3935,14 +3974,14 @@ function RozgrywkiContent() {
 
                     {/* Step 3: Wynik turnieju & Puchar */}
                     {isFinished && event.result && (
-                      <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/30 space-y-2">
+                      <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-200 space-y-2">
                         <span className="text-xs font-black uppercase text-purple-300 tracking-wider block">
                           3. Wynik Turnieju & Miejsce
                         </span>
-                        <div className="text-lg font-black text-white">
+                        <div className="text-lg font-black text-slate-900">
                           🏆 {event.result.tournamentRank || 'Podium'}
                         </div>
-                        {event.result.notes && <p className="text-xs text-slate-300">{event.result.notes}</p>}
+                        {event.result.notes && <p className="text-xs text-slate-600">{event.result.notes}</p>}
                       </div>
                     )}
 
@@ -3951,7 +3990,7 @@ function RozgrywkiContent() {
                       const linked = tactics.filter(t => t.eventId === event.id);
                       if (linked.length === 0) return null;
                       return (
-                        <div className="p-4 rounded-2xl bg-sky-950/20 border border-sky-500/30 space-y-2">
+                        <div className="p-4 rounded-2xl bg-sky-950/20 border border-sky-200 space-y-2">
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-black uppercase text-sky-400 flex items-center gap-1.5">
                               <Compass className="w-3.5 h-3.5" />
@@ -3962,7 +4001,7 @@ function RozgrywkiContent() {
                             </a>
                           </div>
                           {linked[0].drawingData && (
-                            <div className="aspect-[21/9] bg-slate-900 rounded-xl overflow-hidden border border-slate-800 max-h-36">
+                            <div className="aspect-[21/9] bg-slate-100 rounded-xl overflow-hidden border border-slate-200 max-h-36">
                               <img src={linked[0].drawingData} alt={linked[0].title} className="w-full h-full object-contain" />
                             </div>
                           )}
@@ -3979,15 +4018,15 @@ function RozgrywkiContent() {
 
           {/* Turnieje Pagination Controls */}
           {totalTournamentsPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-[#0b0e14] border border-slate-800 rounded-2xl shadow-lg">
-              <span className="text-xs text-slate-400 font-medium">
-                Wyświetlanie <span className="text-white font-bold">{((tournamentsPage - 1) * TOURNAMENTS_PER_PAGE) + 1}</span>–<span className="text-white font-bold">{Math.min(tournamentsPage * TOURNAMENTS_PER_PAGE, tournamentsList.length)}</span> z <span className="text-white font-bold">{tournamentsList.length}</span> turniejów
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-white border border-slate-200 rounded-2xl shadow-lg">
+              <span className="text-xs text-slate-500 font-medium">
+                Wyświetlanie <span className="text-slate-900 font-bold">{((tournamentsPage - 1) * TOURNAMENTS_PER_PAGE) + 1}</span>–<span className="text-slate-900 font-bold">{Math.min(tournamentsPage * TOURNAMENTS_PER_PAGE, tournamentsList.length)}</span> z <span className="text-slate-900 font-bold">{tournamentsList.length}</span> turniejów
               </span>
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => setTournamentsPage(p => Math.max(1, p - 1))}
                   disabled={tournamentsPage === 1}
-                  className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition"
+                  className="p-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed transition"
                   title="Poprzednia strona"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -4000,7 +4039,7 @@ function RozgrywkiContent() {
                       className={`min-w-[28px] h-7 px-2 rounded-lg text-xs font-black transition ${
                         tournamentsPage === idx + 1
                           ? 'bg-purple-500 text-slate-950 shadow-md shadow-purple-500/20'
-                          : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                          : 'bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-900'
                       }`}
                     >
                       {idx + 1}
@@ -4010,7 +4049,7 @@ function RozgrywkiContent() {
                 <button
                   onClick={() => setTournamentsPage(p => Math.min(totalTournamentsPages, p + 1))}
                   disabled={tournamentsPage === totalTournamentsPages}
-                  className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition"
+                  className="p-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed transition"
                   title="Następna strona"
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -4046,13 +4085,13 @@ function RozgrywkiContent() {
       {/* Modal: Wprowadzanie / Edycja Wyniku */}
       {resultModalEvent && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-6 w-full max-w-lg shadow-2xl space-y-4">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
-              <h3 className="text-base font-black uppercase text-white flex items-center gap-2">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-lg shadow-sm space-y-4">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200">
+              <h3 className="text-base font-black uppercase text-slate-900 flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-amber-400" />
                 Wynik Spotkania: {resultModalEvent.title}
               </h3>
-              <button onClick={() => setResultModalEvent(null)} className="text-slate-400 hover:text-white">✕</button>
+              <button onClick={() => setResultModalEvent(null)} className="text-slate-500 hover:text-slate-900">✕</button>
             </div>
 
             <form onSubmit={handleSaveResult} className="space-y-4">
@@ -4066,25 +4105,25 @@ function RozgrywkiContent() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Sety Angels ZTP</label>
+                  <label className="block text-xs font-bold text-slate-600 mb-1">Sety Angels ZTP</label>
                   <input
                     type="number"
                     min={0}
                     max={5}
                     value={resTeamSets}
                     onChange={e => setResTeamSets(Number(e.target.value))}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-center text-xl font-mono font-black text-emerald-400 focus:outline-none focus:border-amber-400"
+                    className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-center text-xl font-mono font-black text-emerald-400 focus:outline-none focus:border-amber-400"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Sety Rywala</label>
+                  <label className="block text-xs font-bold text-slate-600 mb-1">Sety Rywala</label>
                   <input
                     type="number"
                     min={0}
                     max={5}
                     value={resOppSets}
                     onChange={e => setResOppSets(Number(e.target.value))}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-center text-xl font-mono font-black text-rose-400 focus:outline-none focus:border-amber-400"
+                    className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-center text-xl font-mono font-black text-rose-400 focus:outline-none focus:border-amber-400"
                   />
                 </div>
               </div>
@@ -4092,7 +4131,7 @@ function RozgrywkiContent() {
               {/* Set by set inputs */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="block text-xs font-bold text-slate-300">Małe punkty w setach:</label>
+                  <label className="block text-xs font-bold text-slate-600">Małe punkty w setach:</label>
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
@@ -4100,7 +4139,7 @@ function RozgrywkiContent() {
                         const nextNum = resSetsList.length + 1;
                         setResSetsList([...resSetsList, { setNumber: nextNum, teamScore: 25, opponentScore: 20 }]);
                       }}
-                      className="px-2 py-0.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-sky-300 text-[11px] font-bold"
+                      className="px-2 py-0.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-200 text-sky-300 text-[11px] font-bold"
                     >
                       + Dodaj set
                     </button>
@@ -4108,7 +4147,7 @@ function RozgrywkiContent() {
                       <button
                         type="button"
                         onClick={() => setResSetsList(resSetsList.slice(0, -1))}
-                        className="px-2 py-0.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-[11px] font-bold"
+                        className="px-2 py-0.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-200 text-rose-300 text-[11px] font-bold"
                       >
                         - Usuń set
                       </button>
@@ -4117,7 +4156,7 @@ function RozgrywkiContent() {
                 </div>
                 {resSetsList.map((set, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-xs">
-                    <span className="w-14 font-bold text-slate-400">Set {idx + 1}:</span>
+                    <span className="w-14 font-bold text-slate-500">Set {idx + 1}:</span>
                     <input
                       type="number"
                       value={set.teamScore}
@@ -4126,7 +4165,7 @@ function RozgrywkiContent() {
                         copy[idx].teamScore = Number(e.target.value);
                         setResSetsList(copy);
                       }}
-                      className="w-20 bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-center font-mono font-bold text-white focus:outline-none focus:border-amber-400"
+                      className="w-20 bg-slate-100 border border-slate-300 rounded-lg p-1.5 text-center font-mono font-bold text-slate-900 focus:outline-none focus:border-amber-400"
                     />
                     <span className="text-slate-500 font-bold">-</span>
                     <input
@@ -4137,18 +4176,18 @@ function RozgrywkiContent() {
                         copy[idx].opponentScore = Number(e.target.value);
                         setResSetsList(copy);
                       }}
-                      className="w-20 bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-center font-mono font-bold text-white focus:outline-none focus:border-amber-400"
+                      className="w-20 bg-slate-100 border border-slate-300 rounded-lg p-1.5 text-center font-mono font-bold text-slate-900 focus:outline-none focus:border-amber-400"
                     />
                   </div>
                 ))}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">MVP Meczu</label>
+                <label className="block text-xs font-bold text-slate-600 mb-1">MVP Meczu</label>
                 <select
                   value={resMvp}
                   onChange={e => setResMvp(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"
+                  className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
                 >
                   <option value="">Wybierz MVP spośród zawodników...</option>
                   {players.map(p => (
@@ -4161,25 +4200,25 @@ function RozgrywkiContent() {
 
               {resultModalEvent.type === 'TURNIEJ' && (
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Miejsce końcowe w turnieju</label>
+                  <label className="block text-xs font-bold text-slate-600 mb-1">Miejsce końcowe w turnieju</label>
                   <input
                     type="text"
                     value={resTournamentRank}
                     onChange={e => setResTournamentRank(e.target.value)}
                     placeholder="np. 1. miejsce (Złoty puchar)"
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"
+                    className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
                   />
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Notatki trenera / wnioski</label>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Notatki trenera / wnioski</label>
                 <textarea
                   rows={2}
                   value={resNotes}
                   onChange={e => setResNotes(e.target.value)}
                   placeholder="Kluczowe zagrania, elementy do poprawy..."
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"
+                  className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
                 />
               </div>
 
@@ -4187,7 +4226,7 @@ function RozgrywkiContent() {
                 <button
                   type="button"
                   onClick={() => setResultModalEvent(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-900"
                 >
                   Anuluj
                 </button>
@@ -4209,68 +4248,68 @@ function RozgrywkiContent() {
       {/* Modal: Dodaj Wydarzenie (Sparing / Turniej) */}
       {showAddEventModal && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-6 w-full max-w-lg shadow-2xl space-y-4">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
-              <h3 className="text-base font-black uppercase text-white">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-lg shadow-sm space-y-4">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200">
+              <h3 className="text-base font-black uppercase text-slate-900">
                 Nowy {eventTypeToCreate === 'SPARING' ? 'Sparing' : 'Turniej'}
               </h3>
-              <button onClick={() => setShowAddEventModal(false)} className="text-slate-400 hover:text-white">✕</button>
+              <button onClick={() => setShowAddEventModal(false)} className="text-slate-500 hover:text-slate-900">✕</button>
             </div>
 
             <form onSubmit={handleCreateEvent} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Tytuł wydarzenia *</label>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Tytuł wydarzenia *</label>
                 <input
                   type="text"
                   required
                   value={eventTitle}
                   onChange={e => setEventTitle(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"
+                  className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Przeciwnik / Zaproszone zespoły</label>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Przeciwnik / Zaproszone zespoły</label>
                 <input
                   type="text"
                   placeholder="np. Trefl Gdańsk II"
                   value={eventOpponent}
                   onChange={e => setEventOpponent(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"
+                  className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Data i godzina *</label>
+                  <label className="block text-xs font-bold text-slate-600 mb-1">Data i godzina *</label>
                   <input
                     type="datetime-local"
                     required
                     value={eventDate}
                     onChange={e => setEventDate(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"
+                    className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Miejsce / Hala *</label>
+                  <label className="block text-xs font-bold text-slate-600 mb-1">Miejsce / Hala *</label>
                   <input
                     type="text"
                     required
                     value={eventLocation}
                     onChange={e => setEventLocation(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"
+                    className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Opis / Zbiórka</label>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Opis / Zbiórka</label>
                 <textarea
                   rows={2}
                   value={eventDescription}
                   onChange={e => setEventDescription(e.target.value)}
                   placeholder="Godzina zbiórki, stroje meczowe..."
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"
+                  className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
                 />
               </div>
 
@@ -4278,7 +4317,7 @@ function RozgrywkiContent() {
                 <button
                   type="button"
                   onClick={() => setShowAddEventModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-900"
                 >
                   Anuluj
                 </button>
@@ -4300,55 +4339,55 @@ function RozgrywkiContent() {
       {/* Modal: Dodaj Serię Zdjęć do Galerii */}
       {showAddPhotoModal && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-6 w-full max-w-xl shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-xl shadow-sm space-y-4 max-h-[92vh] overflow-y-auto">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200">
               <div className="flex items-center gap-2">
                 <Camera className="w-5 h-5 text-amber-400" />
-                <h3 className="text-base font-black uppercase text-white">
+                <h3 className="text-base font-black uppercase text-slate-900">
                   Dodaj Serię Zdjęć / Fotorelację
                 </h3>
               </div>
-              <button onClick={() => setShowAddPhotoModal(false)} className="text-slate-400 hover:text-white">✕</button>
+              <button onClick={() => setShowAddPhotoModal(false)} className="text-slate-500 hover:text-slate-900">✕</button>
             </div>
 
             <form onSubmit={handleAddPhoto} className="space-y-4">
               {/* Wybór kategorii dopasowany do aktywnej zakładki */}
               {activeTab === 'liga' ? (
-                <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 flex items-center justify-between text-xs">
+                <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-200 flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-sky-400" />
-                    <span className="font-bold text-white">Galeria Ligowa LALS</span>
-                    <span className="text-slate-400 text-[11px] hidden sm:inline">(Zdjęcia trafią wyłącznie do sekcji ligowej)</span>
+                    <span className="font-bold text-slate-900">Galeria Ligowa LALS</span>
+                    <span className="text-slate-500 text-[11px] hidden sm:inline">(Zdjęcia trafią wyłącznie do sekcji ligowej)</span>
                   </div>
-                  <span className="text-[10px] font-mono text-sky-300 font-bold px-2 py-0.5 rounded bg-sky-500/20 border border-sky-500/30">
+                  <span className="text-[10px] font-mono text-sky-300 font-bold px-2 py-0.5 rounded bg-sky-500/20 border border-sky-200">
                     MECZ LIGOWY
                   </span>
                 </div>
               ) : activeTab === 'sparingi' ? (
-                <div className="p-3 rounded-xl bg-amber-950/40 border border-amber-500/30 flex items-center justify-between text-xs">
+                <div className="p-3 rounded-xl bg-amber-950/40 border border-amber-200 flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-amber-400" />
-                    <span className="font-bold text-white">Fotorelacje ze Sparingów</span>
-                    <span className="text-slate-400 text-[11px] hidden sm:inline">(Zdjęcia trafią wyłącznie do sekcji sparingowej)</span>
+                    <span className="font-bold text-slate-900">Fotorelacje ze Sparingów</span>
+                    <span className="text-slate-500 text-[11px] hidden sm:inline">(Zdjęcia trafią wyłącznie do sekcji sparingowej)</span>
                   </div>
-                  <span className="text-[10px] font-mono text-amber-300 font-bold px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/30">
+                  <span className="text-[10px] font-mono text-amber-300 font-bold px-2 py-0.5 rounded bg-amber-500/20 border border-amber-200">
                     SPARING
                   </span>
                 </div>
               ) : activeTab === 'turnieje' ? (
-                <div className="p-3 rounded-xl bg-purple-950/40 border border-purple-500/30 flex items-center justify-between text-xs">
+                <div className="p-3 rounded-xl bg-purple-950/40 border border-purple-200 flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-purple-400" />
-                    <span className="font-bold text-white">Fotorelacje Turniejowe</span>
-                    <span className="text-slate-400 text-[11px] hidden sm:inline">(Zdjęcia trafią wyłącznie do sekcji turniejowej)</span>
+                    <span className="font-bold text-slate-900">Fotorelacje Turniejowe</span>
+                    <span className="text-slate-500 text-[11px] hidden sm:inline">(Zdjęcia trafią wyłącznie do sekcji turniejowej)</span>
                   </div>
-                  <span className="text-[10px] font-mono text-purple-300 font-bold px-2 py-0.5 rounded bg-purple-500/20 border border-purple-500/30">
+                  <span className="text-[10px] font-mono text-purple-300 font-bold px-2 py-0.5 rounded bg-purple-500/20 border border-purple-200">
                     TURNIEJ
                   </span>
                 </div>
               ) : (
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Typ Wydarzenia *</label>
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Typ Wydarzenia *</label>
                   <div className="grid grid-cols-4 gap-2">
                     <button
                       type="button"
@@ -4356,7 +4395,7 @@ function RozgrywkiContent() {
                       className={`py-2 px-1 rounded-xl text-[11px] font-black uppercase transition border ${
                         photoCategory === 'MECZ'
                           ? 'bg-sky-500/20 text-sky-300 border-sky-400'
-                          : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'
+                          : 'bg-slate-100 text-slate-500 border-slate-200 hover:border-slate-300'
                       }`}
                     >
                       Mecz LALS
@@ -4367,7 +4406,7 @@ function RozgrywkiContent() {
                       className={`py-2 px-1 rounded-xl text-[11px] font-black uppercase transition border ${
                         photoCategory === 'SPARING'
                           ? 'bg-amber-500/20 text-amber-300 border-amber-400'
-                          : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'
+                          : 'bg-slate-100 text-slate-500 border-slate-200 hover:border-slate-300'
                       }`}
                     >
                       Sparing
@@ -4378,7 +4417,7 @@ function RozgrywkiContent() {
                       className={`py-2 px-1 rounded-xl text-[11px] font-black uppercase transition border ${
                         photoCategory === 'TURNIEJ'
                           ? 'bg-purple-500/20 text-purple-300 border-purple-400'
-                          : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'
+                          : 'bg-slate-100 text-slate-500 border-slate-200 hover:border-slate-300'
                       }`}
                     >
                       Turniej
@@ -4388,8 +4427,8 @@ function RozgrywkiContent() {
                       onClick={() => setPhotoCategory('INNE')}
                       className={`py-2 px-1 rounded-xl text-[11px] font-black uppercase transition border ${
                         photoCategory === 'INNE'
-                          ? 'bg-slate-700 text-white border-slate-600'
-                          : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'
+                          ? 'bg-slate-700 text-slate-900 border-slate-600'
+                          : 'bg-slate-100 text-slate-500 border-slate-200 hover:border-slate-300'
                       }`}
                     >
                       Inne
@@ -4400,7 +4439,7 @@ function RozgrywkiContent() {
 
               {/* Szybkie powiązanie z konkretnym meczem lub wydarzeniem */}
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Powiąż z konkretnym meczem / wydarzeniem</label>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Powiąż z konkretnym meczem / wydarzeniem</label>
                 <select
                   value={photoLinkedEventId}
                   onChange={e => {
@@ -4419,7 +4458,7 @@ function RozgrywkiContent() {
                       }
                     }
                   }}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-400"
+                  className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-400"
                 >
                   <option value="">-- Wybierz z kalendarza lub wpisz ręcznie poniżej --</option>
                   
@@ -4452,7 +4491,7 @@ function RozgrywkiContent() {
               {/* Wybór wielu zdjęć (seria) */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-slate-300">
+                  <label className="text-xs font-bold text-slate-600">
                     Wybierz zdjęcia (możesz zaznaczyć całą serię na raz) *
                   </label>
                   {photoSeriesList.length > 0 && (
@@ -4462,9 +4501,9 @@ function RozgrywkiContent() {
                   )}
                 </div>
                 
-                <label className="flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-dashed border-slate-700 hover:border-amber-400 bg-slate-900/60 cursor-pointer transition group mb-2 text-center">
-                  <Upload className="w-7 h-7 text-slate-400 group-hover:text-amber-400 transition mb-1" />
-                  <span className="text-xs font-bold text-slate-300 group-hover:text-white">
+                <label className="flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-dashed border-slate-300 hover:border-amber-400 bg-slate-50 cursor-pointer transition group mb-2 text-center">
+                  <Upload className="w-7 h-7 text-slate-500 group-hover:text-amber-400 transition mb-1" />
+                  <span className="text-xs font-bold text-slate-600 group-hover:text-slate-900">
                     {photoSeriesList.length > 0
                       ? '✓ Dodaj kolejne zdjęcia do serii z galerii'
                       : 'Wybierz serię zdjęć z telefonu / komputera'}
@@ -4481,8 +4520,8 @@ function RozgrywkiContent() {
 
                 {/* Podgląd miniatur wczytanej serii */}
                 {photoSeriesList.length > 0 && (
-                  <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-2 mb-2">
-                    <div className="flex items-center justify-between text-[11px] text-slate-400">
+                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 mb-2">
+                    <div className="flex items-center justify-between text-[11px] text-slate-500">
                       <span>Miniatury serii do wgrania:</span>
                       <button
                         type="button"
@@ -4494,17 +4533,17 @@ function RozgrywkiContent() {
                     </div>
                     <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-40 overflow-y-auto p-1">
                       {photoSeriesList.map((item, idx) => (
-                        <div key={idx} className="relative group rounded-xl overflow-hidden aspect-square border border-slate-700 bg-slate-950">
+                        <div key={idx} className="relative group rounded-xl overflow-hidden aspect-square border border-slate-300 bg-slate-50">
                           <img src={item.url} alt={`Podgląd ${idx + 1}`} className="w-full h-full object-cover" />
                           <button
                             type="button"
                             onClick={() => handleRemoveFromSeries(idx)}
-                            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-rose-600/90 text-white text-[10px] font-bold flex items-center justify-center opacity-90 hover:opacity-100 transition shadow"
+                            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-rose-600/90 text-slate-900 text-[10px] font-bold flex items-center justify-center opacity-90 hover:opacity-100 transition shadow"
                             title="Usuń to zdjęcie z serii"
                           >
                             ✕
                           </button>
-                          <span className="absolute bottom-0.5 left-1 text-[9px] font-mono text-white/80 bg-black/60 px-1 rounded">
+                          <span className="absolute bottom-0.5 left-1 text-[9px] font-mono text-slate-900/80 bg-black/60 px-1 rounded">
                             #{idx + 1}
                           </span>
                         </div>
@@ -4520,13 +4559,13 @@ function RozgrywkiContent() {
                   onChange={e => {
                     if (!e.target.value.startsWith('[')) setPhotoUrl(e.target.value);
                   }}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"
+                  className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
                 />
               </div>
 
               {/* Tytuł serii / meczu */}
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Tytuł serii / wydarzenia *</label>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Tytuł serii / wydarzenia *</label>
                 <input
                   type="text"
                   required
@@ -4536,37 +4575,37 @@ function RozgrywkiContent() {
                     setPhotoSeriesTitle(e.target.value);
                     setPhotoTitle(e.target.value);
                   }}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-400"
+                  className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-400"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Mecz / Rywal (opcjonalnie)</label>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Mecz / Rywal (opcjonalnie)</label>
                 <input
                   type="text"
                   placeholder="np. Angels ZTP vs KS Metro Poznań"
                   value={photoMatch}
                   onChange={e => setPhotoMatch(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"
+                  className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Opis / Notatka do serii</label>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Opis / Notatka do serii</label>
                 <input
                   type="text"
                   placeholder="Krótki opis akcji, fotografa lub momentu meczu..."
                   value={photoCaption}
                   onChange={e => setPhotoCaption(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"
+                  className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
                 <button
                   type="button"
                   onClick={() => setShowAddPhotoModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-900"
                 >
                   Anuluj
                 </button>
@@ -4592,16 +4631,16 @@ function RozgrywkiContent() {
       {/* MODAL 1: Eksport Powiadomienia na Czat (WhatsApp / Messenger / Discord) */}
       {shareModalEvent && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-6 sm:p-7 w-full max-w-lg shadow-2xl space-y-4">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-lg shadow-sm space-y-4">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200">
               <div className="flex items-center gap-2">
                 <Share2 className="w-5 h-5 text-emerald-400" />
-                <h3 className="text-base font-black uppercase text-white">Eksport Raportu na Czat</h3>
+                <h3 className="text-base font-black uppercase text-slate-900">Eksport Raportu na Czat</h3>
               </div>
-              <button onClick={() => setShareModalEvent(null)} className="text-slate-400 hover:text-white font-black">✕</button>
+              <button onClick={() => setShareModalEvent(null)} className="text-slate-500 hover:text-slate-900 font-black">✕</button>
             </div>
 
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500">
               Gotowy, sformatowany komunikat do wysłania na grupę drużyny (WhatsApp, Messenger, Discord, SMS):
             </p>
 
@@ -4609,7 +4648,7 @@ function RozgrywkiContent() {
               readOnly
               rows={11}
               value={generateChatAnnouncementText(shareModalEvent)}
-              className="w-full bg-[#07090d] border border-slate-800 rounded-2xl p-3 text-xs text-slate-200 font-mono leading-relaxed select-all focus:outline-none focus:border-emerald-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs text-slate-700 font-mono leading-relaxed select-all focus:outline-none focus:border-emerald-500"
             />
 
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
@@ -4624,7 +4663,7 @@ function RozgrywkiContent() {
                   className={`flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 ${
                     copiedShareText
                       ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
-                      : 'bg-slate-900 hover:bg-slate-800 text-emerald-300 border border-emerald-500/30'
+                      : 'bg-slate-100 hover:bg-slate-100 text-emerald-300 border border-emerald-200'
                   }`}
                 >
                   <Copy className="w-3.5 h-3.5" />
@@ -4653,16 +4692,16 @@ function RozgrywkiContent() {
       {/* MODAL 2: Automatyczny Generator Wyjściowej Szóstki */}
       {lineupModalEvent && generatedLineup && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-6 sm:p-7 w-full max-w-xl shadow-2xl space-y-4">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-xl shadow-sm space-y-4">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200">
               <div className="flex items-center gap-2">
                 <Zap className="w-5 h-5 text-amber-400" />
-                <h3 className="text-base font-black uppercase text-white">Generator Wyjściowej Szóstki</h3>
+                <h3 className="text-base font-black uppercase text-slate-900">Generator Wyjściowej Szóstki</h3>
               </div>
-              <button onClick={() => setLineupModalEvent(null)} className="text-slate-400 hover:text-white font-black">✕</button>
+              <button onClick={() => setLineupModalEvent(null)} className="text-slate-500 hover:text-slate-900 font-black">✕</button>
             </div>
 
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500">
               System automatycznie przypisał optymalną szóstkę na podstawie graczy, którzy potwierdzili obecność (1xR, 1xA, 2xP, 2xŚ, 1xL):
             </p>
 
@@ -4681,37 +4720,37 @@ function RozgrywkiContent() {
 
             {/* Starting Lineup Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800">
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200">
                 <span className="text-[10px] text-sky-400 font-black uppercase block">Rozgrywający (R)</span>
-                <span className="text-sm font-black text-white mt-0.5 block">{generatedLineup.setter}</span>
+                <span className="text-sm font-black text-slate-900 mt-0.5 block">{generatedLineup.setter}</span>
               </div>
-              <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800">
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200">
                 <span className="text-[10px] text-rose-400 font-black uppercase block">Atakujący (A)</span>
-                <span className="text-sm font-black text-white mt-0.5 block">{generatedLineup.opposite}</span>
+                <span className="text-sm font-black text-slate-900 mt-0.5 block">{generatedLineup.opposite}</span>
               </div>
-              <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800">
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200">
                 <span className="text-[10px] text-emerald-400 font-black uppercase block">Przyjmujący (P1, P2)</span>
-                <span className="text-sm font-black text-white mt-0.5 block">{generatedLineup.outsideHitters.join(' oraz ')}</span>
+                <span className="text-sm font-black text-slate-900 mt-0.5 block">{generatedLineup.outsideHitters.join(' oraz ')}</span>
               </div>
-              <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800">
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200">
                 <span className="text-[10px] text-purple-400 font-black uppercase block">Środkowi Bloku (Ś1, Ś2)</span>
-                <span className="text-sm font-black text-white mt-0.5 block">{generatedLineup.middleBlockers.join(' oraz ')}</span>
+                <span className="text-sm font-black text-slate-900 mt-0.5 block">{generatedLineup.middleBlockers.join(' oraz ')}</span>
               </div>
-              <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 sm:col-span-2">
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 sm:col-span-2">
                 <span className="text-[10px] text-amber-400 font-black uppercase block">Libero (L)</span>
-                <span className="text-sm font-black text-white mt-0.5 block">{generatedLineup.libero}</span>
+                <span className="text-sm font-black text-slate-900 mt-0.5 block">{generatedLineup.libero}</span>
               </div>
-              <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800/80 sm:col-span-2">
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 sm:col-span-2">
                 <span className="text-[10px] text-slate-500 font-black uppercase block">Ławka Rezerwowych ({generatedLineup.reserves.length})</span>
-                <span className="text-xs text-slate-300 mt-0.5 block">{generatedLineup.reserves.join(', ') || 'Brak rezerwowych'}</span>
+                <span className="text-xs text-slate-600 mt-0.5 block">{generatedLineup.reserves.join(', ') || 'Brak rezerwowych'}</span>
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-3 border-t border-slate-800">
+            <div className="flex justify-end gap-3 pt-3 border-t border-slate-200">
               <button
                 type="button"
                 onClick={() => setLineupModalEvent(null)}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white"
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-900"
               >
                 Anuluj
               </button>
@@ -4733,32 +4772,32 @@ function RozgrywkiContent() {
       {/* MODAL 3: Live Scorekeeper na Telefon */}
       {liveModalEvent && (
         <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-5 sm:p-7 w-full max-w-lg shadow-2xl space-y-5">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
+          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-7 w-full max-w-lg shadow-sm space-y-5">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200">
               <div className="flex items-center gap-2">
                 <Radio className="w-5 h-5 text-rose-500 animate-pulse" />
                 <div>
-                  <h3 className="text-sm sm:text-base font-black uppercase text-white">Live Scorekeeper</h3>
-                  <span className="text-[10px] text-slate-400">Wynik na żywo: {liveModalEvent.opponent || 'Mecz'}</span>
+                  <h3 className="text-sm sm:text-base font-black uppercase text-slate-900">Live Scorekeeper</h3>
+                  <span className="text-[10px] text-slate-500">Wynik na żywo: {liveModalEvent.opponent || 'Mecz'}</span>
                 </div>
               </div>
-              <button onClick={() => setLiveModalEvent(null)} className="text-slate-400 hover:text-white font-black text-lg">✕</button>
+              <button onClick={() => setLiveModalEvent(null)} className="text-slate-500 hover:text-slate-900 font-black text-lg">✕</button>
             </div>
 
             {/* Set info & Set score indicator */}
-            <div className="flex items-center justify-between bg-slate-900/60 p-3 rounded-2xl border border-slate-800 text-xs">
+            <div className="flex items-center justify-between bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
               <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase block">Aktualny Set:</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase block">Aktualny Set:</span>
                 <span className="text-base font-black text-amber-400">SET {liveCurrentSet}</span>
               </div>
               <div className="text-center">
-                <span className="text-[10px] font-bold text-slate-400 uppercase block">Stan Setów:</span>
-                <span className="text-base font-black text-white font-mono">{liveSetsWonTeam} : {liveSetsWonOpp}</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase block">Stan Setów:</span>
+                <span className="text-base font-black text-slate-900 font-mono">{liveSetsWonTeam} : {liveSetsWonOpp}</span>
               </div>
               <button
                 onClick={() => setIsServingTeam(!isServingTeam)}
                 className={`px-3 py-1.5 rounded-xl font-bold text-[11px] border transition flex items-center gap-1.5 ${
-                  isServingTeam ? 'bg-sky-500/20 text-sky-300 border-sky-500/40' : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                  isServingTeam ? 'bg-sky-500/20 text-sky-300 border-sky-200' : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
                 }`}
               >
                 <span>🏐 Serwis: {isServingTeam ? 'Angels ZTP' : 'Rywal'}</span>
@@ -4769,7 +4808,7 @@ function RozgrywkiContent() {
             {liveFinishedSets.length > 0 && (
               <div className="flex flex-wrap gap-2 text-xs">
                 {liveFinishedSets.map(s => (
-                  <span key={s.setNumber} className="px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-800 font-mono font-bold text-slate-300">
+                  <span key={s.setNumber} className="px-2.5 py-1 rounded-xl bg-slate-100 border border-slate-200 font-mono font-bold text-slate-600">
                     S{s.setNumber}: {s.teamScore}-{s.opponentScore}
                   </span>
                 ))}
@@ -4779,17 +4818,17 @@ function RozgrywkiContent() {
             {/* Main Scoreboard: Big Touch Buttons */}
             <div className="grid grid-cols-2 gap-4 select-none">
               {/* Angels ZTP Column */}
-              <div className="bg-[#07090d] border border-sky-500/30 rounded-3xl p-4 sm:p-5 text-center space-y-3 shadow-inner">
+              <div className="bg-slate-50 border border-sky-200 rounded-3xl p-4 sm:p-5 text-center space-y-3 shadow-inner">
                 <span className="text-xs font-black uppercase tracking-wider text-sky-400 block truncate">
                   Angels ZTP
                 </span>
-                <div className="text-5xl sm:text-6xl font-black font-mono text-white py-1">
+                <div className="text-5xl sm:text-6xl font-black font-mono text-slate-900 py-1">
                   {liveTeamScore}
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => handleScoreChange(-1, 0)}
-                    className="py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 font-black text-base"
+                    className="py-3 rounded-2xl bg-slate-100 hover:bg-slate-100 border border-slate-200 text-slate-500 font-black text-base"
                   >
                     -1
                   </button>
@@ -4803,23 +4842,23 @@ function RozgrywkiContent() {
               </div>
 
               {/* Opponent Column */}
-              <div className="bg-[#07090d] border border-rose-500/30 rounded-3xl p-4 sm:p-5 text-center space-y-3 shadow-inner">
+              <div className="bg-slate-50 border border-rose-200 rounded-3xl p-4 sm:p-5 text-center space-y-3 shadow-inner">
                 <span className="text-xs font-black uppercase tracking-wider text-rose-400 block truncate">
                   {liveModalEvent.opponent || 'Rywal'}
                 </span>
-                <div className="text-5xl sm:text-6xl font-black font-mono text-white py-1">
+                <div className="text-5xl sm:text-6xl font-black font-mono text-slate-900 py-1">
                   {liveOppScore}
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => handleScoreChange(0, -1)}
-                    className="py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 font-black text-base"
+                    className="py-3 rounded-2xl bg-slate-100 hover:bg-slate-100 border border-slate-200 text-slate-500 font-black text-base"
                   >
                     -1
                   </button>
                   <button
                     onClick={() => handleScoreChange(0, 1)}
-                    className="py-3 rounded-2xl bg-rose-500 hover:bg-rose-400 text-white font-black text-lg shadow-lg shadow-rose-500/20"
+                    className="py-3 rounded-2xl bg-rose-500 hover:bg-rose-400 text-slate-900 font-black text-lg shadow-lg shadow-rose-500/20"
                   >
                     +1
                   </button>
@@ -4838,7 +4877,7 @@ function RozgrywkiContent() {
             <div className="grid grid-cols-2 gap-3 pt-2">
               <button
                 onClick={handleFinishLiveSet}
-                className="py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-bold text-white transition text-center"
+                className="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-100 border border-slate-300 text-xs font-bold text-slate-900 transition text-center"
               >
                 ✓ Zakończ Set {liveCurrentSet}
               </button>
@@ -4852,8 +4891,8 @@ function RozgrywkiContent() {
             </div>
 
             {/* Quick alternative: Switch to full manual result entry */}
-            <div className="pt-2 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
-              <span className="text-slate-400 text-[11px]">Nie chcesz klikać punkt po punkcie?</span>
+            <div className="pt-2 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+              <span className="text-slate-500 text-[11px]">Nie chcesz klikać punkt po punkcie?</span>
               <button
                 type="button"
                 onClick={() => {
@@ -4875,49 +4914,49 @@ function RozgrywkiContent() {
       {/* MODAL 4: Social Media Post Generator */}
       {socialModalEvent && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-6 sm:p-7 w-full max-w-lg shadow-2xl space-y-4">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-lg shadow-sm space-y-4">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200">
               <div className="flex items-center gap-2">
                 <Award className="w-5 h-5 text-purple-400" />
-                <h3 className="text-base font-black uppercase text-white">Generator Posta na Social Media</h3>
+                <h3 className="text-base font-black uppercase text-slate-900">Generator Posta na Social Media</h3>
               </div>
-              <button onClick={() => setSocialModalEvent(null)} className="text-slate-400 hover:text-white font-black">✕</button>
+              <button onClick={() => setSocialModalEvent(null)} className="text-slate-500 hover:text-slate-900 font-black">✕</button>
             </div>
 
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500">
               Uzupełnij szczegóły i skopiuj gotowy, widowiskowy post na Instagram, Facebook lub stronę klubu:
             </p>
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="block text-slate-300 font-bold mb-1">Akcja Meczu (Highlights)</label>
+                <label className="block text-slate-600 font-bold mb-1">Akcja Meczu (Highlights)</label>
                 <input
                   type="text"
                   placeholder="np. Pojedynczy blok Bartka na środku w końcówce 3. seta!"
                   value={socialBestAction}
                   onChange={e => setSocialBestAction(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white"
+                  className="w-full bg-slate-100 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-bold mb-1">Komentarz Trenera / Sztabu</label>
+                <label className="block text-slate-600 font-bold mb-1">Komentarz Trenera / Sztabu</label>
                 <input
                   type="text"
                   placeholder="np. Znakomite przyjęcie i pełna realizacja taktyki."
                   value={socialNotes}
                   onChange={e => setSocialNotes(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-white"
+                  className="w-full bg-slate-100 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-400 font-bold mb-1">Podgląd posta:</label>
+                <label className="block text-slate-500 font-bold mb-1">Podgląd posta:</label>
                 <textarea
                   readOnly
                   rows={9}
                   value={generateSocialPostText(socialModalEvent)}
-                  className="w-full bg-[#07090d] border border-slate-800 rounded-2xl p-3 text-xs text-slate-200 font-mono leading-relaxed select-all focus:outline-none"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs text-slate-700 font-mono leading-relaxed select-all focus:outline-none"
                 />
               </div>
             </div>
@@ -4929,7 +4968,7 @@ function RozgrywkiContent() {
               <button
                 onClick={() => handleCopySocialPost(socialModalEvent)}
                 className={`px-5 py-2.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 ${
-                  copiedSocialText ? 'bg-purple-500 text-white shadow-md' : 'bg-purple-600 hover:bg-purple-500 text-white'
+                  copiedSocialText ? 'bg-purple-500 text-slate-900 shadow-md' : 'bg-purple-600 hover:bg-purple-500 text-slate-900'
                 }`}
               >
                 <Copy className="w-3.5 h-3.5" />
@@ -4969,7 +5008,7 @@ function RozgrywkiContent() {
               {/* Close Button */}
               <button
                 onClick={() => setSelectedPhotoPreview(null)}
-                className="absolute top-2 right-2 sm:-top-10 sm:right-0 w-9 h-9 rounded-full bg-slate-900/80 hover:bg-slate-800 text-white flex items-center justify-center border border-slate-700 transition z-20 shadow-lg text-sm"
+                className="absolute top-2 right-2 sm:-top-10 sm:right-0 w-9 h-9 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-900 flex items-center justify-center border border-slate-300 transition z-20 shadow-lg text-sm"
                 title="Zamknij podgląd"
               >
                 ✕
@@ -4979,7 +5018,7 @@ function RozgrywkiContent() {
               {hasPrev && (
                 <button
                   onClick={handlePrev}
-                  className="absolute left-2 sm:-left-12 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-slate-900/90 hover:bg-amber-500 hover:text-slate-950 text-white flex items-center justify-center border border-slate-700 transition z-20 shadow-xl"
+                  className="absolute left-2 sm:-left-12 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-slate-50 hover:bg-amber-500 hover:text-slate-950 text-slate-900 flex items-center justify-center border border-slate-300 transition z-20 shadow-sm"
                   title="Poprzednie zdjęcie w serii"
                 >
                   <ChevronLeft className="w-6 h-6" />
@@ -4990,7 +5029,7 @@ function RozgrywkiContent() {
               {hasNext && (
                 <button
                   onClick={handleNext}
-                  className="absolute right-2 sm:-right-12 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-slate-900/90 hover:bg-amber-500 hover:text-slate-950 text-white flex items-center justify-center border border-slate-700 transition z-20 shadow-xl"
+                  className="absolute right-2 sm:-right-12 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-slate-50 hover:bg-amber-500 hover:text-slate-950 text-slate-900 flex items-center justify-center border border-slate-300 transition z-20 shadow-sm"
                   title="Następne zdjęcie w serii"
                 >
                   <ChevronRight className="w-6 h-6" />
@@ -4998,7 +5037,7 @@ function RozgrywkiContent() {
               )}
 
               {/* Photo Display */}
-              <div className="relative rounded-3xl overflow-hidden border border-slate-800 bg-black max-h-[75vh] flex items-center justify-center shadow-2xl">
+              <div className="relative rounded-3xl overflow-hidden border border-slate-200 bg-black max-h-[75vh] flex items-center justify-center shadow-sm">
                 <img
                   src={selectedPhotoPreview.url}
                   alt={selectedPhotoPreview.title}
@@ -5007,14 +5046,14 @@ function RozgrywkiContent() {
               </div>
 
               {/* Bottom Info Bar */}
-              <div className="mt-3.5 w-full flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-slate-950/80 border border-slate-800/80 backdrop-blur-md">
+              <div className="mt-3.5 w-full flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 backdrop-blur-md">
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider">
                       {selectedPhotoPreview.matchName || (selectedPhotoPreview.category === 'TURNIEJ' ? 'Turniej' : selectedPhotoPreview.category === 'SPARING' ? 'Sparing' : 'Mecz LALS')}
                     </span>
                     {selectedPhotoPreview.seriesTitle && (
-                      <span className="text-[10px] text-slate-400 font-bold">
+                      <span className="text-[10px] text-slate-500 font-bold">
                         • {selectedPhotoPreview.seriesTitle}
                       </span>
                     )}
@@ -5024,9 +5063,9 @@ function RozgrywkiContent() {
                       </span>
                     )}
                   </div>
-                  <h3 className="text-sm font-black text-white">{selectedPhotoPreview.title}</h3>
+                  <h3 className="text-sm font-black text-slate-900">{selectedPhotoPreview.title}</h3>
                   {selectedPhotoPreview.caption && (
-                    <p className="text-xs text-slate-300">{selectedPhotoPreview.caption}</p>
+                    <p className="text-xs text-slate-600">{selectedPhotoPreview.caption}</p>
                   )}
                 </div>
 
@@ -5036,7 +5075,7 @@ function RozgrywkiContent() {
                     download={`angels_foto_${selectedPhotoPreview.id}.jpg`}
                     target="_blank"
                     rel="noreferrer"
-                    className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-bold text-white transition flex items-center gap-1.5 shadow"
+                    className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-100 border border-slate-300 text-xs font-bold text-slate-900 transition flex items-center gap-1.5 shadow"
                     title="Pobierz pełny plik zdjęcia"
                   >
                     <Download className="w-3.5 h-3.5 text-amber-400" />
@@ -5052,21 +5091,21 @@ function RozgrywkiContent() {
       {/* MODAL IMPORTU TERMINARZA & WYNIKÓW (TEKST / ZDJĘCIE OCR) */}
       {showImportScheduleModal && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-slate-100 border border-slate-300 rounded-2xl max-w-3xl w-full max-h-[92vh] flex flex-col shadow-sm overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             {/* Nagłówek */}
-            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-slate-900 via-sky-950/30 to-slate-900">
+            <div className="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-slate-900 via-sky-950/30 to-slate-900">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-200 flex items-center justify-center text-sky-400 shrink-0">
                   <Calendar className="w-5 h-5 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
                     Import Terminarza & Wyników LALS
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-200">
                       Tekst / Zdjęcie OCR
                     </span>
                   </h3>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500">
                     Wgraj zdjęcie terminarza ze strony LALS lub wklej tekst, a system rozpozna daty, mecze i sety.
                   </p>
                 </div>
@@ -5074,22 +5113,22 @@ function RozgrywkiContent() {
               <button
                 type="button"
                 onClick={() => setShowImportScheduleModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition"
+                className="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Zakładki Tekst vs Zdjęcie */}
-            <div className="p-3 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between gap-3">
-              <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-1">
+            <div className="p-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-3">
+              <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-1">
                 <button
                   type="button"
                   onClick={() => setScheduleImportTab('text')}
                   className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
                     scheduleImportTab === 'text'
                       ? 'bg-sky-500 text-slate-950 shadow-md'
-                      : 'text-slate-400 hover:text-white'
+                      : 'text-slate-500 hover:text-slate-900'
                   }`}
                 >
                   <FileText className="w-3.5 h-3.5" />
@@ -5101,7 +5140,7 @@ function RozgrywkiContent() {
                   className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
                     scheduleImportTab === 'image'
                       ? 'bg-sky-500 text-slate-950 shadow-md'
-                      : 'text-slate-400 hover:text-white'
+                      : 'text-slate-500 hover:text-slate-900'
                   }`}
                 >
                   <Camera className="w-3.5 h-3.5" />
@@ -5125,7 +5164,7 @@ function RozgrywkiContent() {
             <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
               {scheduleImportTab === 'text' ? (
                 <div className="space-y-2">
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500">
                     Wklej linie terminarza lub wyników (jedna linia na mecz):
                   </p>
                   <textarea
@@ -5139,7 +5178,7 @@ function RozgrywkiContent() {
 15 listopada 2026, Niedziela
 [Runda: 11Nr 1972AAngels ZTP6:30 po południuCCoco Jumbo](https://...)
 (lub tradycyjnie: 15.11.2026 18:30 Angels ZTP vs Coco Jumbo)`}
-                    className="w-full rounded-xl bg-slate-950 border border-slate-700 p-3 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500 resize-y"
+                    className="w-full rounded-xl bg-slate-50 border border-slate-300 p-3 text-xs font-mono text-slate-700 placeholder:text-slate-600 focus:outline-none focus:border-sky-500 resize-y"
                   />
                   <div className="flex justify-end">
                     <button
@@ -5153,12 +5192,12 @@ function RozgrywkiContent() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500">
                     Wybierz zdjęcie, zrzut ekranu lub zdjęcie telefonu z terminarzem LALS:
                   </p>
-                  <label className="cursor-pointer p-6 rounded-2xl bg-slate-950 border-2 border-dashed border-slate-700 hover:border-sky-500 transition flex flex-col items-center justify-center gap-2 group">
+                  <label className="cursor-pointer p-6 rounded-2xl bg-slate-50 border-2 border-dashed border-slate-300 hover:border-sky-500 transition flex flex-col items-center justify-center gap-2 group">
                     <Camera className="w-8 h-8 text-slate-500 group-hover:text-sky-400 transition" />
-                    <span className="text-xs font-bold text-slate-300 group-hover:text-white">
+                    <span className="text-xs font-bold text-slate-600 group-hover:text-slate-900">
                       Kliknij, aby wybrać plik zdjęcia lub zrzut ekranu
                     </span>
                     <span className="text-[10px] text-slate-500">
@@ -5176,7 +5215,7 @@ function RozgrywkiContent() {
                   </label>
 
                   {scheduleOcrLoading && (
-                    <div className="p-4 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-2">
+                    <div className="p-4 rounded-xl bg-sky-950/40 border border-sky-200 space-y-2">
                       <div className="flex items-center justify-between text-xs text-sky-300 font-bold">
                         <span>{scheduleOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
                         <span className="font-mono">{scheduleOcrProgress}%</span>
@@ -5192,7 +5231,7 @@ function RozgrywkiContent() {
 
                   {rawScheduleInput && (
                     <div className="space-y-1.5 pt-2">
-                      <span className="text-xs font-bold text-slate-400">
+                      <span className="text-xs font-bold text-slate-500">
                         Rozpoznany tekst z OCR (możesz edytować przed zatwierdzeniem):
                       </span>
                       <textarea
@@ -5202,7 +5241,7 @@ function RozgrywkiContent() {
                           setRawScheduleInput(e.target.value);
                           handleParseScheduleText(e.target.value);
                         }}
-                        className="w-full rounded-xl bg-slate-950 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
+                        className="w-full rounded-xl bg-slate-50 border border-slate-300 p-2.5 text-xs font-mono text-slate-700 focus:outline-none focus:border-sky-500"
                       />
                     </div>
                   )}
@@ -5210,13 +5249,13 @@ function RozgrywkiContent() {
               )}
 
               {/* Podgląd rozpoznanych meczów */}
-              <div className="space-y-4 pt-3 border-t border-slate-800">
-                <h4 className="text-xs font-black uppercase text-slate-300 tracking-wider">
+              <div className="space-y-4 pt-3 border-t border-slate-200">
+                <h4 className="text-xs font-black uppercase text-slate-600 tracking-wider">
                   Podgląd rozpoznanych jednostek (Łącznie: {parsedMatchesToImport.length + parsedFixturesToImport.length}):
                 </h4>
 
                 {parsedMatchesToImport.length === 0 && parsedFixturesToImport.length === 0 ? (
-                  <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 text-center text-xs text-slate-500">
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center text-xs text-slate-500">
                     Wklej tekst lub wgraj zdjęcie, aby zobaczyć rozpoznane spotkania.
                   </div>
                 ) : (
@@ -5232,13 +5271,13 @@ function RozgrywkiContent() {
                           {parsedMatchesToImport.map((m, idx) => (
                             <div
                               key={idx}
-                              className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 flex items-center justify-between text-xs"
+                              className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-200 flex items-center justify-between text-xs"
                             >
                               <div>
-                                <span className="font-bold text-white">
+                                <span className="font-bold text-slate-900">
                                   {m.title || (m.isHome ? 'Angels ZTP' : m.opponent) + ' vs ' + (m.isHome ? m.opponent : 'Angels ZTP')}
                                 </span>
-                                <span className="text-slate-400 block text-[11px]">
+                                <span className="text-slate-500 block text-[11px]">
                                   {m.date.replace('T', ' ')} • {m.sets?.map((s: any) => `${s.teamScore}:${s.opponentScore}`).join(', ')}
                                 </span>
                               </div>
@@ -5262,15 +5301,15 @@ function RozgrywkiContent() {
                           {parsedFixturesToImport.map((f, idx) => (
                             <div
                               key={idx}
-                              className="p-3 rounded-xl bg-sky-950/20 border border-sky-500/30 flex items-center justify-between text-xs"
+                              className="p-3 rounded-xl bg-sky-950/20 border border-sky-200 flex items-center justify-between text-xs"
                             >
                               <div>
-                                <span className="font-bold text-white">{f.title}</span>
-                                <span className="text-slate-400 block text-[11px]">
+                                <span className="font-bold text-slate-900">{f.title}</span>
+                                <span className="text-slate-500 block text-[11px]">
                                   {f.date.replace('T', ' ')} • {f.location}
                                 </span>
                               </div>
-                              <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                              <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-sky-500/20 text-sky-300 border border-sky-200">
                                 Terminarz
                               </span>
                             </div>
@@ -5284,15 +5323,15 @@ function RozgrywkiContent() {
             </div>
 
             {/* Stopka */}
-            <div className="p-4 sm:p-5 border-t border-slate-800 bg-slate-950 flex items-center justify-between gap-3">
-              <span className="text-xs text-slate-400">
-                Gotowe do zapisu: <strong className="text-white">{parsedMatchesToImport.length + parsedFixturesToImport.length}</strong>
+            <div className="p-4 sm:p-5 border-t border-slate-200 bg-slate-50 flex items-center justify-between gap-3">
+              <span className="text-xs text-slate-500">
+                Gotowe do zapisu: <strong className="text-slate-900">{parsedMatchesToImport.length + parsedFixturesToImport.length}</strong>
               </span>
               <div className="flex items-center gap-2.5">
                 <button
                   type="button"
                   onClick={() => setShowImportScheduleModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition"
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-600 transition"
                   disabled={submittingScheduleImport}
                 >
                   Anuluj
@@ -5324,21 +5363,21 @@ function RozgrywkiContent() {
       {/* MODAL IMPORTU Z VOLLEYSTATION */}
       {showVolleyStationImportModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-700/80 rounded-2xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-slate-100 border border-slate-300 rounded-2xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-sm overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             {/* Nagłówek modalu */}
-            <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-slate-900 via-sky-950/30 to-slate-900">
+            <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-slate-900 via-sky-950/30 to-slate-900">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-200 flex items-center justify-center text-sky-400 shrink-0">
                   <Upload className="w-5 h-5 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
                     Import Danych z VolleyStation
-                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-200">
                       Auto-Parser LALS
                     </span>
                   </h3>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500">
                     Wklej skopiowany terminarz lub szczegółowy raport meczu (sety, MVP, statystyki)
                   </p>
                 </div>
@@ -5346,7 +5385,7 @@ function RozgrywkiContent() {
               <button
                 type="button"
                 onClick={() => setShowVolleyStationImportModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition"
+                className="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center transition"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -5355,38 +5394,38 @@ function RozgrywkiContent() {
             {/* Treść modalu */}
             <form onSubmit={handleImportVolleyStation} className="p-5 overflow-y-auto flex-1 space-y-4">
               {/* Pasek z bezpośrednim linkiem do oficjalnego terminarza */}
-              <div className="flex flex-wrap items-center justify-between gap-2.5 p-3 rounded-xl bg-slate-950 border border-sky-500/30">
+              <div className="flex flex-wrap items-center justify-between gap-2.5 p-3 rounded-xl bg-slate-50 border border-sky-200">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-xs font-bold text-white">Oficjalny terminarz ligowy LALS:</span>
+                  <span className="text-xs font-bold text-slate-900">Oficjalny terminarz ligowy LALS:</span>
                 </div>
                 <a
                   href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 hover:text-white border border-sky-500/40 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
+                  className="px-3 py-1.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 hover:text-slate-900 border border-sky-200 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-sky-400" />
                   <span>Otwórz: panel.volleystation.com/schedule ↗</span>
                 </a>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-sky-950/20 border border-sky-500/30 text-xs text-slate-300 space-y-1.5">
+              <div className="p-3.5 rounded-xl bg-sky-950/20 border border-sky-200 text-xs text-slate-600 space-y-1.5">
                 <div className="font-bold text-sky-400 flex items-center gap-1.5">
                   <Info className="w-4 h-4 shrink-0" />
                   Jak zaimportować dane w 5 sekund:
                 </div>
-                <ol className="list-decimal list-inside space-y-1 text-slate-300 pl-1">
+                <ol className="list-decimal list-inside space-y-1 text-slate-600 pl-1">
                   <li>Otwórz powyższy link do terminarza w nowej karcie.</li>
-                  <li>Zaznacz mecze i wyniki (lub cały raport ze statystykami zawodników) i skopiuj (<code className="text-white bg-slate-900 px-1 rounded">Ctrl+C</code>).</li>
-                  <li>Wklej poniżej (<code className="text-white bg-slate-900 px-1 rounded">Ctrl+V</code>) i kliknij <em>Zaimportuj dane</em>.</li>
+                  <li>Zaznacz mecze i wyniki (lub cały raport ze statystykami zawodników) i skopiuj (<code className="text-slate-900 bg-slate-100 px-1 rounded">Ctrl+C</code>).</li>
+                  <li>Wklej poniżej (<code className="text-slate-900 bg-slate-100 px-1 rounded">Ctrl+V</code>) i kliknij <em>Zaimportuj dane</em>.</li>
                 </ol>
               </div>
 
               {/* Wybór fazy rozgrywek dla importu */}
-              <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2">
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="block text-xs font-bold text-slate-200">
+                  <label className="block text-xs font-bold text-slate-700">
                     🎯 Faza rozgrywek LALS, do której przypisać importowane mecze:
                   </label>
                   <span className="text-[10px] font-mono text-sky-400 font-bold">
@@ -5403,8 +5442,8 @@ function RozgrywkiContent() {
                         onClick={() => setImportPhaseTargetId(phase.id)}
                         className={`p-2.5 rounded-xl text-left border transition flex flex-col gap-1 ${
                           isSelected
-                            ? 'bg-sky-500/15 border-sky-500/60 text-white shadow-md shadow-sky-500/10 ring-1 ring-sky-500/30'
-                            : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                            ? 'bg-sky-500/15 border-sky-500/60 text-slate-900 shadow-md shadow-sky-500/10 ring-1 ring-sky-500/30'
+                            : 'bg-slate-50 border-slate-200 text-slate-500 hover:text-slate-700 hover:border-slate-300'
                         }`}
                       >
                         <div className="flex items-center justify-between">
@@ -5415,7 +5454,7 @@ function RozgrywkiContent() {
                             </span>
                           )}
                         </div>
-                        <span className="text-[11px] text-slate-400">
+                        <span className="text-[11px] text-slate-500">
                           {phase.advancementSpots === 3
                             ? '🟢 Grupa 7 zespołów • Top 3 awansuje dalej'
                             : '🏆 Grupa Finałowa (7 zespołów) • Walka o podium'}
@@ -5428,7 +5467,7 @@ function RozgrywkiContent() {
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
-                  <label className="font-bold uppercase tracking-wider text-slate-300">
+                  <label className="font-bold uppercase tracking-wider text-slate-600">
                     Wklejony tekst z VolleyStation:
                   </label>
                   <div className="flex items-center gap-2">
@@ -5453,34 +5492,34 @@ function RozgrywkiContent() {
                   onChange={e => setVolleyStationRawInput(e.target.value)}
                   placeholder="Wklej tutaj treść skopiowaną z terminarza ligowego lub ze strony raportu meczowego VolleyStation..."
                   rows={9}
-                  className="w-full rounded-xl bg-slate-950 border border-slate-700 p-3 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition resize-y"
+                  className="w-full rounded-xl bg-slate-50 border border-slate-300 p-3 text-xs font-mono text-slate-700 placeholder:text-slate-600 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition resize-y"
                   required
                 />
               </div>
 
-              <label className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-950/60 border border-slate-800 cursor-pointer hover:border-slate-700 transition">
+              <label className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-slate-300 transition">
                 <input
                   type="checkbox"
                   checked={volleyStationAutoCreate}
                   onChange={e => setVolleyStationAutoCreate(e.target.checked)}
-                  className="mt-0.5 rounded border-slate-700 bg-slate-900 text-sky-500 focus:ring-0 focus:ring-offset-0"
+                  className="mt-0.5 rounded border-slate-300 bg-slate-100 text-sky-500 focus:ring-0 focus:ring-offset-0"
                 />
                 <div className="text-xs">
-                  <span className="font-bold text-white block">
+                  <span className="font-bold text-slate-900 block">
                     Automatycznie synchronizuj z terminarzem ligowym LALS
                   </span>
-                  <span className="text-slate-400">
+                  <span className="text-slate-500">
                     Tworzy lub aktualizuje wpisy meczów z przeciwnikami, wynikiem, setami i nagrodą MVP.
                   </span>
                 </div>
               </label>
 
               {/* Stopka z przyciskami */}
-              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-200">
                 <button
                   type="button"
                   onClick={() => setShowVolleyStationImportModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition"
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-600 transition"
                   disabled={submittingVolleyStation}
                 >
                   Anuluj
@@ -5511,21 +5550,21 @@ function RozgrywkiContent() {
       {/* MODAL RĘCZNEGO DODAWANIA MECZU LIGOWEGO */}
       {showAddMatchModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-slate-900 via-sky-950/30 to-slate-900">
+          <div className="bg-slate-100 border border-slate-300 rounded-2xl max-w-xl w-full max-h-[92vh] flex flex-col shadow-sm overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-slate-900 via-sky-950/30 to-slate-900">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-200 flex items-center justify-center text-sky-400 shrink-0">
                   <Volleyball className="w-5 h-5 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-white">Dodaj Wynik Meczu Ligowego</h3>
-                  <p className="text-xs text-slate-400">Wprowadź oficjalny rezultat meczu LALS</p>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900">Dodaj Wynik Meczu Ligowego</h3>
+                  <p className="text-xs text-slate-500">Wprowadź oficjalny rezultat meczu LALS</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setShowAddMatchModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition"
+                className="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center transition"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -5534,7 +5573,7 @@ function RozgrywkiContent() {
             <form onSubmit={handleAddLeagueMatch} className="p-5 overflow-y-auto flex-1 space-y-4">
               {/* Faza rozgrywek */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-300">Faza rozgrywek:</label>
+                <label className="block text-xs font-bold text-slate-600">Faza rozgrywek:</label>
                 <div className="grid grid-cols-2 gap-2">
                   {leaguePhases.map(phase => (
                     <button
@@ -5543,8 +5582,8 @@ function RozgrywkiContent() {
                       onClick={() => setMatchPhaseId(phase.id)}
                       className={`p-2 rounded-xl text-left border text-xs font-bold transition flex items-center justify-between ${
                         matchPhaseId === phase.id
-                          ? 'bg-sky-500/20 border-sky-500 text-white shadow'
-                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                          ? 'bg-sky-500/20 border-sky-500 text-slate-900 shadow'
+                          : 'bg-slate-50 border-slate-200 text-slate-500 hover:text-slate-900'
                       }`}
                     >
                       <span className="truncate">{phase.shortName}: {phase.advancementSpots === 3 ? 'Eliminacje' : 'Finały'}</span>
@@ -5556,7 +5595,7 @@ function RozgrywkiContent() {
 
               {/* Przeciwnik */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-300">Przeciwnik (Drużyna rywali):</label>
+                <label className="block text-xs font-bold text-slate-600">Przeciwnik (Drużyna rywali):</label>
                 <div className="flex flex-wrap gap-1.5 mb-2">
                   {['Gladiatorzy BUD-WENT', 'Afera Volley', 'Coco Jumbo', 'Volleyboars', 'Koty Broniszewice', 'Czelendż'].map(team => (
                     <button
@@ -5566,7 +5605,7 @@ function RozgrywkiContent() {
                       className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition ${
                         matchOpponent === team
                           ? 'bg-sky-500 text-slate-950 border-sky-400'
-                          : 'bg-slate-950/80 border-slate-800 text-slate-300 hover:bg-slate-800'
+                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                       }`}
                     >
                       {team}
@@ -5578,7 +5617,7 @@ function RozgrywkiContent() {
                   value={matchOpponent}
                   onChange={e => setMatchOpponent(e.target.value)}
                   placeholder="np. Gladiatorzy BUD-WENT lub wpisz inną nazwę"
-                  className="w-full rounded-xl bg-slate-950 border border-slate-700 p-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-sky-500"
+                  className="w-full rounded-xl bg-slate-50 border border-slate-300 p-2.5 text-xs text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-sky-500"
                   required
                 />
               </div>
@@ -5586,54 +5625,54 @@ function RozgrywkiContent() {
               {/* Data i Lokalizacja */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="block text-xs font-bold text-slate-300">Data i godzina:</label>
+                  <label className="block text-xs font-bold text-slate-600">Data i godzina:</label>
                   <input
                     type="datetime-local"
                     value={matchDate}
                     onChange={e => setMatchDate(e.target.value)}
-                    className="w-full rounded-xl bg-slate-950 border border-slate-700 p-2 text-xs text-white focus:outline-none focus:border-sky-500"
+                    className="w-full rounded-xl bg-slate-50 border border-slate-300 p-2 text-xs text-slate-900 focus:outline-none focus:border-sky-500"
                     required
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="block text-xs font-bold text-slate-300">Hala / Miejsce:</label>
+                  <label className="block text-xs font-bold text-slate-600">Hala / Miejsce:</label>
                   <input
                     type="text"
                     value={matchLocation}
                     onChange={e => setMatchLocation(e.target.value)}
-                    className="w-full rounded-xl bg-slate-950 border border-slate-700 p-2 text-xs text-white focus:outline-none focus:border-sky-500"
+                    className="w-full rounded-xl bg-slate-50 border border-slate-300 p-2 text-xs text-slate-900 focus:outline-none focus:border-sky-500"
                   />
                 </div>
               </div>
 
               {/* Dom / Wyjazd */}
               <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-300">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-600">
                   <input
                     type="radio"
                     name="isHome"
                     checked={matchIsHome}
                     onChange={() => setMatchIsHome(true)}
-                    className="text-sky-500 bg-slate-900 border-slate-700 focus:ring-0"
+                    className="text-sky-500 bg-slate-100 border-slate-300 focus:ring-0"
                   />
                   <span>🏠 Gospodarz (Angels ZTP)</span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-300">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-600">
                   <input
                     type="radio"
                     name="isHome"
                     checked={!matchIsHome}
                     onChange={() => setMatchIsHome(false)}
-                    className="text-sky-500 bg-slate-900 border-slate-700 focus:ring-0"
+                    className="text-sky-500 bg-slate-100 border-slate-300 focus:ring-0"
                   />
                   <span>🚌 Wyjazd</span>
                 </label>
               </div>
 
               {/* Punkty w setach */}
-              <div className="space-y-2 p-3.5 rounded-xl bg-slate-950/80 border border-slate-800">
+              <div className="space-y-2 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-slate-200">
+                  <label className="text-xs font-bold text-slate-700">
                     Wynik setów (małe punkty):
                   </label>
                   <button
@@ -5651,7 +5690,7 @@ function RozgrywkiContent() {
                 <div className="space-y-2">
                   {manualMatchSets.map((s, idx) => (
                     <div key={idx} className="flex items-center gap-2">
-                      <span className="text-xs font-mono font-bold text-slate-400 w-14">Set {s.setNumber}:</span>
+                      <span className="text-xs font-mono font-bold text-slate-500 w-14">Set {s.setNumber}:</span>
                       <div className="flex items-center gap-1.5 flex-1">
                         <input
                           type="number"
@@ -5664,7 +5703,7 @@ function RozgrywkiContent() {
                             updated[idx].teamScore = val;
                             setManualMatchSets(updated);
                           }}
-                          className="w-16 bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-center text-xs font-bold text-white"
+                          className="w-16 bg-slate-100 border border-slate-300 rounded-lg p-1.5 text-center text-xs font-bold text-slate-900"
                         />
                         <span className="text-slate-500 font-bold">:</span>
                         <input
@@ -5678,7 +5717,7 @@ function RozgrywkiContent() {
                             updated[idx].opponentScore = val;
                             setManualMatchSets(updated);
                           }}
-                          className="w-16 bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-center text-xs font-bold text-white"
+                          className="w-16 bg-slate-100 border border-slate-300 rounded-lg p-1.5 text-center text-xs font-bold text-slate-900"
                         />
                       </div>
                       {manualMatchSets.length > 1 && (
@@ -5701,33 +5740,33 @@ function RozgrywkiContent() {
               {/* MVP & Notatki */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="block text-xs font-bold text-slate-300">MVP Meczu:</label>
+                  <label className="block text-xs font-bold text-slate-600">MVP Meczu:</label>
                   <input
                     type="text"
                     value={matchMvp}
                     onChange={e => setMatchMvp(e.target.value)}
                     placeholder="np. Karol Ordon, Łukasz Kremer..."
-                    className="w-full rounded-xl bg-slate-950 border border-slate-700 p-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-sky-500"
+                    className="w-full rounded-xl bg-slate-50 border border-slate-300 p-2 text-xs text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-sky-500"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="block text-xs font-bold text-slate-300">Notatki / Komentarz:</label>
+                  <label className="block text-xs font-bold text-slate-600">Notatki / Komentarz:</label>
                   <input
                     type="text"
                     value={matchNotes}
                     onChange={e => setMatchNotes(e.target.value)}
                     placeholder="np. Kluczowa seria asów w 3. secie"
-                    className="w-full rounded-xl bg-slate-950 border border-slate-700 p-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-sky-500"
+                    className="w-full rounded-xl bg-slate-50 border border-slate-300 p-2 text-xs text-slate-900 placeholder:text-slate-500 focus:outline-none focus:border-sky-500"
                   />
                 </div>
               </div>
 
               {/* Przyciski */}
-              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-200">
                 <button
                   type="button"
                   onClick={() => setShowAddMatchModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition"
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-600 transition"
                   disabled={submittingMatch}
                 >
                   Anuluj
@@ -5758,21 +5797,21 @@ function RozgrywkiContent() {
       {/* MODAL: TWORZENIE NOWEJ FAZY / GRUPY */}
       {showCreatePhaseModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="bg-slate-100 border border-slate-200 rounded-2xl max-w-lg w-full p-5 shadow-sm space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-200 flex items-center justify-center text-emerald-400">
                   <Plus className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-white">Nowa Faza / Grupa Ligowa</h3>
-                  <p className="text-xs text-slate-400">Dodaj nową fazę rozgrywek (np. Grupa B, Finały, Play-off)</p>
+                  <h3 className="text-base font-black text-slate-900">Nowa Faza / Grupa Ligowa</h3>
+                  <p className="text-xs text-slate-500">Dodaj nową fazę rozgrywek (np. Grupa B, Finały, Play-off)</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setShowCreatePhaseModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center"
+                className="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -5780,57 +5819,57 @@ function RozgrywkiContent() {
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="block text-slate-400 font-bold mb-1">Pełna nazwa fazy:</label>
+                <label className="block text-slate-500 font-bold mb-1">Pełna nazwa fazy:</label>
                 <input
                   type="text"
                   value={newPhaseName}
                   onChange={e => setNewPhaseName(e.target.value)}
                   placeholder="np. Faza II: Grupa Pocieszenia (Miejsca 5-8)"
-                  className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                  className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-400 font-bold mb-1">Krótka nazwa (na przycisk):</label>
+                <label className="block text-slate-500 font-bold mb-1">Krótka nazwa (na przycisk):</label>
                 <input
                   type="text"
                   value={newPhaseShortName}
                   onChange={e => setNewPhaseShortName(e.target.value)}
                   placeholder="np. Miejsca 5-8 lub Grupa B"
-                  className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                  className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">Miejsca z awansem (0 = finał):</label>
+                  <label className="block text-slate-500 font-bold mb-1">Miejsca z awansem (0 = finał):</label>
                   <input
                     type="number"
                     min="0"
                     max="16"
                     value={newPhaseAdvSpots}
                     onChange={e => setNewPhaseAdvSpots(parseInt(e.target.value) || 0)}
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-mono font-bold focus:border-sky-500 outline-none"
+                    className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-mono font-bold focus:border-sky-500 outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">Cel awansu:</label>
+                  <label className="block text-slate-500 font-bold mb-1">Cel awansu:</label>
                   <input
                     type="text"
                     value={newPhaseAdvTarget}
                     onChange={e => setNewPhaseAdvTarget(e.target.value)}
                     placeholder="np. Grupa Finałowa lub Mistrz"
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                    className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="pt-2 border-t border-slate-800 flex items-center justify-end gap-2">
+            <div className="pt-2 border-t border-slate-200 flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setShowCreatePhaseModal(false)}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300"
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-600"
               >
                 Anuluj
               </button>
@@ -5851,21 +5890,21 @@ function RozgrywkiContent() {
       {/* MODAL: PODZIAŁ GRUPY (SPLIT) */}
       {showSplitPhaseModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="bg-slate-100 border border-slate-200 rounded-2xl max-w-lg w-full p-5 shadow-sm space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-200 flex items-center justify-center text-purple-400">
                   <GitFork className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-white">Podział Grupy LALS</h3>
-                  <p className="text-xs text-slate-400">Wydziel nową fazę ze wskazanego zakresu miejsc</p>
+                  <h3 className="text-base font-black text-slate-900">Podział Grupy LALS</h3>
+                  <p className="text-xs text-slate-500">Wydziel nową fazę ze wskazanego zakresu miejsc</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setShowSplitPhaseModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center"
+                className="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -5873,11 +5912,11 @@ function RozgrywkiContent() {
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="block text-slate-400 font-bold mb-1">Faza źródłowa:</label>
+                <label className="block text-slate-500 font-bold mb-1">Faza źródłowa:</label>
                 <select
                   value={splitSourcePhaseId}
                   onChange={e => setSplitSourcePhaseId(e.target.value)}
-                  className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                  className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
                 >
                   {leaguePhases.map(ph => (
                     <option key={ph.id} value={ph.id}>{ph.name} ({ph.table?.length || 0} drużyn)</option>
@@ -5887,90 +5926,90 @@ function RozgrywkiContent() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">Pozycja od:</label>
+                  <label className="block text-slate-500 font-bold mb-1">Pozycja od:</label>
                   <input
                     type="number"
                     min="1"
                     value={splitStartRank}
                     onChange={e => setSplitStartRank(parseInt(e.target.value) || 1)}
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-mono font-bold focus:border-sky-500 outline-none"
+                    className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-mono font-bold focus:border-sky-500 outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">Pozycja do:</label>
+                  <label className="block text-slate-500 font-bold mb-1">Pozycja do:</label>
                   <input
                     type="number"
                     min="1"
                     value={splitEndRank}
                     onChange={e => setSplitEndRank(parseInt(e.target.value) || 1)}
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-mono font-bold focus:border-sky-500 outline-none"
+                    className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-mono font-bold focus:border-sky-500 outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-400 font-bold mb-1">Nazwa nowo powstałej fazy:</label>
+                <label className="block text-slate-500 font-bold mb-1">Nazwa nowo powstałej fazy:</label>
                 <input
                   type="text"
                   value={splitPhaseName}
                   onChange={e => setSplitPhaseName(e.target.value)}
                   placeholder="np. Grupa Mistrzowska (Miejsca 1-4)"
-                  className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                  className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-400 font-bold mb-1">Krótka nazwa:</label>
+                <label className="block text-slate-500 font-bold mb-1">Krótka nazwa:</label>
                 <input
                   type="text"
                   value={splitPhaseShortName}
                   onChange={e => setSplitPhaseShortName(e.target.value)}
                   placeholder="np. Mistrzowska (1-4)"
-                  className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                  className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
                 />
               </div>
 
-              <label className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 cursor-pointer hover:bg-slate-950">
+              <label className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-50">
                 <input
                   type="checkbox"
                   checked={splitCarryOverStats}
                   onChange={e => setSplitCarryOverStats(e.target.checked)}
                   className="rounded text-purple-500 focus:ring-0"
                 />
-                <span className="text-slate-300">
+                <span className="text-slate-600">
                   <strong>Przenieś punkty i sety</strong> z poprzedniej fazy (odznaczenie = reset do 0:0)
                 </span>
               </label>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">Awans z nowej grupy (0 = finał):</label>
+                  <label className="block text-slate-500 font-bold mb-1">Awans z nowej grupy (0 = finał):</label>
                   <input
                     type="number"
                     min="0"
                     value={splitAdvSpots}
                     onChange={e => setSplitAdvSpots(parseInt(e.target.value) || 0)}
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-mono font-bold focus:border-sky-500 outline-none"
+                    className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-mono font-bold focus:border-sky-500 outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">Cel awansu / Tytuł:</label>
+                  <label className="block text-slate-500 font-bold mb-1">Cel awansu / Tytuł:</label>
                   <input
                     type="text"
                     value={splitAdvTarget}
                     onChange={e => setSplitAdvTarget(e.target.value)}
                     placeholder="np. Mistrz Ligi LALS"
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                    className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="pt-2 border-t border-slate-800 flex items-center justify-end gap-2">
+            <div className="pt-2 border-t border-slate-200 flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setShowSplitPhaseModal(false)}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300"
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-600"
               >
                 Anuluj
               </button>
@@ -5978,7 +6017,7 @@ function RozgrywkiContent() {
                 type="button"
                 onClick={handleSplitPhase}
                 disabled={splittingPhase || !splitPhaseName.trim()}
-                className="px-5 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-black text-xs flex items-center gap-2 disabled:opacity-50 transition"
+                className="px-5 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-slate-900 font-black text-xs flex items-center gap-2 disabled:opacity-50 transition"
               >
                 {splittingPhase ? <Loader2 className="w-4 h-4 animate-spin" /> : <GitFork className="w-4 h-4" />}
                 <span>Podziel i Utwórz Fazę</span>
@@ -5991,21 +6030,21 @@ function RozgrywkiContent() {
       {/* MODAL: KONFIGURACJA I USUWANIE FAZY */}
       {showConfigPhaseModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="bg-slate-100 border border-slate-200 rounded-2xl max-w-lg w-full p-5 shadow-sm space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
+                <div className="w-9 h-9 rounded-xl bg-sky-500/10 border border-sky-200 flex items-center justify-center text-sky-400">
                   <Settings className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-white">Konfiguracja Fazy Ligowej</h3>
-                  <p className="text-xs text-slate-400">Edytuj nazwę, reguły awansu lub usuń fazę</p>
+                  <h3 className="text-base font-black text-slate-900">Konfiguracja Fazy Ligowej</h3>
+                  <p className="text-xs text-slate-500">Edytuj nazwę, reguły awansu lub usuń fazę</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setShowConfigPhaseModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center"
+                className="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -6013,55 +6052,55 @@ function RozgrywkiContent() {
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="block text-slate-400 font-bold mb-1">Pełna nazwa fazy:</label>
+                <label className="block text-slate-500 font-bold mb-1">Pełna nazwa fazy:</label>
                 <input
                   type="text"
                   value={configPhaseName}
                   onChange={e => setConfigPhaseName(e.target.value)}
-                  className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                  className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-400 font-bold mb-1">Krótka nazwa:</label>
+                <label className="block text-slate-500 font-bold mb-1">Krótka nazwa:</label>
                 <input
                   type="text"
                   value={configPhaseShortName}
                   onChange={e => setConfigPhaseShortName(e.target.value)}
-                  className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                  className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">Miejsca awansujące (0 = finał):</label>
+                  <label className="block text-slate-500 font-bold mb-1">Miejsca awansujące (0 = finał):</label>
                   <input
                     type="number"
                     min="0"
                     value={configPhaseAdvSpots}
                     onChange={e => setConfigPhaseAdvSpots(parseInt(e.target.value) || 0)}
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-mono font-bold focus:border-sky-500 outline-none"
+                    className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-mono font-bold focus:border-sky-500 outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">Cel awansu / Etap:</label>
+                  <label className="block text-slate-500 font-bold mb-1">Cel awansu / Etap:</label>
                   <input
                     type="text"
                     value={configPhaseAdvTarget}
                     onChange={e => setConfigPhaseAdvTarget(e.target.value)}
                     placeholder="np. Grupa Finałowa"
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                    className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
+            <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
               {leaguePhases.length > 1 ? (
                 <button
                   type="button"
                   onClick={() => handleDeletePhase(configPhaseId)}
-                  className="px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-500/30 text-xs font-bold flex items-center gap-1.5 transition"
+                  className="px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-200 text-xs font-bold flex items-center gap-1.5 transition"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>Usuń tę fazę</span>
@@ -6072,7 +6111,7 @@ function RozgrywkiContent() {
                 <button
                   type="button"
                   onClick={() => setShowConfigPhaseModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300"
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-600"
                 >
                   Anuluj
                 </button>
@@ -6094,21 +6133,21 @@ function RozgrywkiContent() {
       {/* MODAL EDYCJI TABELI LIGOWEJ */}
       {showEditTableModal && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-slate-100 border border-slate-300 rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-sm overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             {/* Nagłówek */}
-            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-slate-900 via-sky-950/30 to-slate-900">
+            <div className="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-slate-900 via-sky-950/30 to-slate-900">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-200 flex items-center justify-center text-sky-400 shrink-0">
                   <Trophy className="w-5 h-5 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
                     Edycja Tabeli Ligowej
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-200">
                       {leaguePhases.find(p => p.id === editingTablePhaseId)?.name || 'Faza I'}
                     </span>
                   </h3>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500">
                     {(() => {
                       const p = leaguePhases.find(ph => ph.id === editingTablePhaseId);
                       const spots = p?.advancementSpots ?? 0;
@@ -6120,16 +6159,16 @@ function RozgrywkiContent() {
               <button
                 type="button"
                 onClick={() => setShowEditTableModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition"
+                className="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Faza wybór */}
-            <div className="p-3 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between gap-3">
+            <div className="p-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-400">Edytowana faza:</span>
+                <span className="text-xs font-bold text-slate-500">Edytowana faza:</span>
                 <div className="flex gap-1.5">
                   {leaguePhases.map(ph => (
                     <button
@@ -6142,7 +6181,7 @@ function RozgrywkiContent() {
                       className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
                         editingTablePhaseId === ph.id
                           ? 'bg-sky-500 text-slate-950 font-black'
-                          : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                          : 'bg-slate-100 text-slate-500 hover:text-slate-900 border border-slate-200'
                       }`}
                     >
                       {ph.shortName}
@@ -6154,7 +6193,7 @@ function RozgrywkiContent() {
               <button
                 type="button"
                 onClick={handleAddTableRow}
-                className="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 hover:text-emerald-200 text-xs font-bold flex items-center gap-1 transition"
+                className="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-200 text-emerald-300 hover:text-emerald-200 text-xs font-bold flex items-center gap-1 transition"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Dodaj zespół</span>
@@ -6163,23 +6202,23 @@ function RozgrywkiContent() {
 
             <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
               {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
-              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                   <div className="flex items-center gap-2">
                     <Upload className="w-4 h-4 text-sky-400" />
-                    <span className="font-bold text-white uppercase tracking-wider text-xs">
+                    <span className="font-bold text-slate-900 uppercase tracking-wider text-xs">
                       Szybki Import Tabeli LALS
                     </span>
                   </div>
                   {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
-                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
+                  <div className="flex items-center bg-slate-100 border border-slate-200 rounded-lg p-0.5">
                     <button
                       type="button"
                       onClick={() => setTableImportTab('text')}
                       className={`px-3 py-1 rounded-md text-xs font-bold transition ${
                         tableImportTab === 'text'
                           ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
+                          : 'text-slate-500 hover:text-slate-900'
                       }`}
                     >
                       📋 Wklej Tekst
@@ -6190,7 +6229,7 @@ function RozgrywkiContent() {
                       className={`px-3 py-1 rounded-md text-xs font-bold transition ${
                         tableImportTab === 'image'
                           ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
+                          : 'text-slate-500 hover:text-slate-900'
                       }`}
                     >
                       📸 Zdjęcie / Screenshot (OCR)
@@ -6200,7 +6239,7 @@ function RozgrywkiContent() {
 
                 {tableImportTab === 'text' ? (
                   <div className="space-y-2 pt-1">
-                    <p className="text-[11px] text-slate-400">
+                    <p className="text-[11px] text-slate-500">
                       Wklej tabelę skopiowaną ze strony LALS / VolleyStation (zaznacz całą tabelę na stronie lub wklej z Excela):
                     </p>
                     <textarea
@@ -6222,7 +6261,7 @@ Punkty
 258
 218...
 (lub wierszami: 1 Gladiatorzy 8 3 3 0 9 2...)`}
-                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
+                      className="w-full rounded-xl bg-slate-100 border border-slate-300 p-2.5 text-xs font-mono text-slate-700 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
                     />
                     <div className="flex justify-end">
                       <button
@@ -6237,11 +6276,11 @@ Punkty
                   </div>
                 ) : (
                   <div className="space-y-3 pt-1">
-                    <p className="text-[11px] text-slate-400">
+                    <p className="text-[11px] text-slate-500">
                       Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
                     </p>
                     <div className="flex flex-col sm:flex-row items-center gap-3">
-                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
+                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-100 border border-slate-300 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
                         <Camera className="w-4 h-4" />
                         <span>Wybierz zdjęcie / screen tabeli</span>
                         <input
@@ -6262,7 +6301,7 @@ Punkty
                     </div>
 
                     {tableOcrLoading && (
-                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
+                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-200 space-y-1.5">
                         <div className="flex items-center justify-between text-xs text-sky-300">
                           <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
                           <span className="font-mono font-bold">{tableOcrProgress}%</span>
@@ -6278,14 +6317,14 @@ Punkty
 
                     {rawTableInput && (
                       <div className="space-y-1.5 pt-2">
-                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
+                        <div className="flex items-center justify-between text-[11px] text-slate-500 font-bold">
                           <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
                         </div>
                         <textarea
                           rows={3}
                           value={rawTableInput}
                           onChange={e => setRawTableInput(e.target.value)}
-                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
+                          className="w-full rounded-xl bg-slate-100 border border-slate-300 p-2 text-xs font-mono text-slate-700 focus:outline-none focus:border-sky-500"
                         />
                         <div className="flex justify-end">
                           <button
@@ -6304,7 +6343,7 @@ Punkty
 
               {/* Edycja wierszy tabeli */}
               <div className="space-y-2">
-                <div className="text-[11px] uppercase tracking-wider font-bold text-slate-400 flex items-center justify-between px-1">
+                <div className="text-[11px] uppercase tracking-wider font-bold text-slate-500 flex items-center justify-between px-1">
                   <span>Wiersze tabeli ({tableRows.length} zespołów):</span>
                   {editingTablePhaseId === 'faza_1' && (
                     <span className="text-emerald-400 font-bold lowercase tracking-normal">
@@ -6324,8 +6363,8 @@ Punkty
                         <div
                           className={`p-3 rounded-xl border transition flex flex-col md:flex-row md:items-center justify-between gap-3 ${
                             isAdvancing
-                              ? 'bg-slate-950/80 border-emerald-500/40 ring-1 ring-emerald-500/20'
-                              : 'bg-slate-950/60 border-slate-800'
+                              ? 'bg-slate-50 border-emerald-200 ring-1 ring-emerald-500/20'
+                              : 'bg-slate-50 border-slate-200'
                           }`}
                         >
                           <div className="flex items-center gap-2">
@@ -6335,7 +6374,7 @@ Punkty
                                 type="button"
                                 disabled={idx === 0}
                                 onClick={() => handleMoveTableRow(idx, 'up')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
+                                className="w-5 h-5 rounded bg-slate-100 hover:bg-slate-100 disabled:opacity-30 text-slate-500 hover:text-slate-900 flex items-center justify-center text-[10px]"
                                 title="Przesuń wyżej"
                               >
                                 ▲
@@ -6344,7 +6383,7 @@ Punkty
                                 type="button"
                                 disabled={idx === tableRows.length - 1}
                                 onClick={() => handleMoveTableRow(idx, 'down')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
+                                className="w-5 h-5 rounded bg-slate-100 hover:bg-slate-100 disabled:opacity-30 text-slate-500 hover:text-slate-900 flex items-center justify-center text-[10px]"
                                 title="Przesuń niżej"
                               >
                                 ▼
@@ -6352,7 +6391,7 @@ Punkty
                             </div>
 
                             {/* Position */}
-                            <span className={`w-7 text-center font-mono font-black text-sm ${isAdvancing ? 'text-emerald-400' : 'text-slate-400'}`}>
+                            <span className={`w-7 text-center font-mono font-black text-sm ${isAdvancing ? 'text-emerald-400' : 'text-slate-500'}`}>
                               {idx + 1}.
                             </span>
 
@@ -6361,12 +6400,12 @@ Punkty
                               type="text"
                               value={row.teamName}
                               onChange={e => handleUpdateTableRow(idx, 'teamName', e.target.value)}
-                              className="w-48 sm:w-56 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-sky-500"
+                              className="w-48 sm:w-56 bg-slate-100 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-sky-500"
                               placeholder="Nazwa zespołu"
                             />
 
                             {isAdvancing && (
-                              <span className="hidden sm:inline-block text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                              <span className="hidden sm:inline-block text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-200">
                                 AWANS
                               </span>
                             )}
@@ -6375,13 +6414,13 @@ Punkty
                           {/* Stats Inputs */}
                           <div className="flex items-center gap-2 flex-wrap">
                             <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">M:</span>
+                              <span className="text-[10px] text-slate-500 font-mono">M:</span>
                               <input
                                 type="number"
                                 min="0"
                                 value={row.matchesPlayed}
                                 onChange={e => handleUpdateTableRow(idx, 'matchesPlayed', parseInt(e.target.value) || 0)}
-                                className="w-12 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
+                                className="w-12 bg-slate-100 border border-slate-300 rounded-lg p-1 text-center text-xs font-mono text-slate-900"
                                 title="Mecze rozegrane"
                               />
                             </div>
@@ -6393,19 +6432,19 @@ Punkty
                                 min="0"
                                 value={row.points}
                                 onChange={e => handleUpdateTableRow(idx, 'points', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-amber-500/40 rounded-lg p-1 text-center text-xs font-mono font-black text-amber-300"
+                                className="w-14 bg-slate-100 border border-amber-500/40 rounded-lg p-1 text-center text-xs font-mono font-black text-amber-300"
                                 title="Punkty ligowe"
                               />
                             </div>
 
                             <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Sety:</span>
+                              <span className="text-[10px] text-slate-500 font-mono">Sety:</span>
                               <input
                                 type="number"
                                 min="0"
                                 value={row.setsWon}
                                 onChange={e => handleUpdateTableRow(idx, 'setsWon', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
+                                className="w-10 bg-slate-100 border border-slate-300 rounded-lg p-1 text-center text-xs font-mono text-slate-900"
                                 title="Sety wygrane"
                               />
                               <span className="text-slate-500">:</span>
@@ -6414,19 +6453,19 @@ Punkty
                                 min="0"
                                 value={row.setsLost}
                                 onChange={e => handleUpdateTableRow(idx, 'setsLost', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
+                                className="w-10 bg-slate-100 border border-slate-300 rounded-lg p-1 text-center text-xs font-mono text-slate-900"
                                 title="Sety przegrane"
                               />
                             </div>
 
                             <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Małe pkt:</span>
+                              <span className="text-[10px] text-slate-500 font-mono">Małe pkt:</span>
                               <input
                                 type="number"
                                 min="0"
                                 value={row.pointsWon}
                                 onChange={e => handleUpdateTableRow(idx, 'pointsWon', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
+                                className="w-14 bg-slate-100 border border-slate-300 rounded-lg p-1 text-center text-xs font-mono text-slate-900"
                                 title="Małe punkty zdobyte"
                               />
                               <span className="text-slate-500">:</span>
@@ -6435,7 +6474,7 @@ Punkty
                                 min="0"
                                 value={row.pointsLost}
                                 onChange={e => handleUpdateTableRow(idx, 'pointsLost', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
+                                className="w-14 bg-slate-100 border border-slate-300 rounded-lg p-1 text-center text-xs font-mono text-slate-900"
                                 title="Małe punkty stracone"
                               />
                             </div>
@@ -6453,7 +6492,7 @@ Punkty
 
                         {/* Cutoff visual separator after 3rd place in Faza 1 */}
                         {isCutoff && (
-                          <div className="my-2.5 px-3 py-1.5 rounded-xl bg-emerald-950/30 border border-emerald-500/40 flex items-center justify-between text-xs font-bold text-emerald-300 shadow">
+                          <div className="my-2.5 px-3 py-1.5 rounded-xl bg-emerald-950/30 border border-emerald-200 flex items-center justify-between text-xs font-bold text-emerald-300 shadow">
                             <span className="flex items-center gap-1.5">
                               <span>══════</span>
                               <span>🟢 GRANICA AWANSU DO GRUPY FINAŁOWEJ (TOP 3)</span>
@@ -6471,15 +6510,15 @@ Punkty
             </div>
 
             {/* Stopka */}
-            <div className="p-4 sm:p-5 border-t border-slate-800 bg-slate-950 flex items-center justify-between gap-3">
-              <span className="text-xs text-slate-400">
-                Liczba zespołów w grupie: <strong className="text-white">{tableRows.length}</strong>
+            <div className="p-4 sm:p-5 border-t border-slate-200 bg-slate-50 flex items-center justify-between gap-3">
+              <span className="text-xs text-slate-500">
+                Liczba zespołów w grupie: <strong className="text-slate-900">{tableRows.length}</strong>
               </span>
               <div className="flex items-center gap-2.5">
                 <button
                   type="button"
                   onClick={() => setShowEditTableModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition"
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-600 transition"
                   disabled={savingTable}
                 >
                   Anuluj
@@ -6513,7 +6552,7 @@ Punkty
 
 export default function RozgrywkiPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-slate-400">Ładowanie Rozgrywek...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-slate-500">Ładowanie Rozgrywek...</div>}>
       <RozgrywkiContent />
     </Suspense>
   );

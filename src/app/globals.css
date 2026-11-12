@@ -4,49 +4,40 @@
 
 :root {
   --foreground-rgb: 15, 23, 42;
-  --background-start-rgb: 246, 248, 251;
+  --background-start-rgb: 248, 250, 252;
   --background-end-rgb: 241, 245, 249;
 }
 
 html,
 body {
   color: #0f172a;
-  background-color: #f6f8fb;
+  background-color: #f8fafc;
   min-height: 100vh;
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
   max-width: 100%;
   position: relative;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ==========================================================================
-   1. PRIMARY BRIGHT / LIGHT SPORTS THEME (Domyślna jasna kolorystyka)
+   1. MODERN PRO SPORTS DESIGN SYSTEM - LIGHT AS DEFAULT
    ========================================================================== */
-html.theme-light,
-body.theme-light,
-.theme-light body,
-html.light,
-body.light,
-html:not(.dark),
-body:not(.dark) {
-  color: #0f172a;
-  background-color: #f6f8fb;
-}
 
-/* Light Court Background */
+/* Subtle energetic sports canvas background */
 .cyber-court-bg {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  background-color: #f6f8fb;
+  background-color: #f8fafc;
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.09) 0%, transparent 60%),
+    radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.08) 0%, transparent 50%),
     radial-gradient(circle at 100% 100%, rgba(14, 165, 233, 0.05) 0%, transparent 40%),
-    linear-gradient(rgba(148, 163, 184, 0.16) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.16) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+    linear-gradient(rgba(226, 232, 240, 0.6) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(226, 232, 240, 0.6) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
   background-position: 0 0, 0 0, -1px -1px, -1px -1px;
 }
 
@@ -54,18 +45,21 @@ body:not(.dark) {
   display: none !important;
 }
 
-/* Clean High-Contrast Sports Cards */
-.cyber-card {
+/* Premium Pro Sports Cards */
+.cyber-card,
+.angel-card {
   background: #ffffff !important;
   color: #0f172a !important;
   border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03) !important;
-  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03) !important;
+  border-radius: 1.25rem !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-.cyber-card:hover {
+.cyber-card:hover,
+.angel-card:hover {
   border-color: #38bdf8 !important;
-  box-shadow: 0 8px 25px -4px rgba(2, 132, 199, 0.15), 0 0 12px -3px rgba(56, 189, 248, 0.2) !important;
+  box-shadow: 0 12px 30px -4px rgba(2, 132, 199, 0.12), 0 2px 6px rgba(15, 23, 42, 0.04) !important;
   transform: translateY(-2px);
 }
 
@@ -73,26 +67,28 @@ body:not(.dark) {
   background: #fffdf5 !important;
   color: #0f172a !important;
   border: 1px solid #fde68a !important;
-  box-shadow: 0 4px 16px -2px rgba(245, 158, 11, 0.08) !important;
-  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 18px -2px rgba(245, 158, 11, 0.08) !important;
+  border-radius: 1.25rem !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .cyber-card-gold:hover {
   border-color: #f59e0b !important;
-  box-shadow: 0 8px 24px -4px rgba(245, 158, 11, 0.18) !important;
+  box-shadow: 0 12px 28px -4px rgba(245, 158, 11, 0.16) !important;
   transform: translateY(-2px);
 }
 
 .glass-panel {
   background: #ffffff !important;
   border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04) !important;
 }
 
-/* Header, Footer & Navigation in Light Mode */
+/* Header, Footer & Navigation */
 header {
   background-color: rgba(255, 255, 255, 0.95) !important;
   border-bottom: 1px solid #e2e8f0 !important;
-  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04) !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03) !important;
   color: #0f172a !important;
 }
 
@@ -105,374 +101,97 @@ footer {
 nav.fixed.bottom-0 {
   background-color: rgba(255, 255, 255, 0.96) !important;
   border-top: 1px solid #e2e8f0 !important;
-  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.06) !important;
+  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.05) !important;
 }
 
-/* Typography Overrides for Light Theme */
-.theme-light h1, .theme-light h2, .theme-light h3, .theme-light h4,
-.light h1, .light h2, .light h3, .light h4,
-html:not(.dark) h1, html:not(.dark) h2, html:not(.dark) h3, html:not(.dark) h4 {
-  color: #0f172a !important;
-}
-
-.theme-light .text-white,
-.light .text-white,
-html:not(.dark) .text-white {
+/* Headings & Text hierarchy */
+h1, h2, h3, h4, h5, h6 {
   color: #0f172a;
 }
 
-.theme-light .text-slate-100,
-.theme-light .text-slate-200,
-.theme-light .text-slate-300,
-.light .text-slate-100,
-.light .text-slate-200,
-.light .text-slate-300,
-html:not(.dark) .text-slate-100,
-html:not(.dark) .text-slate-200,
-html:not(.dark) .text-slate-300 {
-  color: #334155 !important;
+/* Gradients */
+.text-gradient-cyan {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.theme-light .text-slate-400,
-.theme-light .text-slate-500,
-.light .text-slate-400,
-.light .text-slate-500,
-html:not(.dark) .text-slate-400,
-html:not(.dark) .text-slate-500 {
-  color: #64748b !important;
+.text-gradient-gold {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* Background Utility Overrides in Light Mode */
-.theme-light .bg-slate-900,
-.theme-light .bg-slate-950,
-.theme-light .bg-\[\#05070b\],
-.theme-light .bg-\[\#07090c\],
-.theme-light .bg-\[\#0b0e14\],
-.theme-light .bg-\[\#0d121c\],
-.theme-light .bg-\[\#07090e\],
-.theme-light .bg-\[\#0c1016\],
-.theme-light .bg-\[\#050811\],
-.theme-light .bg-\[\#0e121b\],
-.theme-light .bg-\[\#141a26\],
-.light .bg-slate-900,
-.light .bg-slate-950,
-.light .bg-\[\#05070b\],
-.light .bg-\[\#07090c\],
-.light .bg-\[\#0b0e14\],
-.light .bg-\[\#0d121c\],
-.light .bg-\[\#07090e\],
-.light .bg-\[\#0c1016\],
-.light .bg-\[\#050811\],
-.light .bg-\[\#0e121b\],
-.light .bg-\[\#141a26\],
-html:not(.dark) .bg-slate-900,
-html:not(.dark) .bg-slate-950,
-html:not(.dark) .bg-\[\#05070b\],
-html:not(.dark) .bg-\[\#07090c\],
-html:not(.dark) .bg-\[\#0b0e14\],
-html:not(.dark) .bg-\[\#0d121c\],
-html:not(.dark) .bg-\[\#07090e\],
-html:not(.dark) .bg-\[\#0c1016\],
-html:not(.dark) .bg-\[\#050811\],
-html:not(.dark) .bg-\[\#0e121b\],
-html:not(.dark) .bg-\[\#141a26\] {
-  background-color: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  color: #0f172a !important;
+.text-gradient-fire {
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.theme-light .bg-slate-800,
-.theme-light .bg-slate-800\/80,
-.theme-light .bg-slate-800\/60,
-.theme-light .bg-slate-900\/80,
-.theme-light .bg-slate-900\/90,
-.theme-light .bg-slate-900\/70,
-.theme-light .bg-slate-900\/60,
-.theme-light .bg-slate-900\/50,
-.theme-light .bg-slate-950\/80,
-.theme-light .bg-slate-950\/70,
-.theme-light .bg-slate-950\/60,
-.light .bg-slate-800,
-.light .bg-slate-800\/80,
-.light .bg-slate-800\/60,
-.light .bg-slate-900\/80,
-.light .bg-slate-900\/90,
-.light .bg-slate-900\/70,
-.light .bg-slate-900\/60,
-.light .bg-slate-900\/50,
-.light .bg-slate-950\/80,
-.light .bg-slate-950\/70,
-.light .bg-slate-950\/60,
-html:not(.dark) .bg-slate-800,
-html:not(.dark) .bg-slate-800\/80,
-html:not(.dark) .bg-slate-800\/60,
-html:not(.dark) .bg-slate-900\/80,
-html:not(.dark) .bg-slate-900\/90,
-html:not(.dark) .bg-slate-900\/70,
-html:not(.dark) .bg-slate-900\/60,
-html:not(.dark) .bg-slate-900\/50,
-html:not(.dark) .bg-slate-950\/80,
-html:not(.dark) .bg-slate-950\/70,
-html:not(.dark) .bg-slate-950\/60 {
-  background-color: #f1f5f9 !important;
-  border-color: #cbd5e1 !important;
-  color: #0f172a !important;
+/* Athletic Pills */
+.neon-pill-cyan {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #7dd3fc;
 }
 
-.theme-light .bg-black\/40,
-.theme-light .bg-black\/50,
-.theme-light .bg-black\/60,
-.theme-light .bg-black\/70,
-.light .bg-black\/40,
-.light .bg-black\/50,
-.light .bg-black\/60,
-.light .bg-black\/70,
-html:not(.dark) .bg-black\/40,
-html:not(.dark) .bg-black\/50,
-html:not(.dark) .bg-black\/60,
-html:not(.dark) .bg-black\/70 {
-  background-color: #f8fafc !important;
-  border-color: #e2e8f0 !important;
+.neon-pill-gold {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
 }
 
-/* Modals Backdrop in Light Mode */
-.theme-light .fixed.inset-0.bg-black\/80,
-.theme-light .fixed.inset-0.bg-black\/85,
-.light .fixed.inset-0.bg-black\/80,
-.light .fixed.inset-0.bg-black\/85,
-html:not(.dark) .fixed.inset-0.bg-black\/80,
-html:not(.dark) .fixed.inset-0.bg-black\/85 {
-  background-color: rgba(15, 23, 42, 0.45) !important;
+.neon-pill-emerald {
+  background: #d1fae5;
+  color: #047857;
+  border: 1px solid #6ee7b7;
 }
 
-/* Borders in Light Mode */
-.theme-light .border-slate-800,
-.theme-light .border-slate-700,
-.theme-light .border-slate-800\/80,
-.theme-light .border-slate-800\/60,
-.theme-light .border-slate-800\/90,
-.theme-light .divide-slate-800,
-.theme-light .divide-slate-800\/60,
-.light .border-slate-800,
-.light .border-slate-700,
-.light .border-slate-800\/80,
-.light .border-slate-800\/60,
-.light .border-slate-800\/90,
-.light .divide-slate-800,
-.light .divide-slate-800\/60,
-html:not(.dark) .border-slate-800,
-html:not(.dark) .border-slate-700,
-html:not(.dark) .border-slate-800\/80,
-html:not(.dark) .border-slate-800\/60,
-html:not(.dark) .border-slate-800\/90,
-html:not(.dark) .divide-slate-800,
-html:not(.dark) .divide-slate-800\/60 {
-  border-color: #e2e8f0 !important;
+/* Table Light Styling */
+table thead {
+  background-color: #f8fafc;
+  color: #475569;
 }
 
-/* Form Controls in Light Mode */
-.theme-light input:not([type="checkbox"]):not([type="radio"]),
-.theme-light textarea,
-.theme-light select,
-.light input:not([type="checkbox"]):not([type="radio"]),
-.light textarea,
-.light select,
-html:not(.dark) input:not([type="checkbox"]):not([type="radio"]),
-html:not(.dark) textarea,
-html:not(.dark) select {
-  background-color: #ffffff !important;
-  border-color: #cbd5e1 !important;
-  color: #0f172a !important;
+table tbody tr {
+  transition: background-color 0.15s ease;
 }
 
-.theme-light input::placeholder,
-.theme-light textarea::placeholder,
-.light input::placeholder,
-.light textarea::placeholder,
-html:not(.dark) input::placeholder,
-html:not(.dark) textarea::placeholder {
-  color: #94a3b8 !important;
+table tbody tr:hover {
+  background-color: #f1f5f9;
 }
 
-/* Table Headers in Light Mode */
-.theme-light table thead,
-.light table thead,
-html:not(.dark) table thead {
-  background-color: #f1f5f9 !important;
-  color: #475569 !important;
+/* Form Controls */
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  color: #0f172a;
 }
 
-.theme-light table tbody tr:hover,
-.light table tbody tr:hover,
-html:not(.dark) table tbody tr:hover {
-  background-color: #f0f9ff !important;
+input::placeholder,
+textarea::placeholder {
+  color: #94a3b8;
 }
 
-/* Text Gradients in Light Mode */
-.theme-light .text-gradient-cyan,
-.light .text-gradient-cyan,
-html:not(.dark) .text-gradient-cyan {
-  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
 }
 
-.theme-light .text-gradient-gold,
-.light .text-gradient-gold,
-html:not(.dark) .text-gradient-gold {
-  background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-}
-
-.theme-light .text-gradient-fire,
-.light .text-gradient-fire,
-html:not(.dark) .text-gradient-fire {
-  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-}
-
-/* Neon Athletic Pills in Light Mode */
-.theme-light .neon-pill-cyan,
-.light .neon-pill-cyan,
-html:not(.dark) .neon-pill-cyan {
-  background: #e0f2fe !important;
-  color: #0369a1 !important;
-  border-color: #7dd3fc !important;
-}
-
-.theme-light .neon-pill-gold,
-.light .neon-pill-gold,
-html:not(.dark) .neon-pill-gold {
-  background: #fef3c7 !important;
-  color: #b45309 !important;
-  border-color: #fde68a !important;
-}
-
-.theme-light .neon-pill-emerald,
-.light .neon-pill-emerald,
-html:not(.dark) .neon-pill-emerald {
-  background: #d1fae5 !important;
-  color: #047857 !important;
-  border-color: #6ee7b7 !important;
-}
-
-/* Preserving high contrast for primary gradient buttons */
-.theme-light .bg-sky-500,
-.theme-light .bg-sky-600,
-.theme-light .bg-emerald-500,
-.theme-light .bg-emerald-600,
-.theme-light .bg-rose-500,
-.theme-light .bg-purple-500,
-.light .bg-sky-500,
-.light .bg-sky-600,
-.light .bg-emerald-500,
-.light .bg-emerald-600,
-.light .bg-rose-500,
-.light .bg-purple-500,
-html:not(.dark) .bg-sky-500,
-html:not(.dark) .bg-sky-600,
-html:not(.dark) .bg-emerald-500,
-html:not(.dark) .bg-emerald-600,
-html:not(.dark) .bg-rose-500,
-html:not(.dark) .bg-purple-500 {
-  color: #ffffff !important;
-}
-
-.theme-light .bg-sky-500 *,
-.theme-light .bg-emerald-500 *,
-.theme-light .bg-rose-500 *,
-.theme-light .bg-purple-500 *,
-.light .bg-sky-500 *,
-.light .bg-emerald-500 *,
-.light .bg-rose-500 *,
-.light .bg-purple-500 *,
-html:not(.dark) .bg-sky-500 *,
-html:not(.dark) .bg-emerald-500 *,
-html:not(.dark) .bg-rose-500 *,
-html:not(.dark) .bg-purple-500 * {
-  color: inherit;
-}
-
-/* Scrollbar in Light Theme */
-.theme-light ::-webkit-scrollbar-track,
-.light ::-webkit-scrollbar-track,
-html:not(.dark) ::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   background: #f1f5f9;
 }
-.theme-light ::-webkit-scrollbar-thumb,
-.light ::-webkit-scrollbar-thumb,
-html:not(.dark) ::-webkit-scrollbar-thumb {
+
+::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 4px;
+  border-radius: 9999px;
 }
-.theme-light ::-webkit-scrollbar-thumb:hover,
-.light ::-webkit-scrollbar-thumb:hover,
-html:not(.dark) ::-webkit-scrollbar-thumb:hover {
+
+::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
-}
-
-/* ==========================================================================
-   2. DARK THEME (Dla opcjonalnego przełączenia na ciemny motyw)
-   ========================================================================== */
-html.dark,
-body.dark {
-  color: #f1f5f9;
-  background-color: #0e121b;
-}
-
-.dark .cyber-court-bg {
-  background-color: #0e121b;
-  background-image: 
-    radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.16) 0%, transparent 60%),
-    radial-gradient(circle at 100% 100%, rgba(14, 165, 233, 0.1) 0%, transparent 40%),
-    linear-gradient(rgba(56, 189, 248, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
-}
-
-.dark .court-lines-overlay {
-  display: block;
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background: radial-gradient(circle at 50% 30%, rgba(56, 189, 248, 0.05) 0%, transparent 60%);
-  opacity: 0.9;
-}
-
-.dark .cyber-card {
-  background: #141a26 !important;
-  color: #f1f5f9 !important;
-  border: 1px solid rgba(56, 189, 248, 0.22) !important;
-  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.5) !important;
-}
-
-.dark .cyber-card-gold {
-  background: #1c1812 !important;
-  color: #f1f5f9 !important;
-  border: 1px solid rgba(245, 158, 11, 0.35) !important;
-}
-
-.dark .glass-panel {
-  background: #161e2e !important;
-  border: 1px solid rgba(148, 163, 184, 0.2) !important;
-}
-
-.dark header {
-  background-color: rgba(5, 7, 11, 0.9) !important;
-  border-bottom: 1px solid rgba(56, 189, 248, 0.2) !important;
-}
-
-.dark footer {
-  background-color: #030509 !important;
-  border-top: 1px solid rgba(56, 189, 248, 0.2) !important;
-}
-
-.dark nav.fixed.bottom-0 {
-  background-color: rgba(5, 8, 17, 0.92) !important;
-  border-top: 1px solid rgba(56, 189, 248, 0.2) !important;
 }
 
 /* Common Athletic Utilities */
@@ -482,15 +201,15 @@ body.dark {
 }
 
 .glow-cyan {
-  box-shadow: 0 4px 16px -2px rgba(2, 132, 199, 0.35);
+  box-shadow: 0 4px 16px -2px rgba(2, 132, 199, 0.25);
 }
 
 .glow-gold {
-  box-shadow: 0 4px 16px -2px rgba(245, 158, 11, 0.35);
+  box-shadow: 0 4px 16px -2px rgba(245, 158, 11, 0.25);
 }
 
 .glow-emerald {
-  box-shadow: 0 4px 16px -2px rgba(16, 185, 129, 0.35);
+  box-shadow: 0 4px 16px -2px rgba(16, 185, 129, 0.25);
 }
 
 * {
@@ -516,4 +235,43 @@ body.dark {
 
 .animate-fadeIn {
   animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Dark mode overrides (for when user explicitly enables dark theme) */
+html.dark,
+body.dark {
+  color: #f1f5f9;
+  background-color: #0b0f19;
+}
+
+.dark .cyber-court-bg {
+  background-color: #0b0f19;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.15) 0%, transparent 60%),
+    radial-gradient(circle at 100% 100%, rgba(14, 165, 233, 0.08) 0%, transparent 40%),
+    linear-gradient(rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+}
+
+.dark .cyber-card {
+  background: #111827 !important;
+  color: #f1f5f9 !important;
+  border-color: #1f2937 !important;
+}
+
+.dark header {
+  background-color: rgba(17, 24, 39, 0.95) !important;
+  border-bottom-color: #1f2937 !important;
+  color: #f1f5f9 !important;
+}
+
+.dark footer {
+  background-color: #111827 !important;
+  border-top-color: #1f2937 !important;
+  color: #9ca3af !important;
+}
+
+.dark nav.fixed.bottom-0 {
+  background-color: rgba(17, 24, 39, 0.96) !important;
+  border-top-color: #1f2937 !important;
 }

@@ -92,20 +92,20 @@ export default function PwaInstallPrompt() {
       {!dismissed && (
         <aside 
           aria-label="Instalacja aplikacji Angels ZTP"
-          className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 z-40 bg-[#0c1016]/95 backdrop-blur-xl border border-sky-500/30 rounded-2xl p-3.5 shadow-2xl flex items-center justify-between gap-3 animate-fadeIn"
+          className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 z-40 bg-white/95 backdrop-blur-xl border border-slate-200 rounded-2xl p-3.5 shadow-xl flex items-center justify-between gap-3 animate-fadeIn text-slate-800"
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 p-0.5 overflow-hidden shrink-0 shadow-md">
+            <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 p-0.5 overflow-hidden shrink-0 shadow-sm">
               <img src="/logo.jpg" alt="Angels ZTP" className="w-full h-full object-cover rounded-lg" />
             </div>
             <div>
-              <div className="text-xs font-black text-white uppercase tracking-wider flex items-center gap-1.5">
+              <div className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                 <span>Angels ZTP</span>
-                <span className="px-1.5 py-0.2 rounded text-[9px] bg-sky-500/20 text-sky-400 border border-sky-500/40">
+                <span className="px-1.5 py-0.2 rounded text-[9px] bg-sky-50 text-sky-700 border border-sky-200">
                   App
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-slate-500">
                 Dodaj do ekranu telefonu jak natywną aplikację.
               </p>
             </div>
@@ -114,14 +114,14 @@ export default function PwaInstallPrompt() {
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={handleInstallClick}
-              className="px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black transition flex items-center gap-1 shadow-md shadow-sky-500/20"
+              className="px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-black transition flex items-center gap-1 shadow-sm"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Instaluj</span>
             </button>
             <button
               onClick={handleDismiss}
-              className="p-1.5 text-slate-500 hover:text-white rounded-lg"
+              className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg"
               title="Zamknij powiadomienie"
             >
               <X className="w-4 h-4" />
@@ -136,22 +136,22 @@ export default function PwaInstallPrompt() {
           role="dialog" 
           aria-modal="true" 
           aria-labelledby="pwa-install-title"
-          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4"
         >
-          <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-6 sm:p-7 w-full max-w-md shadow-2xl space-y-5">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-md shadow-2xl space-y-5 text-slate-800">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl overflow-hidden border border-slate-700 shadow-md">
+                <div className="w-9 h-9 rounded-xl overflow-hidden border border-slate-200 shadow-sm">
                   <img src="/logo.jpg" alt="Logo" className="w-full h-full object-cover" />
                 </div>
                 <div>
-                  <h3 id="pwa-install-title" className="text-sm font-black uppercase text-white">Instalacja Angels ZTP</h3>
-                  <span className="text-[10px] text-slate-400">Tryb Progressive Web App (PWA)</span>
+                  <h3 id="pwa-install-title" className="text-sm font-black uppercase text-slate-900">Instalacja Angels ZTP</h3>
+                  <span className="text-[10px] text-slate-500">Tryb Progressive Web App (PWA)</span>
                 </div>
               </div>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-slate-400 hover:text-white font-black text-lg"
+                className="text-slate-400 hover:text-slate-700 font-black text-lg"
               >
                 ✕
               </button>
@@ -160,42 +160,42 @@ export default function PwaInstallPrompt() {
             {/* iOS Instructions */}
             {isIOS ? (
               <div className="space-y-4 text-xs">
-                <p className="text-slate-300">
+                <p className="text-slate-600">
                   Na systemie iOS (iPhone / iPad) w przeglądarce <strong>Safari</strong> dodasz aplikację w 3 prostych krokach:
                 </p>
 
-                <div className="space-y-3 bg-[#07090d] p-4 rounded-2xl border border-slate-800">
+                <div className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                   <div className="flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-sky-500/20 text-sky-400 font-bold flex items-center justify-center shrink-0">
+                    <span className="w-6 h-6 rounded-full bg-sky-100 text-sky-700 font-bold flex items-center justify-center shrink-0">
                       1
                     </span>
                     <div>
-                      <p className="font-bold text-white">Kliknij przycisk Udostępnij</p>
-                      <p className="text-slate-400 text-[11px] mt-0.5 flex items-center gap-1">
-                        Ikona <Share className="w-3.5 h-3.5 text-sky-400 inline" /> na dolnym pasku przeglądarki Safari.
+                      <p className="font-bold text-slate-900">Kliknij przycisk Udostępnij</p>
+                      <p className="text-slate-500 text-[11px] mt-0.5 flex items-center gap-1">
+                        Ikona <Share className="w-3.5 h-3.5 text-sky-600 inline" /> na dolnym pasku przeglądarki Safari.
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-sky-500/20 text-sky-400 font-bold flex items-center justify-center shrink-0">
+                    <span className="w-6 h-6 rounded-full bg-sky-100 text-sky-700 font-bold flex items-center justify-center shrink-0">
                       2
                     </span>
                     <div>
-                      <p className="font-bold text-white">Wybierz &quot;Do ekranu początkowego&quot;</p>
-                      <p className="text-slate-400 text-[11px] mt-0.5 flex items-center gap-1">
-                        Przewiń menu w dół i kliknij <PlusSquare className="w-3.5 h-3.5 text-sky-400 inline" /> &quot;Do ekranu początkowego&quot; (Add to Home Screen).
+                      <p className="font-bold text-slate-900">Wybierz &quot;Do ekranu początkowego&quot;</p>
+                      <p className="text-slate-500 text-[11px] mt-0.5 flex items-center gap-1">
+                        Przewiń menu w dół i kliknij <PlusSquare className="w-3.5 h-3.5 text-sky-600 inline" /> &quot;Do ekranu początkowego&quot; (Add to Home Screen).
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-sky-500/20 text-sky-400 font-bold flex items-center justify-center shrink-0">
+                    <span className="w-6 h-6 rounded-full bg-sky-100 text-sky-700 font-bold flex items-center justify-center shrink-0">
                       3
                     </span>
                     <div>
-                      <p className="font-bold text-white">Kliknij &quot;Dodaj&quot; w prawym górnym rogu</p>
-                      <p className="text-slate-400 text-[11px] mt-0.5">
+                      <p className="font-bold text-slate-900">Kliknij &quot;Dodaj&quot; w prawym górnym rogu</p>
+                      <p className="text-slate-500 text-[11px] mt-0.5">
                         Aplikacja pojawi się na pulpicie telefonu z oficjalną ikoną Angels ZTP.
                       </p>
                     </div>
@@ -204,30 +204,30 @@ export default function PwaInstallPrompt() {
               </div>
             ) : isAndroid ? (
               <div className="space-y-4 text-xs">
-                <p className="text-slate-300">
+                <p className="text-slate-600">
                   Na telefonie z systemem Android w przeglądarce <strong>Chrome</strong>:
                 </p>
 
-                <div className="space-y-3 bg-[#07090d] p-4 rounded-2xl border border-slate-800">
+                <div className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                   <div className="flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center shrink-0">
+                    <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center shrink-0">
                       1
                     </span>
                     <div>
-                      <p className="font-bold text-white">Kliknij menu Chrome (3 kropki w prawym górnym rogu)</p>
-                      <p className="text-slate-400 text-[11px] mt-0.5">
+                      <p className="font-bold text-slate-900">Kliknij menu Chrome (3 kropki w prawym górnym rogu)</p>
+                      <p className="text-slate-500 text-[11px] mt-0.5">
                         Otwórz menu przeglądarki ⋮ w prawym górnym rogu.
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center shrink-0">
+                    <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center shrink-0">
                       2
                     </span>
                     <div>
-                      <p className="font-bold text-white">Wybierz &quot;Zainstaluj aplikację&quot; lub &quot;Dodaj do ekranu głównego&quot;</p>
-                      <p className="text-slate-400 text-[11px] mt-0.5">
+                      <p className="font-bold text-slate-900">Wybierz &quot;Zainstaluj aplikację&quot; lub &quot;Dodaj do ekranu głównego&quot;</p>
+                      <p className="text-slate-500 text-[11px] mt-0.5">
                         System automatycznie pobierze ikonę i skonfiguruje tryb pełnoekranowy bez paska adresu.
                       </p>
                     </div>
@@ -237,7 +237,7 @@ export default function PwaInstallPrompt() {
                 {deferredPrompt && (
                   <button
                     onClick={handleInstallClick}
-                    className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
+                    className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition flex items-center justify-center gap-2 shadow-sm"
                   >
                     <Download className="w-4 h-4" />
                     <span>Zainstaluj jednym kliknięciem teraz</span>
@@ -246,10 +246,10 @@ export default function PwaInstallPrompt() {
               </div>
             ) : (
               <div className="space-y-4 text-xs">
-                <p className="text-slate-300">
+                <p className="text-slate-600">
                   Możesz zainstalować aplikację Angels ZTP również na komputerze (Chrome, Edge) lub telefonie:
                 </p>
-                <div className="bg-[#07090d] p-4 rounded-2xl border border-slate-800 space-y-2 text-slate-400">
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2 text-slate-600">
                   <p>
                     • W przeglądarce Chrome/Edge na komputerze kliknij ikonę <strong>Instaluj</strong> w pasku adresu (po prawej stronie obok gwiazdki).
                   </p>
@@ -260,7 +260,7 @@ export default function PwaInstallPrompt() {
                 {deferredPrompt && (
                   <button
                     onClick={handleInstallClick}
-                    className="w-full py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs transition flex items-center justify-center gap-2"
+                    className="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs transition flex items-center justify-center gap-2 shadow-sm"
                   >
                     <Download className="w-4 h-4" />
                     <span>Zainstaluj aplikację</span>
@@ -270,11 +270,11 @@ export default function PwaInstallPrompt() {
             )}
 
             {/* Why PWA Benefits */}
-            <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
-              <span className="flex items-center gap-1 text-emerald-400 font-bold">
+            <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+              <span className="flex items-center gap-1 text-emerald-700 font-bold">
                 <Check className="w-3.5 h-3.5" /> Pełny ekran (bez paska URL)
               </span>
-              <span className="flex items-center gap-1 text-sky-400 font-bold">
+              <span className="flex items-center gap-1 text-sky-700 font-bold">
                 <Check className="w-3.5 h-3.5" /> Szybki start z ikony
               </span>
             </div>
