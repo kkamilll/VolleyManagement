@@ -33,6 +33,8 @@ import {
   ArrowUp,
   ArrowDown,
   Layers,
+  Settings,
+  GitFork,
   Crown,
   ChevronLeft,
   ChevronRight,
@@ -113,6 +115,33 @@ function RozgrywkiContent() {
   const [leagueTable, setLeagueTable] = useState<LeagueTableTeam[]>([]);
   const [leaguePhases, setLeaguePhases] = useState<LeaguePhase[]>([]);
   const [activeLeaguePhaseId, setActiveLeaguePhaseId] = useState<string>('faza_1');
+
+  // Dynamic LALS Phases & Groups Modals
+  const [showCreatePhaseModal, setShowCreatePhaseModal] = useState(false);
+  const [newPhaseName, setNewPhaseName] = useState('');
+  const [newPhaseShortName, setNewPhaseShortName] = useState('');
+  const [newPhaseAdvSpots, setNewPhaseAdvSpots] = useState<number>(3);
+  const [newPhaseAdvTarget, setNewPhaseAdvTarget] = useState('Grupa Finałowa');
+  const [creatingPhase, setCreatingPhase] = useState(false);
+
+  const [showSplitPhaseModal, setShowSplitPhaseModal] = useState(false);
+  const [splitSourcePhaseId, setSplitSourcePhaseId] = useState<string>('faza_1');
+  const [splitPhaseName, setSplitPhaseName] = useState('Grupa Mistrzowska (Miejsca 1-4)');
+  const [splitPhaseShortName, setSplitPhaseShortName] = useState('Mistrzowska');
+  const [splitStartRank, setSplitStartRank] = useState<number>(1);
+  const [splitEndRank, setSplitEndRank] = useState<number>(4);
+  const [splitAdvSpots, setSplitAdvSpots] = useState<number>(1);
+  const [splitAdvTarget, setSplitAdvTarget] = useState('Mistrz Ligi LALS');
+  const [splitCarryOverStats, setSplitCarryOverStats] = useState<boolean>(true);
+  const [splittingPhase, setSplittingPhase] = useState(false);
+
+  const [showConfigPhaseModal, setShowConfigPhaseModal] = useState(false);
+  const [configPhaseId, setConfigPhaseId] = useState<string>('faza_1');
+  const [configPhaseName, setConfigPhaseName] = useState('');
+  const [configPhaseShortName, setConfigPhaseShortName] = useState('');
+  const [configPhaseAdvSpots, setConfigPhaseAdvSpots] = useState<number>(3);
+  const [configPhaseAdvTarget, setConfigPhaseAdvTarget] = useState('');
+  const [updatingPhaseConfig, setUpdatingPhaseConfig] = useState(false);
   const [selectedPhaseFilter, setSelectedPhaseFilter] = useState<string>('ALL');
   const [showEditTableModal, setShowEditTableModal] = useState(false);
   const [editingTablePhaseId, setEditingTablePhaseId] = useState<string>('faza_1');
@@ -1006,6 +1035,188 @@ function RozgrywkiContent() {
       console.error(e);
     } finally {
       setSavingTable(false);
+    }
+  };
+
+  const handleOpenCreatePhase = () => {
+    setNewPhaseName(`Faza ${leaguePhases.length + 1}`);
+    setNewPhaseShortName(`Grupa ${String.fromCharCode(65 + leaguePhases.length)}`);
+    setNewPhaseAdvSpots(1);
+    setNewPhaseAdvTarget('Mistrz Ligi LALS');
+    setShowCreatePhaseModal(true);
+  };
+
+  const handleCreatePhase = async () => {
+    if (!newPhaseName.trim()) {
+      alert('Podaj nazwę nowej fazy');
+      return;
+    }
+    setCreatingPhase(true);
+    try {
+      const res = await fetch('/api/league', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'CREATE_PHASE',
+          name: newPhaseName.trim(),
+          shortName: newPhaseShortName.trim() || newPhaseName.trim(),
+          advancementSpots: Number(newPhaseAdvSpots) || 0,
+          advancementTargetName: newPhaseAdvTarget.trim() || 'Kolejny Etap',
+          table: []
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.phase) {
+        setShowCreatePhaseModal(false);
+        await fetchData();
+        await handleSwitchPhase(data.phase.id);
+        alert(`Nowa faza "${data.phase.name}" została utworzona!`);
+      } else {
+        alert(data.error || 'Błąd tworzenia fazy');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Wystąpił błąd podczas tworzenia fazy');
+    } finally {
+      setCreatingPhase(false);
+    }
+  };
+
+  const handleOpenSplitPhase = (sourcePhaseId?: string) => {
+    const srcId = sourcePhaseId || activeLeaguePhaseId;
+    const src = leaguePhases.find(p => p.id === srcId) || currentLeaguePhase;
+    const count = src?.table?.length || leagueTable.length || 7;
+    setSplitSourcePhaseId(srcId);
+    setSplitStartRank(1);
+    const half = Math.min(4, Math.max(1, Math.ceil(count / 2)));
+    setSplitEndRank(half);
+    setSplitPhaseName(`Grupa Mistrzowska (Miejsca 1-${half})`);
+    setSplitPhaseShortName(`Mistrzowska (1-${half})`);
+    setSplitAdvSpots(1);
+    setSplitAdvTarget('Mistrz Ligi LALS');
+    setSplitCarryOverStats(true);
+    setShowSplitPhaseModal(true);
+  };
+
+  const handleSplitPhase = async () => {
+    if (!splitPhaseName.trim()) {
+      alert('Podaj nazwę nowej grupy');
+      return;
+    }
+    setSplittingPhase(true);
+    try {
+      const res = await fetch('/api/league', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'SPLIT_PHASE',
+          sourcePhaseId: splitSourcePhaseId,
+          newPhaseName: splitPhaseName.trim(),
+          newPhaseShortName: splitPhaseShortName.trim() || splitPhaseName.trim(),
+          startRank: Number(splitStartRank) || 1,
+          endRank: Number(splitEndRank) || 4,
+          advancementSpots: Number(splitAdvSpots) || 0,
+          advancementTargetName: splitAdvTarget.trim() || 'Mistrz Ligi',
+          carryOverStats: splitCarryOverStats
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.phase) {
+        setShowSplitPhaseModal(false);
+        await fetchData();
+        await handleSwitchPhase(data.phase.id);
+        alert(data.message || 'Podział grupy zakończony pomyślnie!');
+      } else {
+        alert(data.error || 'Błąd podziału grupy');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Wystąpił błąd podczas podziału grupy');
+    } finally {
+      setSplittingPhase(false);
+    }
+  };
+
+  const handleOpenConfigPhase = (phaseId?: string) => {
+    const target = leaguePhases.find(p => p.id === (phaseId || activeLeaguePhaseId)) || currentLeaguePhase;
+    if (!target) return;
+    setConfigPhaseId(target.id);
+    setConfigPhaseName(target.name);
+    setConfigPhaseShortName(target.shortName || target.name);
+    setConfigPhaseAdvSpots(target.advancementSpots ?? 0);
+    setConfigPhaseAdvTarget(target.advancementTargetName || '');
+    setShowConfigPhaseModal(true);
+  };
+
+  const handleSavePhaseConfig = async () => {
+    if (!configPhaseName.trim()) {
+      alert('Podaj nazwę fazy');
+      return;
+    }
+    setUpdatingPhaseConfig(true);
+    try {
+      const res = await fetch('/api/league', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'UPDATE_PHASE',
+          phase: {
+            id: configPhaseId,
+            name: configPhaseName.trim(),
+            shortName: configPhaseShortName.trim() || configPhaseName.trim(),
+            advancementSpots: Number(configPhaseAdvSpots) || 0,
+            advancementTargetName: configPhaseAdvTarget.trim()
+          }
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setShowConfigPhaseModal(false);
+        await fetchData();
+        alert('Ustawienia fazy zostały pomyślnie zaktualizowane!');
+      } else {
+        alert(data.error || 'Błąd aktualizacji fazy');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Wystąpił błąd podczas zapisu konfiguracji fazy');
+    } finally {
+      setUpdatingPhaseConfig(false);
+    }
+  };
+
+  const handleDeletePhase = async (phaseId: string) => {
+    if (leaguePhases.length <= 1) {
+      alert('Nie można usunąć jedynej fazy w lidze.');
+      return;
+    }
+    const target = leaguePhases.find(p => p.id === phaseId);
+    if (!confirm(`Czy na pewno chcesz usunąć fazę "${target?.name || phaseId}"? Ta operacja jest nieodwracalna.`)) {
+      return;
+    }
+    try {
+      const res = await fetch('/api/league', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'DELETE_PHASE',
+          phaseId
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setShowConfigPhaseModal(false);
+        await fetchData();
+        if (data.activeLeaguePhaseId) {
+          await handleSwitchPhase(data.activeLeaguePhaseId);
+        }
+        alert('Faza została pomyślnie usunięta.');
+      } else {
+        alert(data.error || 'Błąd usuwania fazy');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Wystąpił błąd podczas usuwania fazy');
     }
   };
 
@@ -2404,18 +2615,18 @@ function RozgrywkiContent() {
                 </div>
               </div>
 
-              {/* Phase Switcher Navigation Ribbon */}
-              <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-inner">
-                <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1 sm:pb-0">
-                  <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider shrink-0 mr-1">
-                    Faza / Grupa:
+              {/* Dynamic Phase Switcher & Group Management Ribbon */}
+              <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800/90 flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-inner">
+                <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1 lg:pb-0 flex-wrap">
+                  <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider shrink-0 mr-1 flex items-center gap-1">
+                    <Layers className="w-3 h-3 text-sky-400" /> Faza / Grupa:
                   </span>
                   {(leaguePhases.length > 0 ? leaguePhases : [
-                    { id: 'faza_1', name: 'Faza I: Grupa Eliminacyjna (Top 3 awans)', shortName: 'Faza I (Eliminacje)', advancementSpots: 3 },
-                    { id: 'faza_2', name: 'Faza II: Grupa Finałowa (7 zespołów)', shortName: 'Faza II (Grupa Finałowa)', advancementSpots: 1 }
+                    { id: 'faza_1', name: 'Faza I: Grupa Eliminacyjna', shortName: 'Faza I (Eliminacje)', advancementSpots: 3, advancementTargetName: 'Grupa Finałowa' },
+                    { id: 'faza_2', name: 'Faza II: Grupa Finałowa', shortName: 'Faza II (Grupa Finałowa)', advancementSpots: 1, advancementTargetName: 'Mistrz LALS' }
                   ]).map((phase: any) => {
                     const isSelected = (phase.id === activeLeaguePhaseId);
-                    const isFaza1 = phase.id === 'faza_1';
+                    const spots = phase.advancementSpots ?? 0;
                     return (
                       <button
                         key={phase.id}
@@ -2423,21 +2634,19 @@ function RozgrywkiContent() {
                         onClick={() => handleSwitchPhase(phase.id)}
                         className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-2 shrink-0 border ${
                           isSelected
-                            ? isFaza1
-                              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-md shadow-emerald-500/10'
-                              : 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-md shadow-amber-500/10'
+                            ? 'bg-sky-500/20 text-sky-300 border-sky-500/50 shadow-md shadow-sky-500/10 ring-1 ring-sky-500/30'
                             : 'bg-slate-950 text-slate-400 hover:text-white border-slate-800'
                         }`}
                       >
-                        {isFaza1 ? (
-                          <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-emerald-400 animate-pulse' : 'bg-emerald-500/50'}`}></span>
+                        <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-sky-400 animate-pulse' : 'bg-slate-600'}`}></span>
+                        <span>{phase.shortName || phase.name}</span>
+                        {spots > 0 ? (
+                          <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-600/40">
+                            Awans: {spots}
+                          </span>
                         ) : (
-                          <Trophy className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-400' : 'text-slate-500'}`} />
-                        )}
-                        <span>{phase.name}</span>
-                        {isFaza1 && (
-                          <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-600/40">
-                            Awans: 3
+                          <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-950/80 text-amber-300 border border-amber-600/40">
+                            Finał
                           </span>
                         )}
                       </button>
@@ -2445,10 +2654,44 @@ function RozgrywkiContent() {
                   })}
                 </div>
 
-                <div className="flex items-center gap-2 text-[11px] text-slate-400 shrink-0">
-                  <span className="font-bold text-slate-300">
-                    Liczba zespołów w grupie: <strong className="text-white font-mono">{leagueTable.length}</strong>
+                <div className="flex items-center gap-2 text-[11px] text-slate-400 shrink-0 flex-wrap">
+                  <span className="font-bold text-slate-300 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">
+                    Drużyn w grupie: <strong className="text-white font-mono">{leagueTable.length}</strong>
                   </span>
+
+                  {canManage && !isArchiveMode && (
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenConfigPhase(activeLeaguePhaseId)}
+                        className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition flex items-center gap-1 border border-slate-700"
+                        title="Zmień nazwę, awanse lub usuń tę fazę"
+                      >
+                        <Settings className="w-3 h-3 text-sky-400" />
+                        <span>Ustawienia Fazy</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleOpenSplitPhase(activeLeaguePhaseId)}
+                        className="px-2.5 py-1 rounded-lg bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 hover:text-purple-200 text-xs font-bold transition flex items-center gap-1 border border-purple-500/30"
+                        title="Automatycznie wydziel nową grupę (np. miejsca 1-4 lub 5-8) z przeniesieniem punktów"
+                      >
+                        <GitFork className="w-3 h-3 text-purple-400" />
+                        <span>Podziel Grupę</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleOpenCreatePhase}
+                        className="px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 hover:text-emerald-200 text-xs font-bold transition flex items-center gap-1 border border-emerald-500/30"
+                        title="Dodaj nową fazę / grupę od zera"
+                      >
+                        <Plus className="w-3 h-3 text-emerald-400" />
+                        <span>Nowa Faza</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -2468,9 +2711,10 @@ function RozgrywkiContent() {
                   <tbody className="divide-y divide-slate-800/60 font-mono">
                     {leagueTable.map((team, idx) => {
                       const isAngels = team.teamName.toLowerCase().includes('angels');
-                      const advSpots = currentLeaguePhase?.advancementSpots ?? 3;
-                      const isAdvancing = currentLeaguePhase?.id === 'faza_1' ? (team.position <= advSpots) : false;
-                      const isFinalMedalist = currentLeaguePhase?.id === 'faza_2' && team.position <= 3;
+                      const advSpots = currentLeaguePhase?.advancementSpots ?? 0;
+                      const isAdvancing = advSpots > 0 && team.position <= advSpots;
+                      const isGoldMedalist = advSpots === 0 && team.position === 1;
+                      const isMedalist = advSpots === 0 && team.position <= 3;
 
                       return (
                         <React.Fragment key={team.id || idx}>
@@ -2483,10 +2727,12 @@ function RozgrywkiContent() {
                               <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs ${
                                 isAdvancing
                                   ? 'bg-emerald-500 text-slate-950 shadow-sm shadow-emerald-500/30'
-                                  : isFinalMedalist
-                                  ? team.position === 1 ? 'bg-amber-400 text-slate-950 font-black' : team.position === 2 ? 'bg-slate-300 text-slate-950' : 'bg-amber-700 text-white'
-                                  : idx === 0
-                                  ? 'bg-amber-500 text-slate-950'
+                                  : isGoldMedalist
+                                  ? 'bg-amber-400 text-slate-950 font-black'
+                                  : isMedalist && team.position === 2
+                                  ? 'bg-slate-300 text-slate-950'
+                                  : isMedalist && team.position === 3
+                                  ? 'bg-amber-700 text-white'
                                   : 'bg-slate-800 text-slate-300'
                               }`}>
                                 {team.position}
@@ -2501,10 +2747,10 @@ function RozgrywkiContent() {
                               )}
                               {isAdvancing && (
                                 <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
-                                  <span>🟢 Awans (Top 3)</span>
+                                  <span>🟢 Awans ({currentLeaguePhase?.advancementTargetName || 'Finał'})</span>
                                 </span>
                               )}
-                              {currentLeaguePhase?.id === 'faza_2' && team.position === 1 && (
+                              {isGoldMedalist && (
                                 <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
                                   🥇 Mistrz LALS
                                 </span>
@@ -2534,17 +2780,17 @@ function RozgrywkiContent() {
                             </td>
                           </tr>
 
-                          {/* Linia oddzielająca strefę awansu dla Fazy 1 po 3. pozycji */}
-                          {currentLeaguePhase?.id === 'faza_1' && team.position === advSpots && (
+                          {/* Dynamiczna linia oddzielająca strefę awansu */}
+                          {advSpots > 0 && team.position === advSpots && (
                             <tr className="bg-emerald-950/30 border-y-2 border-emerald-500/40">
                               <td colSpan={7} className="py-2.5 px-4">
                                 <div className="flex items-center justify-between gap-3 text-xs font-black uppercase text-emerald-300">
                                   <div className="flex items-center gap-2">
                                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                                    <span>▲ STREFA AWANSU: 3 DRUŻYNY Z TEJ GRUPY WYCHODZĄ DALEJ ▲</span>
+                                    <span>▲ STREFA AWANSU: ${advSpots} ${advSpots === 1 ? 'DRUŻYNA AWANSUJE' : advSpots < 5 ? 'DRUŻYNY AWANSUJĄ' : 'DRUŻYN AWANSUJE'} DO: ${currentLeaguePhase?.advancementTargetName || 'KOLEJNEJ FAZY'} ▲</span>
                                   </div>
                                   <span className="text-[10px] font-mono text-emerald-400/80 lowercase">
-                                    miejsca 1–3 &rarr; grupa finałowa (7 zespołów)
+                                    miejsca 1–${advSpots} &rarr; ${currentLeaguePhase?.advancementTargetName || 'kolejny etap'}
                                   </span>
                                 </div>
                               </td>
@@ -2562,13 +2808,14 @@ function RozgrywkiContent() {
                 <div className="flex items-center gap-2.5 text-slate-300">
                   <Info className="w-4 h-4 text-sky-400 shrink-0" />
                   <span>
-                    {currentLeaguePhase?.id === 'faza_1' ? (
+                    <strong>Format grupy:</strong> W tej grupie występuje <strong>{leagueTable.length} zespołów</strong>.{' '}
+                    {currentLeaguePhase?.advancementSpots && currentLeaguePhase.advancementSpots > 0 ? (
                       <>
-                        <strong>Format Fazy I:</strong> W naszej grupie występuje <strong>7 zespołów</strong>. Zgodnie z regulaminem LALS, <strong>3 najlepsze drużyny (miejsca 1–3)</strong> uzyskują awans do <strong>7-zespołowej Grupy Finałowej</strong>, która zagra o mistrzostwo ligi.
+                        Zgodnie z regulaminem, <strong>{currentLeaguePhase.advancementSpots} {currentLeaguePhase.advancementSpots === 1 ? 'najlepsza drużyna' : currentLeaguePhase.advancementSpots < 5 ? 'najlepsze drużyny' : 'najlepszych drużyn'} (miejsca 1–{currentLeaguePhase.advancementSpots})</strong> uzyskuje bezpośredni awans do: <strong>{currentLeaguePhase.advancementTargetName || 'Grupy Finałowej'}</strong>.
                       </>
                     ) : (
                       <>
-                        <strong>Format Fazy II:</strong> <strong>7 najlepszych zespołów</strong> (w tym 3 z naszej grupy eliminacyjnej) rywalizuje systemem ligowym o tytuł <strong>Mistrza Lubońskiej Ligi Siatkówki (LALS)</strong>.
+                        Faza medalowa / ostateczna – walka systemem ligowym o końcowe pozycje oraz medale mistrzostw.
                       </>
                     )}
                   </span>
@@ -3292,404 +3539,7 @@ function RozgrywkiContent() {
         </div>
       )}
 
-      {/* MODAL EDYCJI TABELI LIGOWEJ */}
-      {showEditTableModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            {/* Nagłówek */}
-            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-slate-900 via-sky-950/30 to-slate-900">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
-                  <Trophy className="w-5 h-5 stroke-[2.5]" />
-                </div>
-                <div>
-                  <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-                    Edycja Tabeli Ligowej
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                      {leaguePhases.find(p => p.id === editingTablePhaseId)?.name || 'Faza I'}
-                    </span>
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    {editingTablePhaseId === 'faza_1'
-                      ? 'Grupa eliminacyjna (7 zespołów) • Pozycje 1-3 mają zielony awans do Grupy Finałowej'
-                      : 'Grupa finałowa (7 zespołów) • Faza medalowa'}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowEditTableModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            {/* Faza wybór */}
-            <div className="p-3 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-400">Edytowana faza:</span>
-                <div className="flex gap-1.5">
-                  {leaguePhases.map(ph => (
-                    <button
-                      key={ph.id}
-                      type="button"
-                      onClick={() => {
-                        setEditingTablePhaseId(ph.id);
-                        setTableRows(ph.table ? JSON.parse(JSON.stringify(ph.table)) : []);
-                      }}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
-                        editingTablePhaseId === ph.id
-                          ? 'bg-sky-500 text-slate-950 font-black'
-                          : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                      }`}
-                    >
-                      {ph.shortName}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleAddTableRow}
-                className="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 hover:text-emerald-200 text-xs font-bold flex items-center gap-1 transition"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Dodaj zespół</span>
-              </button>
-            </div>
-
-            <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
-              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  <div className="flex items-center gap-2">
-                    <Upload className="w-4 h-4 text-sky-400" />
-                    <span className="font-bold text-white uppercase tracking-wider text-xs">
-                      Szybki Import Tabeli LALS
-                    </span>
-                  </div>
-                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
-                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
-                    <button
-                      type="button"
-                      onClick={() => setTableImportTab('text')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
-                        tableImportTab === 'text'
-                          ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      📋 Wklej Tekst
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setTableImportTab('image')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
-                        tableImportTab === 'image'
-                          ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      📸 Zdjęcie / Screenshot (OCR)
-                    </button>
-                  </div>
-                </div>
-
-                {tableImportTab === 'text' ? (
-                  <div className="space-y-2 pt-1">
-                    <p className="text-[11px] text-slate-400">
-                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
-                    </p>
-                    <textarea
-                      rows={4}
-                      value={rawTableInput}
-                      onChange={e => setRawTableInput(e.target.value)}
-                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                    />
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={() => handleParseRawTable()}
-                        disabled={!rawTableInput.trim()}
-                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
-                      >
-                        Przetwórz i wstaw do tabeli
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3 pt-1">
-                    <p className="text-[11px] text-slate-400">
-                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
-                    </p>
-                    <div className="flex flex-col sm:flex-row items-center gap-3">
-                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
-                        <Camera className="w-4 h-4" />
-                        <span>Wybierz zdjęcie / screen tabeli</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={e => {
-                            const file = e.target.files?.[0];
-                            if (file) handleTableImageOcr(file);
-                          }}
-                        />
-                      </label>
-                      {tableImagePreview && (
-                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
-                        </span>
-                      )}
-                    </div>
-
-                    {tableOcrLoading && (
-                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
-                        <div className="flex items-center justify-between text-xs text-sky-300">
-                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
-                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
-                        </div>
-                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                          <div
-                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
-                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {rawTableInput && (
-                      <div className="space-y-1.5 pt-2">
-                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
-                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
-                        </div>
-                        <textarea
-                          rows={3}
-                          value={rawTableInput}
-                          onChange={e => setRawTableInput(e.target.value)}
-                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
-                        />
-                        <div className="flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => handleParseRawTable()}
-                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
-                          >
-                            Zastosuj do tabeli
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Edycja wierszy tabeli */}
-              <div className="space-y-2">
-                <div className="text-[11px] uppercase tracking-wider font-bold text-slate-400 flex items-center justify-between px-1">
-                  <span>Wiersze tabeli ({tableRows.length} zespołów):</span>
-                  {editingTablePhaseId === 'faza_1' && (
-                    <span className="text-emerald-400 font-bold lowercase tracking-normal">
-                      🟢 top 3 ma awans (linia odcięcia pod 3. miejscem)
-                    </span>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  {tableRows.map((row, idx) => {
-                    const isCutoff = editingTablePhaseId === 'faza_1' && idx === 2; // after 3rd team
-                    const isAdvancing = editingTablePhaseId === 'faza_1' && idx < 3;
-                    return (
-                      <React.Fragment key={row.id || idx}>
-                        <div
-                          className={`p-3 rounded-xl border transition flex flex-col md:flex-row md:items-center justify-between gap-3 ${
-                            isAdvancing
-                              ? 'bg-slate-950/80 border-emerald-500/40 ring-1 ring-emerald-500/20'
-                              : 'bg-slate-950/60 border-slate-800'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            {/* Reorder Buttons */}
-                            <div className="flex flex-col gap-0.5">
-                              <button
-                                type="button"
-                                disabled={idx === 0}
-                                onClick={() => handleMoveTableRow(idx, 'up')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
-                                title="Przesuń wyżej"
-                              >
-                                ▲
-                              </button>
-                              <button
-                                type="button"
-                                disabled={idx === tableRows.length - 1}
-                                onClick={() => handleMoveTableRow(idx, 'down')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
-                                title="Przesuń niżej"
-                              >
-                                ▼
-                              </button>
-                            </div>
-
-                            {/* Position */}
-                            <span className={`w-7 text-center font-mono font-black text-sm ${isAdvancing ? 'text-emerald-400' : 'text-slate-400'}`}>
-                              {idx + 1}.
-                            </span>
-
-                            {/* Team Name */}
-                            <input
-                              type="text"
-                              value={row.teamName}
-                              onChange={e => handleUpdateTableRow(idx, 'teamName', e.target.value)}
-                              className="w-48 sm:w-56 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-sky-500"
-                              placeholder="Nazwa zespołu"
-                            />
-
-                            {isAdvancing && (
-                              <span className="hidden sm:inline-block text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                AWANS
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Stats Inputs */}
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">M:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.matchesPlayed}
-                                onChange={e => handleUpdateTableRow(idx, 'matchesPlayed', parseInt(e.target.value) || 0)}
-                                className="w-12 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Mecze rozegrane"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-amber-400 font-mono font-bold">Pkt:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.points}
-                                onChange={e => handleUpdateTableRow(idx, 'points', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-amber-500/40 rounded-lg p-1 text-center text-xs font-mono font-black text-amber-300"
-                                title="Punkty ligowe"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Sety:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.setsWon}
-                                onChange={e => handleUpdateTableRow(idx, 'setsWon', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Sety wygrane"
-                              />
-                              <span className="text-slate-500">:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.setsLost}
-                                onChange={e => handleUpdateTableRow(idx, 'setsLost', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Sety przegrane"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Małe pkt:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.pointsWon}
-                                onChange={e => handleUpdateTableRow(idx, 'pointsWon', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Małe punkty zdobyte"
-                              />
-                              <span className="text-slate-500">:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.pointsLost}
-                                onChange={e => handleUpdateTableRow(idx, 'pointsLost', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Małe punkty stracone"
-                              />
-                            </div>
-
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteTableRow(idx)}
-                              className="w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 flex items-center justify-center transition ml-1"
-                              title="Usuń drużynę z tabeli"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Cutoff visual separator after 3rd place in Faza 1 */}
-                        {isCutoff && (
-                          <div className="my-2.5 px-3 py-1.5 rounded-xl bg-emerald-950/30 border border-emerald-500/40 flex items-center justify-between text-xs font-bold text-emerald-300 shadow">
-                            <span className="flex items-center gap-1.5">
-                              <span>══════</span>
-                              <span>🟢 GRANICA AWANSU DO GRUPY FINAŁOWEJ (TOP 3)</span>
-                            </span>
-                            <span className="text-[10px] uppercase font-mono bg-emerald-500/20 px-2 py-0.5 rounded">
-                              3 ZESPOŁY AWANSUJĄ
-                            </span>
-                          </div>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Stopka */}
-            <div className="p-4 sm:p-5 border-t border-slate-800 bg-slate-950 flex items-center justify-between gap-3">
-              <span className="text-xs text-slate-400">
-                Liczba zespołów w grupie: <strong className="text-white">{tableRows.length}</strong>
-              </span>
-              <div className="flex items-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setShowEditTableModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition"
-                  disabled={savingTable}
-                >
-                  Anuluj
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveTable}
-                  disabled={savingTable}
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50 text-slate-950 font-black text-xs flex items-center gap-2 transition shadow-lg shadow-emerald-500/20"
-                >
-                  {savingTable ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Zapisywanie tabeli...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" />
-                      <span>Zapisz Zmiany w Tabeli</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* 3. TAB: TURNIEJE */}
       {activeTab === 'turnieje' && (
@@ -4001,404 +3851,7 @@ function RozgrywkiContent() {
       </div>
     )}
 
-      {/* MODAL EDYCJI TABELI LIGOWEJ */}
-      {showEditTableModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            {/* Nagłówek */}
-            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-slate-900 via-sky-950/30 to-slate-900">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
-                  <Trophy className="w-5 h-5 stroke-[2.5]" />
-                </div>
-                <div>
-                  <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-                    Edycja Tabeli Ligowej
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                      {leaguePhases.find(p => p.id === editingTablePhaseId)?.name || 'Faza I'}
-                    </span>
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    {editingTablePhaseId === 'faza_1'
-                      ? 'Grupa eliminacyjna (7 zespołów) • Pozycje 1-3 mają zielony awans do Grupy Finałowej'
-                      : 'Grupa finałowa (7 zespołów) • Faza medalowa'}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowEditTableModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            {/* Faza wybór */}
-            <div className="p-3 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-400">Edytowana faza:</span>
-                <div className="flex gap-1.5">
-                  {leaguePhases.map(ph => (
-                    <button
-                      key={ph.id}
-                      type="button"
-                      onClick={() => {
-                        setEditingTablePhaseId(ph.id);
-                        setTableRows(ph.table ? JSON.parse(JSON.stringify(ph.table)) : []);
-                      }}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
-                        editingTablePhaseId === ph.id
-                          ? 'bg-sky-500 text-slate-950 font-black'
-                          : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                      }`}
-                    >
-                      {ph.shortName}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleAddTableRow}
-                className="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 hover:text-emerald-200 text-xs font-bold flex items-center gap-1 transition"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Dodaj zespół</span>
-              </button>
-            </div>
-
-            <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
-              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  <div className="flex items-center gap-2">
-                    <Upload className="w-4 h-4 text-sky-400" />
-                    <span className="font-bold text-white uppercase tracking-wider text-xs">
-                      Szybki Import Tabeli LALS
-                    </span>
-                  </div>
-                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
-                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
-                    <button
-                      type="button"
-                      onClick={() => setTableImportTab('text')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
-                        tableImportTab === 'text'
-                          ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      📋 Wklej Tekst
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setTableImportTab('image')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
-                        tableImportTab === 'image'
-                          ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      📸 Zdjęcie / Screenshot (OCR)
-                    </button>
-                  </div>
-                </div>
-
-                {tableImportTab === 'text' ? (
-                  <div className="space-y-2 pt-1">
-                    <p className="text-[11px] text-slate-400">
-                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
-                    </p>
-                    <textarea
-                      rows={4}
-                      value={rawTableInput}
-                      onChange={e => setRawTableInput(e.target.value)}
-                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                    />
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={() => handleParseRawTable()}
-                        disabled={!rawTableInput.trim()}
-                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
-                      >
-                        Przetwórz i wstaw do tabeli
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3 pt-1">
-                    <p className="text-[11px] text-slate-400">
-                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
-                    </p>
-                    <div className="flex flex-col sm:flex-row items-center gap-3">
-                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
-                        <Camera className="w-4 h-4" />
-                        <span>Wybierz zdjęcie / screen tabeli</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={e => {
-                            const file = e.target.files?.[0];
-                            if (file) handleTableImageOcr(file);
-                          }}
-                        />
-                      </label>
-                      {tableImagePreview && (
-                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
-                        </span>
-                      )}
-                    </div>
-
-                    {tableOcrLoading && (
-                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
-                        <div className="flex items-center justify-between text-xs text-sky-300">
-                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
-                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
-                        </div>
-                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                          <div
-                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
-                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {rawTableInput && (
-                      <div className="space-y-1.5 pt-2">
-                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
-                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
-                        </div>
-                        <textarea
-                          rows={3}
-                          value={rawTableInput}
-                          onChange={e => setRawTableInput(e.target.value)}
-                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
-                        />
-                        <div className="flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => handleParseRawTable()}
-                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
-                          >
-                            Zastosuj do tabeli
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Edycja wierszy tabeli */}
-              <div className="space-y-2">
-                <div className="text-[11px] uppercase tracking-wider font-bold text-slate-400 flex items-center justify-between px-1">
-                  <span>Wiersze tabeli ({tableRows.length} zespołów):</span>
-                  {editingTablePhaseId === 'faza_1' && (
-                    <span className="text-emerald-400 font-bold lowercase tracking-normal">
-                      🟢 top 3 ma awans (linia odcięcia pod 3. miejscem)
-                    </span>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  {tableRows.map((row, idx) => {
-                    const isCutoff = editingTablePhaseId === 'faza_1' && idx === 2; // after 3rd team
-                    const isAdvancing = editingTablePhaseId === 'faza_1' && idx < 3;
-                    return (
-                      <React.Fragment key={row.id || idx}>
-                        <div
-                          className={`p-3 rounded-xl border transition flex flex-col md:flex-row md:items-center justify-between gap-3 ${
-                            isAdvancing
-                              ? 'bg-slate-950/80 border-emerald-500/40 ring-1 ring-emerald-500/20'
-                              : 'bg-slate-950/60 border-slate-800'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            {/* Reorder Buttons */}
-                            <div className="flex flex-col gap-0.5">
-                              <button
-                                type="button"
-                                disabled={idx === 0}
-                                onClick={() => handleMoveTableRow(idx, 'up')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
-                                title="Przesuń wyżej"
-                              >
-                                ▲
-                              </button>
-                              <button
-                                type="button"
-                                disabled={idx === tableRows.length - 1}
-                                onClick={() => handleMoveTableRow(idx, 'down')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
-                                title="Przesuń niżej"
-                              >
-                                ▼
-                              </button>
-                            </div>
-
-                            {/* Position */}
-                            <span className={`w-7 text-center font-mono font-black text-sm ${isAdvancing ? 'text-emerald-400' : 'text-slate-400'}`}>
-                              {idx + 1}.
-                            </span>
-
-                            {/* Team Name */}
-                            <input
-                              type="text"
-                              value={row.teamName}
-                              onChange={e => handleUpdateTableRow(idx, 'teamName', e.target.value)}
-                              className="w-48 sm:w-56 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-sky-500"
-                              placeholder="Nazwa zespołu"
-                            />
-
-                            {isAdvancing && (
-                              <span className="hidden sm:inline-block text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                AWANS
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Stats Inputs */}
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">M:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.matchesPlayed}
-                                onChange={e => handleUpdateTableRow(idx, 'matchesPlayed', parseInt(e.target.value) || 0)}
-                                className="w-12 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Mecze rozegrane"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-amber-400 font-mono font-bold">Pkt:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.points}
-                                onChange={e => handleUpdateTableRow(idx, 'points', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-amber-500/40 rounded-lg p-1 text-center text-xs font-mono font-black text-amber-300"
-                                title="Punkty ligowe"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Sety:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.setsWon}
-                                onChange={e => handleUpdateTableRow(idx, 'setsWon', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Sety wygrane"
-                              />
-                              <span className="text-slate-500">:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.setsLost}
-                                onChange={e => handleUpdateTableRow(idx, 'setsLost', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Sety przegrane"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Małe pkt:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.pointsWon}
-                                onChange={e => handleUpdateTableRow(idx, 'pointsWon', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Małe punkty zdobyte"
-                              />
-                              <span className="text-slate-500">:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.pointsLost}
-                                onChange={e => handleUpdateTableRow(idx, 'pointsLost', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Małe punkty stracone"
-                              />
-                            </div>
-
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteTableRow(idx)}
-                              className="w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 flex items-center justify-center transition ml-1"
-                              title="Usuń drużynę z tabeli"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Cutoff visual separator after 3rd place in Faza 1 */}
-                        {isCutoff && (
-                          <div className="my-2.5 px-3 py-1.5 rounded-xl bg-emerald-950/30 border border-emerald-500/40 flex items-center justify-between text-xs font-bold text-emerald-300 shadow">
-                            <span className="flex items-center gap-1.5">
-                              <span>══════</span>
-                              <span>🟢 GRANICA AWANSU DO GRUPY FINAŁOWEJ (TOP 3)</span>
-                            </span>
-                            <span className="text-[10px] uppercase font-mono bg-emerald-500/20 px-2 py-0.5 rounded">
-                              3 ZESPOŁY AWANSUJĄ
-                            </span>
-                          </div>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Stopka */}
-            <div className="p-4 sm:p-5 border-t border-slate-800 bg-slate-950 flex items-center justify-between gap-3">
-              <span className="text-xs text-slate-400">
-                Liczba zespołów w grupie: <strong className="text-white">{tableRows.length}</strong>
-              </span>
-              <div className="flex items-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setShowEditTableModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition"
-                  disabled={savingTable}
-                >
-                  Anuluj
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveTable}
-                  disabled={savingTable}
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50 text-slate-950 font-black text-xs flex items-center gap-2 transition shadow-lg shadow-emerald-500/20"
-                >
-                  {savingTable ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Zapisywanie tabeli...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" />
-                      <span>Zapisz Zmiany w Tabeli</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Modal: Wprowadzanie / Edycja Wyniku */}
       {resultModalEvent && (
@@ -4561,404 +4014,7 @@ function RozgrywkiContent() {
         </div>
       )}
 
-      {/* MODAL EDYCJI TABELI LIGOWEJ */}
-      {showEditTableModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            {/* Nagłówek */}
-            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-slate-900 via-sky-950/30 to-slate-900">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
-                  <Trophy className="w-5 h-5 stroke-[2.5]" />
-                </div>
-                <div>
-                  <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-                    Edycja Tabeli Ligowej
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                      {leaguePhases.find(p => p.id === editingTablePhaseId)?.name || 'Faza I'}
-                    </span>
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    {editingTablePhaseId === 'faza_1'
-                      ? 'Grupa eliminacyjna (7 zespołów) • Pozycje 1-3 mają zielony awans do Grupy Finałowej'
-                      : 'Grupa finałowa (7 zespołów) • Faza medalowa'}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowEditTableModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            {/* Faza wybór */}
-            <div className="p-3 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-400">Edytowana faza:</span>
-                <div className="flex gap-1.5">
-                  {leaguePhases.map(ph => (
-                    <button
-                      key={ph.id}
-                      type="button"
-                      onClick={() => {
-                        setEditingTablePhaseId(ph.id);
-                        setTableRows(ph.table ? JSON.parse(JSON.stringify(ph.table)) : []);
-                      }}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
-                        editingTablePhaseId === ph.id
-                          ? 'bg-sky-500 text-slate-950 font-black'
-                          : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                      }`}
-                    >
-                      {ph.shortName}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleAddTableRow}
-                className="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 hover:text-emerald-200 text-xs font-bold flex items-center gap-1 transition"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Dodaj zespół</span>
-              </button>
-            </div>
-
-            <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
-              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  <div className="flex items-center gap-2">
-                    <Upload className="w-4 h-4 text-sky-400" />
-                    <span className="font-bold text-white uppercase tracking-wider text-xs">
-                      Szybki Import Tabeli LALS
-                    </span>
-                  </div>
-                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
-                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
-                    <button
-                      type="button"
-                      onClick={() => setTableImportTab('text')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
-                        tableImportTab === 'text'
-                          ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      📋 Wklej Tekst
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setTableImportTab('image')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
-                        tableImportTab === 'image'
-                          ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      📸 Zdjęcie / Screenshot (OCR)
-                    </button>
-                  </div>
-                </div>
-
-                {tableImportTab === 'text' ? (
-                  <div className="space-y-2 pt-1">
-                    <p className="text-[11px] text-slate-400">
-                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
-                    </p>
-                    <textarea
-                      rows={4}
-                      value={rawTableInput}
-                      onChange={e => setRawTableInput(e.target.value)}
-                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                    />
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={() => handleParseRawTable()}
-                        disabled={!rawTableInput.trim()}
-                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
-                      >
-                        Przetwórz i wstaw do tabeli
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3 pt-1">
-                    <p className="text-[11px] text-slate-400">
-                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
-                    </p>
-                    <div className="flex flex-col sm:flex-row items-center gap-3">
-                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
-                        <Camera className="w-4 h-4" />
-                        <span>Wybierz zdjęcie / screen tabeli</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={e => {
-                            const file = e.target.files?.[0];
-                            if (file) handleTableImageOcr(file);
-                          }}
-                        />
-                      </label>
-                      {tableImagePreview && (
-                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
-                        </span>
-                      )}
-                    </div>
-
-                    {tableOcrLoading && (
-                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
-                        <div className="flex items-center justify-between text-xs text-sky-300">
-                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
-                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
-                        </div>
-                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                          <div
-                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
-                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {rawTableInput && (
-                      <div className="space-y-1.5 pt-2">
-                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
-                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
-                        </div>
-                        <textarea
-                          rows={3}
-                          value={rawTableInput}
-                          onChange={e => setRawTableInput(e.target.value)}
-                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
-                        />
-                        <div className="flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => handleParseRawTable()}
-                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
-                          >
-                            Zastosuj do tabeli
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Edycja wierszy tabeli */}
-              <div className="space-y-2">
-                <div className="text-[11px] uppercase tracking-wider font-bold text-slate-400 flex items-center justify-between px-1">
-                  <span>Wiersze tabeli ({tableRows.length} zespołów):</span>
-                  {editingTablePhaseId === 'faza_1' && (
-                    <span className="text-emerald-400 font-bold lowercase tracking-normal">
-                      🟢 top 3 ma awans (linia odcięcia pod 3. miejscem)
-                    </span>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  {tableRows.map((row, idx) => {
-                    const isCutoff = editingTablePhaseId === 'faza_1' && idx === 2; // after 3rd team
-                    const isAdvancing = editingTablePhaseId === 'faza_1' && idx < 3;
-                    return (
-                      <React.Fragment key={row.id || idx}>
-                        <div
-                          className={`p-3 rounded-xl border transition flex flex-col md:flex-row md:items-center justify-between gap-3 ${
-                            isAdvancing
-                              ? 'bg-slate-950/80 border-emerald-500/40 ring-1 ring-emerald-500/20'
-                              : 'bg-slate-950/60 border-slate-800'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            {/* Reorder Buttons */}
-                            <div className="flex flex-col gap-0.5">
-                              <button
-                                type="button"
-                                disabled={idx === 0}
-                                onClick={() => handleMoveTableRow(idx, 'up')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
-                                title="Przesuń wyżej"
-                              >
-                                ▲
-                              </button>
-                              <button
-                                type="button"
-                                disabled={idx === tableRows.length - 1}
-                                onClick={() => handleMoveTableRow(idx, 'down')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
-                                title="Przesuń niżej"
-                              >
-                                ▼
-                              </button>
-                            </div>
-
-                            {/* Position */}
-                            <span className={`w-7 text-center font-mono font-black text-sm ${isAdvancing ? 'text-emerald-400' : 'text-slate-400'}`}>
-                              {idx + 1}.
-                            </span>
-
-                            {/* Team Name */}
-                            <input
-                              type="text"
-                              value={row.teamName}
-                              onChange={e => handleUpdateTableRow(idx, 'teamName', e.target.value)}
-                              className="w-48 sm:w-56 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-sky-500"
-                              placeholder="Nazwa zespołu"
-                            />
-
-                            {isAdvancing && (
-                              <span className="hidden sm:inline-block text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                AWANS
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Stats Inputs */}
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">M:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.matchesPlayed}
-                                onChange={e => handleUpdateTableRow(idx, 'matchesPlayed', parseInt(e.target.value) || 0)}
-                                className="w-12 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Mecze rozegrane"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-amber-400 font-mono font-bold">Pkt:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.points}
-                                onChange={e => handleUpdateTableRow(idx, 'points', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-amber-500/40 rounded-lg p-1 text-center text-xs font-mono font-black text-amber-300"
-                                title="Punkty ligowe"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Sety:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.setsWon}
-                                onChange={e => handleUpdateTableRow(idx, 'setsWon', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Sety wygrane"
-                              />
-                              <span className="text-slate-500">:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.setsLost}
-                                onChange={e => handleUpdateTableRow(idx, 'setsLost', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Sety przegrane"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Małe pkt:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.pointsWon}
-                                onChange={e => handleUpdateTableRow(idx, 'pointsWon', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Małe punkty zdobyte"
-                              />
-                              <span className="text-slate-500">:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.pointsLost}
-                                onChange={e => handleUpdateTableRow(idx, 'pointsLost', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Małe punkty stracone"
-                              />
-                            </div>
-
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteTableRow(idx)}
-                              className="w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 flex items-center justify-center transition ml-1"
-                              title="Usuń drużynę z tabeli"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Cutoff visual separator after 3rd place in Faza 1 */}
-                        {isCutoff && (
-                          <div className="my-2.5 px-3 py-1.5 rounded-xl bg-emerald-950/30 border border-emerald-500/40 flex items-center justify-between text-xs font-bold text-emerald-300 shadow">
-                            <span className="flex items-center gap-1.5">
-                              <span>══════</span>
-                              <span>🟢 GRANICA AWANSU DO GRUPY FINAŁOWEJ (TOP 3)</span>
-                            </span>
-                            <span className="text-[10px] uppercase font-mono bg-emerald-500/20 px-2 py-0.5 rounded">
-                              3 ZESPOŁY AWANSUJĄ
-                            </span>
-                          </div>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Stopka */}
-            <div className="p-4 sm:p-5 border-t border-slate-800 bg-slate-950 flex items-center justify-between gap-3">
-              <span className="text-xs text-slate-400">
-                Liczba zespołów w grupie: <strong className="text-white">{tableRows.length}</strong>
-              </span>
-              <div className="flex items-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setShowEditTableModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition"
-                  disabled={savingTable}
-                >
-                  Anuluj
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveTable}
-                  disabled={savingTable}
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50 text-slate-950 font-black text-xs flex items-center gap-2 transition shadow-lg shadow-emerald-500/20"
-                >
-                  {savingTable ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Zapisywanie tabeli...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" />
-                      <span>Zapisz Zmiany w Tabeli</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Modal: Dodaj Wydarzenie (Sparing / Turniej) */}
       {showAddEventModal && (
@@ -5049,404 +4105,7 @@ function RozgrywkiContent() {
         </div>
       )}
 
-      {/* MODAL EDYCJI TABELI LIGOWEJ */}
-      {showEditTableModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            {/* Nagłówek */}
-            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-slate-900 via-sky-950/30 to-slate-900">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
-                  <Trophy className="w-5 h-5 stroke-[2.5]" />
-                </div>
-                <div>
-                  <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-                    Edycja Tabeli Ligowej
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                      {leaguePhases.find(p => p.id === editingTablePhaseId)?.name || 'Faza I'}
-                    </span>
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    {editingTablePhaseId === 'faza_1'
-                      ? 'Grupa eliminacyjna (7 zespołów) • Pozycje 1-3 mają zielony awans do Grupy Finałowej'
-                      : 'Grupa finałowa (7 zespołów) • Faza medalowa'}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowEditTableModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            {/* Faza wybór */}
-            <div className="p-3 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-400">Edytowana faza:</span>
-                <div className="flex gap-1.5">
-                  {leaguePhases.map(ph => (
-                    <button
-                      key={ph.id}
-                      type="button"
-                      onClick={() => {
-                        setEditingTablePhaseId(ph.id);
-                        setTableRows(ph.table ? JSON.parse(JSON.stringify(ph.table)) : []);
-                      }}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
-                        editingTablePhaseId === ph.id
-                          ? 'bg-sky-500 text-slate-950 font-black'
-                          : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                      }`}
-                    >
-                      {ph.shortName}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleAddTableRow}
-                className="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 hover:text-emerald-200 text-xs font-bold flex items-center gap-1 transition"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Dodaj zespół</span>
-              </button>
-            </div>
-
-            <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
-              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  <div className="flex items-center gap-2">
-                    <Upload className="w-4 h-4 text-sky-400" />
-                    <span className="font-bold text-white uppercase tracking-wider text-xs">
-                      Szybki Import Tabeli LALS
-                    </span>
-                  </div>
-                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
-                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
-                    <button
-                      type="button"
-                      onClick={() => setTableImportTab('text')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
-                        tableImportTab === 'text'
-                          ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      📋 Wklej Tekst
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setTableImportTab('image')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
-                        tableImportTab === 'image'
-                          ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      📸 Zdjęcie / Screenshot (OCR)
-                    </button>
-                  </div>
-                </div>
-
-                {tableImportTab === 'text' ? (
-                  <div className="space-y-2 pt-1">
-                    <p className="text-[11px] text-slate-400">
-                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
-                    </p>
-                    <textarea
-                      rows={4}
-                      value={rawTableInput}
-                      onChange={e => setRawTableInput(e.target.value)}
-                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                    />
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={() => handleParseRawTable()}
-                        disabled={!rawTableInput.trim()}
-                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
-                      >
-                        Przetwórz i wstaw do tabeli
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3 pt-1">
-                    <p className="text-[11px] text-slate-400">
-                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
-                    </p>
-                    <div className="flex flex-col sm:flex-row items-center gap-3">
-                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
-                        <Camera className="w-4 h-4" />
-                        <span>Wybierz zdjęcie / screen tabeli</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={e => {
-                            const file = e.target.files?.[0];
-                            if (file) handleTableImageOcr(file);
-                          }}
-                        />
-                      </label>
-                      {tableImagePreview && (
-                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
-                        </span>
-                      )}
-                    </div>
-
-                    {tableOcrLoading && (
-                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
-                        <div className="flex items-center justify-between text-xs text-sky-300">
-                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
-                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
-                        </div>
-                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                          <div
-                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
-                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {rawTableInput && (
-                      <div className="space-y-1.5 pt-2">
-                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
-                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
-                        </div>
-                        <textarea
-                          rows={3}
-                          value={rawTableInput}
-                          onChange={e => setRawTableInput(e.target.value)}
-                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
-                        />
-                        <div className="flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => handleParseRawTable()}
-                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
-                          >
-                            Zastosuj do tabeli
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Edycja wierszy tabeli */}
-              <div className="space-y-2">
-                <div className="text-[11px] uppercase tracking-wider font-bold text-slate-400 flex items-center justify-between px-1">
-                  <span>Wiersze tabeli ({tableRows.length} zespołów):</span>
-                  {editingTablePhaseId === 'faza_1' && (
-                    <span className="text-emerald-400 font-bold lowercase tracking-normal">
-                      🟢 top 3 ma awans (linia odcięcia pod 3. miejscem)
-                    </span>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  {tableRows.map((row, idx) => {
-                    const isCutoff = editingTablePhaseId === 'faza_1' && idx === 2; // after 3rd team
-                    const isAdvancing = editingTablePhaseId === 'faza_1' && idx < 3;
-                    return (
-                      <React.Fragment key={row.id || idx}>
-                        <div
-                          className={`p-3 rounded-xl border transition flex flex-col md:flex-row md:items-center justify-between gap-3 ${
-                            isAdvancing
-                              ? 'bg-slate-950/80 border-emerald-500/40 ring-1 ring-emerald-500/20'
-                              : 'bg-slate-950/60 border-slate-800'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            {/* Reorder Buttons */}
-                            <div className="flex flex-col gap-0.5">
-                              <button
-                                type="button"
-                                disabled={idx === 0}
-                                onClick={() => handleMoveTableRow(idx, 'up')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
-                                title="Przesuń wyżej"
-                              >
-                                ▲
-                              </button>
-                              <button
-                                type="button"
-                                disabled={idx === tableRows.length - 1}
-                                onClick={() => handleMoveTableRow(idx, 'down')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
-                                title="Przesuń niżej"
-                              >
-                                ▼
-                              </button>
-                            </div>
-
-                            {/* Position */}
-                            <span className={`w-7 text-center font-mono font-black text-sm ${isAdvancing ? 'text-emerald-400' : 'text-slate-400'}`}>
-                              {idx + 1}.
-                            </span>
-
-                            {/* Team Name */}
-                            <input
-                              type="text"
-                              value={row.teamName}
-                              onChange={e => handleUpdateTableRow(idx, 'teamName', e.target.value)}
-                              className="w-48 sm:w-56 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-sky-500"
-                              placeholder="Nazwa zespołu"
-                            />
-
-                            {isAdvancing && (
-                              <span className="hidden sm:inline-block text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                AWANS
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Stats Inputs */}
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">M:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.matchesPlayed}
-                                onChange={e => handleUpdateTableRow(idx, 'matchesPlayed', parseInt(e.target.value) || 0)}
-                                className="w-12 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Mecze rozegrane"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-amber-400 font-mono font-bold">Pkt:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.points}
-                                onChange={e => handleUpdateTableRow(idx, 'points', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-amber-500/40 rounded-lg p-1 text-center text-xs font-mono font-black text-amber-300"
-                                title="Punkty ligowe"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Sety:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.setsWon}
-                                onChange={e => handleUpdateTableRow(idx, 'setsWon', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Sety wygrane"
-                              />
-                              <span className="text-slate-500">:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.setsLost}
-                                onChange={e => handleUpdateTableRow(idx, 'setsLost', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Sety przegrane"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Małe pkt:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.pointsWon}
-                                onChange={e => handleUpdateTableRow(idx, 'pointsWon', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Małe punkty zdobyte"
-                              />
-                              <span className="text-slate-500">:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.pointsLost}
-                                onChange={e => handleUpdateTableRow(idx, 'pointsLost', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Małe punkty stracone"
-                              />
-                            </div>
-
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteTableRow(idx)}
-                              className="w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 flex items-center justify-center transition ml-1"
-                              title="Usuń drużynę z tabeli"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Cutoff visual separator after 3rd place in Faza 1 */}
-                        {isCutoff && (
-                          <div className="my-2.5 px-3 py-1.5 rounded-xl bg-emerald-950/30 border border-emerald-500/40 flex items-center justify-between text-xs font-bold text-emerald-300 shadow">
-                            <span className="flex items-center gap-1.5">
-                              <span>══════</span>
-                              <span>🟢 GRANICA AWANSU DO GRUPY FINAŁOWEJ (TOP 3)</span>
-                            </span>
-                            <span className="text-[10px] uppercase font-mono bg-emerald-500/20 px-2 py-0.5 rounded">
-                              3 ZESPOŁY AWANSUJĄ
-                            </span>
-                          </div>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Stopka */}
-            <div className="p-4 sm:p-5 border-t border-slate-800 bg-slate-950 flex items-center justify-between gap-3">
-              <span className="text-xs text-slate-400">
-                Liczba zespołów w grupie: <strong className="text-white">{tableRows.length}</strong>
-              </span>
-              <div className="flex items-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setShowEditTableModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition"
-                  disabled={savingTable}
-                >
-                  Anuluj
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveTable}
-                  disabled={savingTable}
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50 text-slate-950 font-black text-xs flex items-center gap-2 transition shadow-lg shadow-emerald-500/20"
-                >
-                  {savingTable ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Zapisywanie tabeli...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" />
-                      <span>Zapisz Zmiany w Tabeli</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Modal: Dodaj Serię Zdjęć do Galerii */}
       {showAddPhotoModal && (
@@ -5738,404 +4397,7 @@ function RozgrywkiContent() {
         </div>
       )}
 
-      {/* MODAL EDYCJI TABELI LIGOWEJ */}
-      {showEditTableModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            {/* Nagłówek */}
-            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-slate-900 via-sky-950/30 to-slate-900">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
-                  <Trophy className="w-5 h-5 stroke-[2.5]" />
-                </div>
-                <div>
-                  <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-                    Edycja Tabeli Ligowej
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                      {leaguePhases.find(p => p.id === editingTablePhaseId)?.name || 'Faza I'}
-                    </span>
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    {editingTablePhaseId === 'faza_1'
-                      ? 'Grupa eliminacyjna (7 zespołów) • Pozycje 1-3 mają zielony awans do Grupy Finałowej'
-                      : 'Grupa finałowa (7 zespołów) • Faza medalowa'}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowEditTableModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            {/* Faza wybór */}
-            <div className="p-3 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-400">Edytowana faza:</span>
-                <div className="flex gap-1.5">
-                  {leaguePhases.map(ph => (
-                    <button
-                      key={ph.id}
-                      type="button"
-                      onClick={() => {
-                        setEditingTablePhaseId(ph.id);
-                        setTableRows(ph.table ? JSON.parse(JSON.stringify(ph.table)) : []);
-                      }}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
-                        editingTablePhaseId === ph.id
-                          ? 'bg-sky-500 text-slate-950 font-black'
-                          : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                      }`}
-                    >
-                      {ph.shortName}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleAddTableRow}
-                className="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 hover:text-emerald-200 text-xs font-bold flex items-center gap-1 transition"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Dodaj zespół</span>
-              </button>
-            </div>
-
-            <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
-              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  <div className="flex items-center gap-2">
-                    <Upload className="w-4 h-4 text-sky-400" />
-                    <span className="font-bold text-white uppercase tracking-wider text-xs">
-                      Szybki Import Tabeli LALS
-                    </span>
-                  </div>
-                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
-                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
-                    <button
-                      type="button"
-                      onClick={() => setTableImportTab('text')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
-                        tableImportTab === 'text'
-                          ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      📋 Wklej Tekst
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setTableImportTab('image')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
-                        tableImportTab === 'image'
-                          ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      📸 Zdjęcie / Screenshot (OCR)
-                    </button>
-                  </div>
-                </div>
-
-                {tableImportTab === 'text' ? (
-                  <div className="space-y-2 pt-1">
-                    <p className="text-[11px] text-slate-400">
-                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
-                    </p>
-                    <textarea
-                      rows={4}
-                      value={rawTableInput}
-                      onChange={e => setRawTableInput(e.target.value)}
-                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                    />
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={() => handleParseRawTable()}
-                        disabled={!rawTableInput.trim()}
-                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
-                      >
-                        Przetwórz i wstaw do tabeli
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3 pt-1">
-                    <p className="text-[11px] text-slate-400">
-                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
-                    </p>
-                    <div className="flex flex-col sm:flex-row items-center gap-3">
-                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
-                        <Camera className="w-4 h-4" />
-                        <span>Wybierz zdjęcie / screen tabeli</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={e => {
-                            const file = e.target.files?.[0];
-                            if (file) handleTableImageOcr(file);
-                          }}
-                        />
-                      </label>
-                      {tableImagePreview && (
-                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
-                        </span>
-                      )}
-                    </div>
-
-                    {tableOcrLoading && (
-                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
-                        <div className="flex items-center justify-between text-xs text-sky-300">
-                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
-                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
-                        </div>
-                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                          <div
-                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
-                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {rawTableInput && (
-                      <div className="space-y-1.5 pt-2">
-                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
-                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
-                        </div>
-                        <textarea
-                          rows={3}
-                          value={rawTableInput}
-                          onChange={e => setRawTableInput(e.target.value)}
-                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
-                        />
-                        <div className="flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => handleParseRawTable()}
-                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
-                          >
-                            Zastosuj do tabeli
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Edycja wierszy tabeli */}
-              <div className="space-y-2">
-                <div className="text-[11px] uppercase tracking-wider font-bold text-slate-400 flex items-center justify-between px-1">
-                  <span>Wiersze tabeli ({tableRows.length} zespołów):</span>
-                  {editingTablePhaseId === 'faza_1' && (
-                    <span className="text-emerald-400 font-bold lowercase tracking-normal">
-                      🟢 top 3 ma awans (linia odcięcia pod 3. miejscem)
-                    </span>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  {tableRows.map((row, idx) => {
-                    const isCutoff = editingTablePhaseId === 'faza_1' && idx === 2; // after 3rd team
-                    const isAdvancing = editingTablePhaseId === 'faza_1' && idx < 3;
-                    return (
-                      <React.Fragment key={row.id || idx}>
-                        <div
-                          className={`p-3 rounded-xl border transition flex flex-col md:flex-row md:items-center justify-between gap-3 ${
-                            isAdvancing
-                              ? 'bg-slate-950/80 border-emerald-500/40 ring-1 ring-emerald-500/20'
-                              : 'bg-slate-950/60 border-slate-800'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            {/* Reorder Buttons */}
-                            <div className="flex flex-col gap-0.5">
-                              <button
-                                type="button"
-                                disabled={idx === 0}
-                                onClick={() => handleMoveTableRow(idx, 'up')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
-                                title="Przesuń wyżej"
-                              >
-                                ▲
-                              </button>
-                              <button
-                                type="button"
-                                disabled={idx === tableRows.length - 1}
-                                onClick={() => handleMoveTableRow(idx, 'down')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
-                                title="Przesuń niżej"
-                              >
-                                ▼
-                              </button>
-                            </div>
-
-                            {/* Position */}
-                            <span className={`w-7 text-center font-mono font-black text-sm ${isAdvancing ? 'text-emerald-400' : 'text-slate-400'}`}>
-                              {idx + 1}.
-                            </span>
-
-                            {/* Team Name */}
-                            <input
-                              type="text"
-                              value={row.teamName}
-                              onChange={e => handleUpdateTableRow(idx, 'teamName', e.target.value)}
-                              className="w-48 sm:w-56 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-sky-500"
-                              placeholder="Nazwa zespołu"
-                            />
-
-                            {isAdvancing && (
-                              <span className="hidden sm:inline-block text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                AWANS
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Stats Inputs */}
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">M:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.matchesPlayed}
-                                onChange={e => handleUpdateTableRow(idx, 'matchesPlayed', parseInt(e.target.value) || 0)}
-                                className="w-12 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Mecze rozegrane"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-amber-400 font-mono font-bold">Pkt:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.points}
-                                onChange={e => handleUpdateTableRow(idx, 'points', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-amber-500/40 rounded-lg p-1 text-center text-xs font-mono font-black text-amber-300"
-                                title="Punkty ligowe"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Sety:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.setsWon}
-                                onChange={e => handleUpdateTableRow(idx, 'setsWon', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Sety wygrane"
-                              />
-                              <span className="text-slate-500">:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.setsLost}
-                                onChange={e => handleUpdateTableRow(idx, 'setsLost', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Sety przegrane"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Małe pkt:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.pointsWon}
-                                onChange={e => handleUpdateTableRow(idx, 'pointsWon', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Małe punkty zdobyte"
-                              />
-                              <span className="text-slate-500">:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.pointsLost}
-                                onChange={e => handleUpdateTableRow(idx, 'pointsLost', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Małe punkty stracone"
-                              />
-                            </div>
-
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteTableRow(idx)}
-                              className="w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 flex items-center justify-center transition ml-1"
-                              title="Usuń drużynę z tabeli"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Cutoff visual separator after 3rd place in Faza 1 */}
-                        {isCutoff && (
-                          <div className="my-2.5 px-3 py-1.5 rounded-xl bg-emerald-950/30 border border-emerald-500/40 flex items-center justify-between text-xs font-bold text-emerald-300 shadow">
-                            <span className="flex items-center gap-1.5">
-                              <span>══════</span>
-                              <span>🟢 GRANICA AWANSU DO GRUPY FINAŁOWEJ (TOP 3)</span>
-                            </span>
-                            <span className="text-[10px] uppercase font-mono bg-emerald-500/20 px-2 py-0.5 rounded">
-                              3 ZESPOŁY AWANSUJĄ
-                            </span>
-                          </div>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Stopka */}
-            <div className="p-4 sm:p-5 border-t border-slate-800 bg-slate-950 flex items-center justify-between gap-3">
-              <span className="text-xs text-slate-400">
-                Liczba zespołów w grupie: <strong className="text-white">{tableRows.length}</strong>
-              </span>
-              <div className="flex items-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setShowEditTableModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition"
-                  disabled={savingTable}
-                >
-                  Anuluj
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveTable}
-                  disabled={savingTable}
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50 text-slate-950 font-black text-xs flex items-center gap-2 transition shadow-lg shadow-emerald-500/20"
-                >
-                  {savingTable ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Zapisywanie tabeli...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" />
-                      <span>Zapisz Zmiany w Tabeli</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* MODAL 1: Eksport Powiadomienia na Czat (WhatsApp / Messenger / Discord) */}
       {shareModalEvent && (
@@ -6196,404 +4458,7 @@ function RozgrywkiContent() {
         </div>
       )}
 
-      {/* MODAL EDYCJI TABELI LIGOWEJ */}
-      {showEditTableModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            {/* Nagłówek */}
-            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-slate-900 via-sky-950/30 to-slate-900">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
-                  <Trophy className="w-5 h-5 stroke-[2.5]" />
-                </div>
-                <div>
-                  <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-                    Edycja Tabeli Ligowej
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                      {leaguePhases.find(p => p.id === editingTablePhaseId)?.name || 'Faza I'}
-                    </span>
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    {editingTablePhaseId === 'faza_1'
-                      ? 'Grupa eliminacyjna (7 zespołów) • Pozycje 1-3 mają zielony awans do Grupy Finałowej'
-                      : 'Grupa finałowa (7 zespołów) • Faza medalowa'}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowEditTableModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            {/* Faza wybór */}
-            <div className="p-3 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-400">Edytowana faza:</span>
-                <div className="flex gap-1.5">
-                  {leaguePhases.map(ph => (
-                    <button
-                      key={ph.id}
-                      type="button"
-                      onClick={() => {
-                        setEditingTablePhaseId(ph.id);
-                        setTableRows(ph.table ? JSON.parse(JSON.stringify(ph.table)) : []);
-                      }}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
-                        editingTablePhaseId === ph.id
-                          ? 'bg-sky-500 text-slate-950 font-black'
-                          : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                      }`}
-                    >
-                      {ph.shortName}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleAddTableRow}
-                className="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 hover:text-emerald-200 text-xs font-bold flex items-center gap-1 transition"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Dodaj zespół</span>
-              </button>
-            </div>
-
-            <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
-              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  <div className="flex items-center gap-2">
-                    <Upload className="w-4 h-4 text-sky-400" />
-                    <span className="font-bold text-white uppercase tracking-wider text-xs">
-                      Szybki Import Tabeli LALS
-                    </span>
-                  </div>
-                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
-                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
-                    <button
-                      type="button"
-                      onClick={() => setTableImportTab('text')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
-                        tableImportTab === 'text'
-                          ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      📋 Wklej Tekst
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setTableImportTab('image')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
-                        tableImportTab === 'image'
-                          ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      📸 Zdjęcie / Screenshot (OCR)
-                    </button>
-                  </div>
-                </div>
-
-                {tableImportTab === 'text' ? (
-                  <div className="space-y-2 pt-1">
-                    <p className="text-[11px] text-slate-400">
-                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
-                    </p>
-                    <textarea
-                      rows={4}
-                      value={rawTableInput}
-                      onChange={e => setRawTableInput(e.target.value)}
-                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                    />
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={() => handleParseRawTable()}
-                        disabled={!rawTableInput.trim()}
-                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
-                      >
-                        Przetwórz i wstaw do tabeli
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3 pt-1">
-                    <p className="text-[11px] text-slate-400">
-                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
-                    </p>
-                    <div className="flex flex-col sm:flex-row items-center gap-3">
-                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
-                        <Camera className="w-4 h-4" />
-                        <span>Wybierz zdjęcie / screen tabeli</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={e => {
-                            const file = e.target.files?.[0];
-                            if (file) handleTableImageOcr(file);
-                          }}
-                        />
-                      </label>
-                      {tableImagePreview && (
-                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
-                        </span>
-                      )}
-                    </div>
-
-                    {tableOcrLoading && (
-                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
-                        <div className="flex items-center justify-between text-xs text-sky-300">
-                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
-                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
-                        </div>
-                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                          <div
-                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
-                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {rawTableInput && (
-                      <div className="space-y-1.5 pt-2">
-                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
-                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
-                        </div>
-                        <textarea
-                          rows={3}
-                          value={rawTableInput}
-                          onChange={e => setRawTableInput(e.target.value)}
-                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
-                        />
-                        <div className="flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => handleParseRawTable()}
-                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
-                          >
-                            Zastosuj do tabeli
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Edycja wierszy tabeli */}
-              <div className="space-y-2">
-                <div className="text-[11px] uppercase tracking-wider font-bold text-slate-400 flex items-center justify-between px-1">
-                  <span>Wiersze tabeli ({tableRows.length} zespołów):</span>
-                  {editingTablePhaseId === 'faza_1' && (
-                    <span className="text-emerald-400 font-bold lowercase tracking-normal">
-                      🟢 top 3 ma awans (linia odcięcia pod 3. miejscem)
-                    </span>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  {tableRows.map((row, idx) => {
-                    const isCutoff = editingTablePhaseId === 'faza_1' && idx === 2; // after 3rd team
-                    const isAdvancing = editingTablePhaseId === 'faza_1' && idx < 3;
-                    return (
-                      <React.Fragment key={row.id || idx}>
-                        <div
-                          className={`p-3 rounded-xl border transition flex flex-col md:flex-row md:items-center justify-between gap-3 ${
-                            isAdvancing
-                              ? 'bg-slate-950/80 border-emerald-500/40 ring-1 ring-emerald-500/20'
-                              : 'bg-slate-950/60 border-slate-800'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            {/* Reorder Buttons */}
-                            <div className="flex flex-col gap-0.5">
-                              <button
-                                type="button"
-                                disabled={idx === 0}
-                                onClick={() => handleMoveTableRow(idx, 'up')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
-                                title="Przesuń wyżej"
-                              >
-                                ▲
-                              </button>
-                              <button
-                                type="button"
-                                disabled={idx === tableRows.length - 1}
-                                onClick={() => handleMoveTableRow(idx, 'down')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
-                                title="Przesuń niżej"
-                              >
-                                ▼
-                              </button>
-                            </div>
-
-                            {/* Position */}
-                            <span className={`w-7 text-center font-mono font-black text-sm ${isAdvancing ? 'text-emerald-400' : 'text-slate-400'}`}>
-                              {idx + 1}.
-                            </span>
-
-                            {/* Team Name */}
-                            <input
-                              type="text"
-                              value={row.teamName}
-                              onChange={e => handleUpdateTableRow(idx, 'teamName', e.target.value)}
-                              className="w-48 sm:w-56 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-sky-500"
-                              placeholder="Nazwa zespołu"
-                            />
-
-                            {isAdvancing && (
-                              <span className="hidden sm:inline-block text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                AWANS
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Stats Inputs */}
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">M:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.matchesPlayed}
-                                onChange={e => handleUpdateTableRow(idx, 'matchesPlayed', parseInt(e.target.value) || 0)}
-                                className="w-12 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Mecze rozegrane"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-amber-400 font-mono font-bold">Pkt:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.points}
-                                onChange={e => handleUpdateTableRow(idx, 'points', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-amber-500/40 rounded-lg p-1 text-center text-xs font-mono font-black text-amber-300"
-                                title="Punkty ligowe"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Sety:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.setsWon}
-                                onChange={e => handleUpdateTableRow(idx, 'setsWon', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Sety wygrane"
-                              />
-                              <span className="text-slate-500">:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.setsLost}
-                                onChange={e => handleUpdateTableRow(idx, 'setsLost', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Sety przegrane"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Małe pkt:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.pointsWon}
-                                onChange={e => handleUpdateTableRow(idx, 'pointsWon', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Małe punkty zdobyte"
-                              />
-                              <span className="text-slate-500">:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.pointsLost}
-                                onChange={e => handleUpdateTableRow(idx, 'pointsLost', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Małe punkty stracone"
-                              />
-                            </div>
-
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteTableRow(idx)}
-                              className="w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 flex items-center justify-center transition ml-1"
-                              title="Usuń drużynę z tabeli"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Cutoff visual separator after 3rd place in Faza 1 */}
-                        {isCutoff && (
-                          <div className="my-2.5 px-3 py-1.5 rounded-xl bg-emerald-950/30 border border-emerald-500/40 flex items-center justify-between text-xs font-bold text-emerald-300 shadow">
-                            <span className="flex items-center gap-1.5">
-                              <span>══════</span>
-                              <span>🟢 GRANICA AWANSU DO GRUPY FINAŁOWEJ (TOP 3)</span>
-                            </span>
-                            <span className="text-[10px] uppercase font-mono bg-emerald-500/20 px-2 py-0.5 rounded">
-                              3 ZESPOŁY AWANSUJĄ
-                            </span>
-                          </div>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Stopka */}
-            <div className="p-4 sm:p-5 border-t border-slate-800 bg-slate-950 flex items-center justify-between gap-3">
-              <span className="text-xs text-slate-400">
-                Liczba zespołów w grupie: <strong className="text-white">{tableRows.length}</strong>
-              </span>
-              <div className="flex items-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setShowEditTableModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition"
-                  disabled={savingTable}
-                >
-                  Anuluj
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveTable}
-                  disabled={savingTable}
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50 text-slate-950 font-black text-xs flex items-center gap-2 transition shadow-lg shadow-emerald-500/20"
-                >
-                  {savingTable ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Zapisywanie tabeli...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" />
-                      <span>Zapisz Zmiany w Tabeli</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* MODAL 2: Automatyczny Generator Wyjściowej Szóstki */}
       {lineupModalEvent && generatedLineup && (
@@ -6673,404 +4538,7 @@ function RozgrywkiContent() {
         </div>
       )}
 
-      {/* MODAL EDYCJI TABELI LIGOWEJ */}
-      {showEditTableModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            {/* Nagłówek */}
-            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-slate-900 via-sky-950/30 to-slate-900">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
-                  <Trophy className="w-5 h-5 stroke-[2.5]" />
-                </div>
-                <div>
-                  <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-                    Edycja Tabeli Ligowej
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                      {leaguePhases.find(p => p.id === editingTablePhaseId)?.name || 'Faza I'}
-                    </span>
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    {editingTablePhaseId === 'faza_1'
-                      ? 'Grupa eliminacyjna (7 zespołów) • Pozycje 1-3 mają zielony awans do Grupy Finałowej'
-                      : 'Grupa finałowa (7 zespołów) • Faza medalowa'}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowEditTableModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            {/* Faza wybór */}
-            <div className="p-3 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-400">Edytowana faza:</span>
-                <div className="flex gap-1.5">
-                  {leaguePhases.map(ph => (
-                    <button
-                      key={ph.id}
-                      type="button"
-                      onClick={() => {
-                        setEditingTablePhaseId(ph.id);
-                        setTableRows(ph.table ? JSON.parse(JSON.stringify(ph.table)) : []);
-                      }}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
-                        editingTablePhaseId === ph.id
-                          ? 'bg-sky-500 text-slate-950 font-black'
-                          : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                      }`}
-                    >
-                      {ph.shortName}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleAddTableRow}
-                className="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 hover:text-emerald-200 text-xs font-bold flex items-center gap-1 transition"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Dodaj zespół</span>
-              </button>
-            </div>
-
-            <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
-              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  <div className="flex items-center gap-2">
-                    <Upload className="w-4 h-4 text-sky-400" />
-                    <span className="font-bold text-white uppercase tracking-wider text-xs">
-                      Szybki Import Tabeli LALS
-                    </span>
-                  </div>
-                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
-                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
-                    <button
-                      type="button"
-                      onClick={() => setTableImportTab('text')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
-                        tableImportTab === 'text'
-                          ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      📋 Wklej Tekst
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setTableImportTab('image')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
-                        tableImportTab === 'image'
-                          ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      📸 Zdjęcie / Screenshot (OCR)
-                    </button>
-                  </div>
-                </div>
-
-                {tableImportTab === 'text' ? (
-                  <div className="space-y-2 pt-1">
-                    <p className="text-[11px] text-slate-400">
-                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
-                    </p>
-                    <textarea
-                      rows={4}
-                      value={rawTableInput}
-                      onChange={e => setRawTableInput(e.target.value)}
-                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                    />
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={() => handleParseRawTable()}
-                        disabled={!rawTableInput.trim()}
-                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
-                      >
-                        Przetwórz i wstaw do tabeli
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3 pt-1">
-                    <p className="text-[11px] text-slate-400">
-                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
-                    </p>
-                    <div className="flex flex-col sm:flex-row items-center gap-3">
-                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
-                        <Camera className="w-4 h-4" />
-                        <span>Wybierz zdjęcie / screen tabeli</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={e => {
-                            const file = e.target.files?.[0];
-                            if (file) handleTableImageOcr(file);
-                          }}
-                        />
-                      </label>
-                      {tableImagePreview && (
-                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
-                        </span>
-                      )}
-                    </div>
-
-                    {tableOcrLoading && (
-                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
-                        <div className="flex items-center justify-between text-xs text-sky-300">
-                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
-                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
-                        </div>
-                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                          <div
-                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
-                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {rawTableInput && (
-                      <div className="space-y-1.5 pt-2">
-                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
-                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
-                        </div>
-                        <textarea
-                          rows={3}
-                          value={rawTableInput}
-                          onChange={e => setRawTableInput(e.target.value)}
-                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
-                        />
-                        <div className="flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => handleParseRawTable()}
-                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
-                          >
-                            Zastosuj do tabeli
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Edycja wierszy tabeli */}
-              <div className="space-y-2">
-                <div className="text-[11px] uppercase tracking-wider font-bold text-slate-400 flex items-center justify-between px-1">
-                  <span>Wiersze tabeli ({tableRows.length} zespołów):</span>
-                  {editingTablePhaseId === 'faza_1' && (
-                    <span className="text-emerald-400 font-bold lowercase tracking-normal">
-                      🟢 top 3 ma awans (linia odcięcia pod 3. miejscem)
-                    </span>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  {tableRows.map((row, idx) => {
-                    const isCutoff = editingTablePhaseId === 'faza_1' && idx === 2; // after 3rd team
-                    const isAdvancing = editingTablePhaseId === 'faza_1' && idx < 3;
-                    return (
-                      <React.Fragment key={row.id || idx}>
-                        <div
-                          className={`p-3 rounded-xl border transition flex flex-col md:flex-row md:items-center justify-between gap-3 ${
-                            isAdvancing
-                              ? 'bg-slate-950/80 border-emerald-500/40 ring-1 ring-emerald-500/20'
-                              : 'bg-slate-950/60 border-slate-800'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            {/* Reorder Buttons */}
-                            <div className="flex flex-col gap-0.5">
-                              <button
-                                type="button"
-                                disabled={idx === 0}
-                                onClick={() => handleMoveTableRow(idx, 'up')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
-                                title="Przesuń wyżej"
-                              >
-                                ▲
-                              </button>
-                              <button
-                                type="button"
-                                disabled={idx === tableRows.length - 1}
-                                onClick={() => handleMoveTableRow(idx, 'down')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
-                                title="Przesuń niżej"
-                              >
-                                ▼
-                              </button>
-                            </div>
-
-                            {/* Position */}
-                            <span className={`w-7 text-center font-mono font-black text-sm ${isAdvancing ? 'text-emerald-400' : 'text-slate-400'}`}>
-                              {idx + 1}.
-                            </span>
-
-                            {/* Team Name */}
-                            <input
-                              type="text"
-                              value={row.teamName}
-                              onChange={e => handleUpdateTableRow(idx, 'teamName', e.target.value)}
-                              className="w-48 sm:w-56 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-sky-500"
-                              placeholder="Nazwa zespołu"
-                            />
-
-                            {isAdvancing && (
-                              <span className="hidden sm:inline-block text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                AWANS
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Stats Inputs */}
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">M:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.matchesPlayed}
-                                onChange={e => handleUpdateTableRow(idx, 'matchesPlayed', parseInt(e.target.value) || 0)}
-                                className="w-12 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Mecze rozegrane"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-amber-400 font-mono font-bold">Pkt:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.points}
-                                onChange={e => handleUpdateTableRow(idx, 'points', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-amber-500/40 rounded-lg p-1 text-center text-xs font-mono font-black text-amber-300"
-                                title="Punkty ligowe"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Sety:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.setsWon}
-                                onChange={e => handleUpdateTableRow(idx, 'setsWon', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Sety wygrane"
-                              />
-                              <span className="text-slate-500">:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.setsLost}
-                                onChange={e => handleUpdateTableRow(idx, 'setsLost', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Sety przegrane"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Małe pkt:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.pointsWon}
-                                onChange={e => handleUpdateTableRow(idx, 'pointsWon', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Małe punkty zdobyte"
-                              />
-                              <span className="text-slate-500">:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.pointsLost}
-                                onChange={e => handleUpdateTableRow(idx, 'pointsLost', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Małe punkty stracone"
-                              />
-                            </div>
-
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteTableRow(idx)}
-                              className="w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 flex items-center justify-center transition ml-1"
-                              title="Usuń drużynę z tabeli"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Cutoff visual separator after 3rd place in Faza 1 */}
-                        {isCutoff && (
-                          <div className="my-2.5 px-3 py-1.5 rounded-xl bg-emerald-950/30 border border-emerald-500/40 flex items-center justify-between text-xs font-bold text-emerald-300 shadow">
-                            <span className="flex items-center gap-1.5">
-                              <span>══════</span>
-                              <span>🟢 GRANICA AWANSU DO GRUPY FINAŁOWEJ (TOP 3)</span>
-                            </span>
-                            <span className="text-[10px] uppercase font-mono bg-emerald-500/20 px-2 py-0.5 rounded">
-                              3 ZESPOŁY AWANSUJĄ
-                            </span>
-                          </div>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Stopka */}
-            <div className="p-4 sm:p-5 border-t border-slate-800 bg-slate-950 flex items-center justify-between gap-3">
-              <span className="text-xs text-slate-400">
-                Liczba zespołów w grupie: <strong className="text-white">{tableRows.length}</strong>
-              </span>
-              <div className="flex items-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setShowEditTableModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition"
-                  disabled={savingTable}
-                >
-                  Anuluj
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveTable}
-                  disabled={savingTable}
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50 text-slate-950 font-black text-xs flex items-center gap-2 transition shadow-lg shadow-emerald-500/20"
-                >
-                  {savingTable ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Zapisywanie tabeli...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" />
-                      <span>Zapisz Zmiany w Tabeli</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* MODAL 3: Live Scorekeeper na Telefon */}
       {liveModalEvent && (
@@ -7212,404 +4680,7 @@ function RozgrywkiContent() {
         </div>
       )}
 
-      {/* MODAL EDYCJI TABELI LIGOWEJ */}
-      {showEditTableModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            {/* Nagłówek */}
-            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-slate-900 via-sky-950/30 to-slate-900">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
-                  <Trophy className="w-5 h-5 stroke-[2.5]" />
-                </div>
-                <div>
-                  <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-                    Edycja Tabeli Ligowej
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                      {leaguePhases.find(p => p.id === editingTablePhaseId)?.name || 'Faza I'}
-                    </span>
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    {editingTablePhaseId === 'faza_1'
-                      ? 'Grupa eliminacyjna (7 zespołów) • Pozycje 1-3 mają zielony awans do Grupy Finałowej'
-                      : 'Grupa finałowa (7 zespołów) • Faza medalowa'}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowEditTableModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            {/* Faza wybór */}
-            <div className="p-3 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-400">Edytowana faza:</span>
-                <div className="flex gap-1.5">
-                  {leaguePhases.map(ph => (
-                    <button
-                      key={ph.id}
-                      type="button"
-                      onClick={() => {
-                        setEditingTablePhaseId(ph.id);
-                        setTableRows(ph.table ? JSON.parse(JSON.stringify(ph.table)) : []);
-                      }}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
-                        editingTablePhaseId === ph.id
-                          ? 'bg-sky-500 text-slate-950 font-black'
-                          : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                      }`}
-                    >
-                      {ph.shortName}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleAddTableRow}
-                className="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 hover:text-emerald-200 text-xs font-bold flex items-center gap-1 transition"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Dodaj zespół</span>
-              </button>
-            </div>
-
-            <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
-              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  <div className="flex items-center gap-2">
-                    <Upload className="w-4 h-4 text-sky-400" />
-                    <span className="font-bold text-white uppercase tracking-wider text-xs">
-                      Szybki Import Tabeli LALS
-                    </span>
-                  </div>
-                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
-                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
-                    <button
-                      type="button"
-                      onClick={() => setTableImportTab('text')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
-                        tableImportTab === 'text'
-                          ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      📋 Wklej Tekst
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setTableImportTab('image')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
-                        tableImportTab === 'image'
-                          ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      📸 Zdjęcie / Screenshot (OCR)
-                    </button>
-                  </div>
-                </div>
-
-                {tableImportTab === 'text' ? (
-                  <div className="space-y-2 pt-1">
-                    <p className="text-[11px] text-slate-400">
-                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
-                    </p>
-                    <textarea
-                      rows={4}
-                      value={rawTableInput}
-                      onChange={e => setRawTableInput(e.target.value)}
-                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                    />
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={() => handleParseRawTable()}
-                        disabled={!rawTableInput.trim()}
-                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
-                      >
-                        Przetwórz i wstaw do tabeli
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3 pt-1">
-                    <p className="text-[11px] text-slate-400">
-                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
-                    </p>
-                    <div className="flex flex-col sm:flex-row items-center gap-3">
-                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
-                        <Camera className="w-4 h-4" />
-                        <span>Wybierz zdjęcie / screen tabeli</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={e => {
-                            const file = e.target.files?.[0];
-                            if (file) handleTableImageOcr(file);
-                          }}
-                        />
-                      </label>
-                      {tableImagePreview && (
-                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
-                        </span>
-                      )}
-                    </div>
-
-                    {tableOcrLoading && (
-                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
-                        <div className="flex items-center justify-between text-xs text-sky-300">
-                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
-                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
-                        </div>
-                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                          <div
-                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
-                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {rawTableInput && (
-                      <div className="space-y-1.5 pt-2">
-                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
-                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
-                        </div>
-                        <textarea
-                          rows={3}
-                          value={rawTableInput}
-                          onChange={e => setRawTableInput(e.target.value)}
-                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
-                        />
-                        <div className="flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => handleParseRawTable()}
-                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
-                          >
-                            Zastosuj do tabeli
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Edycja wierszy tabeli */}
-              <div className="space-y-2">
-                <div className="text-[11px] uppercase tracking-wider font-bold text-slate-400 flex items-center justify-between px-1">
-                  <span>Wiersze tabeli ({tableRows.length} zespołów):</span>
-                  {editingTablePhaseId === 'faza_1' && (
-                    <span className="text-emerald-400 font-bold lowercase tracking-normal">
-                      🟢 top 3 ma awans (linia odcięcia pod 3. miejscem)
-                    </span>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  {tableRows.map((row, idx) => {
-                    const isCutoff = editingTablePhaseId === 'faza_1' && idx === 2; // after 3rd team
-                    const isAdvancing = editingTablePhaseId === 'faza_1' && idx < 3;
-                    return (
-                      <React.Fragment key={row.id || idx}>
-                        <div
-                          className={`p-3 rounded-xl border transition flex flex-col md:flex-row md:items-center justify-between gap-3 ${
-                            isAdvancing
-                              ? 'bg-slate-950/80 border-emerald-500/40 ring-1 ring-emerald-500/20'
-                              : 'bg-slate-950/60 border-slate-800'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            {/* Reorder Buttons */}
-                            <div className="flex flex-col gap-0.5">
-                              <button
-                                type="button"
-                                disabled={idx === 0}
-                                onClick={() => handleMoveTableRow(idx, 'up')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
-                                title="Przesuń wyżej"
-                              >
-                                ▲
-                              </button>
-                              <button
-                                type="button"
-                                disabled={idx === tableRows.length - 1}
-                                onClick={() => handleMoveTableRow(idx, 'down')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
-                                title="Przesuń niżej"
-                              >
-                                ▼
-                              </button>
-                            </div>
-
-                            {/* Position */}
-                            <span className={`w-7 text-center font-mono font-black text-sm ${isAdvancing ? 'text-emerald-400' : 'text-slate-400'}`}>
-                              {idx + 1}.
-                            </span>
-
-                            {/* Team Name */}
-                            <input
-                              type="text"
-                              value={row.teamName}
-                              onChange={e => handleUpdateTableRow(idx, 'teamName', e.target.value)}
-                              className="w-48 sm:w-56 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-sky-500"
-                              placeholder="Nazwa zespołu"
-                            />
-
-                            {isAdvancing && (
-                              <span className="hidden sm:inline-block text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                AWANS
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Stats Inputs */}
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">M:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.matchesPlayed}
-                                onChange={e => handleUpdateTableRow(idx, 'matchesPlayed', parseInt(e.target.value) || 0)}
-                                className="w-12 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Mecze rozegrane"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-amber-400 font-mono font-bold">Pkt:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.points}
-                                onChange={e => handleUpdateTableRow(idx, 'points', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-amber-500/40 rounded-lg p-1 text-center text-xs font-mono font-black text-amber-300"
-                                title="Punkty ligowe"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Sety:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.setsWon}
-                                onChange={e => handleUpdateTableRow(idx, 'setsWon', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Sety wygrane"
-                              />
-                              <span className="text-slate-500">:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.setsLost}
-                                onChange={e => handleUpdateTableRow(idx, 'setsLost', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Sety przegrane"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Małe pkt:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.pointsWon}
-                                onChange={e => handleUpdateTableRow(idx, 'pointsWon', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Małe punkty zdobyte"
-                              />
-                              <span className="text-slate-500">:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.pointsLost}
-                                onChange={e => handleUpdateTableRow(idx, 'pointsLost', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Małe punkty stracone"
-                              />
-                            </div>
-
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteTableRow(idx)}
-                              className="w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 flex items-center justify-center transition ml-1"
-                              title="Usuń drużynę z tabeli"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Cutoff visual separator after 3rd place in Faza 1 */}
-                        {isCutoff && (
-                          <div className="my-2.5 px-3 py-1.5 rounded-xl bg-emerald-950/30 border border-emerald-500/40 flex items-center justify-between text-xs font-bold text-emerald-300 shadow">
-                            <span className="flex items-center gap-1.5">
-                              <span>══════</span>
-                              <span>🟢 GRANICA AWANSU DO GRUPY FINAŁOWEJ (TOP 3)</span>
-                            </span>
-                            <span className="text-[10px] uppercase font-mono bg-emerald-500/20 px-2 py-0.5 rounded">
-                              3 ZESPOŁY AWANSUJĄ
-                            </span>
-                          </div>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Stopka */}
-            <div className="p-4 sm:p-5 border-t border-slate-800 bg-slate-950 flex items-center justify-between gap-3">
-              <span className="text-xs text-slate-400">
-                Liczba zespołów w grupie: <strong className="text-white">{tableRows.length}</strong>
-              </span>
-              <div className="flex items-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setShowEditTableModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition"
-                  disabled={savingTable}
-                >
-                  Anuluj
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveTable}
-                  disabled={savingTable}
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50 text-slate-950 font-black text-xs flex items-center gap-2 transition shadow-lg shadow-emerald-500/20"
-                >
-                  {savingTable ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Zapisywanie tabeli...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" />
-                      <span>Zapisz Zmiany w Tabeli</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* MODAL 4: Social Media Post Generator */}
       {socialModalEvent && (
@@ -7679,404 +4750,7 @@ function RozgrywkiContent() {
         </div>
       )}
 
-      {/* MODAL EDYCJI TABELI LIGOWEJ */}
-      {showEditTableModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            {/* Nagłówek */}
-            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-slate-900 via-sky-950/30 to-slate-900">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
-                  <Trophy className="w-5 h-5 stroke-[2.5]" />
-                </div>
-                <div>
-                  <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-                    Edycja Tabeli Ligowej
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                      {leaguePhases.find(p => p.id === editingTablePhaseId)?.name || 'Faza I'}
-                    </span>
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    {editingTablePhaseId === 'faza_1'
-                      ? 'Grupa eliminacyjna (7 zespołów) • Pozycje 1-3 mają zielony awans do Grupy Finałowej'
-                      : 'Grupa finałowa (7 zespołów) • Faza medalowa'}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowEditTableModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            {/* Faza wybór */}
-            <div className="p-3 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-400">Edytowana faza:</span>
-                <div className="flex gap-1.5">
-                  {leaguePhases.map(ph => (
-                    <button
-                      key={ph.id}
-                      type="button"
-                      onClick={() => {
-                        setEditingTablePhaseId(ph.id);
-                        setTableRows(ph.table ? JSON.parse(JSON.stringify(ph.table)) : []);
-                      }}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
-                        editingTablePhaseId === ph.id
-                          ? 'bg-sky-500 text-slate-950 font-black'
-                          : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                      }`}
-                    >
-                      {ph.shortName}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleAddTableRow}
-                className="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 hover:text-emerald-200 text-xs font-bold flex items-center gap-1 transition"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Dodaj zespół</span>
-              </button>
-            </div>
-
-            <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
-              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  <div className="flex items-center gap-2">
-                    <Upload className="w-4 h-4 text-sky-400" />
-                    <span className="font-bold text-white uppercase tracking-wider text-xs">
-                      Szybki Import Tabeli LALS
-                    </span>
-                  </div>
-                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
-                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
-                    <button
-                      type="button"
-                      onClick={() => setTableImportTab('text')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
-                        tableImportTab === 'text'
-                          ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      📋 Wklej Tekst
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setTableImportTab('image')}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
-                        tableImportTab === 'image'
-                          ? 'bg-sky-500 text-slate-950 shadow-sm'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      📸 Zdjęcie / Screenshot (OCR)
-                    </button>
-                  </div>
-                </div>
-
-                {tableImportTab === 'text' ? (
-                  <div className="space-y-2 pt-1">
-                    <p className="text-[11px] text-slate-400">
-                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
-                    </p>
-                    <textarea
-                      rows={4}
-                      value={rawTableInput}
-                      onChange={e => setRawTableInput(e.target.value)}
-                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                    />
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={() => handleParseRawTable()}
-                        disabled={!rawTableInput.trim()}
-                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
-                      >
-                        Przetwórz i wstaw do tabeli
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3 pt-1">
-                    <p className="text-[11px] text-slate-400">
-                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
-                    </p>
-                    <div className="flex flex-col sm:flex-row items-center gap-3">
-                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
-                        <Camera className="w-4 h-4" />
-                        <span>Wybierz zdjęcie / screen tabeli</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={e => {
-                            const file = e.target.files?.[0];
-                            if (file) handleTableImageOcr(file);
-                          }}
-                        />
-                      </label>
-                      {tableImagePreview && (
-                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
-                        </span>
-                      )}
-                    </div>
-
-                    {tableOcrLoading && (
-                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
-                        <div className="flex items-center justify-between text-xs text-sky-300">
-                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
-                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
-                        </div>
-                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                          <div
-                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
-                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {rawTableInput && (
-                      <div className="space-y-1.5 pt-2">
-                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
-                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
-                        </div>
-                        <textarea
-                          rows={3}
-                          value={rawTableInput}
-                          onChange={e => setRawTableInput(e.target.value)}
-                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
-                        />
-                        <div className="flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => handleParseRawTable()}
-                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
-                          >
-                            Zastosuj do tabeli
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Edycja wierszy tabeli */}
-              <div className="space-y-2">
-                <div className="text-[11px] uppercase tracking-wider font-bold text-slate-400 flex items-center justify-between px-1">
-                  <span>Wiersze tabeli ({tableRows.length} zespołów):</span>
-                  {editingTablePhaseId === 'faza_1' && (
-                    <span className="text-emerald-400 font-bold lowercase tracking-normal">
-                      🟢 top 3 ma awans (linia odcięcia pod 3. miejscem)
-                    </span>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  {tableRows.map((row, idx) => {
-                    const isCutoff = editingTablePhaseId === 'faza_1' && idx === 2; // after 3rd team
-                    const isAdvancing = editingTablePhaseId === 'faza_1' && idx < 3;
-                    return (
-                      <React.Fragment key={row.id || idx}>
-                        <div
-                          className={`p-3 rounded-xl border transition flex flex-col md:flex-row md:items-center justify-between gap-3 ${
-                            isAdvancing
-                              ? 'bg-slate-950/80 border-emerald-500/40 ring-1 ring-emerald-500/20'
-                              : 'bg-slate-950/60 border-slate-800'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            {/* Reorder Buttons */}
-                            <div className="flex flex-col gap-0.5">
-                              <button
-                                type="button"
-                                disabled={idx === 0}
-                                onClick={() => handleMoveTableRow(idx, 'up')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
-                                title="Przesuń wyżej"
-                              >
-                                ▲
-                              </button>
-                              <button
-                                type="button"
-                                disabled={idx === tableRows.length - 1}
-                                onClick={() => handleMoveTableRow(idx, 'down')}
-                                className="w-5 h-5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-400 hover:text-white flex items-center justify-center text-[10px]"
-                                title="Przesuń niżej"
-                              >
-                                ▼
-                              </button>
-                            </div>
-
-                            {/* Position */}
-                            <span className={`w-7 text-center font-mono font-black text-sm ${isAdvancing ? 'text-emerald-400' : 'text-slate-400'}`}>
-                              {idx + 1}.
-                            </span>
-
-                            {/* Team Name */}
-                            <input
-                              type="text"
-                              value={row.teamName}
-                              onChange={e => handleUpdateTableRow(idx, 'teamName', e.target.value)}
-                              className="w-48 sm:w-56 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-sky-500"
-                              placeholder="Nazwa zespołu"
-                            />
-
-                            {isAdvancing && (
-                              <span className="hidden sm:inline-block text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                AWANS
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Stats Inputs */}
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">M:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.matchesPlayed}
-                                onChange={e => handleUpdateTableRow(idx, 'matchesPlayed', parseInt(e.target.value) || 0)}
-                                className="w-12 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Mecze rozegrane"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-amber-400 font-mono font-bold">Pkt:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.points}
-                                onChange={e => handleUpdateTableRow(idx, 'points', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-amber-500/40 rounded-lg p-1 text-center text-xs font-mono font-black text-amber-300"
-                                title="Punkty ligowe"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Sety:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.setsWon}
-                                onChange={e => handleUpdateTableRow(idx, 'setsWon', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Sety wygrane"
-                              />
-                              <span className="text-slate-500">:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.setsLost}
-                                onChange={e => handleUpdateTableRow(idx, 'setsLost', parseInt(e.target.value) || 0)}
-                                className="w-10 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Sety przegrane"
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-1">
-                              <span className="text-[10px] text-slate-400 font-mono">Małe pkt:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.pointsWon}
-                                onChange={e => handleUpdateTableRow(idx, 'pointsWon', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Małe punkty zdobyte"
-                              />
-                              <span className="text-slate-500">:</span>
-                              <input
-                                type="number"
-                                min="0"
-                                value={row.pointsLost}
-                                onChange={e => handleUpdateTableRow(idx, 'pointsLost', parseInt(e.target.value) || 0)}
-                                className="w-14 bg-slate-900 border border-slate-700 rounded-lg p-1 text-center text-xs font-mono text-white"
-                                title="Małe punkty stracone"
-                              />
-                            </div>
-
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteTableRow(idx)}
-                              className="w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 flex items-center justify-center transition ml-1"
-                              title="Usuń drużynę z tabeli"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Cutoff visual separator after 3rd place in Faza 1 */}
-                        {isCutoff && (
-                          <div className="my-2.5 px-3 py-1.5 rounded-xl bg-emerald-950/30 border border-emerald-500/40 flex items-center justify-between text-xs font-bold text-emerald-300 shadow">
-                            <span className="flex items-center gap-1.5">
-                              <span>══════</span>
-                              <span>🟢 GRANICA AWANSU DO GRUPY FINAŁOWEJ (TOP 3)</span>
-                            </span>
-                            <span className="text-[10px] uppercase font-mono bg-emerald-500/20 px-2 py-0.5 rounded">
-                              3 ZESPOŁY AWANSUJĄ
-                            </span>
-                          </div>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Stopka */}
-            <div className="p-4 sm:p-5 border-t border-slate-800 bg-slate-950 flex items-center justify-between gap-3">
-              <span className="text-xs text-slate-400">
-                Liczba zespołów w grupie: <strong className="text-white">{tableRows.length}</strong>
-              </span>
-              <div className="flex items-center gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setShowEditTableModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition"
-                  disabled={savingTable}
-                >
-                  Anuluj
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveTable}
-                  disabled={savingTable}
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50 text-slate-950 font-black text-xs flex items-center gap-2 transition shadow-lg shadow-emerald-500/20"
-                >
-                  {savingTable ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Zapisywanie tabeli...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" />
-                      <span>Zapisz Zmiany w Tabeli</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Lightbox Photo Preview & Series Viewer */}
       {selectedPhotoPreview && (() => {
@@ -8888,6 +5562,342 @@ function RozgrywkiContent() {
         </div>
       )}
 
+      {/* MODAL: TWORZENIE NOWEJ FAZY / GRUPY */}
+      {showCreatePhaseModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                  <Plus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-white">Nowa Faza / Grupa Ligowa</h3>
+                  <p className="text-xs text-slate-400">Dodaj nową fazę rozgrywek (np. Grupa B, Finały, Play-off)</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCreatePhaseModal(false)}
+                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="block text-slate-400 font-bold mb-1">Pełna nazwa fazy:</label>
+                <input
+                  type="text"
+                  value={newPhaseName}
+                  onChange={e => setNewPhaseName(e.target.value)}
+                  placeholder="np. Faza II: Grupa Pocieszenia (Miejsca 5-8)"
+                  className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-400 font-bold mb-1">Krótka nazwa (na przycisk):</label>
+                <input
+                  type="text"
+                  value={newPhaseShortName}
+                  onChange={e => setNewPhaseShortName(e.target.value)}
+                  placeholder="np. Miejsca 5-8 lub Grupa B"
+                  className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-400 font-bold mb-1">Miejsca z awansem (0 = finał):</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="16"
+                    value={newPhaseAdvSpots}
+                    onChange={e => setNewPhaseAdvSpots(parseInt(e.target.value) || 0)}
+                    className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-mono font-bold focus:border-sky-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 font-bold mb-1">Cel awansu:</label>
+                  <input
+                    type="text"
+                    value={newPhaseAdvTarget}
+                    onChange={e => setNewPhaseAdvTarget(e.target.value)}
+                    placeholder="np. Grupa Finałowa lub Mistrz"
+                    className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-slate-800 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowCreatePhaseModal(false)}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300"
+              >
+                Anuluj
+              </button>
+              <button
+                type="button"
+                onClick={handleCreatePhase}
+                disabled={creatingPhase || !newPhaseName.trim()}
+                className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-xs flex items-center gap-2 disabled:opacity-50 transition"
+              >
+                {creatingPhase ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                <span>Utwórz Fazę</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: PODZIAŁ GRUPY (SPLIT) */}
+      {showSplitPhaseModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                  <GitFork className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-white">Podział Grupy LALS</h3>
+                  <p className="text-xs text-slate-400">Wydziel nową fazę ze wskazanego zakresu miejsc</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSplitPhaseModal(false)}
+                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="block text-slate-400 font-bold mb-1">Faza źródłowa:</label>
+                <select
+                  value={splitSourcePhaseId}
+                  onChange={e => setSplitSourcePhaseId(e.target.value)}
+                  className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                >
+                  {leaguePhases.map(ph => (
+                    <option key={ph.id} value={ph.id}>{ph.name} ({ph.table?.length || 0} drużyn)</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-400 font-bold mb-1">Pozycja od:</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={splitStartRank}
+                    onChange={e => setSplitStartRank(parseInt(e.target.value) || 1)}
+                    className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-mono font-bold focus:border-sky-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 font-bold mb-1">Pozycja do:</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={splitEndRank}
+                    onChange={e => setSplitEndRank(parseInt(e.target.value) || 1)}
+                    className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-mono font-bold focus:border-sky-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-400 font-bold mb-1">Nazwa nowo powstałej fazy:</label>
+                <input
+                  type="text"
+                  value={splitPhaseName}
+                  onChange={e => setSplitPhaseName(e.target.value)}
+                  placeholder="np. Grupa Mistrzowska (Miejsca 1-4)"
+                  className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-400 font-bold mb-1">Krótka nazwa:</label>
+                <input
+                  type="text"
+                  value={splitPhaseShortName}
+                  onChange={e => setSplitPhaseShortName(e.target.value)}
+                  placeholder="np. Mistrzowska (1-4)"
+                  className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                />
+              </div>
+
+              <label className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 cursor-pointer hover:bg-slate-950">
+                <input
+                  type="checkbox"
+                  checked={splitCarryOverStats}
+                  onChange={e => setSplitCarryOverStats(e.target.checked)}
+                  className="rounded text-purple-500 focus:ring-0"
+                />
+                <span className="text-slate-300">
+                  <strong>Przenieś punkty i sety</strong> z poprzedniej fazy (odznaczenie = reset do 0:0)
+                </span>
+              </label>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-400 font-bold mb-1">Awans z nowej grupy (0 = finał):</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={splitAdvSpots}
+                    onChange={e => setSplitAdvSpots(parseInt(e.target.value) || 0)}
+                    className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-mono font-bold focus:border-sky-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 font-bold mb-1">Cel awansu / Tytuł:</label>
+                  <input
+                    type="text"
+                    value={splitAdvTarget}
+                    onChange={e => setSplitAdvTarget(e.target.value)}
+                    placeholder="np. Mistrz Ligi LALS"
+                    className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-slate-800 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowSplitPhaseModal(false)}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300"
+              >
+                Anuluj
+              </button>
+              <button
+                type="button"
+                onClick={handleSplitPhase}
+                disabled={splittingPhase || !splitPhaseName.trim()}
+                className="px-5 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-black text-xs flex items-center gap-2 disabled:opacity-50 transition"
+              >
+                {splittingPhase ? <Loader2 className="w-4 h-4 animate-spin" /> : <GitFork className="w-4 h-4" />}
+                <span>Podziel i Utwórz Fazę</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: KONFIGURACJA I USUWANIE FAZY */}
+      {showConfigPhaseModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
+                  <Settings className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-white">Konfiguracja Fazy Ligowej</h3>
+                  <p className="text-xs text-slate-400">Edytuj nazwę, reguły awansu lub usuń fazę</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowConfigPhaseModal(false)}
+                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="block text-slate-400 font-bold mb-1">Pełna nazwa fazy:</label>
+                <input
+                  type="text"
+                  value={configPhaseName}
+                  onChange={e => setConfigPhaseName(e.target.value)}
+                  className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-400 font-bold mb-1">Krótka nazwa:</label>
+                <input
+                  type="text"
+                  value={configPhaseShortName}
+                  onChange={e => setConfigPhaseShortName(e.target.value)}
+                  className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-400 font-bold mb-1">Miejsca awansujące (0 = finał):</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={configPhaseAdvSpots}
+                    onChange={e => setConfigPhaseAdvSpots(parseInt(e.target.value) || 0)}
+                    className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-mono font-bold focus:border-sky-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 font-bold mb-1">Cel awansu / Etap:</label>
+                  <input
+                    type="text"
+                    value={configPhaseAdvTarget}
+                    onChange={e => setConfigPhaseAdvTarget(e.target.value)}
+                    placeholder="np. Grupa Finałowa"
+                    className="w-full rounded-xl bg-slate-950 border border-slate-800 p-2.5 text-white font-bold focus:border-sky-500 outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
+              {leaguePhases.length > 1 ? (
+                <button
+                  type="button"
+                  onClick={() => handleDeletePhase(configPhaseId)}
+                  className="px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-500/30 text-xs font-bold flex items-center gap-1.5 transition"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Usuń tę fazę</span>
+                </button>
+              ) : <div />}
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowConfigPhaseModal(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300"
+                >
+                  Anuluj
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSavePhaseConfig}
+                  disabled={updatingPhaseConfig || !configPhaseName.trim()}
+                  className="px-5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs flex items-center gap-2 disabled:opacity-50 transition"
+                >
+                  {updatingPhaseConfig ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                  <span>Zapisz Zmiany</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* MODAL EDYCJI TABELI LIGOWEJ */}
       {showEditTableModal && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
@@ -8906,9 +5916,11 @@ function RozgrywkiContent() {
                     </span>
                   </h3>
                   <p className="text-xs text-slate-400">
-                    {editingTablePhaseId === 'faza_1'
-                      ? 'Grupa eliminacyjna (7 zespołów) • Pozycje 1-3 mają zielony awans do Grupy Finałowej'
-                      : 'Grupa finałowa (7 zespołów) • Faza medalowa'}
+                    {(() => {
+                      const p = leaguePhases.find(ph => ph.id === editingTablePhaseId);
+                      const spots = p?.advancementSpots ?? 0;
+                      return `${p?.name || 'Faza ligowa'} • ${tableRows.length} zespołów • ${spots > 0 ? `Miejsca 1–${spots} awansują (${p?.advancementTargetName || 'Finał'})` : 'Faza medalowa / końcowa'}`;
+                    })()}
                   </p>
                 </div>
               </div>
@@ -9096,8 +6108,10 @@ function RozgrywkiContent() {
 
                 <div className="space-y-2">
                   {tableRows.map((row, idx) => {
-                    const isCutoff = editingTablePhaseId === 'faza_1' && idx === 2; // after 3rd team
-                    const isAdvancing = editingTablePhaseId === 'faza_1' && idx < 3;
+                    const currentEditingPhase = leaguePhases.find(p => p.id === editingTablePhaseId);
+                    const advSpots = currentEditingPhase?.advancementSpots ?? 0;
+                    const isAdvancing = advSpots > 0 && idx < advSpots;
+                    const isCutoff = advSpots > 0 && idx === advSpots - 1;
                     return (
                       <React.Fragment key={row.id || idx}>
                         <div

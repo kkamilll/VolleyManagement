@@ -173,12 +173,27 @@ export async function POST(request: Request) {
         });
       }
 
+      // 3. Zapisz tabelę ligową (jeśli zaimportowano wsad z tabelą)
+      let importedTableCount = 0;
+      if (Array.isArray(body.tableToImport) && body.tableToImport.length > 0) {
+        const targetPhaseId = body.leaguePhaseId || db.activeLeaguePhaseId || 'faza_1';
+        if (!db.leaguePhases) db.leaguePhases = [];
+        const phase = db.leaguePhases.find(p => p.id === targetPhaseId);
+        if (phase) {
+          phase.table = body.tableToImport;
+          phase.teamsCount = body.tableToImport.length;
+        }
+        db.leagueTable = body.tableToImport;
+        importedTableCount = body.tableToImport.length;
+      }
+
       writeDatabase(db);
       return NextResponse.json({
         success: true,
         importedMatchesCount,
         importedFixturesCount,
-        message: `Zaimportowano pomyślnie: ${importedMatchesCount} wyników meczów i ${importedFixturesCount} jednostek terminarza!`
+        importedTableCount,
+        message: `Zaimportowano pomyślnie: ${importedMatchesCount} wyników meczów, ${importedFixturesCount} jednostek terminarza${importedTableCount > 0 ? ` oraz tabelę z ${importedTableCount} drużynami` : ''}!`
       });
     }
 

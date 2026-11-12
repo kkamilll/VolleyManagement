@@ -402,13 +402,87 @@ export async function POST(request: Request) {
         isActive: false,
         advancementSpots: Number(advancementSpots) || 1,
         advancementTargetName: advancementTargetName?.trim() || 'Mistrz Ligi LALS',
-        teamsCount: Number(teamsCount) || 7,
+        teamsCount: Number(teamsCount) || (Array.isArray(table) ? table.length : 0),
         table: Array.isArray(table) ? table : [],
         createdAt: new Date().toISOString()
       };
       db.leaguePhases.push(newPhase);
       writeDatabase(db);
       return NextResponse.json({ success: true, phase: newPhase, message: 'Nowa faza ligowa została utworzona!' });
+    }
+
+    if (body.action === 'DELETE_PHASE') {
+      if (!canManage) {
+        return NextResponse.json({ error: 'Brak uprawnień do usuwania fazy' }, { status: 403 });
+      }
+      const { phaseId } = body;
+      if (!phaseId) return NextResponse.json({ error: 'Brak ID fazy' }, { status: 400 });
+
+      if (db.leaguePhases && db.leaguePhases.length > 1) {
+        db.leaguePhases = db.leaguePhases.filter(p => p.id !== phaseId);
+        if (db.activeLeaguePhaseId === phaseId) {
+          db.activeLeaguePhaseId = db.leaguePhases[0].id;
+          db.leaguePhases[0].isActive = true;
+        }
+        writeDatabase(db);
+        return NextResponse.json({ success: true, message: 'Faza została usunięta', activeLeaguePhaseId: db.activeLeaguePhaseId });
+      } else {
+        return NextResponse.json({ error: 'Nie można usunąć jedynej fazy w lidze' }, { status: 400 });
+      }
+    }
+
+    if (body.action === 'SPLIT_PHASE') {
+      if (!canManage) {
+        return NextResponse.json({ error: 'Brak uprawnień do podziału fazy' }, { status: 403 });
+      }
+      const { sourcePhaseId, newPhaseName, newPhaseShortName, startRank, endRank, advancementSpots, advancementTargetName, carryOverStats } = body;
+      if (!sourcePhaseId || !newPhaseName) {
+        return NextResponse.json({ error: 'Podaj ID fazy źródłowej oraz nazwę nowej grupy' }, { status: 400 });
+      }
+
+      const sourcePhase = (db.leaguePhases || []).find(p => p.id === sourcePhaseId);
+      if (!sourcePhase || !sourcePhase.table) {
+        return NextResponse.json({ error: 'Nie znaleziono fazy źródłowej lub jej tabeli' }, { status: 404 });
+      }
+
+      const start = Math.max(1, Number(startRank) || 1) - 1;
+      const end = Math.min(sourcePhase.table.length, Number(endRank) || sourcePhase.table.length);
+      const selectedTeams = sourcePhase.table.slice(start, end);
+
+      const splitTable: LeagueTableTeam[] = selectedTeams.map((t, idx) => ({
+        id: `t_${Date.now()}_${idx}`,
+        position: idx + 1,
+        teamName: t.teamName,
+        matchesPlayed: carryOverStats ? t.matchesPlayed : 0,
+        points: carryOverStats ? t.points : 0,
+        setsWon: carryOverStats ? t.setsWon : 0,
+        setsLost: carryOverStats ? t.setsLost : 0,
+        pointsWon: carryOverStats ? t.pointsWon : 0,
+        pointsLost: carryOverStats ? t.pointsLost : 0,
+        form: carryOverStats ? (t.form || []) : []
+      }));
+
+      const newPhase: LeaguePhase = {
+        id: `faza_${Date.now()}`,
+        name: newPhaseName.trim(),
+        shortName: newPhaseShortName?.trim() || `Grupa (${start + 1}-${end})`,
+        isActive: false,
+        advancementSpots: Number(advancementSpots) || 1,
+        advancementTargetName: advancementTargetName?.trim() || 'Mistrz Ligi LALS',
+        teamsCount: splitTable.length,
+        table: splitTable,
+        createdAt: new Date().toISOString()
+      };
+
+      if (!db.leaguePhases) db.leaguePhases = [];
+      db.leaguePhases.push(newPhase);
+      writeDatabase(db);
+
+      return NextResponse.json({
+        success: true,
+        phase: newPhase,
+        message: `Utworzono fazę: "${newPhase.name}" z ${splitTable.length} zespołami (miejsca ${start + 1} do ${end})!`
+      });
     }
 
     if (body.action === 'UPDATE_TABLE') {
