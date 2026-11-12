@@ -28,7 +28,8 @@ import {
   Search,
   ChevronDown,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Camera
 } from 'lucide-react';
 import { User, Role, PlayerPosition, PlayerStats } from '@/lib/types';
 
@@ -52,7 +53,43 @@ export default function TeamPage() {
   const [editPhone, setEditPhone] = useState('');
   const [editStatus, setEditStatus] = useState<'Aktywny' | 'Kontuzjowany' | 'Nieobecny'>('Aktywny');
   const [editIsCaptain, setEditIsCaptain] = useState(false);
+  const [editAvatar, setEditAvatar] = useState<string>('');
   const [saving, setSaving] = useState(false);
+
+  const handleEditAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 400;
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          setEditAvatar(canvas.toDataURL('image/jpeg', 0.85));
+        }
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
 
   const fetchUsers = async () => {
     try {
@@ -83,6 +120,7 @@ export default function TeamPage() {
     setEditPhone(user.phone || '');
     setEditStatus(user.status || 'Aktywny');
     setEditIsCaptain(Boolean(user.isCaptain));
+    setEditAvatar(user.avatar || '');
   };
 
   const openProfile = (user: User) => {
@@ -118,7 +156,8 @@ export default function TeamPage() {
           height: editHeight ? Number(editHeight) : undefined,
           phone: editPhone,
           status: editStatus,
-          isCaptain: editIsCaptain
+          isCaptain: editIsCaptain,
+          avatar: editAvatar || ''
         })
       });
 
@@ -247,11 +286,19 @@ export default function TeamPage() {
               className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm relative flex items-start justify-between group hover:border-amber-400 hover:shadow-md transition-all duration-200"
             >
               <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg text-white shadow-sm ${
-                  member.role === 'KIEROWNIK' ? 'bg-amber-600 border border-amber-400' : 'bg-sky-600 border border-sky-400'
-                }`}>
-                  {member.name.charAt(0)}
-                </div>
+                {member.avatar ? (
+                  <img
+                    src={member.avatar}
+                    alt={member.name}
+                    className="w-12 h-12 rounded-2xl object-cover border border-slate-200 shadow-sm shrink-0"
+                  />
+                ) : (
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg text-white shadow-sm shrink-0 ${
+                    member.role === 'KIEROWNIK' ? 'bg-amber-600 border border-amber-400' : 'bg-sky-600 border border-sky-400'
+                  }`}>
+                    {member.name.charAt(0)}
+                  </div>
+                )}
                 <div>
                   <h3 className="text-sm font-black text-slate-900">{member.name}</h3>
                   <div className="flex items-center gap-1.5 mt-0.5">
@@ -390,13 +437,28 @@ export default function TeamPage() {
                   {/* Top Bar with Number & Position */}
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-mono font-black text-xl shadow-sm ${
-                        isLukaszCaptain
-                          ? 'bg-amber-100 border border-amber-300 text-amber-800'
-                          : 'bg-sky-50 border border-sky-200 text-sky-700'
-                      }`}>
-                        {player.number ? `#${player.number}` : '-'}
-                      </div>
+                      {player.avatar ? (
+                        <div className="relative w-12 h-12 rounded-2xl overflow-hidden border border-slate-200 shadow-sm shrink-0">
+                          <img
+                            src={player.avatar}
+                            alt={player.name}
+                            className="w-full h-full object-cover"
+                          />
+                          {player.number && (
+                            <span className="absolute bottom-0 right-0 bg-slate-900/80 text-white font-mono font-black text-[9px] px-1 rounded-tl-md">
+                              #{player.number}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-mono font-black text-xl shadow-sm shrink-0 ${
+                          isLukaszCaptain
+                            ? 'bg-amber-100 border border-amber-300 text-amber-800'
+                            : 'bg-sky-50 border border-sky-200 text-sky-700'
+                        }`}>
+                          {player.number ? `#${player.number}` : '-'}
+                        </div>
+                      )}
                       <div>
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <h3 className="text-base font-black text-slate-900 tracking-wide">{player.name}</h3>
@@ -824,6 +886,54 @@ export default function TeamPage() {
             </h3>
 
             <form onSubmit={handleSaveEdit} className="space-y-4">
+              {/* Zdjęcie profilowe */}
+              <div className="flex items-center gap-4 p-3 bg-slate-50 border border-slate-200 rounded-2xl">
+                <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-white shadow-md bg-white shrink-0 flex items-center justify-center">
+                  {editAvatar ? (
+                    <img src={editAvatar} alt="Podgląd" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-slate-200 text-slate-600 font-black text-xl flex items-center justify-center">
+                      {editName ? editName.charAt(0) : '?'}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <label
+                      htmlFor="team-edit-avatar-file"
+                      className="px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 text-xs font-bold cursor-pointer transition inline-flex items-center gap-1.5 shadow-2xs"
+                    >
+                      <Camera className="w-3.5 h-3.5" />
+                      Wybierz zdjęcie
+                    </label>
+                    <input
+                      type="file"
+                      id="team-edit-avatar-file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleEditAvatarFileChange}
+                    />
+                    {editAvatar && (
+                      <button
+                        type="button"
+                        onClick={() => setEditAvatar('')}
+                        className="px-2 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold transition"
+                      >
+                        Usuń
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    type="url"
+                    value={editAvatar.startsWith('data:') ? '' : editAvatar}
+                    onChange={e => setEditAvatar(e.target.value)}
+                    placeholder="Lub podaj URL zdjęcia..."
+                    className="w-full px-2.5 py-1 text-[11px] rounded-lg bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-500"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Imię i Nazwisko</label>
                 <input

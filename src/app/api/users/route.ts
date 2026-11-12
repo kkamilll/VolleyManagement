@@ -23,7 +23,7 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { id, name, role, number, position, height, phone, status, stats, isCaptain } = body;
+    const { id, name, role, number, position, height, phone, status, stats, isCaptain, avatar } = body;
 
     const isStaff = currentUser.role === 'KIEROWNIK' || currentUser.role === 'TRENER' || currentUser.isCaptain;
     // Only Kierownik, Trener or Captain can edit other players; users can edit themselves
@@ -50,6 +50,9 @@ export async function PUT(request: Request) {
     if (height !== undefined) targetUser.height = height ? Number(height) : undefined;
     if (phone !== undefined) targetUser.phone = phone.trim();
     if (status) targetUser.status = status;
+    if (avatar !== undefined) {
+      targetUser.avatar = avatar ? String(avatar).trim() : undefined;
+    }
     if (stats !== undefined && isStaff) {
       targetUser.stats = {
         ...(targetUser.stats || {}),
