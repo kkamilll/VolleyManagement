@@ -181,7 +181,6 @@ function RozgrywkiContent() {
   const [leagueTable, setLeagueTable] = useState<LeagueTableTeam[]>([]);
   const [leaguePhases, setLeaguePhases] = useState<LeaguePhase[]>([]);
   const [activeLeaguePhaseId, setActiveLeaguePhaseId] = useState<string>('faza_1');
-  const [tableDetailedView, setTableDetailedView] = useState<boolean>(true);
   const [leagueSchedule, setLeagueSchedule] = useState<VolleyStationScheduleMatch[]>([]);
   const [leagueScheduleScope, setLeagueScheduleScope] = useState<'ALL' | 'ANGELS'>('ALL');
   const [leagueScheduleStatus, setLeagueScheduleStatus] = useState<'ALL' | 'UPCOMING' | 'FINISHED'>('ALL');
@@ -3239,40 +3238,17 @@ function RozgrywkiContent() {
                   })}
                 </div>
 
-                {/* Row 2: View Controls and Phase Management */}
+                {/* Row 2: Phase Info and Phase Management */}
                 <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-slate-200/80">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs text-slate-600 font-medium">
                       Drużyn w grupie: <strong className="text-slate-900 font-mono font-bold">{leagueTable.length}</strong>
                     </span>
-
-                    {/* Przełącznik widoku tabeli */}
-                    <div className="flex items-center gap-1 bg-slate-200/70 p-0.5 rounded-xl text-xs">
-                      <button
-                        type="button"
-                        onClick={() => setTableDetailedView(false)}
-                        className={`px-2.5 py-1 rounded-lg font-bold transition text-xs ${
-                          !tableDetailedView ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                        }`}
-                      >
-                        Kompaktowa
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setTableDetailedView(true)}
-                        className={`px-2.5 py-1 rounded-lg font-bold transition text-xs flex items-center gap-1.5 ${
-                          tableDetailedView ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                        }`}
-                        title="Pełna tabela zgodna z oficjalnym systemem VolleyStation"
-                      >
-                        <span>Pełna VolleyStation</span>
-                        <span className={`text-[9px] px-1 py-0.2 rounded font-mono font-black ${
-                          tableDetailedView ? 'bg-white/20 text-white' : 'bg-slate-300 text-slate-700'
-                        }`}>
-                          LIVE
-                        </span>
-                      </button>
-                    </div>
+                    <span className="text-slate-300">•</span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-sky-50 text-sky-800 border border-sky-200">
+                      <span>Oficjalna Tabela VolleyStation</span>
+                      <span className="text-[9px] px-1 py-0.2 rounded font-mono font-black bg-sky-600 text-white">LIVE</span>
+                    </span>
                   </div>
 
                   {canManage && !isArchiveMode && (
@@ -3319,59 +3295,45 @@ function RozgrywkiContent() {
 
               {/* Responsive Table Container */}
               <div className="overflow-x-auto -mx-2 sm:mx-0 rounded-2xl border border-slate-200 bg-white shadow-sm scrollbar-thin">
-                <table className={`w-full text-xs text-left whitespace-nowrap ${tableDetailedView ? 'min-w-[960px]' : 'min-w-[620px]'}`}>
+                <table className="w-full text-xs text-left whitespace-nowrap min-w-[960px]">
                   <thead className="bg-slate-50 text-slate-600 uppercase font-black tracking-wider text-[10px] border-b border-slate-200">
-                    {tableDetailedView ? (
-                      <>
-                        <tr>
-                          <th rowSpan={2} className="py-2.5 px-3 border-r border-slate-200 text-center sticky left-0 bg-slate-50 z-20 w-10">Poz.</th>
-                          <th rowSpan={2} className="py-2.5 px-4 border-r border-slate-200 sticky left-10 bg-slate-50 z-20 min-w-[190px]">Drużyna</th>
-                          <th rowSpan={2} className="py-2.5 px-3 text-center font-black text-slate-900 border-r border-slate-200">Punkty</th>
-                          <th colSpan={3} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Mecze</th>
-                          <th colSpan={2} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Sety</th>
-                          <th colSpan={2} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Punkty</th>
-                          <th colSpan={2} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Stosunek</th>
-                          <th colSpan={6} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Wynik</th>
-                          <th rowSpan={2} className="py-2.5 px-3 text-center">Forma</th>
-                        </tr>
-                        <tr className="border-b border-slate-200 text-[9px]">
-                          {/* Mecze */}
-                          <th className="py-1.5 px-2 text-center text-slate-500">Rozegr.</th>
-                          <th className="py-1.5 px-2 text-center text-emerald-700">Wygr.</th>
-                          <th className="py-1.5 px-2 text-center text-rose-600 border-r border-slate-200">Przegr.</th>
+                    <tr>
+                      <th rowSpan={2} className="py-2.5 px-3 border-r border-slate-200 text-center sticky left-0 bg-slate-50 z-20 w-10">Poz.</th>
+                      <th rowSpan={2} className="py-2.5 px-4 border-r border-slate-200 sticky left-10 bg-slate-50 z-20 min-w-[190px]">Drużyna</th>
+                      <th rowSpan={2} className="py-2.5 px-3 text-center font-black text-slate-900 border-r border-slate-200">Punkty</th>
+                      <th colSpan={3} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Mecze</th>
+                      <th colSpan={2} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Sety</th>
+                      <th colSpan={2} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Punkty</th>
+                      <th colSpan={2} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Stosunek</th>
+                      <th colSpan={6} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Wynik</th>
+                      <th rowSpan={2} className="py-2.5 px-3 text-center">Forma</th>
+                    </tr>
+                    <tr className="border-b border-slate-200 text-[9px]">
+                      {/* Mecze */}
+                      <th className="py-1.5 px-2 text-center text-slate-500">Rozegr.</th>
+                      <th className="py-1.5 px-2 text-center text-emerald-700">Wygr.</th>
+                      <th className="py-1.5 px-2 text-center text-rose-600 border-r border-slate-200">Przegr.</th>
 
-                          {/* Sety */}
-                          <th className="py-1.5 px-2 text-center text-emerald-700">Wygr.</th>
-                          <th className="py-1.5 px-2 text-center text-rose-600 border-r border-slate-200">Przegr.</th>
+                      {/* Sety */}
+                      <th className="py-1.5 px-2 text-center text-emerald-700">Wygr.</th>
+                      <th className="py-1.5 px-2 text-center text-rose-600 border-r border-slate-200">Przegr.</th>
 
-                          {/* Punkty */}
-                          <th className="py-1.5 px-2 text-center text-emerald-700">Wygr.</th>
-                          <th className="py-1.5 px-2 text-center text-rose-600 border-r border-slate-200">Przegr.</th>
+                      {/* Punkty */}
+                      <th className="py-1.5 px-2 text-center text-emerald-700">Wygr.</th>
+                      <th className="py-1.5 px-2 text-center text-rose-600 border-r border-slate-200">Przegr.</th>
 
-                          {/* Stosunek */}
-                          <th className="py-1.5 px-2 text-center text-sky-700">Sety</th>
-                          <th className="py-1.5 px-2 text-center text-sky-700 border-r border-slate-200">Punkty</th>
+                      {/* Stosunek */}
+                      <th className="py-1.5 px-2 text-center text-sky-700">Sety</th>
+                      <th className="py-1.5 px-2 text-center text-sky-700 border-r border-slate-200">Punkty</th>
 
-                          {/* Wynik */}
-                          <th className="py-1.5 px-1.5 text-center text-slate-700 font-mono">3-0</th>
-                          <th className="py-1.5 px-1.5 text-center text-slate-700 font-mono">3-1</th>
-                          <th className="py-1.5 px-1.5 text-center text-slate-700 font-mono">3-2</th>
-                          <th className="py-1.5 px-1.5 text-center text-slate-500 font-mono">2-3</th>
-                          <th className="py-1.5 px-1.5 text-center text-slate-500 font-mono">1-3</th>
-                          <th className="py-1.5 px-1.5 text-center text-slate-500 font-mono border-r border-slate-200">0-3</th>
-                        </tr>
-                      </>
-                    ) : (
-                      <tr>
-                        <th className="py-3 px-3 text-center sticky left-0 bg-slate-50 z-20 w-10 border-r border-slate-200">Poz.</th>
-                        <th className="py-3 px-4 sticky left-10 bg-slate-50 z-20 min-w-[190px] border-r border-slate-200">Drużyna</th>
-                        <th className="py-3 px-2 text-center font-black text-slate-900 border-r border-slate-200">Punkty</th>
-                        <th className="py-3 px-2 text-center border-r border-slate-200">Mecze</th>
-                        <th className="py-3 px-3 text-center border-r border-slate-200">Sety (W:P)</th>
-                        <th className="py-3 px-3 text-center border-r border-slate-200">Małe Punkty</th>
-                        <th className="py-3 px-4 text-center">Forma</th>
-                      </tr>
-                    )}
+                      {/* Wynik */}
+                      <th className="py-1.5 px-1.5 text-center text-slate-700 font-mono">3-0</th>
+                      <th className="py-1.5 px-1.5 text-center text-slate-700 font-mono">3-1</th>
+                      <th className="py-1.5 px-1.5 text-center text-slate-700 font-mono">3-2</th>
+                      <th className="py-1.5 px-1.5 text-center text-slate-500 font-mono">2-3</th>
+                      <th className="py-1.5 px-1.5 text-center text-slate-500 font-mono">1-3</th>
+                      <th className="py-1.5 px-1.5 text-center text-slate-500 font-mono border-r border-slate-200">0-3</th>
+                    </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-mono text-slate-800">
                     {leagueTable.map((team, idx) => {
@@ -3444,47 +3406,32 @@ function RozgrywkiContent() {
                               </div>
                             </td>
 
-                            {tableDetailedView ? (
-                              <>
-                                <td className="py-3 px-3 text-center text-sm font-black text-slate-900 border-r border-slate-200">{team.points}</td>
-                                
-                                {/* Mecze */}
-                                <td className="py-3 px-2 text-center text-slate-700">{team.matchesPlayed}</td>
-                                <td className="py-3 px-2 text-center text-emerald-700 font-bold">{mWon}</td>
-                                <td className="py-3 px-2 text-center text-rose-600 border-r border-slate-200">{mLost}</td>
+                            <td className="py-3 px-3 text-center text-sm font-black text-slate-900 border-r border-slate-200">{team.points}</td>
+                            
+                            {/* Mecze */}
+                            <td className="py-3 px-2 text-center text-slate-700">{team.matchesPlayed}</td>
+                            <td className="py-3 px-2 text-center text-emerald-700 font-bold">{mWon}</td>
+                            <td className="py-3 px-2 text-center text-rose-600 border-r border-slate-200">{mLost}</td>
 
-                                {/* Sety */}
-                                <td className="py-3 px-2 text-center text-emerald-700 font-bold">{team.setsWon}</td>
-                                <td className="py-3 px-2 text-center text-rose-600 border-r border-slate-200">{team.setsLost}</td>
+                            {/* Sety */}
+                            <td className="py-3 px-2 text-center text-emerald-700 font-bold">{team.setsWon}</td>
+                            <td className="py-3 px-2 text-center text-rose-600 border-r border-slate-200">{team.setsLost}</td>
 
-                                {/* Punkty */}
-                                <td className="py-3 px-2 text-center text-emerald-700">{team.pointsWon}</td>
-                                <td className="py-3 px-2 text-center text-rose-600 border-r border-slate-200">{team.pointsLost}</td>
+                            {/* Punkty */}
+                            <td className="py-3 px-2 text-center text-emerald-700">{team.pointsWon}</td>
+                            <td className="py-3 px-2 text-center text-rose-600 border-r border-slate-200">{team.pointsLost}</td>
 
-                                {/* Stosunek */}
-                                <td className="py-3 px-2 text-center text-sky-700">{setRatioStr}</td>
-                                <td className="py-3 px-2 text-center text-sky-700 border-r border-slate-200">{pointRatioStr}</td>
+                            {/* Stosunek */}
+                            <td className="py-3 px-2 text-center text-sky-700">{setRatioStr}</td>
+                            <td className="py-3 px-2 text-center text-sky-700 border-r border-slate-200">{pointRatioStr}</td>
 
-                                {/* Wyniki */}
-                                <td className="py-3 px-1.5 text-center text-slate-700">{team.w3_0 ?? 0}</td>
-                                <td className="py-3 px-1.5 text-center text-slate-700">{team.w3_1 ?? 0}</td>
-                                <td className="py-3 px-1.5 text-center text-slate-700">{team.w3_2 ?? 0}</td>
-                                <td className="py-3 px-1.5 text-center text-slate-500">{team.p2_3 ?? 0}</td>
-                                <td className="py-3 px-1.5 text-center text-slate-500">{team.p1_3 ?? 0}</td>
-                                <td className="py-3 px-1.5 text-center text-slate-500 border-r border-slate-200">{team.p0_3 ?? 0}</td>
-                              </>
-                            ) : (
-                              <>
-                                <td className="py-3 px-2 text-center text-sm font-black text-slate-900 border-r border-slate-200">{team.points}</td>
-                                <td className="py-3 px-2 text-center text-slate-700 border-r border-slate-200">{team.matchesPlayed}</td>
-                                <td className="py-3 px-3 text-center text-slate-700 border-r border-slate-200">
-                                  {team.setsWon} : {team.setsLost}
-                                </td>
-                                <td className="py-3 px-3 text-center text-slate-600 border-r border-slate-200">
-                                  {team.pointsWon} : {team.pointsLost}
-                                </td>
-                              </>
-                            )}
+                            {/* Wyniki */}
+                            <td className="py-3 px-1.5 text-center text-slate-700">{team.w3_0 ?? 0}</td>
+                            <td className="py-3 px-1.5 text-center text-slate-700">{team.w3_1 ?? 0}</td>
+                            <td className="py-3 px-1.5 text-center text-slate-700">{team.w3_2 ?? 0}</td>
+                            <td className="py-3 px-1.5 text-center text-slate-500">{team.p2_3 ?? 0}</td>
+                            <td className="py-3 px-1.5 text-center text-slate-500">{team.p1_3 ?? 0}</td>
+                            <td className="py-3 px-1.5 text-center text-slate-500 border-r border-slate-200">{team.p0_3 ?? 0}</td>
 
                             <td className="py-3 px-4 text-center">
                               <div className="flex items-center justify-center gap-1">
@@ -3505,7 +3452,7 @@ function RozgrywkiContent() {
                           {/* Dynamiczna linia oddzielająca strefę awansu */}
                           {advSpots > 0 && team.position === advSpots && (
                             <tr className="bg-emerald-50 border-y-2 border-emerald-300">
-                              <td colSpan={tableDetailedView ? 19 : 7} className="py-2.5 px-4">
+                              <td colSpan={19} className="py-2.5 px-4">
                                 <div className="flex items-center justify-between gap-3 text-xs font-black uppercase text-emerald-800">
                                   <div className="flex items-center gap-2">
                                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
