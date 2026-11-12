@@ -2468,16 +2468,16 @@ function RozgrywkiContent() {
             </div>
 
             {canManage && (
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-2 overflow-x-auto scrollbar-none shrink-0 self-start sm:self-auto py-0.5">
                 {sparingSubTab === 'mecze' && (
                   <>
                     <button
                       type="button"
                       onClick={() => setShowAddMatchModal(true)}
-                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 transition shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
                     >
                       <Plus className="w-3.5 h-3.5 text-amber-600" />
-                      <span>Dodaj Wynik Meczu</span>
+                      <span>Dodaj Wynik</span>
                     </button>
                     <button
                       type="button"
@@ -2486,7 +2486,7 @@ function RozgrywkiContent() {
                         setEventTitle('Sparing kontrolny');
                         setShowAddEventModal(true);
                       }}
-                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm whitespace-nowrap shrink-0"
                     >
                       <Calendar className="w-3.5 h-3.5" />
                       <span>Utwórz Sparing</span>
@@ -2503,10 +2503,10 @@ function RozgrywkiContent() {
                       setPhotoSeriesList([]);
                       setShowAddPhotoModal(true);
                     }}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm whitespace-nowrap shrink-0"
                   >
                     <Camera className="w-3.5 h-3.5" />
-                    <span>+ Dodaj Zdjęcia ze Sparingów</span>
+                    <span>+ Dodaj Zdjęcia</span>
                   </button>
                 )}
               </div>
@@ -3014,11 +3014,11 @@ function RozgrywkiContent() {
       {activeTab === 'liga' && (
         <div className="space-y-6">
           {/* Liga Subtabs (Tabela, Wyniki, Statystyki, Zdjęcia) */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-200">
-            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200 overflow-x-auto scrollbar-none max-w-full shrink-0">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200 overflow-x-auto scrollbar-none max-w-full">
               <button
                 onClick={() => setLigaSubTab('tabela')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition whitespace-nowrap ${
                   ligaSubTab === 'tabela'
                     ? 'bg-sky-600 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
@@ -3029,7 +3029,7 @@ function RozgrywkiContent() {
               </button>
               <button
                 onClick={() => setLigaSubTab('wyniki')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition whitespace-nowrap ${
                   ligaSubTab === 'wyniki'
                     ? 'bg-sky-600 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
@@ -3040,7 +3040,7 @@ function RozgrywkiContent() {
               </button>
               <button
                 onClick={() => setLigaSubTab('statystyki')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition whitespace-nowrap ${
                   ligaSubTab === 'statystyki'
                     ? 'bg-sky-600 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
@@ -3051,7 +3051,7 @@ function RozgrywkiContent() {
               </button>
               <Link
                 href="/galeria"
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white/60 shrink-0 transition"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white/60 shrink-0 transition whitespace-nowrap"
               >
                 <Camera className="w-3.5 h-3.5 text-sky-600" />
                 <span>Galeria zdjęć ➔</span>
@@ -3059,22 +3059,21 @@ function RozgrywkiContent() {
             </div>
 
             {canManage && (
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-2 overflow-x-auto scrollbar-none shrink-0 self-start lg:self-auto py-0.5">
                 {ligaSubTab === 'tabela' && (
                   <>
                     <button
                       type="button"
                       onClick={() => handleOpenEditTable(currentLeaguePhase?.id || 'faza_1', 'text')}
-                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
                     >
                       <Upload className="w-3.5 h-3.5 text-sky-600" />
-                      <span className="hidden sm:inline">Importuj Tabelę (Tekst / OCR)</span>
-                      <span className="sm:hidden">Import Tabeli</span>
+                      <span>Import Tabeli</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => handleOpenEditTable(currentLeaguePhase?.id || 'faza_1')}
-                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
                       <span>Edytuj Tabelę</span>
@@ -3086,19 +3085,18 @@ function RozgrywkiContent() {
                     <button
                       type="button"
                       onClick={() => setShowImportScheduleModal(true)}
-                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
                     >
                       <Upload className="w-3.5 h-3.5 text-sky-600" />
-                      <span className="hidden sm:inline">Import Terminarza / Wyników</span>
-                      <span className="sm:hidden">Import LALS</span>
+                      <span>Import Terminarza</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setShowAddMatchModal(true)}
-                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
                     >
                       <Plus className="w-3.5 h-3.5" />
-                      <span>Dodaj Wynik Meczu</span>
+                      <span>Dodaj Wynik</span>
                     </button>
                   </>
                 )}
@@ -3107,26 +3105,25 @@ function RozgrywkiContent() {
                     <button
                       type="button"
                       onClick={() => setShowVolleyStationImportModal(true)}
-                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
                     >
                       <Upload className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Importuj z VolleyStation</span>
-                      <span className="sm:hidden">Import Statystyk</span>
+                      <span>Import Statystyk</span>
                     </button>
                     <a
                       href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
                     >
                       <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
-                      <span className="hidden sm:inline">VolleyStation LALS ↗</span>
-                      <span className="sm:hidden">VolleyStation ↗</span>
+                      <span>VolleyStation ↗</span>
                     </a>
                   </>
                 )}
                 {ligaSubTab === 'zdjecia' && (
                   <button
+                    type="button"
                     onClick={() => {
                       setPhotoCategory('MECZ');
                       setPhotoTitle('');
@@ -3134,10 +3131,10 @@ function RozgrywkiContent() {
                       setPhotoSeriesList([]);
                       setShowAddPhotoModal(true);
                     }}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
                   >
                     <Camera className="w-3.5 h-3.5" />
-                    <span>+ Dodaj Zdjęcia z Meczu LALS</span>
+                    <span>+ Dodaj Zdjęcia</span>
                   </button>
                 )}
               </div>
@@ -3298,8 +3295,8 @@ function RozgrywkiContent() {
                 <table className="w-full text-xs text-left whitespace-nowrap min-w-[960px]">
                   <thead className="bg-slate-50 text-slate-600 uppercase font-black tracking-wider text-[10px] border-b border-slate-200">
                     <tr>
-                      <th rowSpan={2} className="py-2.5 px-3 border-r border-slate-200 text-center sticky left-0 bg-slate-50 z-20 w-10">Poz.</th>
-                      <th rowSpan={2} className="py-2.5 px-4 border-r border-slate-200 sticky left-10 bg-slate-50 z-20 min-w-[190px]">Drużyna</th>
+                      <th rowSpan={2} className="py-2.5 px-2 border-r border-slate-200 text-center sticky left-0 bg-slate-50 z-20 w-12 min-w-[48px] max-w-[48px]">Poz.</th>
+                      <th rowSpan={2} className="py-2.5 px-4 border-r border-slate-200 sticky left-[48px] bg-slate-50 z-20 min-w-[190px]">Drużyna</th>
                       <th rowSpan={2} className="py-2.5 px-3 text-center font-black text-slate-900 border-r border-slate-200">Punkty</th>
                       <th colSpan={3} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Mecze</th>
                       <th colSpan={2} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Sety</th>
@@ -3362,7 +3359,7 @@ function RozgrywkiContent() {
                       return (
                         <React.Fragment key={team.id || idx}>
                           <tr className={`hover:bg-slate-50 transition ${rowBg}`}>
-                            <td className={`py-3 px-3 text-center sticky left-0 ${stickyCellBg} z-10 border-r border-slate-100`}>
+                            <td className={`py-3 px-2 text-center sticky left-0 ${stickyCellBg} z-10 border-r border-slate-100 w-12 min-w-[48px] max-w-[48px]`}>
                               <span className={`w-6 h-6 rounded-lg inline-flex items-center justify-center font-black text-xs ${
                                 isAdvancing
                                   ? 'bg-emerald-600 text-white shadow-sm'
@@ -3378,7 +3375,7 @@ function RozgrywkiContent() {
                               </span>
                             </td>
 
-                            <td className={`py-3 px-4 font-sans font-bold text-slate-900 text-sm sticky left-10 ${stickyCellBg} z-10 border-r border-slate-200`}>
+                            <td className={`py-3 px-4 font-sans font-bold text-slate-900 text-sm sticky left-[48px] ${stickyCellBg} z-10 border-r border-slate-200 min-w-[190px]`}>
                               <div className="flex items-center gap-2 flex-wrap">
                                 {team.teamUrl ? (
                                   <a
@@ -4349,16 +4346,16 @@ function RozgrywkiContent() {
             </div>
 
             {canManage && (
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-2 overflow-x-auto scrollbar-none shrink-0 self-start sm:self-auto py-0.5">
                 {turniejSubTab === 'drabinki' && (
                   <>
                     <button
                       type="button"
                       onClick={() => setShowAddMatchModal(true)}
-                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 transition shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
                     >
                       <Plus className="w-3.5 h-3.5 text-purple-600" />
-                      <span>Dodaj Wynik Meczu</span>
+                      <span>Dodaj Wynik</span>
                     </button>
                     <button
                       type="button"
@@ -4367,7 +4364,7 @@ function RozgrywkiContent() {
                         setEventTitle('Turniej Siatkarski');
                         setShowAddEventModal(true);
                       }}
-                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-purple-600 hover:bg-purple-500 text-white transition shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-purple-600 hover:bg-purple-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
                     >
                       <Award className="w-3.5 h-3.5" />
                       <span>Utwórz Turniej</span>
@@ -4384,10 +4381,10 @@ function RozgrywkiContent() {
                       setPhotoSeriesList([]);
                       setShowAddPhotoModal(true);
                     }}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-purple-600 hover:bg-purple-500 text-white transition shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-purple-600 hover:bg-purple-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
                   >
                     <Camera className="w-3.5 h-3.5" />
-                    <span>+ Dodaj Zdjęcia z Turnieju</span>
+                    <span>+ Dodaj Zdjęcia</span>
                   </button>
                 )}
               </div>
