@@ -3539,5 +3539,128 @@
         }
       ]
     }
+  ],
+  "trainingPlans": [
+    {
+      "id": "train_1",
+      "eventId": "evt_past_1",
+      "title": "Trening: Przyjęcie & Blok sytuacyjny",
+      "date": "2026-11-14",
+      "time": "19:30 - 21:00",
+      "location": "Hala POSiR, ul. Chwiałkowskiego 34, Poznań",
+      "durationMinutes": 90,
+      "mainGoal": "Stabilizacja przyjęcia zagrywki typu float w pasie stref 1 i 5 oraz tempo wyprowadzenia kontrataku na lewe skrzydło",
+      "secondaryGoals": [
+        "Asekuracja bloku środkowego na 6. metrze",
+        "Szybkie tempo rozegrania do Maćka Noaka (Ś1) z 1. tempa przy pozytywnym przyjęciu"
+      ],
+      "intensity": "WYSOKA",
+      "equipmentNeeded": "16 piłek Mikasa V200W, 4 pachołki kierunkowe, guma oporowa, tablica taktyczna",
+      "coachNotes": "Przed meczem ligowym musimy wyeliminować błędy własne w 1. akcji po serwisie. Duży nacisk na komunikację Libero z przyjmującymi.",
+      "videoUrls": [
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      ],
+      "exercises": [
+        {
+          "id": "ex_1",
+          "title": "Rozgrzewka dynamiczna & Aktywacja barków z gumami",
+          "category": "ROZGRZEWKA",
+          "durationMinutes": 15,
+          "description": "Bieg ze zmianą kierunku, krążenia ramion w trójkach, aktywacja stożka rotatorów z taśmami thera-band, dogrzanie nadgarstków i palców przy siatce.",
+          "keyPoints": [
+            "Prawidłowa postawa siatkarska",
+            "Płynność ruchów rotacyjnych"
+          ]
+        },
+        {
+          "id": "ex_2",
+          "title": "Dogranie zagrywki float w korytarzu 3-osobowym (L + P1 + P2)",
+          "category": "TECHNIKA",
+          "durationMinutes": 25,
+          "description": "Trener zagrywa z podestu rotację float w strefy 1, 6 i 5. Przyjmujący dogrywają na 2. metr w tempo do wbiegającego Karola (R).",
+          "keyPoints": [
+            "Kąt odbicia platformy przedramion",
+            "Nogi ugięte, stabilna podstawa",
+            "Głośne wołanie Moja!"
+          ],
+          "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+          "id": "ex_3",
+          "title": "Przejście z obrony do kontrataku (Szóstki zadaniowe)",
+          "category": "TAKTYKA",
+          "durationMinutes": 30,
+          "description": "Szóstka wyjściowa (R + Ś1 + P1 + A + Ś2 + P2 / L) broni ataku rywali po prostej i natychmiast organizuje kontrę: skrzydło lub pajp.",
+          "keyPoints": [
+            "Szybkie cofnięcie skrzydłowego po bloku",
+            "Asekuracja atakującego na 6. metrze przez Libero"
+          ]
+        },
+        {
+          "id": "ex_4",
+          "title": "Gra kontrolna na przewagi (od stanu 20:20)",
+          "category": "GRA",
+          "durationMinutes": 20,
+          "description": "Sparing wewnętrzny z limitem błędów własnych na zagrywce (maks. 1 zepsuty serwis na set).",
+          "keyPoints": [
+            "Chłodna głowa w końcówkach",
+            "Zagrywka taktyczna zamiast błędu"
+          ]
+        }
+      ],
+      "conclusions": [
+        {
+          "id": "concl_1",
+          "authorId": "usr_kamil_trener",
+          "authorName": "Kamil (Trener)",
+          "authorRole": "TRENER",
+          "type": "PLUS",
+          "content": "Świetna intensywność i komunikacja w trójce przyjęcia (Bartosz #97 świetnie dowodził pasem).",
+          "createdAt": "2026-11-12T19:34:45.064Z"
+        },
+        {
+          "id": "concl_2",
+          "authorId": "usr_kamil_trener",
+          "authorName": "Kamil (Trener)",
+          "authorRole": "TRENER",
+          "type": "MINUS",
+          "content": "Przy mocnym serwisie skróconym zbyt późny start do piłki w strefie 2.",
+          "createdAt": "2026-11-12T19:34:45.065Z"
+        },
+        {
+          "id": "concl_3",
+          "authorId": "usr_kamil_trener",
+          "authorName": "Kamil (Trener)",
+          "authorRole": "TRENER",
+          "type": "INDYWIDUALNA",
+          "targetPlayerName": "Tomasz Krupa #1",
+          "content": "Bardziej zdecydowane wejście w piłkę przy pajpie, nie czekać na opadanie piłki.",
+          "createdAt": "2026-11-12T19:34:45.065Z"
+        },
+        {
+          "id": "concl_4",
+          "authorId": "usr_kamil_trener",
+          "authorName": "Kamil (Trener)",
+          "authorRole": "TRENER",
+          "type": "INDYWIDUALNA",
+          "targetPlayerName": "Karol Ordon #28",
+          "content": "Bardzo dobra dystrybucja piłki do środka w trudnych sytuacjach.",
+          "createdAt": "2026-11-12T19:34:45.065Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "com_1",
+          "authorId": "usr_bartosz",
+          "authorName": "Bartosz Augustynek #97",
+          "authorRole": "ZAWODNIK",
+          "content": "Dobra jednostka! Float dzisiaj mocno siedział, w piątek powtórzmy to ćwiczenie z kontrą z 6. metra.",
+          "createdAt": "2026-11-12T19:34:45.065Z"
+        }
+      ],
+      "createdById": "usr_kamil_trener",
+      "createdByName": "Kamil (Trener)",
+      "createdAt": "2026-11-12T19:34:45.065Z"
+    }
   ]
 }

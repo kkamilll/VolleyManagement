@@ -59,6 +59,12 @@ async function run() {
       console.log(`Zapisano ${tacticsList.length} wariantów taktycznych w kolekcji 'tactics'`);
     }
 
+    if (Array.isArray(localDb.trainingPlans) && localDb.trainingPlans.length > 0) {
+      await db.collection('training_plans').deleteMany({});
+      await db.collection('training_plans').insertMany(localDb.trainingPlans.map(p => ({ ...p, _id: p.id })));
+      console.log(`Zapisano ${localDb.trainingPlans.length} planów treningowych w kolekcji 'training_plans'`);
+    }
+
     if (localDb.lalsTable && Array.isArray(localDb.lalsTable)) {
       await db.collection('lals_table').deleteMany({});
       await db.collection('lals_table').insertMany(localDb.lalsTable);

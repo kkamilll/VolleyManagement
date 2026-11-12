@@ -1773,7 +1773,7 @@ function TacticsContent() {
         </div>
       </div>
 
-      {/* Sub-navigation tabs: Tablica Taktyczna vs Playbook & Scouting */}
+      {/* Sub-navigation tabs: Tablica Taktyczna vs Playbook & Scouting vs Rozpiski Treningowe */}
       <div className="flex flex-wrap items-center gap-2 border-b border-slate-800/80 pb-2">
         <Link
           href="/taktyka"
@@ -1781,6 +1781,13 @@ function TacticsContent() {
         >
           <Compass className="w-4 h-4 text-sky-400 shrink-0" />
           <span>Tablica Taktyczna</span>
+        </Link>
+        <Link
+          href="/trening"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-400 hover:text-emerald-300 hover:bg-slate-800/60 border border-emerald-500/30 transition shadow-sm"
+        >
+          <Volleyball className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>Rozpiski Treningowe & Warsztat</span>
         </Link>
         <Link
           href="/coach"

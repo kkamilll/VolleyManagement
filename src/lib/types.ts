@@ -517,6 +517,62 @@ export interface SeasonArchive {
   };
 }
 
+export interface TrainingExercise {
+  id: string;
+  title: string;
+  category: 'ROZGRZEWKA' | 'TECHNIKA' | 'TAKTYKA' | 'MOTORYKA' | 'GRA' | 'INNE';
+  durationMinutes: number;
+  description: string;
+  keyPoints?: string[];
+  courtDrawing?: string;
+  imageUrl?: string;
+  videoUrl?: string;
+}
+
+export interface TrainingConclusion {
+  id: string;
+  authorId: string;
+  authorName: string;
+  authorRole: string;
+  type: 'PLUS' | 'MINUS' | 'UWAGA' | 'INDYWIDUALNA';
+  targetPlayerId?: string;
+  targetPlayerName?: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface TrainingComment {
+  id: string;
+  authorId: string;
+  authorName: string;
+  authorRole: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface TrainingPlan {
+  id: string;
+  eventId?: string;
+  title: string;
+  date: string;
+  time?: string;
+  location?: string;
+  durationMinutes: number;
+  mainGoal: string;
+  secondaryGoals?: string[];
+  intensity: 'NISKA' | 'SREDNIA' | 'WYSOKA' | 'MECZOWA';
+  equipmentNeeded?: string;
+  exercises: TrainingExercise[];
+  conclusions: TrainingConclusion[];
+  comments?: TrainingComment[];
+  coachNotes?: string;
+  videoUrls?: string[];
+  createdById: string;
+  createdByName: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface AppDatabase {
   users: User[];
   matches: MatchResult[];
@@ -527,6 +583,7 @@ export interface AppDatabase {
   announcements?: Announcement[];
   polls?: Poll[];
   tactics?: TacticalPlay[];
+  trainingPlans?: TrainingPlan[];
   scoutingReports?: ScoutingReport[];
   leagueTable?: LeagueTableTeam[];
   leaguePhases?: LeaguePhase[];

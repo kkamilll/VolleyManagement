@@ -333,6 +333,18 @@ export default function Navbar() {
             </a>
 
             <a
+              href="/trening"
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-bold transition ${
+                pathname === '/trening'
+                  ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+              }`}
+            >
+              <Volleyball className="w-4 h-4 text-emerald-400" />
+              Treningi
+            </a>
+
+            <a
               href="/galeria"
               className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-bold transition ${
                 pathname === '/galeria'
@@ -727,6 +739,16 @@ export default function Navbar() {
           >
             <Target className="w-4 h-4 text-sky-400" />
             <span>Tablica Taktyczna</span>
+          </a>
+
+          <a
+            href="/trening"
+            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold ${
+              pathname === '/trening' ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-900'
+            }`}
+          >
+            <Volleyball className="w-4 h-4 text-emerald-400" />
+            <span>Warsztat & Treningi</span>
           </a>
 
           <a

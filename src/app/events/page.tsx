@@ -42,6 +42,7 @@ import {
   Swords,
   ExternalLink,
   Layers,
+  Volleyball,
   ArrowRight
 } from 'lucide-react';
 import {
@@ -1429,15 +1430,26 @@ function EventsAttendanceContent() {
                               </Link>
                             </>
                           ) : (
-                            <Link
-                              href={`/taktyka?eventId=${event.id}&type=TRENING`}
-                              onClick={e => e.stopPropagation()}
-                              className="px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-300 border border-slate-800 hover:border-emerald-500/40 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
-                              title="Otwórz tablicę taktyczną dla tego treningu"
-                            >
-                              <Target className="w-3.5 h-3.5 text-emerald-400" />
-                              <span>Taktyka & Plan Treningu</span>
-                            </Link>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <Link
+                                href={`/trening?eventId=${event.id}`}
+                                onClick={e => e.stopPropagation()}
+                                className="px-2.5 py-1 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
+                                title="Otwórz pełną rozpiskę treningową i ćwiczenia"
+                              >
+                                <Volleyball className="w-3.5 h-3.5 text-emerald-400" />
+                                <span>Rozpiska Treningu</span>
+                              </Link>
+                              <Link
+                                href={`/taktyka?eventId=${event.id}&type=TRENING`}
+                                onClick={e => e.stopPropagation()}
+                                className="px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
+                                title="Otwórz tablicę taktyczną dla tego treningu"
+                              >
+                                <Target className="w-3.5 h-3.5 text-sky-400" />
+                                <span>Tablica</span>
+                              </Link>
+                            </div>
                           )}
                         </div>
 
@@ -2264,23 +2276,23 @@ function EventsAttendanceContent() {
                                     </Link>
 
                                     <Link
-                                      href={`/taktyka?eventId=${event.id}&type=TRENING`}
-                                      className="p-4 rounded-2xl border border-slate-700/60 bg-gradient-to-br from-slate-900/80 to-slate-950/90 hover:border-slate-500 text-white transition-all flex items-center justify-between group shadow-lg"
+                                      href={`/trening?eventId=${event.id}`}
+                                      className="p-4 rounded-2xl border border-sky-500/40 bg-gradient-to-br from-sky-950/30 to-slate-900/90 hover:border-sky-400 text-white transition-all flex items-center justify-between group shadow-lg"
                                     >
                                       <div className="space-y-1">
                                         <div className="flex items-center gap-2">
-                                          <div className="w-7 h-7 rounded-lg bg-slate-800 text-sky-400 flex items-center justify-center">
-                                            <Layers className="w-4 h-4" />
+                                          <div className="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center">
+                                            <Volleyball className="w-4 h-4" />
                                           </div>
-                                          <span className="text-xs font-black uppercase tracking-wider text-slate-200">
-                                            Wytyczne & Ćwiczenia Pozycyjne
+                                          <span className="text-xs font-black uppercase tracking-wider text-sky-300">
+                                            Rozpiska Treningowa & Ćwiczenia
                                           </span>
                                         </div>
                                         <p className="text-[11px] text-slate-400">
-                                          Rozkład zadań dla przyjmujących, środkowych, atakujących i libero.
+                                          Rysunki ćwiczeń na boisku, grafiki, wideo, cele jednostki i wnioski trenera.
                                         </p>
                                       </div>
-                                      <ArrowRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
+                                      <ArrowRight className="w-5 h-5 text-sky-400 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
                                     </Link>
                                   </>
                                 ) : event.type === 'SPARING' ? (
