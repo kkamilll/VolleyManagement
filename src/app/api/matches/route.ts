@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { readDatabase, writeDatabase, getEffectiveDatabase, getActiveSeasonIdFromRequest } from '@/lib/db';
 import { getServerUser, hasPermission } from '@/lib/auth';
-import { MatchResult, VolleyballSet, LeagueMatchReport, Announcement } from '@/lib/types';
+import { MatchResult, VolleyballSet, LeagueMatchReport, Announcement, EventItem } from '@/lib/types';
 
 export async function GET(request: Request) {
   const seasonId = getActiveSeasonIdFromRequest(request);
@@ -84,6 +84,104 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
+
+    // Obsługa wsadowego importu meczów (rozegranych) oraz terminarza (przyszłych meczów)
+    if (body.action === 'BATCH_IMPORT') {
+      const { matchesToImport = [], fixturesToImport = [] } = body;
+      const db = readDatabase();
+      let importedMatchesCount = 0;
+      let importedFixturesCount = 0;
+
+      // 1. Zapisz rozegrane mecze z wynikami
+      if (Array.isArray(matchesToImport) && matchesToImport.length > 0) {
+        matchesToImport.forEach((m: any) => {
+          if (!m.opponent || !m.date) return;
+          let teamSetsWon = 0;
+          let opponentSetsWon = 0;
+          const validatedSets: VolleyballSet[] = (m.sets || []).map((s: any, idx: number) => {
+            const teamScore = Number(s.teamScore) || 0;
+            const opponentScore = Number(s.opponentScore) || 0;
+            if (teamScore > opponentScore) teamSetsWon++;
+            else if (opponentScore > teamScore) opponentSetsWon++;
+            return {
+              setNumber: idx + 1,
+              teamScore,
+              opponentScore
+            };
+          });
+
+          // Sprawdź czy mecz z tą drużyną i w tej dacie już istnieje
+          const exists = db.matches.find(
+            old => old.opponent.toLowerCase() === m.opponent.toLowerCase() &&
+                   old.date.slice(0, 10) === m.date.slice(0, 10)
+          );
+
+          if (!exists) {
+            const newMatch: MatchResult = {
+              id: `mat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+              opponent: m.opponent.trim(),
+              date: m.date,
+              location: m.location ? m.location.trim() : 'Hala OSiR, ul. Sportowa 5',
+              isHome: m.isHome !== undefined ? Boolean(m.isHome) : true,
+              matchType: m.matchType || 'Mecz ligowy',
+              sets: validatedSets,
+              teamSetsWon,
+              opponentSetsWon,
+              notes: m.notes ? m.notes.trim() : undefined,
+              leaguePhaseId: m.leaguePhaseId || 'faza_1',
+              leaguePhaseName: m.leaguePhaseName || 'Faza I',
+              createdById: user.id,
+              createdByName: user.name,
+              createdAt: new Date().toISOString()
+            };
+            db.matches.unshift(newMatch);
+            importedMatchesCount++;
+          }
+        });
+      }
+
+      // 2. Zapisz przyszłe mecze do terminarza (db.events)
+      if (Array.isArray(fixturesToImport) && fixturesToImport.length > 0) {
+        if (!db.events) db.events = [];
+        fixturesToImport.forEach((f: any) => {
+          if (!f.opponent || !f.date) return;
+          const exists = db.events.find(
+            old => old.type === 'MECZ' &&
+                   old.opponent?.toLowerCase() === f.opponent.toLowerCase() &&
+                   old.date.slice(0, 10) === f.date.slice(0, 10)
+          );
+
+          if (!exists) {
+            const newEvent: EventItem = {
+              id: `evt_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+              title: f.title || `Mecz LALS vs ${f.opponent}`,
+              type: 'MECZ',
+              date: f.date,
+              location: f.location || 'Hala OSiR, ul. Sportowa 5',
+              opponent: f.opponent.trim(),
+              description: f.description || 'Mecz Lubońskiej Amatorskiej Ligi Siatkówki (LALS)',
+              costPerPerson: 0,
+              status: 'ANKIETA',
+              attendees: [],
+              createdById: user.id,
+              createdByName: user.name,
+              createdAt: new Date().toISOString()
+            };
+            db.events.push(newEvent);
+            importedFixturesCount++;
+          }
+        });
+      }
+
+      writeDatabase(db);
+      return NextResponse.json({
+        success: true,
+        importedMatchesCount,
+        importedFixturesCount,
+        message: `Zaimportowano pomyślnie: ${importedMatchesCount} wyników meczów i ${importedFixturesCount} jednostek terminarza!`
+      });
+    }
+
     const { opponent, date, location, isHome, matchType, sets, mvp, notes, coachComments, reportId, leaguePhaseId, leaguePhaseName } = body;
 
     if (!opponent || !date || !sets || !Array.isArray(sets) || sets.length === 0) {

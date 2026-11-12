@@ -70,6 +70,7 @@ import {
   VolleyballSet,
   TacticalPlay
 } from '@/lib/types';
+import { recognizeTextFromImage } from '@/lib/ocr';
 
 type TabType = 'sparingi' | 'liga' | 'turnieje';
 type LigaSubTab = 'tabela' | 'wyniki' | 'statystyki' | 'zdjecia';
@@ -119,6 +120,23 @@ function RozgrywkiContent() {
   const [savingTable, setSavingTable] = useState(false);
   const [importPhaseTargetId, setImportPhaseTargetId] = useState<string>('faza_1');
   const [rawTableInput, setRawTableInput] = useState('');
+  const [tableOcrLoading, setTableOcrLoading] = useState(false);
+  const [tableOcrProgress, setTableOcrProgress] = useState(0);
+  const [tableOcrStatus, setTableOcrStatus] = useState('');
+  const [tableImportTab, setTableImportTab] = useState<'text' | 'image'>('text');
+  const [tableImagePreview, setTableImagePreview] = useState<string | null>(null);
+
+  // Import Terminarza & Wyników LALS (Tekst / Zdjęcie OCR)
+  const [showImportScheduleModal, setShowImportScheduleModal] = useState(false);
+  const [scheduleImportTab, setScheduleImportTab] = useState<'text' | 'image'>('text');
+  const [rawScheduleInput, setRawScheduleInput] = useState('');
+  const [scheduleImagePreview, setScheduleImagePreview] = useState<string | null>(null);
+  const [scheduleOcrLoading, setScheduleOcrLoading] = useState(false);
+  const [scheduleOcrProgress, setScheduleOcrProgress] = useState(0);
+  const [scheduleOcrStatus, setScheduleOcrStatus] = useState('');
+  const [parsedMatchesToImport, setParsedMatchesToImport] = useState<any[]>([]);
+  const [parsedFixturesToImport, setParsedFixturesToImport] = useState<any[]>([]);
+  const [submittingScheduleImport, setSubmittingScheduleImport] = useState(false);
   const [leaguePhotos, setLeaguePhotos] = useState<LeaguePhoto[]>([]);
   const [tactics, setTactics] = useState<TacticalPlay[]>([]);
   const [loading, setLoading] = useState(true);
@@ -991,18 +1009,71 @@ function RozgrywkiContent() {
     }
   };
 
-  const handleParseRawTable = () => {
-    if (!rawTableInput.trim()) return;
-    const lines = rawTableInput.split('\n').map(l => l.trim()).filter(Boolean);
+  const handleParseRawTable = (overrideText?: string) => {
+    const textToParse = typeof overrideText === 'string' ? overrideText : rawTableInput;
+    if (!textToParse.trim()) return;
+    const lines = textToParse.split('\n').map(l => l.trim()).filter(Boolean);
     const parsed: LeagueTableTeam[] = [];
     
     lines.forEach((line, idx) => {
+      // Pomiń nagłówki tabeli (np. "Lp Drużyna M Pkt Sety...")
+      if (/^(lp|poz|miejsce|drużyna|zespół|team|nr)\b/i.test(line)) return;
+
+      // 1. Spróbuj dopasować liczby na końcu linii: [Nazwa] [Mecze] [Punkty] [Sety wygrane:przegrane]? [Małe punkty]?
+      const endStatsMatch = line.match(/(.*?)\s+(\d+)\s+(\d+)(?:\s+(\d+[:\-]\d+))?(?:\s+(\d+[:\-]\d+))?$/);
+      if (endStatsMatch) {
+        const lead = endStatsMatch[1].trim();
+        const matches = parseInt(endStatsMatch[2]) || 0;
+        const pts = parseInt(endStatsMatch[3]) || 0;
+        const setsStr = endStatsMatch[4] || '';
+        const ptsStr = endStatsMatch[5] || '';
+
+        // Usuń ewentualną cyfrę pozycji z początku (np. "1. " lub "1 ")
+        const posMatch = lead.match(/^(\d+)[.)\s]+(.*)$/);
+        const pos = posMatch ? parseInt(posMatch[1]) : (parsed.length + 1);
+        const teamName = posMatch ? posMatch[2].trim() : lead;
+
+        let setsWon = 0;
+        let setsLost = 0;
+        if (setsStr) {
+          const [sw, sl] = setsStr.split(/[:\-]/).map(n => parseInt(n) || 0);
+          setsWon = sw || 0;
+          setsLost = sl || 0;
+        }
+
+        let pointsWon = 0;
+        let pointsLost = 0;
+        if (ptsStr) {
+          const [pw, pl] = ptsStr.split(/[:\-]/).map(n => parseInt(n) || 0);
+          pointsWon = pw || 0;
+          pointsLost = pl || 0;
+        }
+
+        if (teamName) {
+          parsed.push({
+            id: `team_${Date.now()}_${idx}`,
+            position: pos,
+            teamName,
+            matchesPlayed: matches,
+            points: pts,
+            setsWon,
+            setsLost,
+            pointsWon,
+            pointsLost,
+            form: []
+          });
+          return;
+        }
+      }
+
+      // 2. Podział tabulatorem lub wieloma spacjami
       const parts = line.split(/\t|\s{2,}/).map(p => p.trim()).filter(Boolean);
       if (parts.length >= 3) {
-        const pos = parseInt(parts[0]) || (parsed.length + 1);
-        const teamName = isNaN(parseInt(parts[0])) ? parts[0] : parts[1];
-        const matches = parseInt(parts[2]) || 0;
-        const pts = parseInt(parts[3]) || 0;
+        const firstIsNum = !isNaN(parseInt(parts[0]));
+        const pos = firstIsNum ? parseInt(parts[0]) : (parsed.length + 1);
+        const teamName = firstIsNum ? parts[1] : parts[0];
+        const matches = parseInt(firstIsNum ? parts[2] : parts[1]) || 0;
+        const pts = parseInt(firstIsNum ? parts[3] : parts[2]) || 0;
         parsed.push({
           id: `team_${Date.now()}_${idx}`,
           position: pos,
@@ -1023,6 +1094,222 @@ function RozgrywkiContent() {
       alert(`Wczytano ${parsed.length} zespołów do tabeli!`);
     } else {
       alert('Nie udało się automatycznie rozpoznać kolumn tabeli. Możesz edytować wiersze ręcznie.');
+    }
+  };
+
+  // OCR dla zdjęcia tabeli
+  const handleTableImageOcr = async (file: File) => {
+    setTableOcrLoading(true);
+    setTableOcrProgress(0);
+    setTableOcrStatus('Wczytywanie zdjęcia tabeli...');
+    try {
+      const previewUrl = URL.createObjectURL(file);
+      setTableImagePreview(previewUrl);
+      const text = await recognizeTextFromImage(file, p => {
+        setTableOcrProgress(p.progress);
+        setTableOcrStatus(p.status);
+      });
+      setRawTableInput(text);
+      handleParseRawTable(text);
+    } catch (err: any) {
+      alert('Błąd OCR podczas rozpoznawania zdjęcia tabeli: ' + (err?.message || err));
+    } finally {
+      setTableOcrLoading(false);
+      setTableOcrStatus('');
+    }
+  };
+
+  // Parser tekstu terminarza i wyników
+  const handleParseScheduleText = (text: string) => {
+    if (!text.trim()) {
+      setParsedMatchesToImport([]);
+      setParsedFixturesToImport([]);
+      return;
+    }
+
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    const matchesList: any[] = [];
+    const fixturesList: any[] = [];
+    const currentYear = new Date().getFullYear();
+
+    lines.forEach(line => {
+      // 1. Szukaj daty (np. 14.11.2026 lub 14.11 lub 2026-11-14)
+      const dateMatch = line.match(/(\d{1,2})[.\-/](\d{1,2})(?:[.\-/](\d{2,4}))?/) || line.match(/(\d{4})[.\-/](\d{1,2})[.\-/](\d{1,2})/);
+      let dateIso = '';
+
+      // 2. Szukaj godziny (np. 19:30 lub 18:00)
+      const timeMatch = line.match(/\b([01]?\d|2[0-3]):([0-5]\d)\b/);
+      const timeStr = timeMatch ? `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}` : '19:30';
+
+      if (dateMatch) {
+        if (dateMatch[3] && dateMatch[3].length === 4) {
+          const d = dateMatch[1].padStart(2, '0');
+          const m = dateMatch[2].padStart(2, '0');
+          const y = dateMatch[3];
+          dateIso = `${y}-${m}-${d}T${timeStr}:00`;
+        } else if (dateMatch[1].length === 4) {
+          const y = dateMatch[1];
+          const m = dateMatch[2].padStart(2, '0');
+          const d = dateMatch[3].padStart(2, '0');
+          dateIso = `${y}-${m}-${d}T${timeStr}:00`;
+        } else {
+          const d = dateMatch[1].padStart(2, '0');
+          const m = dateMatch[2].padStart(2, '0');
+          dateIso = `${currentYear}-${m}-${d}T${timeStr}:00`;
+        }
+      } else {
+        // Jeśli nie ma daty, pomijamy linie nagłówkowe
+        return;
+      }
+
+      // 3. Sprawdź czy jest wynik meczu, np. 3:1, 3-0, 1:3
+      const scoreMatch = line.match(/\b([0-3])\s*[:\-]\s*([0-3])\b/);
+      
+      // 4. Szukaj setów w nawiasie, np. (25:21, 23:25, 25:18, 25:20)
+      const setsMatch = line.match(/\(([^)]+)\)/);
+      let detailedSets: VolleyballSet[] = [];
+
+      if (setsMatch) {
+        const rawSets = setsMatch[1].split(/[,;]/).map(s => s.trim()).filter(Boolean);
+        rawSets.forEach((sStr, idx) => {
+          const sScores = sStr.match(/(\d+)\s*[:\-]\s*(\d+)/);
+          if (sScores) {
+            detailedSets.push({
+              setNumber: idx + 1,
+              teamScore: parseInt(sScores[1]) || 0,
+              opponentScore: parseInt(sScores[2]) || 0
+            });
+          }
+        });
+      }
+
+      // 5. Nazwy drużyn
+      let cleanLine = line
+        .replace(/(\d{1,2})[.\-/](\d{1,2})(?:[.\-/](\d{2,4}))?/, '')
+        .replace(/\b([01]?\d|2[0-3]):([0-5]\d)\b/, '')
+        .replace(/\(([^)]+)\)/, '')
+        .replace(/\b([0-3])\s*[:\-]\s*([0-3])\b/, '')
+        .trim();
+
+      let parts = cleanLine.split(/\s+(?:vs|VS|v|\-|–|—)\s+/).map(p => p.trim()).filter(Boolean);
+      if (parts.length < 2) {
+        parts = cleanLine.split(/\s{2,}|\t/).map(p => p.trim()).filter(Boolean);
+      }
+
+      let teamA = parts[0] || 'Angels ZTP';
+      let teamB = parts[1] || 'Przeciwnik';
+
+      const aIsAngels = teamA.toLowerCase().includes('angel');
+      const bIsAngels = teamB.toLowerCase().includes('angel');
+
+      let opponent = '';
+      let isHome = true;
+
+      if (bIsAngels) {
+        opponent = teamA;
+        isHome = false;
+      } else {
+        opponent = teamB;
+        isHome = true;
+      }
+
+      // Czy to rozegrany mecz z wynikiem, czy przyszły mecz terminarza?
+      if (scoreMatch) {
+        let setsA = parseInt(scoreMatch[1]);
+        let setsB = parseInt(scoreMatch[2]);
+        let ourSets = bIsAngels ? setsB : setsA;
+        let oppSets = bIsAngels ? setsA : setsB;
+
+        if (detailedSets.length === 0) {
+          for (let i = 1; i <= ourSets + oppSets; i++) {
+            if (i <= ourSets) {
+              detailedSets.push({ setNumber: i, teamScore: 25, opponentScore: 20 });
+            } else {
+              detailedSets.push({ setNumber: i, teamScore: 20, opponentScore: 25 });
+            }
+          }
+        }
+
+        matchesList.push({
+          opponent,
+          date: dateIso,
+          isHome,
+          matchType: 'Mecz ligowy',
+          teamSetsWon: ourSets,
+          opponentSetsWon: oppSets,
+          sets: detailedSets,
+          notes: `Zaimportowano z LALS: ${line}`
+        });
+      } else {
+        fixturesList.push({
+          title: `Mecz ligowy LALS vs ${opponent}`,
+          opponent,
+          date: dateIso,
+          location: 'Hala OSiR, ul. Sportowa 5',
+          description: `Oficjalny mecz LALS: ${line}`
+        });
+      }
+    });
+
+    setParsedMatchesToImport(matchesList);
+    setParsedFixturesToImport(fixturesList);
+  };
+
+  // OCR dla zdjęcia terminarza
+  const handleScheduleImageOcr = async (file: File) => {
+    setScheduleOcrLoading(true);
+    setScheduleOcrProgress(0);
+    setScheduleOcrStatus('Wczytywanie zdjęcia terminarza...');
+    try {
+      const previewUrl = URL.createObjectURL(file);
+      setScheduleImagePreview(previewUrl);
+      const text = await recognizeTextFromImage(file, p => {
+        setScheduleOcrProgress(p.progress);
+        setScheduleOcrStatus(p.status);
+      });
+      setRawScheduleInput(text);
+      handleParseScheduleText(text);
+    } catch (err: any) {
+      alert('Błąd OCR podczas rozpoznawania terminarza: ' + (err?.message || err));
+    } finally {
+      setScheduleOcrLoading(false);
+      setScheduleOcrStatus('');
+    }
+  };
+
+  // Zapisz zaimportowane mecze i terminarz do bazy
+  const handleSaveImportedSchedule = async () => {
+    if (parsedMatchesToImport.length === 0 && parsedFixturesToImport.length === 0) {
+      alert('Brak rozpoznanych meczów do zaimportowania.');
+      return;
+    }
+    setSubmittingScheduleImport(true);
+    try {
+      const res = await fetch('/api/matches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'BATCH_IMPORT',
+          matchesToImport: parsedMatchesToImport,
+          fixturesToImport: parsedFixturesToImport
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message || 'Pomyślnie zaimportowano terminarz i mecze!');
+        setShowImportScheduleModal(false);
+        setRawScheduleInput('');
+        setParsedMatchesToImport([]);
+        setParsedFixturesToImport([]);
+        await fetchData();
+      } else {
+        alert(data.error || 'Błąd importu');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Wystąpił błąd podczas zapisywania');
+    } finally {
+      setSubmittingScheduleImport(false);
     }
   };
 
@@ -2029,13 +2316,24 @@ function RozgrywkiContent() {
             {canManage && (
               <div className="flex items-center gap-2">
                 {ligaSubTab === 'wyniki' && (
-                  <button
-                    onClick={() => setShowAddMatchModal(true)}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-sky-500 hover:bg-sky-400 text-slate-950 transition"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    Dodaj Wynik Meczu
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowImportScheduleModal(true)}
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-800 hover:bg-slate-700 text-sky-300 border border-sky-500/30 transition shadow-sm"
+                    >
+                      <Upload className="w-3.5 h-3.5 text-sky-400" />
+                      <span>Import Terminarza / Wyników (Tekst / Zdjęcie)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowAddMatchModal(true)}
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-sky-500 hover:bg-sky-400 text-slate-950 transition"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Dodaj Wynik Meczu
+                    </button>
+                  </div>
                 )}
                 {ligaSubTab === 'zdjecia' && (
                   <button
@@ -3063,38 +3361,131 @@ function RozgrywkiContent() {
             </div>
 
             <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego wklejania tabeli */}
-              <details className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-xs text-slate-300 group">
-                <summary className="font-bold cursor-pointer text-sky-400 flex items-center justify-between list-none">
-                  <span className="flex items-center gap-1.5">
-                    <Upload className="w-3.5 h-3.5" />
-                    Szybkie wklejanie tabeli skopiowanej z VolleyStation
-                  </span>
-                  <span className="text-[10px] text-slate-500 group-open:rotate-180 transition-transform">▼</span>
-                </summary>
-                <div className="mt-3 space-y-2">
-                  <p className="text-[11px] text-slate-400">
-                    Skopiuj całą tabelę z VolleyStation i wklej poniżej, a system automatycznie rozpozna drużyny, mecze i punkty:
-                  </p>
-                  <textarea
-                    rows={4}
-                    value={rawTableInput}
-                    onChange={e => setRawTableInput(e.target.value)}
-                    placeholder="np. 1 Angels ZTP 6 16&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                    className="w-full rounded-lg bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                  />
-                  <div className="flex justify-end">
+              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
+              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div className="flex items-center gap-2">
+                    <Upload className="w-4 h-4 text-sky-400" />
+                    <span className="font-bold text-white uppercase tracking-wider text-xs">
+                      Szybki Import Tabeli LALS
+                    </span>
+                  </div>
+                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
+                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
                     <button
                       type="button"
-                      onClick={handleParseRawTable}
-                      disabled={!rawTableInput.trim()}
-                      className="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-bold transition"
+                      onClick={() => setTableImportTab('text')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'text'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
                     >
-                      Przetwórz i wstaw do tabeli
+                      📋 Wklej Tekst
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTableImportTab('image')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'image'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      📸 Zdjęcie / Screenshot (OCR)
                     </button>
                   </div>
                 </div>
-              </details>
+
+                {tableImportTab === 'text' ? (
+                  <div className="space-y-2 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
+                    </p>
+                    <textarea
+                      rows={4}
+                      value={rawTableInput}
+                      onChange={e => setRawTableInput(e.target.value)}
+                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
+                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleParseRawTable()}
+                        disabled={!rawTableInput.trim()}
+                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
+                      >
+                        Przetwórz i wstaw do tabeli
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
+                        <Camera className="w-4 h-4" />
+                        <span>Wybierz zdjęcie / screen tabeli</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (file) handleTableImageOcr(file);
+                          }}
+                        />
+                      </label>
+                      {tableImagePreview && (
+                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
+                        </span>
+                      )}
+                    </div>
+
+                    {tableOcrLoading && (
+                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
+                        <div className="flex items-center justify-between text-xs text-sky-300">
+                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
+                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
+                        </div>
+                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
+                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {rawTableInput && (
+                      <div className="space-y-1.5 pt-2">
+                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
+                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
+                        </div>
+                        <textarea
+                          rows={3}
+                          value={rawTableInput}
+                          onChange={e => setRawTableInput(e.target.value)}
+                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
+                        />
+                        <div className="flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => handleParseRawTable()}
+                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
+                          >
+                            Zastosuj do tabeli
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Edycja wierszy tabeli */}
               <div className="space-y-2">
@@ -3679,38 +4070,131 @@ function RozgrywkiContent() {
             </div>
 
             <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego wklejania tabeli */}
-              <details className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-xs text-slate-300 group">
-                <summary className="font-bold cursor-pointer text-sky-400 flex items-center justify-between list-none">
-                  <span className="flex items-center gap-1.5">
-                    <Upload className="w-3.5 h-3.5" />
-                    Szybkie wklejanie tabeli skopiowanej z VolleyStation
-                  </span>
-                  <span className="text-[10px] text-slate-500 group-open:rotate-180 transition-transform">▼</span>
-                </summary>
-                <div className="mt-3 space-y-2">
-                  <p className="text-[11px] text-slate-400">
-                    Skopiuj całą tabelę z VolleyStation i wklej poniżej, a system automatycznie rozpozna drużyny, mecze i punkty:
-                  </p>
-                  <textarea
-                    rows={4}
-                    value={rawTableInput}
-                    onChange={e => setRawTableInput(e.target.value)}
-                    placeholder="np. 1 Angels ZTP 6 16&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                    className="w-full rounded-lg bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                  />
-                  <div className="flex justify-end">
+              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
+              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div className="flex items-center gap-2">
+                    <Upload className="w-4 h-4 text-sky-400" />
+                    <span className="font-bold text-white uppercase tracking-wider text-xs">
+                      Szybki Import Tabeli LALS
+                    </span>
+                  </div>
+                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
+                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
                     <button
                       type="button"
-                      onClick={handleParseRawTable}
-                      disabled={!rawTableInput.trim()}
-                      className="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-bold transition"
+                      onClick={() => setTableImportTab('text')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'text'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
                     >
-                      Przetwórz i wstaw do tabeli
+                      📋 Wklej Tekst
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTableImportTab('image')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'image'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      📸 Zdjęcie / Screenshot (OCR)
                     </button>
                   </div>
                 </div>
-              </details>
+
+                {tableImportTab === 'text' ? (
+                  <div className="space-y-2 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
+                    </p>
+                    <textarea
+                      rows={4}
+                      value={rawTableInput}
+                      onChange={e => setRawTableInput(e.target.value)}
+                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
+                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleParseRawTable()}
+                        disabled={!rawTableInput.trim()}
+                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
+                      >
+                        Przetwórz i wstaw do tabeli
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
+                        <Camera className="w-4 h-4" />
+                        <span>Wybierz zdjęcie / screen tabeli</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (file) handleTableImageOcr(file);
+                          }}
+                        />
+                      </label>
+                      {tableImagePreview && (
+                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
+                        </span>
+                      )}
+                    </div>
+
+                    {tableOcrLoading && (
+                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
+                        <div className="flex items-center justify-between text-xs text-sky-300">
+                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
+                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
+                        </div>
+                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
+                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {rawTableInput && (
+                      <div className="space-y-1.5 pt-2">
+                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
+                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
+                        </div>
+                        <textarea
+                          rows={3}
+                          value={rawTableInput}
+                          onChange={e => setRawTableInput(e.target.value)}
+                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
+                        />
+                        <div className="flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => handleParseRawTable()}
+                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
+                          >
+                            Zastosuj do tabeli
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Edycja wierszy tabeli */}
               <div className="space-y-2">
@@ -4146,38 +4630,131 @@ function RozgrywkiContent() {
             </div>
 
             <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego wklejania tabeli */}
-              <details className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-xs text-slate-300 group">
-                <summary className="font-bold cursor-pointer text-sky-400 flex items-center justify-between list-none">
-                  <span className="flex items-center gap-1.5">
-                    <Upload className="w-3.5 h-3.5" />
-                    Szybkie wklejanie tabeli skopiowanej z VolleyStation
-                  </span>
-                  <span className="text-[10px] text-slate-500 group-open:rotate-180 transition-transform">▼</span>
-                </summary>
-                <div className="mt-3 space-y-2">
-                  <p className="text-[11px] text-slate-400">
-                    Skopiuj całą tabelę z VolleyStation i wklej poniżej, a system automatycznie rozpozna drużyny, mecze i punkty:
-                  </p>
-                  <textarea
-                    rows={4}
-                    value={rawTableInput}
-                    onChange={e => setRawTableInput(e.target.value)}
-                    placeholder="np. 1 Angels ZTP 6 16&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                    className="w-full rounded-lg bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                  />
-                  <div className="flex justify-end">
+              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
+              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div className="flex items-center gap-2">
+                    <Upload className="w-4 h-4 text-sky-400" />
+                    <span className="font-bold text-white uppercase tracking-wider text-xs">
+                      Szybki Import Tabeli LALS
+                    </span>
+                  </div>
+                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
+                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
                     <button
                       type="button"
-                      onClick={handleParseRawTable}
-                      disabled={!rawTableInput.trim()}
-                      className="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-bold transition"
+                      onClick={() => setTableImportTab('text')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'text'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
                     >
-                      Przetwórz i wstaw do tabeli
+                      📋 Wklej Tekst
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTableImportTab('image')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'image'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      📸 Zdjęcie / Screenshot (OCR)
                     </button>
                   </div>
                 </div>
-              </details>
+
+                {tableImportTab === 'text' ? (
+                  <div className="space-y-2 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
+                    </p>
+                    <textarea
+                      rows={4}
+                      value={rawTableInput}
+                      onChange={e => setRawTableInput(e.target.value)}
+                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
+                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleParseRawTable()}
+                        disabled={!rawTableInput.trim()}
+                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
+                      >
+                        Przetwórz i wstaw do tabeli
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
+                        <Camera className="w-4 h-4" />
+                        <span>Wybierz zdjęcie / screen tabeli</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (file) handleTableImageOcr(file);
+                          }}
+                        />
+                      </label>
+                      {tableImagePreview && (
+                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
+                        </span>
+                      )}
+                    </div>
+
+                    {tableOcrLoading && (
+                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
+                        <div className="flex items-center justify-between text-xs text-sky-300">
+                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
+                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
+                        </div>
+                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
+                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {rawTableInput && (
+                      <div className="space-y-1.5 pt-2">
+                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
+                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
+                        </div>
+                        <textarea
+                          rows={3}
+                          value={rawTableInput}
+                          onChange={e => setRawTableInput(e.target.value)}
+                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
+                        />
+                        <div className="flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => handleParseRawTable()}
+                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
+                          >
+                            Zastosuj do tabeli
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Edycja wierszy tabeli */}
               <div className="space-y-2">
@@ -4541,38 +5118,131 @@ function RozgrywkiContent() {
             </div>
 
             <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego wklejania tabeli */}
-              <details className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-xs text-slate-300 group">
-                <summary className="font-bold cursor-pointer text-sky-400 flex items-center justify-between list-none">
-                  <span className="flex items-center gap-1.5">
-                    <Upload className="w-3.5 h-3.5" />
-                    Szybkie wklejanie tabeli skopiowanej z VolleyStation
-                  </span>
-                  <span className="text-[10px] text-slate-500 group-open:rotate-180 transition-transform">▼</span>
-                </summary>
-                <div className="mt-3 space-y-2">
-                  <p className="text-[11px] text-slate-400">
-                    Skopiuj całą tabelę z VolleyStation i wklej poniżej, a system automatycznie rozpozna drużyny, mecze i punkty:
-                  </p>
-                  <textarea
-                    rows={4}
-                    value={rawTableInput}
-                    onChange={e => setRawTableInput(e.target.value)}
-                    placeholder="np. 1 Angels ZTP 6 16&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                    className="w-full rounded-lg bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                  />
-                  <div className="flex justify-end">
+              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
+              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div className="flex items-center gap-2">
+                    <Upload className="w-4 h-4 text-sky-400" />
+                    <span className="font-bold text-white uppercase tracking-wider text-xs">
+                      Szybki Import Tabeli LALS
+                    </span>
+                  </div>
+                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
+                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
                     <button
                       type="button"
-                      onClick={handleParseRawTable}
-                      disabled={!rawTableInput.trim()}
-                      className="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-bold transition"
+                      onClick={() => setTableImportTab('text')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'text'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
                     >
-                      Przetwórz i wstaw do tabeli
+                      📋 Wklej Tekst
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTableImportTab('image')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'image'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      📸 Zdjęcie / Screenshot (OCR)
                     </button>
                   </div>
                 </div>
-              </details>
+
+                {tableImportTab === 'text' ? (
+                  <div className="space-y-2 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
+                    </p>
+                    <textarea
+                      rows={4}
+                      value={rawTableInput}
+                      onChange={e => setRawTableInput(e.target.value)}
+                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
+                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleParseRawTable()}
+                        disabled={!rawTableInput.trim()}
+                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
+                      >
+                        Przetwórz i wstaw do tabeli
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
+                        <Camera className="w-4 h-4" />
+                        <span>Wybierz zdjęcie / screen tabeli</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (file) handleTableImageOcr(file);
+                          }}
+                        />
+                      </label>
+                      {tableImagePreview && (
+                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
+                        </span>
+                      )}
+                    </div>
+
+                    {tableOcrLoading && (
+                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
+                        <div className="flex items-center justify-between text-xs text-sky-300">
+                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
+                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
+                        </div>
+                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
+                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {rawTableInput && (
+                      <div className="space-y-1.5 pt-2">
+                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
+                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
+                        </div>
+                        <textarea
+                          rows={3}
+                          value={rawTableInput}
+                          onChange={e => setRawTableInput(e.target.value)}
+                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
+                        />
+                        <div className="flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => handleParseRawTable()}
+                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
+                          >
+                            Zastosuj do tabeli
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Edycja wierszy tabeli */}
               <div className="space-y-2">
@@ -5137,38 +5807,131 @@ function RozgrywkiContent() {
             </div>
 
             <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego wklejania tabeli */}
-              <details className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-xs text-slate-300 group">
-                <summary className="font-bold cursor-pointer text-sky-400 flex items-center justify-between list-none">
-                  <span className="flex items-center gap-1.5">
-                    <Upload className="w-3.5 h-3.5" />
-                    Szybkie wklejanie tabeli skopiowanej z VolleyStation
-                  </span>
-                  <span className="text-[10px] text-slate-500 group-open:rotate-180 transition-transform">▼</span>
-                </summary>
-                <div className="mt-3 space-y-2">
-                  <p className="text-[11px] text-slate-400">
-                    Skopiuj całą tabelę z VolleyStation i wklej poniżej, a system automatycznie rozpozna drużyny, mecze i punkty:
-                  </p>
-                  <textarea
-                    rows={4}
-                    value={rawTableInput}
-                    onChange={e => setRawTableInput(e.target.value)}
-                    placeholder="np. 1 Angels ZTP 6 16&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                    className="w-full rounded-lg bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                  />
-                  <div className="flex justify-end">
+              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
+              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div className="flex items-center gap-2">
+                    <Upload className="w-4 h-4 text-sky-400" />
+                    <span className="font-bold text-white uppercase tracking-wider text-xs">
+                      Szybki Import Tabeli LALS
+                    </span>
+                  </div>
+                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
+                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
                     <button
                       type="button"
-                      onClick={handleParseRawTable}
-                      disabled={!rawTableInput.trim()}
-                      className="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-bold transition"
+                      onClick={() => setTableImportTab('text')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'text'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
                     >
-                      Przetwórz i wstaw do tabeli
+                      📋 Wklej Tekst
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTableImportTab('image')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'image'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      📸 Zdjęcie / Screenshot (OCR)
                     </button>
                   </div>
                 </div>
-              </details>
+
+                {tableImportTab === 'text' ? (
+                  <div className="space-y-2 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
+                    </p>
+                    <textarea
+                      rows={4}
+                      value={rawTableInput}
+                      onChange={e => setRawTableInput(e.target.value)}
+                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
+                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleParseRawTable()}
+                        disabled={!rawTableInput.trim()}
+                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
+                      >
+                        Przetwórz i wstaw do tabeli
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
+                        <Camera className="w-4 h-4" />
+                        <span>Wybierz zdjęcie / screen tabeli</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (file) handleTableImageOcr(file);
+                          }}
+                        />
+                      </label>
+                      {tableImagePreview && (
+                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
+                        </span>
+                      )}
+                    </div>
+
+                    {tableOcrLoading && (
+                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
+                        <div className="flex items-center justify-between text-xs text-sky-300">
+                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
+                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
+                        </div>
+                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
+                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {rawTableInput && (
+                      <div className="space-y-1.5 pt-2">
+                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
+                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
+                        </div>
+                        <textarea
+                          rows={3}
+                          value={rawTableInput}
+                          onChange={e => setRawTableInput(e.target.value)}
+                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
+                        />
+                        <div className="flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => handleParseRawTable()}
+                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
+                          >
+                            Zastosuj do tabeli
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Edycja wierszy tabeli */}
               <div className="space-y-2">
@@ -5502,38 +6265,131 @@ function RozgrywkiContent() {
             </div>
 
             <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego wklejania tabeli */}
-              <details className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-xs text-slate-300 group">
-                <summary className="font-bold cursor-pointer text-sky-400 flex items-center justify-between list-none">
-                  <span className="flex items-center gap-1.5">
-                    <Upload className="w-3.5 h-3.5" />
-                    Szybkie wklejanie tabeli skopiowanej z VolleyStation
-                  </span>
-                  <span className="text-[10px] text-slate-500 group-open:rotate-180 transition-transform">▼</span>
-                </summary>
-                <div className="mt-3 space-y-2">
-                  <p className="text-[11px] text-slate-400">
-                    Skopiuj całą tabelę z VolleyStation i wklej poniżej, a system automatycznie rozpozna drużyny, mecze i punkty:
-                  </p>
-                  <textarea
-                    rows={4}
-                    value={rawTableInput}
-                    onChange={e => setRawTableInput(e.target.value)}
-                    placeholder="np. 1 Angels ZTP 6 16&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                    className="w-full rounded-lg bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                  />
-                  <div className="flex justify-end">
+              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
+              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div className="flex items-center gap-2">
+                    <Upload className="w-4 h-4 text-sky-400" />
+                    <span className="font-bold text-white uppercase tracking-wider text-xs">
+                      Szybki Import Tabeli LALS
+                    </span>
+                  </div>
+                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
+                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
                     <button
                       type="button"
-                      onClick={handleParseRawTable}
-                      disabled={!rawTableInput.trim()}
-                      className="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-bold transition"
+                      onClick={() => setTableImportTab('text')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'text'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
                     >
-                      Przetwórz i wstaw do tabeli
+                      📋 Wklej Tekst
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTableImportTab('image')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'image'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      📸 Zdjęcie / Screenshot (OCR)
                     </button>
                   </div>
                 </div>
-              </details>
+
+                {tableImportTab === 'text' ? (
+                  <div className="space-y-2 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
+                    </p>
+                    <textarea
+                      rows={4}
+                      value={rawTableInput}
+                      onChange={e => setRawTableInput(e.target.value)}
+                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
+                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleParseRawTable()}
+                        disabled={!rawTableInput.trim()}
+                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
+                      >
+                        Przetwórz i wstaw do tabeli
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
+                        <Camera className="w-4 h-4" />
+                        <span>Wybierz zdjęcie / screen tabeli</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (file) handleTableImageOcr(file);
+                          }}
+                        />
+                      </label>
+                      {tableImagePreview && (
+                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
+                        </span>
+                      )}
+                    </div>
+
+                    {tableOcrLoading && (
+                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
+                        <div className="flex items-center justify-between text-xs text-sky-300">
+                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
+                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
+                        </div>
+                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
+                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {rawTableInput && (
+                      <div className="space-y-1.5 pt-2">
+                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
+                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
+                        </div>
+                        <textarea
+                          rows={3}
+                          value={rawTableInput}
+                          onChange={e => setRawTableInput(e.target.value)}
+                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
+                        />
+                        <div className="flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => handleParseRawTable()}
+                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
+                          >
+                            Zastosuj do tabeli
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Edycja wierszy tabeli */}
               <div className="space-y-2">
@@ -5886,38 +6742,131 @@ function RozgrywkiContent() {
             </div>
 
             <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego wklejania tabeli */}
-              <details className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-xs text-slate-300 group">
-                <summary className="font-bold cursor-pointer text-sky-400 flex items-center justify-between list-none">
-                  <span className="flex items-center gap-1.5">
-                    <Upload className="w-3.5 h-3.5" />
-                    Szybkie wklejanie tabeli skopiowanej z VolleyStation
-                  </span>
-                  <span className="text-[10px] text-slate-500 group-open:rotate-180 transition-transform">▼</span>
-                </summary>
-                <div className="mt-3 space-y-2">
-                  <p className="text-[11px] text-slate-400">
-                    Skopiuj całą tabelę z VolleyStation i wklej poniżej, a system automatycznie rozpozna drużyny, mecze i punkty:
-                  </p>
-                  <textarea
-                    rows={4}
-                    value={rawTableInput}
-                    onChange={e => setRawTableInput(e.target.value)}
-                    placeholder="np. 1 Angels ZTP 6 16&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                    className="w-full rounded-lg bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                  />
-                  <div className="flex justify-end">
+              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
+              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div className="flex items-center gap-2">
+                    <Upload className="w-4 h-4 text-sky-400" />
+                    <span className="font-bold text-white uppercase tracking-wider text-xs">
+                      Szybki Import Tabeli LALS
+                    </span>
+                  </div>
+                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
+                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
                     <button
                       type="button"
-                      onClick={handleParseRawTable}
-                      disabled={!rawTableInput.trim()}
-                      className="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-bold transition"
+                      onClick={() => setTableImportTab('text')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'text'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
                     >
-                      Przetwórz i wstaw do tabeli
+                      📋 Wklej Tekst
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTableImportTab('image')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'image'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      📸 Zdjęcie / Screenshot (OCR)
                     </button>
                   </div>
                 </div>
-              </details>
+
+                {tableImportTab === 'text' ? (
+                  <div className="space-y-2 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
+                    </p>
+                    <textarea
+                      rows={4}
+                      value={rawTableInput}
+                      onChange={e => setRawTableInput(e.target.value)}
+                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
+                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleParseRawTable()}
+                        disabled={!rawTableInput.trim()}
+                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
+                      >
+                        Przetwórz i wstaw do tabeli
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
+                        <Camera className="w-4 h-4" />
+                        <span>Wybierz zdjęcie / screen tabeli</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (file) handleTableImageOcr(file);
+                          }}
+                        />
+                      </label>
+                      {tableImagePreview && (
+                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
+                        </span>
+                      )}
+                    </div>
+
+                    {tableOcrLoading && (
+                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
+                        <div className="flex items-center justify-between text-xs text-sky-300">
+                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
+                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
+                        </div>
+                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
+                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {rawTableInput && (
+                      <div className="space-y-1.5 pt-2">
+                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
+                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
+                        </div>
+                        <textarea
+                          rows={3}
+                          value={rawTableInput}
+                          onChange={e => setRawTableInput(e.target.value)}
+                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
+                        />
+                        <div className="flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => handleParseRawTable()}
+                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
+                          >
+                            Zastosuj do tabeli
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Edycja wierszy tabeli */}
               <div className="space-y-2">
@@ -6332,38 +7281,131 @@ function RozgrywkiContent() {
             </div>
 
             <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego wklejania tabeli */}
-              <details className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-xs text-slate-300 group">
-                <summary className="font-bold cursor-pointer text-sky-400 flex items-center justify-between list-none">
-                  <span className="flex items-center gap-1.5">
-                    <Upload className="w-3.5 h-3.5" />
-                    Szybkie wklejanie tabeli skopiowanej z VolleyStation
-                  </span>
-                  <span className="text-[10px] text-slate-500 group-open:rotate-180 transition-transform">▼</span>
-                </summary>
-                <div className="mt-3 space-y-2">
-                  <p className="text-[11px] text-slate-400">
-                    Skopiuj całą tabelę z VolleyStation i wklej poniżej, a system automatycznie rozpozna drużyny, mecze i punkty:
-                  </p>
-                  <textarea
-                    rows={4}
-                    value={rawTableInput}
-                    onChange={e => setRawTableInput(e.target.value)}
-                    placeholder="np. 1 Angels ZTP 6 16&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                    className="w-full rounded-lg bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                  />
-                  <div className="flex justify-end">
+              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
+              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div className="flex items-center gap-2">
+                    <Upload className="w-4 h-4 text-sky-400" />
+                    <span className="font-bold text-white uppercase tracking-wider text-xs">
+                      Szybki Import Tabeli LALS
+                    </span>
+                  </div>
+                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
+                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
                     <button
                       type="button"
-                      onClick={handleParseRawTable}
-                      disabled={!rawTableInput.trim()}
-                      className="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-bold transition"
+                      onClick={() => setTableImportTab('text')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'text'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
                     >
-                      Przetwórz i wstaw do tabeli
+                      📋 Wklej Tekst
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTableImportTab('image')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'image'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      📸 Zdjęcie / Screenshot (OCR)
                     </button>
                   </div>
                 </div>
-              </details>
+
+                {tableImportTab === 'text' ? (
+                  <div className="space-y-2 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
+                    </p>
+                    <textarea
+                      rows={4}
+                      value={rawTableInput}
+                      onChange={e => setRawTableInput(e.target.value)}
+                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
+                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleParseRawTable()}
+                        disabled={!rawTableInput.trim()}
+                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
+                      >
+                        Przetwórz i wstaw do tabeli
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
+                        <Camera className="w-4 h-4" />
+                        <span>Wybierz zdjęcie / screen tabeli</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (file) handleTableImageOcr(file);
+                          }}
+                        />
+                      </label>
+                      {tableImagePreview && (
+                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
+                        </span>
+                      )}
+                    </div>
+
+                    {tableOcrLoading && (
+                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
+                        <div className="flex items-center justify-between text-xs text-sky-300">
+                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
+                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
+                        </div>
+                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
+                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {rawTableInput && (
+                      <div className="space-y-1.5 pt-2">
+                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
+                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
+                        </div>
+                        <textarea
+                          rows={3}
+                          value={rawTableInput}
+                          onChange={e => setRawTableInput(e.target.value)}
+                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
+                        />
+                        <div className="flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => handleParseRawTable()}
+                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
+                          >
+                            Zastosuj do tabeli
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Edycja wierszy tabeli */}
               <div className="space-y-2">
@@ -6706,38 +7748,131 @@ function RozgrywkiContent() {
             </div>
 
             <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego wklejania tabeli */}
-              <details className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-xs text-slate-300 group">
-                <summary className="font-bold cursor-pointer text-sky-400 flex items-center justify-between list-none">
-                  <span className="flex items-center gap-1.5">
-                    <Upload className="w-3.5 h-3.5" />
-                    Szybkie wklejanie tabeli skopiowanej z VolleyStation
-                  </span>
-                  <span className="text-[10px] text-slate-500 group-open:rotate-180 transition-transform">▼</span>
-                </summary>
-                <div className="mt-3 space-y-2">
-                  <p className="text-[11px] text-slate-400">
-                    Skopiuj całą tabelę z VolleyStation i wklej poniżej, a system automatycznie rozpozna drużyny, mecze i punkty:
-                  </p>
-                  <textarea
-                    rows={4}
-                    value={rawTableInput}
-                    onChange={e => setRawTableInput(e.target.value)}
-                    placeholder="np. 1 Angels ZTP 6 16&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                    className="w-full rounded-lg bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                  />
-                  <div className="flex justify-end">
+              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
+              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div className="flex items-center gap-2">
+                    <Upload className="w-4 h-4 text-sky-400" />
+                    <span className="font-bold text-white uppercase tracking-wider text-xs">
+                      Szybki Import Tabeli LALS
+                    </span>
+                  </div>
+                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
+                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
                     <button
                       type="button"
-                      onClick={handleParseRawTable}
-                      disabled={!rawTableInput.trim()}
-                      className="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-bold transition"
+                      onClick={() => setTableImportTab('text')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'text'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
                     >
-                      Przetwórz i wstaw do tabeli
+                      📋 Wklej Tekst
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTableImportTab('image')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'image'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      📸 Zdjęcie / Screenshot (OCR)
                     </button>
                   </div>
                 </div>
-              </details>
+
+                {tableImportTab === 'text' ? (
+                  <div className="space-y-2 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
+                    </p>
+                    <textarea
+                      rows={4}
+                      value={rawTableInput}
+                      onChange={e => setRawTableInput(e.target.value)}
+                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
+                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleParseRawTable()}
+                        disabled={!rawTableInput.trim()}
+                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
+                      >
+                        Przetwórz i wstaw do tabeli
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
+                        <Camera className="w-4 h-4" />
+                        <span>Wybierz zdjęcie / screen tabeli</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (file) handleTableImageOcr(file);
+                          }}
+                        />
+                      </label>
+                      {tableImagePreview && (
+                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
+                        </span>
+                      )}
+                    </div>
+
+                    {tableOcrLoading && (
+                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
+                        <div className="flex items-center justify-between text-xs text-sky-300">
+                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
+                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
+                        </div>
+                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
+                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {rawTableInput && (
+                      <div className="space-y-1.5 pt-2">
+                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
+                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
+                        </div>
+                        <textarea
+                          rows={3}
+                          value={rawTableInput}
+                          onChange={e => setRawTableInput(e.target.value)}
+                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
+                        />
+                        <div className="flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => handleParseRawTable()}
+                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
+                          >
+                            Zastosuj do tabeli
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Edycja wierszy tabeli */}
               <div className="space-y-2">
@@ -7049,6 +8184,275 @@ function RozgrywkiContent() {
           </div>
         );
       })()}
+
+      {/* MODAL IMPORTU TERMINARZA & WYNIKÓW (TEKST / ZDJĘCIE OCR) */}
+      {showImportScheduleModal && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            {/* Nagłówek */}
+            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-gradient-to-r from-slate-900 via-sky-950/30 to-slate-900">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
+                  <Calendar className="w-5 h-5 stroke-[2.5]" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                    Import Terminarza & Wyników LALS
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                      Tekst / Zdjęcie OCR
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Wgraj zdjęcie terminarza ze strony LALS lub wklej tekst, a system rozpozna daty, mecze i sety.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowImportScheduleModal(false)}
+                className="w-8 h-8 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Zakładki Tekst vs Zdjęcie */}
+            <div className="p-3 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between gap-3">
+              <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-1">
+                <button
+                  type="button"
+                  onClick={() => setScheduleImportTab('text')}
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
+                    scheduleImportTab === 'text'
+                      ? 'bg-sky-500 text-slate-950 shadow-md'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>Wklej Tekst</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setScheduleImportTab('image')}
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
+                    scheduleImportTab === 'image'
+                      ? 'bg-sky-500 text-slate-950 shadow-md'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Camera className="w-3.5 h-3.5" />
+                  <span>Wgraj Zdjęcie / Screen (OCR)</span>
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const example = `14.11.2026 19:30 Angels ZTP vs Gladiatorzy BUD-WENT 3:1 (25:21, 23:25, 25:18, 25:20)\n21.11.2026 18:00 Angels ZTP vs Volleyboars\n28.11.2026 20:00 Afera Volley vs Angels ZTP`;
+                  setRawScheduleInput(example);
+                  handleParseScheduleText(example);
+                }}
+                className="text-xs text-sky-400 hover:text-sky-300 font-bold underline"
+              >
+                + Wstaw przykład
+              </button>
+            </div>
+
+            <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
+              {scheduleImportTab === 'text' ? (
+                <div className="space-y-2">
+                  <p className="text-xs text-slate-400">
+                    Wklej linie terminarza lub wyników (jedna linia na mecz):
+                  </p>
+                  <textarea
+                    rows={6}
+                    value={rawScheduleInput}
+                    onChange={e => {
+                      setRawScheduleInput(e.target.value);
+                      handleParseScheduleText(e.target.value);
+                    }}
+                    placeholder={`14.11.2026 19:30 Angels ZTP vs Gladiatorzy 3:1 (25:21, 23:25, 25:18, 25:20)\n21.11.2026 18:00 Angels ZTP vs Volleyboars`}
+                    className="w-full rounded-xl bg-slate-950 border border-slate-700 p-3 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500 resize-y"
+                  />
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => handleParseScheduleText(rawScheduleInput)}
+                      className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
+                    >
+                      Przetwórz tekst
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-xs text-slate-400">
+                    Wybierz zdjęcie, zrzut ekranu lub zdjęcie telefonu z terminarzem LALS:
+                  </p>
+                  <label className="cursor-pointer p-6 rounded-2xl bg-slate-950 border-2 border-dashed border-slate-700 hover:border-sky-500 transition flex flex-col items-center justify-center gap-2 group">
+                    <Camera className="w-8 h-8 text-slate-500 group-hover:text-sky-400 transition" />
+                    <span className="text-xs font-bold text-slate-300 group-hover:text-white">
+                      Kliknij, aby wybrać plik zdjęcia lub zrzut ekranu
+                    </span>
+                    <span className="text-[10px] text-slate-500">
+                      Obsługiwane formaty: PNG, JPG, WEBP • Polski słownik OCR
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={e => {
+                        const file = e.target.files?.[0];
+                        if (file) handleScheduleImageOcr(file);
+                      }}
+                    />
+                  </label>
+
+                  {scheduleOcrLoading && (
+                    <div className="p-4 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-2">
+                      <div className="flex items-center justify-between text-xs text-sky-300 font-bold">
+                        <span>{scheduleOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
+                        <span className="font-mono">{scheduleOcrProgress}%</span>
+                      </div>
+                      <div className="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                        <div
+                          className="bg-sky-500 h-full transition-all duration-300 rounded-full"
+                          style={{ width: `${Math.max(5, scheduleOcrProgress)}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {rawScheduleInput && (
+                    <div className="space-y-1.5 pt-2">
+                      <span className="text-xs font-bold text-slate-400">
+                        Rozpoznany tekst z OCR (możesz edytować przed zatwierdzeniem):
+                      </span>
+                      <textarea
+                        rows={4}
+                        value={rawScheduleInput}
+                        onChange={e => {
+                          setRawScheduleInput(e.target.value);
+                          handleParseScheduleText(e.target.value);
+                        }}
+                        className="w-full rounded-xl bg-slate-950 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Podgląd rozpoznanych meczów */}
+              <div className="space-y-4 pt-3 border-t border-slate-800">
+                <h4 className="text-xs font-black uppercase text-slate-300 tracking-wider">
+                  Podgląd rozpoznanych jednostek (Łącznie: {parsedMatchesToImport.length + parsedFixturesToImport.length}):
+                </h4>
+
+                {parsedMatchesToImport.length === 0 && parsedFixturesToImport.length === 0 ? (
+                  <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 text-center text-xs text-slate-500">
+                    Wklej tekst lub wgraj zdjęcie, aby zobaczyć rozpoznane spotkania.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {/* Rozegrane mecze */}
+                    {parsedMatchesToImport.length > 0 && (
+                      <div className="space-y-2">
+                        <span className="text-[11px] font-black uppercase text-emerald-400 tracking-wider flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          Rozegrane mecze z wynikiem ({parsedMatchesToImport.length}):
+                        </span>
+                        <div className="space-y-1.5">
+                          {parsedMatchesToImport.map((m, idx) => (
+                            <div
+                              key={idx}
+                              className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30 flex items-center justify-between text-xs"
+                            >
+                              <div>
+                                <span className="font-bold text-white">
+                                  {m.isHome ? 'Angels ZTP' : m.opponent} vs {m.isHome ? m.opponent : 'Angels ZTP'}
+                                </span>
+                                <span className="text-slate-400 block text-[11px]">
+                                  {m.date.replace('T', ' ')} • {m.sets?.map((s: any) => `${s.teamScore}:${s.opponentScore}`).join(', ')}
+                                </span>
+                              </div>
+                              <span className="px-2.5 py-1 rounded-lg bg-emerald-500 text-slate-950 font-black text-xs font-mono">
+                                {m.teamSetsWon}:{m.opponentSetsWon}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Przyszłe mecze terminarza */}
+                    {parsedFixturesToImport.length > 0 && (
+                      <div className="space-y-2">
+                        <span className="text-[11px] font-black uppercase text-sky-400 tracking-wider flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5" />
+                          Przyszłe mecze do terminarza ({parsedFixturesToImport.length}):
+                        </span>
+                        <div className="space-y-1.5">
+                          {parsedFixturesToImport.map((f, idx) => (
+                            <div
+                              key={idx}
+                              className="p-3 rounded-xl bg-sky-950/20 border border-sky-500/30 flex items-center justify-between text-xs"
+                            >
+                              <div>
+                                <span className="font-bold text-white">{f.title}</span>
+                                <span className="text-slate-400 block text-[11px]">
+                                  {f.date.replace('T', ' ')} • {f.location}
+                                </span>
+                              </div>
+                              <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                                Terminarz
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Stopka */}
+            <div className="p-4 sm:p-5 border-t border-slate-800 bg-slate-950 flex items-center justify-between gap-3">
+              <span className="text-xs text-slate-400">
+                Gotowe do zapisu: <strong className="text-white">{parsedMatchesToImport.length + parsedFixturesToImport.length}</strong>
+              </span>
+              <div className="flex items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setShowImportScheduleModal(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition"
+                  disabled={submittingScheduleImport}
+                >
+                  Anuluj
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveImportedSchedule}
+                  disabled={submittingScheduleImport || (parsedMatchesToImport.length === 0 && parsedFixturesToImport.length === 0)}
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-400 hover:to-sky-500 disabled:opacity-50 text-slate-950 font-black text-xs flex items-center gap-2 transition shadow-lg shadow-sky-500/20"
+                >
+                  {submittingScheduleImport ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Zapisywanie meczów...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      <span>Zapisz do Terminarza & Wyników</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* MODAL IMPORTU Z VOLLEYSTATION */}
       {showVolleyStationImportModal && (
@@ -7553,38 +8957,131 @@ function RozgrywkiContent() {
             </div>
 
             <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
-              {/* Sekcja szybkiego wklejania tabeli */}
-              <details className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-xs text-slate-300 group">
-                <summary className="font-bold cursor-pointer text-sky-400 flex items-center justify-between list-none">
-                  <span className="flex items-center gap-1.5">
-                    <Upload className="w-3.5 h-3.5" />
-                    Szybkie wklejanie tabeli skopiowanej z VolleyStation
-                  </span>
-                  <span className="text-[10px] text-slate-500 group-open:rotate-180 transition-transform">▼</span>
-                </summary>
-                <div className="mt-3 space-y-2">
-                  <p className="text-[11px] text-slate-400">
-                    Skopiuj całą tabelę z VolleyStation i wklej poniżej, a system automatycznie rozpozna drużyny, mecze i punkty:
-                  </p>
-                  <textarea
-                    rows={4}
-                    value={rawTableInput}
-                    onChange={e => setRawTableInput(e.target.value)}
-                    placeholder="np. 1 Angels ZTP 6 16&#10;2 Gladiatorzy BUD-WENT 6 15..."
-                    className="w-full rounded-lg bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
-                  />
-                  <div className="flex justify-end">
+              {/* Sekcja szybkiego importu tabeli: Tekst / Zdjęcie OCR */}
+              <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-300 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div className="flex items-center gap-2">
+                    <Upload className="w-4 h-4 text-sky-400" />
+                    <span className="font-bold text-white uppercase tracking-wider text-xs">
+                      Szybki Import Tabeli LALS
+                    </span>
+                  </div>
+                  {/* Przełącznik Wklej Tekst vs Wgraj Zdjęcie */}
+                  <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
                     <button
                       type="button"
-                      onClick={handleParseRawTable}
-                      disabled={!rawTableInput.trim()}
-                      className="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-bold transition"
+                      onClick={() => setTableImportTab('text')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'text'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
                     >
-                      Przetwórz i wstaw do tabeli
+                      📋 Wklej Tekst
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTableImportTab('image')}
+                      className={`px-3 py-1 rounded-md text-xs font-bold transition ${
+                        tableImportTab === 'image'
+                          ? 'bg-sky-500 text-slate-950 shadow-sm'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      📸 Zdjęcie / Screenshot (OCR)
                     </button>
                   </div>
                 </div>
-              </details>
+
+                {tableImportTab === 'text' ? (
+                  <div className="space-y-2 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wklej tabelę skopiowaną ze strony LALS / VolleyStation lub z Excela (obsługuje dowolne formaty):
+                    </p>
+                    <textarea
+                      rows={4}
+                      value={rawTableInput}
+                      onChange={e => setRawTableInput(e.target.value)}
+                      placeholder="np. 1 Angels ZTP 6 16 17:5 512:430&#10;2 Gladiatorzy BUD-WENT 6 15..."
+                      className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-sky-500"
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleParseRawTable()}
+                        disabled={!rawTableInput.trim()}
+                        className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 disabled:opacity-50 text-slate-950 text-xs font-black uppercase tracking-wider transition shadow-md shadow-sky-500/20"
+                      >
+                        Przetwórz i wstaw do tabeli
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3 pt-1">
+                    <p className="text-[11px] text-slate-400">
+                      Wybierz zdjęcie lub zrzut ekranu tabeli ze strony LALS. System automatycznie rozpozna tekst i wypełni tabelę:
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                      <label className="w-full sm:w-auto cursor-pointer px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-sky-500 text-sky-400 hover:text-sky-300 font-bold text-xs flex items-center justify-center gap-2 transition">
+                        <Camera className="w-4 h-4" />
+                        <span>Wybierz zdjęcie / screen tabeli</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (file) handleTableImageOcr(file);
+                          }}
+                        />
+                      </label>
+                      {tableImagePreview && (
+                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Zdjęcie załadowane
+                        </span>
+                      )}
+                    </div>
+
+                    {tableOcrLoading && (
+                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-500/30 space-y-1.5">
+                        <div className="flex items-center justify-between text-xs text-sky-300">
+                          <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
+                          <span className="font-mono font-bold">{tableOcrProgress}%</span>
+                        </div>
+                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
+                            style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {rawTableInput && (
+                      <div className="space-y-1.5 pt-2">
+                        <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold">
+                          <span>Rozpoznany tekst tabeli (możesz skorygować przed zatwierdzeniem):</span>
+                        </div>
+                        <textarea
+                          rows={3}
+                          value={rawTableInput}
+                          onChange={e => setRawTableInput(e.target.value)}
+                          className="w-full rounded-xl bg-slate-900 border border-slate-700 p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"
+                        />
+                        <div className="flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => handleParseRawTable()}
+                            className="px-4 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black uppercase tracking-wider transition"
+                          >
+                            Zastosuj do tabeli
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Edycja wierszy tabeli */}
               <div className="space-y-2">

@@ -109,6 +109,11 @@ function EventsAttendanceContent() {
   // Tabela obecności: filtr dla każdego wydarzenia (ALL, BEDE, NIEPEWNE, NIE_BEDE, BRAK)
   const [attendanceTableFilter, setAttendanceTableFilter] = useState<Record<string, 'ALL' | 'BEDE' | 'NIEPEWNE' | 'NIE_BEDE' | 'BRAK'>>({});
 
+  // Widok: 'list' (tradycyjna lista) lub 'calendar' (interaktywny kalendarz miesięczny)
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [calendarDate, setCalendarDate] = useState<Date>(new Date());
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState<string>(new Date().toISOString().slice(0, 10));
+
   const { isArchiveMode } = useSeasonArchive();
   const canManage = Boolean(
     !isArchiveMode && user && (user.role === 'TRENER' || user.role === 'KIEROWNIK' || user.isCaptain)
@@ -558,6 +563,90 @@ function EventsAttendanceContent() {
     }
   };
 
+  // Kalendarz miesięczny - obliczenia dni i wydarzeń
+  const calendarYear = calendarDate.getFullYear();
+  const calendarMonth = calendarDate.getMonth();
+  const monthNamesPl = [
+    'Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec',
+    'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'
+  ];
+  const dayNamesPl = ['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob', 'Niedz'];
+
+  const eventsByDate = useMemo(() => {
+    const map: Record<string, EventItem[]> = {};
+    events.forEach(evt => {
+      try {
+        const d = evt.date.slice(0, 10);
+        if (!map[d]) map[d] = [];
+        map[d].push(evt);
+      } catch {}
+    });
+    return map;
+  }, [events]);
+
+  const calendarDays = useMemo(() => {
+    const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+    const firstDayOfWeek = (new Date(calendarYear, calendarMonth, 1).getDay() + 6) % 7;
+    const daysInPrevMonth = new Date(calendarYear, calendarMonth, 0).getDate();
+
+    const days: Array<{
+      dateString: string;
+      dayNumber: number;
+      isCurrentMonth: boolean;
+      isToday: boolean;
+      events: EventItem[];
+    }> = [];
+
+    const todayStr = new Date().toISOString().slice(0, 10);
+
+    for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+      const dNum = daysInPrevMonth - i;
+      const prevDate = new Date(calendarYear, calendarMonth - 1, dNum);
+      const mm = String(prevDate.getMonth() + 1).padStart(2, '0');
+      const dd = String(prevDate.getDate()).padStart(2, '0');
+      const dStr = `${prevDate.getFullYear()}-${mm}-${dd}`;
+      days.push({
+        dateString: dStr,
+        dayNumber: dNum,
+        isCurrentMonth: false,
+        isToday: dStr === todayStr,
+        events: eventsByDate[dStr] || []
+      });
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const mm = String(calendarMonth + 1).padStart(2, '0');
+      const dd = String(d).padStart(2, '0');
+      const dStr = `${calendarYear}-${mm}-${dd}`;
+      days.push({
+        dateString: dStr,
+        dayNumber: d,
+        isCurrentMonth: true,
+        isToday: dStr === todayStr,
+        events: eventsByDate[dStr] || []
+      });
+    }
+
+    const remaining = (7 - (days.length % 7)) % 7;
+    for (let i = 1; i <= remaining; i++) {
+      const nextDate = new Date(calendarYear, calendarMonth + 1, i);
+      const mm = String(nextDate.getMonth() + 1).padStart(2, '0');
+      const dd = String(nextDate.getDate()).padStart(2, '0');
+      const dStr = `${nextDate.getFullYear()}-${mm}-${dd}`;
+      days.push({
+        dateString: dStr,
+        dayNumber: i,
+        isCurrentMonth: false,
+        isToday: dStr === todayStr,
+        events: eventsByDate[dStr] || []
+      });
+    }
+
+    return days;
+  }, [calendarYear, calendarMonth, eventsByDate]);
+
+  const selectedDayEvents = eventsByDate[selectedCalendarDate] || [];
+
   return (
     <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 pt-6 sm:pt-8 pb-20 md:pb-16 space-y-6 sm:space-y-8">
       {/* 1. Header Bar */}
@@ -581,6 +670,34 @@ function EventsAttendanceContent() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
+          {/* Przełącznik widoku: Lista vs Kalendarz */}
+          <div className="flex items-center bg-[#0b0e14] border border-slate-800 rounded-xl p-1 shadow-inner">
+            <button
+              type="button"
+              onClick={() => setViewMode('list')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
+                viewMode === 'list'
+                  ? 'bg-amber-500 text-slate-950 shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <ClipboardList className="w-3.5 h-3.5" />
+              <span>Lista</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('calendar')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
+                viewMode === 'calendar'
+                  ? 'bg-amber-500 text-slate-950 shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              <span>Kalendarz</span>
+            </button>
+          </div>
+
           {canManage && (
             <button
               onClick={() => setShowCreateModal(true)}
@@ -697,17 +814,334 @@ function EventsAttendanceContent() {
             )}
           </div>
 
-          {/* Events List */}
-          {loading ? (
-            <div className="py-20 text-center text-slate-500 text-sm">Ładowanie terminarza...</div>
-          ) : filteredEvents.length === 0 ? (
-            <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-12 text-center space-y-3">
-              <Calendar className="w-10 h-10 text-slate-600 mx-auto" />
-              <h3 className="text-base font-bold text-slate-300">Brak jednostek w wybranym filtrze</h3>
-              <p className="text-xs text-slate-500">Zmień filtry powyżej lub dodaj nową jednostkę treningową.</p>
+          {/* Widok Kalendarza vs Lista */}
+          {viewMode === 'calendar' ? (
+            <div className="space-y-6">
+              {/* Calendar Card */}
+              <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xl space-y-6">
+                {/* Month Navigation Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800/80">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                      <Calendar className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase">
+                        {monthNamesPl[calendarMonth]} <span className="text-cyan-400">{calendarYear}</span>
+                      </h2>
+                      <p className="text-xs text-slate-400">Kliknij na dowolny dzień, aby sprawdzić lub zadeklarować obecność</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCalendarDate(new Date(calendarYear, calendarMonth - 1, 1))}
+                      className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition"
+                      title="Poprzedni miesiąc"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const now = new Date();
+                        setCalendarDate(now);
+                        setSelectedCalendarDate(now.toISOString().slice(0, 10));
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-300 hover:text-white hover:border-slate-700 transition"
+                    >
+                      Dziś
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCalendarDate(new Date(calendarYear, calendarMonth + 1, 1))}
+                      className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition"
+                      title="Następny miesiąc"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Weekday Names */}
+                <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center">
+                  {dayNamesPl.map((dName, idx) => (
+                    <div
+                      key={dName}
+                      className={`py-2 text-[11px] sm:text-xs font-black uppercase tracking-wider rounded-lg ${
+                        idx >= 5 ? 'text-cyan-400/80 bg-cyan-950/20' : 'text-slate-400 bg-slate-900/50'
+                      }`}
+                    >
+                      {dName}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Days Grid */}
+                <div className="grid grid-cols-7 gap-1 sm:gap-2">
+                  {calendarDays.map(day => {
+                    const isSelected = selectedCalendarDate === day.dateString;
+                    const hasEvents = day.events.length > 0;
+                    return (
+                      <button
+                        key={day.dateString}
+                        type="button"
+                        onClick={() => setSelectedCalendarDate(day.dateString)}
+                        className={`min-h-[70px] sm:min-h-[96px] p-1.5 sm:p-2 rounded-xl text-left transition flex flex-col justify-between border relative group ${
+                          isSelected
+                            ? 'border-cyan-400 bg-cyan-950/30 shadow-lg shadow-cyan-500/10 ring-1 ring-cyan-400/50'
+                            : day.isToday
+                            ? 'border-amber-500/60 bg-amber-950/15'
+                            : day.isCurrentMonth
+                            ? 'border-slate-800/80 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/80'
+                            : 'border-slate-900/40 bg-slate-950/30 opacity-40 hover:opacity-75'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <span
+                            className={`text-xs sm:text-sm font-bold ${
+                              isSelected
+                                ? 'text-cyan-300 font-black'
+                                : day.isToday
+                                ? 'w-6 h-6 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs'
+                                : day.isCurrentMonth
+                                ? 'text-slate-200'
+                                : 'text-slate-500'
+                            }`}
+                          >
+                            {day.dayNumber}
+                          </span>
+                          {hasEvents && (
+                            <span className="w-2 h-2 rounded-full bg-cyan-400 sm:hidden"></span>
+                          )}
+                        </div>
+
+                        {/* Event pills on desktop */}
+                        <div className="hidden sm:flex flex-col gap-1 w-full mt-1">
+                          {day.events.slice(0, 2).map(evt => {
+                            const badgeColor =
+                              evt.type === 'TRENING'
+                                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                                : evt.type === 'MECZ'
+                                ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
+                                : evt.type === 'SPARING'
+                                ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                                : 'bg-purple-500/20 text-purple-300 border-purple-500/30';
+                            return (
+                              <div
+                                key={evt.id}
+                                className={`px-1.5 py-0.5 rounded text-[10px] font-bold truncate border ${badgeColor}`}
+                                title={evt.title}
+                              >
+                                {evt.date.slice(11, 16)} {evt.type === 'MECZ' ? (evt.opponent ? `vs ${evt.opponent}` : 'Mecz') : evt.type}
+                              </div>
+                            );
+                          })}
+                          {day.events.length > 2 && (
+                            <span className="text-[9px] text-slate-400 font-bold pl-1">
+                              +{day.events.length - 2} więcej
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Legend */}
+                <div className="flex flex-wrap items-center justify-center gap-4 pt-3 border-t border-slate-800/60 text-xs text-slate-400">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                    <span>Trening</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+                    <span>Mecz Ligowy LALS</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                    <span>Sparing</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-purple-400"></span>
+                    <span>Turniej</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Selected Day Event Drawer */}
+              <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-xl space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                  <div>
+                    <h3 className="text-lg font-black text-white uppercase tracking-tight flex items-center gap-2">
+                      <span>Wydarzenia w dniu:</span>
+                      <span className="text-cyan-400">{selectedCalendarDate}</span>
+                    </h3>
+                    <p className="text-xs text-slate-400">
+                      {selectedDayEvents.length === 0
+                        ? 'Brak zaplanowanych jednostek w tym terminie.'
+                        : `Znaleziono jednostek: ${selectedDayEvents.length}`}
+                    </p>
+                  </div>
+                  {canManage && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewEventDate(`${selectedCalendarDate}T19:30`);
+                        setShowCreateModal(true);
+                      }}
+                      className="px-3.5 py-1.5 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/25 text-xs font-black uppercase tracking-wider transition flex items-center gap-1.5 w-fit"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Zaplanuj na ten dzień</span>
+                    </button>
+                  )}
+                </div>
+
+                {selectedDayEvents.length === 0 ? (
+                  <div className="py-8 text-center space-y-2">
+                    <p className="text-sm text-slate-400">W tym dniu drużyna ma wolne od oficjalnych jednostek.</p>
+                    <p className="text-xs text-slate-600">Kliknij inny dzień na siatce kalendarza, aby podejrzeć szczegóły i obecności.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {selectedDayEvents.map(event => {
+                      const yesAttendees = event.attendees.filter(a => a.status === 'BEDE' && (a.userRole === 'ZAWODNIK' || a.userNumber));
+                      const myAttendance = event.attendees.find(a => a.userId === user?.id);
+
+                      return (
+                        <div
+                          key={event.id}
+                          className="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 hover:border-cyan-500/40 transition space-y-4"
+                        >
+                          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider border ${
+                                  event.type === 'TRENING'
+                                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                                    : event.type === 'MECZ'
+                                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+                                    : event.type === 'SPARING'
+                                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                                    : 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                                }`}>
+                                  {event.type}
+                                </span>
+                                <span className="text-xs text-slate-400 flex items-center gap-1">
+                                  <Clock className="w-3 h-3 text-cyan-400" />
+                                  {event.date.slice(11, 16)}
+                                </span>
+                              </div>
+                              <h4 className="text-base font-black text-white">
+                                {event.title} {event.opponent ? `• rywal: ${event.opponent}` : ''}
+                              </h4>
+                              {event.location && (
+                                <p className="text-xs text-slate-400 flex items-center gap-1.5">
+                                  <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                                  <span>{event.location}</span>
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-2 self-start">
+                              <span className="px-3 py-1 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-slate-300">
+                                Obecnych graczy: <strong className="text-emerald-400">{yesAttendees.length}</strong>
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Szybka deklaracja obecności */}
+                          <div className="pt-3 border-t border-slate-800/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="flex items-center gap-2 text-xs">
+                              <span className="text-slate-400 font-bold">Twoja obecność:</span>
+                              {myAttendance?.status === 'BEDE' ? (
+                                <span className="text-emerald-400 font-black flex items-center gap-1">
+                                  <CheckCircle2 className="w-3.5 h-3.5" /> Będę
+                                </span>
+                              ) : myAttendance?.status === 'NIEPEWNE' ? (
+                                <span className="text-amber-400 font-black flex items-center gap-1">
+                                  <HelpCircle className="w-3.5 h-3.5" /> Niepewne
+                                </span>
+                              ) : myAttendance?.status === 'NIE_BEDE' ? (
+                                <span className="text-rose-400 font-black flex items-center gap-1">
+                                  <XCircle className="w-3.5 h-3.5" /> Nie będę
+                                </span>
+                              ) : (
+                                <span className="text-slate-500 italic">Brak deklaracji</span>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                disabled={submittingAttendanceId === event.id}
+                                onClick={() => handleAttendance(event.id, 'BEDE')}
+                                className={`px-3 py-1.5 rounded-xl text-xs font-black transition border ${
+                                  myAttendance?.status === 'BEDE'
+                                    ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md'
+                                    : 'bg-emerald-950/30 text-emerald-300 border-emerald-500/30 hover:bg-emerald-950/70'
+                                }`}
+                              >
+                                Będę 👍
+                              </button>
+                              <button
+                                type="button"
+                                disabled={submittingAttendanceId === event.id}
+                                onClick={() => handleAttendance(event.id, 'NIEPEWNE')}
+                                className={`px-3 py-1.5 rounded-xl text-xs font-black transition border ${
+                                  myAttendance?.status === 'NIEPEWNE'
+                                    ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md'
+                                    : 'bg-amber-950/30 text-amber-300 border-amber-500/30 hover:bg-amber-950/70'
+                                }`}
+                              >
+                                Niepewne 🤔
+                              </button>
+                              <button
+                                type="button"
+                                disabled={submittingAttendanceId === event.id}
+                                onClick={() => handleAttendance(event.id, 'NIE_BEDE')}
+                                className={`px-3 py-1.5 rounded-xl text-xs font-black transition border ${
+                                  myAttendance?.status === 'NIE_BEDE'
+                                    ? 'bg-rose-500 text-white border-rose-400 shadow-md'
+                                    : 'bg-rose-950/30 text-rose-300 border-rose-500/30 hover:bg-rose-950/70'
+                                }`}
+                              >
+                                Nie będę 👎
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setViewMode('list');
+                                  setExpandedEventId(event.id);
+                                }}
+                                className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition"
+                              >
+                                Szczegóły & Skład →
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
-            <div className="space-y-4">
+            <>
+              {/* Events List */}
+              {loading ? (
+                <div className="py-20 text-center text-slate-500 text-sm">Ładowanie terminarza...</div>
+              ) : filteredEvents.length === 0 ? (
+                <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-12 text-center space-y-3">
+                  <Calendar className="w-10 h-10 text-slate-600 mx-auto" />
+                  <h3 className="text-base font-bold text-slate-300">Brak jednostek w wybranym filtrze</h3>
+                  <p className="text-xs text-slate-500">Zmień filtry powyżej lub dodaj nową jednostkę treningową.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
               {paginatedEvents.map(event => {
                 const isExpanded = expandedEventId === event.id;
                 const yesAttendees = event.attendees.filter(a => a.status === 'BEDE' && (a.userRole === 'ZAWODNIK' || a.userNumber));
@@ -1988,6 +2422,8 @@ function EventsAttendanceContent() {
               </div>
             </div>
           )}
+          </>
+        )}
         </div>
 
 
