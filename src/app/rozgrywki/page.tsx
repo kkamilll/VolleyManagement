@@ -1366,12 +1366,16 @@ function RozgrywkiContent() {
         const dateIso = sm.date || new Date().toISOString();
 
         if (sm.isFinished && sm.homeSetsWon !== undefined && sm.awaySetsWon !== undefined) {
-          const ourSets = isAngelsAway ? sm.awaySetsWon : sm.homeSetsWon;
-          const oppSets = isAngelsAway ? sm.homeSetsWon : sm.awaySetsWon;
+          const ourSets = isAngels ? (isAngelsAway ? sm.awaySetsWon : sm.homeSetsWon) : sm.homeSetsWon;
+          const oppSets = isAngels ? (isAngelsAway ? sm.homeSetsWon : sm.awaySetsWon) : sm.awaySetsWon;
           matchesList.push({
+            title: isAngels ? `Angels ZTP vs ${opponent}` : `${sm.homeTeam} vs ${sm.awayTeam}`,
             opponent,
             date: dateIso,
             isHome,
+            isAngels,
+            homeTeam: sm.homeTeam,
+            awayTeam: sm.awayTeam,
             matchType: 'Mecz ligowy',
             teamSetsWon: ourSets,
             opponentSetsWon: oppSets,
@@ -1386,6 +1390,7 @@ function RozgrywkiContent() {
             opponent: isAngels ? opponent : `${sm.homeTeam} vs ${sm.awayTeam}`,
             date: dateIso,
             time: timeStr,
+            isAngels,
             round: sm.round,
             matchNumber: sm.matchNumber,
             url: sm.url,
@@ -5231,7 +5236,7 @@ function RozgrywkiContent() {
                             >
                               <div>
                                 <span className="font-bold text-white">
-                                  {m.isHome ? 'Angels ZTP' : m.opponent} vs {m.isHome ? m.opponent : 'Angels ZTP'}
+                                  {m.title || (m.isHome ? 'Angels ZTP' : m.opponent) + ' vs ' + (m.isHome ? m.opponent : 'Angels ZTP')}
                                 </span>
                                 <span className="text-slate-400 block text-[11px]">
                                   {m.date.replace('T', ' ')} • {m.sets?.map((s: any) => `${s.teamScore}:${s.opponentScore}`).join(', ')}

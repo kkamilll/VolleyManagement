@@ -96,19 +96,25 @@ export async function POST(request: Request) {
       if (Array.isArray(matchesToImport) && matchesToImport.length > 0) {
         matchesToImport.forEach((m: any) => {
           if (!m.opponent || !m.date) return;
-          let teamSetsWon = 0;
-          let opponentSetsWon = 0;
-          const validatedSets: VolleyballSet[] = (m.sets || []).map((s: any, idx: number) => {
-            const teamScore = Number(s.teamScore) || 0;
-            const opponentScore = Number(s.opponentScore) || 0;
-            if (teamScore > opponentScore) teamSetsWon++;
-            else if (opponentScore > teamScore) opponentSetsWon++;
-            return {
-              setNumber: idx + 1,
-              teamScore,
-              opponentScore
-            };
-          });
+          const teamSetsWon = m.teamSetsWon !== undefined ? Number(m.teamSetsWon) : 0;
+          const opponentSetsWon = m.opponentSetsWon !== undefined ? Number(m.opponentSetsWon) : 0;
+          let validatedSets: VolleyballSet[] = (m.sets || []).map((s: any, idx: number) => ({
+            setNumber: idx + 1,
+            teamScore: Number(s.teamScore) || 0,
+            opponentScore: Number(s.opponentScore) || 0
+          }));
+
+          // Jeśli sety nie zostały rozpisane szczegółowo punkt po punkcie, wygeneruj zestaw setów
+          if (validatedSets.length === 0 || validatedSets.length < teamSetsWon + opponentSetsWon) {
+            validatedSets = [];
+            for (let i = 1; i <= teamSetsWon + opponentSetsWon; i++) {
+              if (i <= teamSetsWon) {
+                validatedSets.push({ setNumber: i, teamScore: 25, opponentScore: 20 });
+              } else {
+                validatedSets.push({ setNumber: i, teamScore: 20, opponentScore: 25 });
+              }
+            }
+          }
 
           // Sprawdź czy mecz z tą drużyną i w tej dacie już istnieje
           const exists = db.matches.find(

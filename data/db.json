@@ -225,86 +225,10 @@
       "leaguePhaseName": "Faza I: Grupa Eliminacyjna (Top 3 awans)"
     },
     {
-      "id": "mat_lals_1887",
-      "opponent": "Koty Broniszewice",
-      "date": "2026-10-04T18:00:00.000Z",
-      "location": "Hala Luboń (Domowa)",
-      "isHome": true,
-      "matchType": "Mecz ligowy",
-      "sets": [
-        {
-          "setNumber": 1,
-          "teamScore": 25,
-          "opponentScore": 22
-        },
-        {
-          "setNumber": 2,
-          "teamScore": 25,
-          "opponentScore": 17
-        },
-        {
-          "setNumber": 3,
-          "teamScore": 25,
-          "opponentScore": 20
-        }
-      ],
-      "teamSetsWon": 3,
-      "opponentSetsWon": 0,
-      "mvp": "Michał Śmigiel (Angels ZTP)",
-      "notes": "Mecz ligowy LALS (Runda 5, Nr 1887). Protokół VolleyStation: https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583849/",
-      "coachComments": "Oficjalny protokół ligowy z VolleyStation. Zwycięstwo 3:0! Czas meczu: 0g 52m. Sędziował: Frąckowiak Mariusz. MVP: Michał Śmigiel (#8).",
-      "createdById": "u_trener",
-      "createdByName": "Trener Michał",
-      "createdAt": "2026-11-06T14:39:39.532Z",
-      "reportId": "rep_vs_2583849",
-      "leaguePhaseId": "faza_1",
-      "leaguePhaseName": "Faza I: Grupa Eliminacyjna (Top 3 awans)"
-    },
-    {
-      "id": "mat_lals_1",
-      "opponent": "Gladiatorzy BUD-WENT",
-      "date": "2026-10-28T18:30:00Z",
-      "location": "Hala Luboń, ul. Kołłątaja 2",
-      "isHome": true,
-      "matchType": "Mecz ligowy",
-      "sets": [
-        {
-          "setNumber": 1,
-          "teamScore": 25,
-          "opponentScore": 21
-        },
-        {
-          "setNumber": 2,
-          "teamScore": 23,
-          "opponentScore": 25
-        },
-        {
-          "setNumber": 3,
-          "teamScore": 25,
-          "opponentScore": 18
-        },
-        {
-          "setNumber": 4,
-          "teamScore": 25,
-          "opponentScore": 22
-        }
-      ],
-      "teamSetsWon": 3,
-      "opponentSetsWon": 1,
-      "mvp": "Kamil Pujanek",
-      "notes": "Zwycięstwo w meczu na szczycie Lubońskiej Amatorskiej Ligi Siatkówki (LALS).",
-      "coachComments": "Świetny blok i wysoka skuteczność ze skrzydeł.",
-      "createdById": "usr_trener",
-      "createdByName": "Hubert",
-      "createdAt": "2026-10-28T21:00:00Z",
-      "leaguePhaseId": "faza_1",
-      "leaguePhaseName": "Faza I: Grupa Eliminacyjna (Top 3 awans)"
-    },
-    {
-      "id": "mat_lals_2",
-      "opponent": "Volley Luboń",
-      "date": "2026-10-21T19:00:00Z",
-      "location": "Hala OSiR Luboń",
+      "id": "mat_lals_1948",
+      "opponent": "Volleyboars",
+      "date": "2026-11-08T18:00:00.000Z",
+      "location": "Wyjazd",
       "isHome": false,
       "matchType": "Mecz ligowy",
       "sets": [
@@ -316,41 +240,41 @@
         {
           "setNumber": 2,
           "teamScore": 25,
-          "opponentScore": 17
+          "opponentScore": 21
         },
         {
           "setNumber": 3,
           "teamScore": 25,
-          "opponentScore": 21
+          "opponentScore": 18
         }
       ],
       "teamSetsWon": 3,
       "opponentSetsWon": 0,
-      "mvp": "Łukasz Kremer",
-      "notes": "Pewne 3:0 w derbach Lubonia.",
-      "coachComments": "Wzorowa dyscyplina taktyczna.",
+      "mvp": "Kamil Pujanek",
+      "notes": "Mecz ligowy LALS (Runda 9, Nr 1948). Zwycięstwo 3:0 na wyjeździe! Protokół VolleyStation: https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584336/",
+      "coachComments": "Kapitalne spotkanie na wyjeździe. Pełna kontrola od pierwszego do ostatniego seta, 3 cenne punkty do tabeli ligowej.",
       "createdById": "usr_trener",
       "createdByName": "Hubert",
-      "createdAt": "2026-10-21T21:00:00Z",
+      "createdAt": "2026-11-08T20:30:00Z",
       "leaguePhaseId": "faza_1",
       "leaguePhaseName": "Faza I: Grupa Eliminacyjna (Top 3 awans)"
     },
     {
-      "id": "mat_lals_3",
-      "opponent": "TKKF Kosmos Luboń",
-      "date": "2026-10-14T20:00:00Z",
-      "location": "Hala Luboń",
-      "isHome": true,
+      "id": "mat_lals_1926",
+      "opponent": "Gladiatorzy BUD-WENT",
+      "date": "2026-10-31T18:00:00.000Z",
+      "location": "Hala Luboń (Wyjazd)",
+      "isHome": false,
       "matchType": "Mecz ligowy",
       "sets": [
         {
           "setNumber": 1,
-          "teamScore": 25,
-          "opponentScore": 16
+          "teamScore": 22,
+          "opponentScore": 25
         },
         {
           "setNumber": 2,
-          "teamScore": 20,
+          "teamScore": 21,
           "opponentScore": 25
         },
         {
@@ -361,17 +285,59 @@
         {
           "setNumber": 4,
           "teamScore": 25,
-          "opponentScore": 18
+          "opponentScore": 21
+        },
+        {
+          "setNumber": 5,
+          "teamScore": 9,
+          "opponentScore": 15
+        }
+      ],
+      "teamSetsWon": 2,
+      "opponentSetsWon": 3,
+      "mvp": "Bogdan Voropai (Gladiatorzy BUD-WENT)",
+      "notes": "Mecz ligowy LALS (Runda 7, Nr 1926). Porażka 2:3 po tie-breaku (1 punkt zdobyty). Protokół VolleyStation: https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583864/",
+      "coachComments": "Wielki powrót ze stanu 0:2 do 2:2! W tie-breaku zadecydowały pojedyncze błędy na siatce, ale zdobyty 1 punkt w starciu z liderem jest bardzo cenny.",
+      "createdById": "usr_trener",
+      "createdByName": "Hubert",
+      "createdAt": "2026-10-31T21:00:00Z",
+      "reportId": "rep_vs_2583864",
+      "leaguePhaseId": "faza_1",
+      "leaguePhaseName": "Faza I: Grupa Eliminacyjna (Top 3 awans)"
+    },
+    {
+      "id": "mat_lals_1887",
+      "opponent": "Koty Broniszewice",
+      "date": "2026-10-18T18:00:00.000Z",
+      "location": "Hala Luboń (Domowa)",
+      "isHome": true,
+      "matchType": "Mecz ligowy",
+      "sets": [
+        {
+          "setNumber": 1,
+          "teamScore": 25,
+          "opponentScore": 17
+        },
+        {
+          "setNumber": 2,
+          "teamScore": 25,
+          "opponentScore": 14
+        },
+        {
+          "setNumber": 3,
+          "teamScore": 25,
+          "opponentScore": 19
         }
       ],
       "teamSetsWon": 3,
-      "opponentSetsWon": 1,
-      "mvp": "Michał Śmigiel",
-      "notes": "3 punkty do tabeli LALS.",
-      "coachComments": "Stabilne przyjęcie po 2. secie.",
-      "createdById": "usr_trener",
-      "createdByName": "Hubert",
-      "createdAt": "2026-10-14T22:00:00Z",
+      "opponentSetsWon": 0,
+      "mvp": "Michał Śmigiel (Angels ZTP)",
+      "notes": "Mecz ligowy LALS (Runda 5, Nr 1887). Protokół VolleyStation: https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583849/",
+      "coachComments": "Oficjalny protokół ligowy z VolleyStation. Zwycięstwo 3:0 przed własną publicznością! Czas meczu: 0g 52m.",
+      "createdById": "u_trener",
+      "createdByName": "Trener Michał",
+      "createdAt": "2026-10-18T20:00:00Z",
+      "reportId": "rep_vs_2583849",
       "leaguePhaseId": "faza_1",
       "leaguePhaseName": "Faza I: Grupa Eliminacyjna (Top 3 awans)"
     }
