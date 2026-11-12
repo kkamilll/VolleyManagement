@@ -3370,14 +3370,14 @@
       "uploadedBy": "Sztab Klubu"
     }
   ],
-  "activeLeaguePhaseId": "faza_1",
+  "activeLeaguePhaseId": "faza_2",
   "leaguePhases": [
     {
       "id": "faza_1",
       "name": "Faza I: Grupa Eliminacyjna (Top 3 awans)",
       "shortName": "Faza I",
       "groupName": "Grupa Angels ZTP (7 zespołów)",
-      "isActive": true,
+      "isActive": false,
       "advancementSpots": 3,
       "advancementTargetName": "Awans do Grupy Finałowej (Top 3)",
       "teamsCount": 7,
@@ -3581,7 +3581,7 @@
       "name": "Faza II: Grupa Finałowa (7 zespołów)",
       "shortName": "Faza II",
       "groupName": "Grupa Mistrzowska LALS (7 zespołów)",
-      "isActive": false,
+      "isActive": true,
       "advancementSpots": 1,
       "advancementTargetName": "Mistrz LALS 2026/2027",
       "teamsCount": 7,

@@ -27,7 +27,8 @@ import {
   Shield,
   ClipboardList,
   FolderArchive,
-  Award
+  Award,
+  Swords
 } from 'lucide-react';
 import { 
   MatchResult, 
@@ -50,19 +51,21 @@ function DashboardContent() {
   const [treasury, setTreasury] = useState<any>(null);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [seasonArchives, setSeasonArchives] = useState<any[]>([]);
+  const [leagueData, setLeagueData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [updatingAttendance, setUpdatingAttendance] = useState(false);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [matchesRes, eventsRes, feesRes, annRes, usersRes, seasonsRes] = await Promise.allSettled([
+      const [matchesRes, eventsRes, feesRes, annRes, usersRes, seasonsRes, leagueRes] = await Promise.allSettled([
         fetch('/api/matches').then(r => r.ok ? r.json() : null).catch(() => null),
         fetch('/api/events').then(r => r.ok ? r.json() : null).catch(() => null),
         fetch('/api/fees').then(r => r.ok ? r.json() : null).catch(() => null),
         fetch('/api/announcements').then(r => r.ok ? r.json() : null).catch(() => null),
         fetch('/api/users').then(r => r.ok ? r.json() : null).catch(() => null),
-        fetch('/api/admin/seasons').then(r => r.ok ? r.json() : null).catch(() => null)
+        fetch('/api/admin/seasons').then(r => r.ok ? r.json() : null).catch(() => null),
+        fetch('/api/league').then(r => r.ok ? r.json() : null).catch(() => null)
       ]);
 
       if (matchesRes.status === 'fulfilled' && matchesRes.value) {
@@ -84,6 +87,9 @@ function DashboardContent() {
       }
       if (seasonsRes.status === 'fulfilled' && seasonsRes.value) {
         setSeasonArchives(seasonsRes.value.seasons || []);
+      }
+      if (leagueRes.status === 'fulfilled' && leagueRes.value) {
+        setLeagueData(leagueRes.value);
       }
     } catch (e) {
       console.error('Error fetching dashboard data:', e);
@@ -129,7 +135,16 @@ function DashboardContent() {
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   const nextEvent = upcomingEvents[0];
 
-  // Find latest finished match
+  // Official LALS Schedule and Table data for Angels ZTP
+  const officialFinishedMatch = leagueData?.leagueSchedule
+    ? [...(leagueData.leagueSchedule || [])]
+        .reverse()
+        .find((m: any) => (m.homeTeam === 'Angels ZTP' || m.awayTeam === 'Angels ZTP') && m.status === 'FINISHED')
+    : null;
+
+  const angelsStanding = leagueData?.leagueTable?.find((t: any) => t.teamName?.includes('Angels')) || null;
+
+  // Find latest finished match (fallback to matches collection)
   const lastMatch = matches.length > 0 ? matches[0] : null;
 
   // Find user's latest fee payment and unpaid totals
@@ -216,7 +231,9 @@ function DashboardContent() {
           >
             <img src="/lals_logo.png" alt="LALS" className="w-5 h-5 rounded-full object-contain" />
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>LALS: 2. Miejsce</span>
+            <span>
+              LALS: {angelsStanding ? `${angelsStanding.rank}. Miejsce (${angelsStanding.points} pkt • Sety ${angelsStanding.setsWon}:${angelsStanding.setsLost})` : '2. Miejsce (7 pkt)'}
+            </span>
           </a>
         </div>
       </div>
@@ -347,6 +364,15 @@ function DashboardContent() {
                       Terminarz &rarr;
                     </a>
                   </div>
+
+                  {/* Szybkie przejście do założeń taktycznych */}
+                  <a
+                    href={`/taktyka?eventId=${nextEvent.id}&type=${nextEvent.type === 'MECZ' ? 'MECZ_LIGOWY' : nextEvent.type}`}
+                    className="w-full py-1.5 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-300 text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-2xs mt-1"
+                  >
+                    <Target className="w-3.5 h-3.5 text-sky-600" />
+                    <span>Założenia Taktyczne na Mecz 🎯</span>
+                  </a>
                 </div>
               </div>
             ) : (
@@ -373,12 +399,52 @@ function DashboardContent() {
                   Ostatni Mecz
                 </span>
               </div>
-              <span className="px-2 py-0.5 rounded-lg text-[10px] font-black uppercase bg-emerald-50 text-emerald-800 border border-emerald-300">
+              <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase bg-emerald-50 text-emerald-800 border border-emerald-300">
                 2. Miejsce LALS
               </span>
             </div>
 
-            {lastMatch ? (
+            {officialFinishedMatch ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-700">
+                    {officialFinishedMatch.round || 'Kolejka III LALS'}: vs {officialFinishedMatch.homeTeam === 'Angels ZTP' ? officialFinishedMatch.awayTeam : officialFinishedMatch.homeTeam}
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-400 font-mono">
+                    {officialFinishedMatch.date}
+                  </span>
+                </div>
+
+                <div className="text-3xl font-black font-mono text-slate-900 flex items-center gap-2">
+                  <span className="text-emerald-600">
+                    {officialFinishedMatch.homeTeam === 'Angels ZTP' ? officialFinishedMatch.homeSetsWon : officialFinishedMatch.awaySetsWon}
+                  </span>
+                  <span className="text-slate-300">:</span>
+                  <span className="text-slate-500">
+                    {officialFinishedMatch.homeTeam === 'Angels ZTP' ? officialFinishedMatch.awaySetsWon : officialFinishedMatch.homeSetsWon}
+                  </span>
+                  <span className="text-xs font-sans font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 ml-1">
+                    Zwycięstwo 3:0 ✓
+                  </span>
+                </div>
+
+                {/* Sety */}
+                <div className="flex flex-wrap gap-1.5 text-[11px] font-mono text-slate-700">
+                  {officialFinishedMatch.setScores?.map((set: string, idx: number) => (
+                    <span key={idx} className="px-2 py-0.5 bg-slate-100 border border-slate-200 rounded-lg font-bold">
+                      Set {idx + 1}: {set}
+                    </span>
+                  ))}
+                </div>
+
+                {officialFinishedMatch.mvp && (
+                  <div className="text-xs text-amber-900 font-bold flex items-center gap-1.5 pt-0.5 bg-amber-50 p-2 rounded-xl border border-amber-200">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                    <span>MVP Meczu: <strong>{officialFinishedMatch.mvp}</strong></span>
+                  </div>
+                )}
+              </div>
+            ) : lastMatch ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-slate-700">vs {lastMatch.opponent}</span>
@@ -524,6 +590,82 @@ function DashboardContent() {
             <span className="text-[10px] font-bold uppercase text-slate-400 block">Skarbiec</span>
             <div className="text-xl font-black text-slate-900 font-mono">{treasury?.balance !== undefined ? `${treasury.balance} zł` : 'Aktywny'}</div>
           </div>
+        </div>
+      </div>
+
+      {/* 5. SZYBKIE SKRÓTY DRUŻYNY */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-black uppercase text-slate-500 tracking-wider">
+            Centrum Drużyny & Szybkie Skróty
+          </h3>
+          <span className="text-[11px] text-slate-400 font-medium">Bezpośredni dostęp do modułów</span>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <a
+            href="/events"
+            className="p-4 rounded-2xl bg-white border border-slate-200 hover:border-sky-300 hover:shadow-sm transition flex flex-col justify-between group space-y-2 shadow-2xs"
+          >
+            <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 border border-sky-200 flex items-center justify-center group-hover:scale-105 transition">
+              <Calendar className="w-4 h-4" />
+            </div>
+            <div>
+              <h4 className="text-xs font-black text-slate-900 group-hover:text-sky-700 transition">Terminarz</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5">Obecności i zbiórki</p>
+            </div>
+          </a>
+
+          <a
+            href="/rozgrywki?tab=sparingi"
+            className="p-4 rounded-2xl bg-white border border-slate-200 hover:border-amber-300 hover:shadow-sm transition flex flex-col justify-between group space-y-2 shadow-2xs"
+          >
+            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center group-hover:scale-105 transition">
+              <Swords className="w-4 h-4" />
+            </div>
+            <div>
+              <h4 className="text-xs font-black text-slate-900 group-hover:text-amber-800 transition">Sparingi</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5">Szóstki i protokoły</p>
+            </div>
+          </a>
+
+          <a
+            href="/rozgrywki?tab=liga"
+            className="p-4 rounded-2xl bg-white border border-slate-200 hover:border-sky-300 hover:shadow-sm transition flex flex-col justify-between group space-y-2 shadow-2xs"
+          >
+            <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-700 border border-sky-200 flex items-center justify-center group-hover:scale-105 transition">
+              <Trophy className="w-4 h-4" />
+            </div>
+            <div>
+              <h4 className="text-xs font-black text-slate-900 group-hover:text-sky-700 transition">Liga LALS</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5">Tabela i wyniki VolleyStation</p>
+            </div>
+          </a>
+
+          <a
+            href="/taktyka"
+            className="p-4 rounded-2xl bg-white border border-slate-200 hover:border-purple-300 hover:shadow-sm transition flex flex-col justify-between group space-y-2 shadow-2xs"
+          >
+            <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 flex items-center justify-center group-hover:scale-105 transition">
+              <Target className="w-4 h-4" />
+            </div>
+            <div>
+              <h4 className="text-xs font-black text-slate-900 group-hover:text-purple-800 transition">Taktyka</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5">Tablica P1-P6 i zrzuty</p>
+            </div>
+          </a>
+
+          <a
+            href="/team"
+            className="p-4 rounded-2xl bg-white border border-slate-200 hover:border-emerald-300 hover:shadow-sm transition flex flex-col justify-between group space-y-2 shadow-2xs"
+          >
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center group-hover:scale-105 transition">
+              <Users className="w-4 h-4" />
+            </div>
+            <div>
+              <h4 className="text-xs font-black text-slate-900 group-hover:text-emerald-800 transition">Kadra</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5">Skład i profile zawodników</p>
+            </div>
+          </a>
         </div>
       </div>
     </div>

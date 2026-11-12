@@ -2225,12 +2225,12 @@ function RozgrywkiContent() {
                     
                     {/* Top Badges */}
                     <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
-                      <span className={`px-2.5 py-0.5 rounded text-[10px] font-black uppercase border shadow-md ${
+                      <span className={`px-2.5 py-0.5 rounded text-[10px] font-black uppercase border shadow-xs ${
                         isT
-                          ? 'bg-purple-950/90 text-purple-300 border-purple-500/40'
+                          ? 'bg-purple-100 text-purple-900 border-purple-300'
                           : isS
-                          ? 'bg-amber-950/90 text-amber-300 border-amber-500/40'
-                          : 'bg-sky-950/90 text-sky-300 border-sky-200'
+                          ? 'bg-amber-100 text-amber-900 border-amber-300'
+                          : 'bg-sky-100 text-sky-900 border-sky-300'
                       }`}>
                         {isT ? '🏆 Turniej' : isS ? '⚔️ Sparing' : '🏐 Mecz LALS'}
                       </span>
@@ -2322,130 +2322,24 @@ function RozgrywkiContent() {
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight font-athletic text-slate-900">
-              Rozgrywki & Mecze
+              {activeTab === 'liga' ? 'Lubońska Amatorska Liga Siatkówki (LALS)' : activeTab === 'sparingi' ? 'Mecze Sparingowe' : 'Turnieje Siatkarskie'}
             </h1>
             <p className="text-xs text-slate-500">
-              Oficjalne mecze ligowe LALS, sparingi przedsezonowe i turnieje siatkarskie
+              {activeTab === 'liga'
+                ? 'Oficjalne mecze ligowe LALS • Terminarz, wyniki i tabela zespołów'
+                : activeTab === 'sparingi'
+                ? 'Mecze kontrolne i sparingi przygotowawcze zespołu Angels ZTP'
+                : 'Turnieje pucharowe, faza grupowa i drabinki meczowe'}
             </p>
           </div>
         </div>
-
-        {/* 3 Main Rozgrywki Navigation Segment Pills */}
-        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200">
-          <button
-            onClick={() => setActiveTab('liga')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
-              activeTab === 'liga'
-                ? 'bg-sky-600 text-white font-bold shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-            }`}
-          >
-            <img src="/lals_logo.png" alt="LALS" className="w-3.5 h-3.5 rounded-full object-contain" />
-            <span>Liga LALS</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('sparingi')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
-              activeTab === 'sparingi'
-                ? 'bg-amber-500 text-slate-950 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-            }`}
-          >
-            <Calendar className="w-3.5 h-3.5" />
-            <span>Sparingi</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('turnieje')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
-              activeTab === 'turnieje'
-                ? 'bg-purple-600 text-white font-bold shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-            }`}
-          >
-            <Trophy className="w-3.5 h-3.5" />
-            <span>Turnieje</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Collapsible Filters Bar */}
-      <div className="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
-                showFilters || activeFiltersCount > 0
-                  ? 'bg-sky-50 text-sky-800 border-sky-300'
-                  : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-              }`}
-            >
-              <Filter className="w-3.5 h-3.5 text-sky-600" />
-              <span>Filtry</span>
-              {activeFiltersCount > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full bg-sky-600 text-slate-900 font-black text-[10px]">
-                  {activeFiltersCount}
-                </span>
-              )}
-              <ChevronDown className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${showFilters ? 'rotate-180' : ''}`} />
-            </button>
-
-            {activeFiltersCount > 0 && (
-              <button
-                onClick={() => {
-                  setStatusFilter('ALL');
-                  setSearchQuery('');
-                }}
-                className="text-[11px] font-bold text-slate-500 hover:text-rose-600 transition underline underline-offset-2 ml-1"
-              >
-                Wyczyść filtry
-              </button>
-            )}
-          </div>
-
-          <div className="relative w-full sm:w-64">
-            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              placeholder="Szukaj meczu / rywala..."
-              className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
-            />
-          </div>
-        </div>
-
-        {showFilters && (
-          <div className="pt-3 mt-3 border-t border-slate-100 flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] font-bold text-slate-500 mr-1">Status:</span>
-            {[
-              { id: 'ALL', label: 'Wszystkie' },
-              { id: 'UPCOMING', label: 'Nadchodzące' },
-              { id: 'FINISHED', label: 'Zakończone z wynikiem' }
-            ].map(s => (
-              <button
-                key={s.id}
-                onClick={() => setStatusFilter(s.id as any)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition border ${
-                  statusFilter === s.id
-                    ? 'bg-sky-600 text-slate-900 font-black border-sky-600 shadow-sm'
-                    : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border-slate-200'
-                }`}
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* 1. TAB: SPARINGI */}
       {activeTab === 'sparingi' && (
         <div className="space-y-6">
-          {/* Sparing Subtabs (Mecze & Protokoły, Zdjęcia ze Sparingów) */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-200">
+          {/* Sparing Subtabs (Mecze & Protokoły) */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200">
             <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200">
               <button
                 onClick={() => setSparingSubTab('mecze')}
@@ -2458,13 +2352,6 @@ function RozgrywkiContent() {
                 <Calendar className="w-3.5 h-3.5" />
                 Mecze & Protokoły ({sparringsList.length})
               </button>
-              <Link
-                href="/galeria"
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white/60 transition"
-              >
-                <Camera className="w-3.5 h-3.5 text-amber-500" />
-                <span>Galeria zdjęć ➔</span>
-              </Link>
             </div>
 
             {canManage && (
@@ -2535,7 +2422,7 @@ function RozgrywkiContent() {
                 return (
                   <div
                     key={event.id}
-                    className="bg-white border border-amber-200 rounded-3xl overflow-hidden shadow-sm transition-all duration-300"
+                    className="bg-white border border-slate-200 hover:border-amber-300 rounded-3xl overflow-hidden shadow-sm transition-all duration-200"
                   >
                     {/* Zwijany Nagłówek Karty Sparingowej */}
                     <div
@@ -2543,36 +2430,36 @@ function RozgrywkiContent() {
                       className="p-5 sm:p-6 cursor-pointer flex flex-col lg:flex-row lg:items-center justify-between gap-4 select-none hover:bg-slate-50 transition group"
                     >
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                          <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                        <div className="flex items-center gap-2 mb-2 flex-wrap">
+                          <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase bg-amber-100 text-amber-900 border border-amber-300 shadow-xs">
                             SPARING
                           </span>
                           {isFinished ? (
-                            <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-200 flex items-center gap-1">
-                              <CheckCircle2 className="w-3 h-3" /> Zakończony
+                            <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1 shadow-xs">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-700" /> Zakończony
                             </span>
                           ) : (
-                            <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-amber-500/20 text-amber-300">
+                            <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase bg-amber-50 text-amber-800 border border-amber-200">
                               Zgłoszenia w toku
                             </span>
                           )}
                           {event.liveScore?.isLive && (
-                            <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-rose-500/20 text-rose-300 border border-rose-500/40 flex items-center gap-1.5 animate-pulse">
-                              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
+                            <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase bg-rose-50 text-rose-700 border border-rose-300 flex items-center gap-1.5 animate-pulse shadow-xs">
+                              <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping" />
                               🔴 NA ŻYWO: Set {event.liveScore.currentSet} ({event.liveScore.teamCurrentScore}:{event.liveScore.opponentCurrentScore})
                             </span>
                           )}
                         </div>
-                        <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-amber-400 transition tracking-tight truncate">
+                        <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-amber-700 transition tracking-tight truncate">
                           {event.title} {event.opponent ? `vs ${event.opponent}` : ''}
                         </h3>
-                        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 mt-2">
-                          <span className="flex items-center gap-1.5 text-slate-600">
-                            <Clock className="w-4 h-4 text-sky-400" />
+                        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600 mt-2 font-medium">
+                          <span className="flex items-center gap-1.5">
+                            <Clock className="w-4 h-4 text-sky-600" />
                             {new Date(event.date).toLocaleString('pl-PL', { dateStyle: 'long', timeStyle: 'short' })}
                           </span>
-                          <span className="flex items-center gap-1.5 text-slate-600">
-                            <MapPin className="w-4 h-4 text-rose-400" />
+                          <span className="flex items-center gap-1.5">
+                            <MapPin className="w-4 h-4 text-rose-600" />
                             {event.location}
                           </span>
                         </div>
@@ -2581,24 +2468,24 @@ function RozgrywkiContent() {
                       {/* Prawa strona nagłówka: Wynik, Licznik obecnych i Przełącznik Chevron */}
                       <div className="flex items-center justify-between lg:justify-end gap-3 shrink-0 pt-2 lg:pt-0 border-t border-slate-200 lg:border-t-0">
                         {isFinished && event.result && (
-                          <div className="text-right px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200">
-                            <span className="text-lg font-mono font-black text-emerald-400 block leading-tight">
+                          <div className="text-right px-4 py-1.5 rounded-2xl bg-slate-900 text-white shadow-sm">
+                            <span className="text-xl font-mono font-black text-white block leading-tight">
                               {event.result.teamSetsWon} : {event.result.opponentSetsWon}
                             </span>
-                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block">
+                            <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest block">
                               Wynik
                             </span>
                           </div>
                         )}
 
-                        <span className="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-600 flex items-center gap-1.5">
-                          <Users className="w-3.5 h-3.5 text-amber-400" />
+                        <span className="px-3.5 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 flex items-center gap-1.5 shadow-xs">
+                          <Users className="w-4 h-4 text-amber-600" />
                           <span>{yesCount} obecnych</span>
                         </span>
 
                         <div
-                          className={`w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 transition-all duration-200 ${
-                            isExpanded ? 'rotate-180 bg-amber-500/10 text-amber-400 border-amber-500/40' : 'group-hover:text-slate-900 group-hover:border-slate-300'
+                          className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-all duration-200 ${
+                            isExpanded ? 'rotate-180 bg-amber-100 text-amber-900 border-amber-300' : 'bg-slate-100 border-slate-200 text-slate-500 group-hover:text-slate-900 group-hover:border-slate-300'
                           }`}
                         >
                           <ChevronDown className="w-4 h-4" />
@@ -2608,7 +2495,7 @@ function RozgrywkiContent() {
 
                     {/* Rozwijana Zawartość Karty Sparingowej */}
                     {isExpanded && (
-                      <div className="p-6 sm:p-7 border-t border-slate-200 space-y-6 animate-fadeIn">
+                      <div className="p-6 sm:p-7 border-t border-slate-200 space-y-6 animate-fadeIn bg-white">
                         {/* Coach & Captain Management Controls */}
                         {canManage && (
                           <div className="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-200">
@@ -2618,45 +2505,45 @@ function RozgrywkiContent() {
                             <div className="flex flex-wrap items-center gap-2">
                               <button
                                 onClick={() => setShareModalEvent(event)}
-                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-200 transition flex items-center gap-1.5"
+                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 transition flex items-center gap-1.5 shadow-xs"
                                 title="Wygeneruj i skopiuj gotowy raport na WhatsApp / Messenger"
                               >
-                                <Share2 className="w-3.5 h-3.5 text-emerald-400" />
+                                <Share2 className="w-3.5 h-3.5 text-emerald-600" />
                                 <span>Na Czat</span>
                               </button>
 
                               <button
                                 onClick={() => handleOpenAutoLineup(event)}
-                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-200 transition flex items-center gap-1.5"
+                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition flex items-center gap-1.5 shadow-xs"
                                 title="Automatycznie wygeneruj wyjściową szóstkę"
                               >
-                                <Zap className="w-3.5 h-3.5 text-amber-400" />
+                                <Zap className="w-3.5 h-3.5 text-amber-600" />
                                 <span>Szóstka</span>
                               </button>
 
                               <button
                                 onClick={() => handleOpenLiveScorekeeper(event)}
-                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-200 transition flex items-center gap-1.5"
+                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 transition flex items-center gap-1.5 shadow-xs"
                                 title="Opcjonalnie: klikaj punkt po punkcie na żywo w trakcie sparingu"
                               >
-                                <Radio className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
+                                <Radio className="w-3.5 h-3.5 text-rose-600 animate-pulse" />
                                 <span>Live Score (opcjonalnie)</span>
                               </button>
 
                               {isFinished && (
                                 <button
                                   onClick={() => setSocialModalEvent(event)}
-                                  className="px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-200 transition flex items-center gap-1.5"
+                                  className="px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 transition flex items-center gap-1.5 shadow-xs"
                                   title="Wygeneruj post do Social Mediów"
                                 >
-                                  <Award className="w-3.5 h-3.5 text-purple-400" />
+                                  <Award className="w-3.5 h-3.5 text-purple-600" />
                                   <span>Social Post</span>
                                 </button>
                               )}
 
                               <button
                                 onClick={() => openResultModal(event)}
-                                className="px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-100 hover:bg-slate-100 text-amber-400 border border-amber-200 transition flex items-center gap-1.5"
+                                className="px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-600 text-slate-950 transition flex items-center gap-1.5 shadow-xs"
                                 title="Wpisz wynik po sparingu (bez klikania każdego punktu)"
                               >
                                 <Trophy className="w-3.5 h-3.5" />
@@ -2667,7 +2554,7 @@ function RozgrywkiContent() {
                         )}
 
                     {/* Step 1: Ankieta Dostępności (RSVP) */}
-                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black text-xs flex items-center justify-center">
@@ -2681,18 +2568,18 @@ function RozgrywkiContent() {
                         {/* Player Vote Buttons OR Coach Banner */}
                         {user && (
                           user.role === 'TRENER' ? (
-                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-500/10 border border-sky-200 text-sky-300 text-xs font-bold">
-                              <Flame className="w-3.5 h-3.5 text-sky-400" />
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-50 border border-sky-200 text-sky-800 text-xs font-bold">
+                              <Flame className="w-3.5 h-3.5 text-sky-600" />
                               <span>Sztab trenerski (Obecność stała)</span>
                             </div>
                           ) : (
                             <div className="flex items-center gap-1.5">
                               <button
                                 onClick={() => handleAttendance(event.id, 'BEDE')}
-                                className={`px-3 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1 ${
+                                className={`px-3 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1 shadow-xs ${
                                   myAttendance?.status === 'BEDE'
-                                    ? 'bg-emerald-500 text-slate-950 shadow-md'
-                                    : 'bg-slate-100 text-emerald-400 border border-emerald-200 hover:bg-emerald-500/10'
+                                    ? 'bg-emerald-600 text-white shadow-sm'
+                                    : 'bg-white text-emerald-800 border border-emerald-300 hover:bg-emerald-50'
                                 }`}
                               >
                                 <CheckCircle2 className="w-3.5 h-3.5" />
@@ -2700,10 +2587,10 @@ function RozgrywkiContent() {
                               </button>
                               <button
                                 onClick={() => handleAttendance(event.id, 'NIEPEWNE')}
-                                className={`px-3 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1 ${
+                                className={`px-3 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1 shadow-xs ${
                                   myAttendance?.status === 'NIEPEWNE'
-                                    ? 'bg-amber-500 text-slate-950 shadow-md'
-                                    : 'bg-slate-100 text-amber-400 border border-amber-200 hover:bg-amber-500/10'
+                                    ? 'bg-amber-500 text-slate-950 shadow-sm'
+                                    : 'bg-white text-amber-900 border border-amber-300 hover:bg-amber-50'
                                 }`}
                               >
                                 <HelpCircle className="w-3.5 h-3.5" />
@@ -2711,10 +2598,10 @@ function RozgrywkiContent() {
                               </button>
                               <button
                                 onClick={() => handleAttendance(event.id, 'NIE_BEDE')}
-                                className={`px-3 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1 ${
+                                className={`px-3 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1 shadow-xs ${
                                   myAttendance?.status === 'NIE_BEDE'
-                                    ? 'bg-rose-500 text-slate-900 shadow-md'
-                                    : 'bg-slate-100 text-rose-400 border border-rose-200 hover:bg-rose-500/10'
+                                    ? 'bg-rose-600 text-white shadow-sm'
+                                    : 'bg-white text-rose-800 border border-rose-300 hover:bg-rose-50'
                                 }`}
                               >
                                 <AlertCircle className="w-3.5 h-3.5" />
@@ -2726,10 +2613,10 @@ function RozgrywkiContent() {
                       </div>
 
                       {/* Declaration Progress & Details */}
-                      <div className="flex items-center gap-4 text-xs pt-2">
-                        <span className="font-bold text-emerald-400">🟢 Będą: {yesCount}</span>
-                        <span className="font-bold text-amber-400">🟡 Niepewni: {maybeCount}</span>
-                        <span className="font-bold text-rose-400">🔴 Nieobecni: {noCount}</span>
+                      <div className="flex items-center gap-4 text-xs pt-1">
+                        <span className="font-bold text-emerald-700">🟢 Będą: {yesCount}</span>
+                        <span className="font-bold text-amber-700">🟡 Niepewni: {maybeCount}</span>
+                        <span className="font-bold text-rose-700">🔴 Nieobecni: {noCount}</span>
                       </div>
 
                       {/* Declared players list */}
@@ -2737,12 +2624,12 @@ function RozgrywkiContent() {
                         {event.attendees.map(a => (
                           <span
                             key={a.userId}
-                            className={`px-2 py-1 rounded-lg text-[11px] font-bold border flex items-center gap-1 ${
+                            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border flex items-center gap-1 shadow-2xs ${
                               a.status === 'BEDE'
-                                ? 'bg-emerald-500/10 text-emerald-300 border-emerald-200'
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                                 : a.status === 'NIEPEWNE'
-                                ? 'bg-amber-500/10 text-amber-300 border-amber-200'
-                                : 'bg-rose-500/10 text-rose-300 border-rose-200'
+                                ? 'bg-amber-50 text-amber-900 border-amber-300'
+                                : 'bg-rose-50 text-rose-800 border-rose-300'
                             }`}
                           >
                             <span>{a.userName}</span>
@@ -2754,59 +2641,59 @@ function RozgrywkiContent() {
 
                     {/* Wyjściowa Szóstka Meczu */}
                     {event.lineup && (
-                      <div className="p-4 rounded-2xl bg-slate-50 border border-amber-200 space-y-2">
+                      <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/50 border border-amber-200 space-y-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black text-xs flex items-center justify-center">
                               ⚡
                             </span>
-                            <h4 className="text-xs font-black uppercase text-amber-300 tracking-wider">
+                            <h4 className="text-xs font-black uppercase text-amber-900 tracking-wider">
                               Oficjalna Wyjściowa Szóstka Meczu
                             </h4>
                           </div>
                           {canManage && (
                             <button
                               onClick={() => handleOpenAutoLineup(event)}
-                              className="text-xs text-amber-400 hover:underline font-bold"
+                              className="text-xs text-amber-800 hover:text-amber-900 hover:underline font-bold"
                             >
                               Zmień szóstkę
                             </button>
                           )}
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pt-1 text-xs">
-                          <div className="p-2 rounded-xl bg-slate-100 border border-slate-200">
+                          <div className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs">
                             <span className="text-[10px] text-slate-500 font-bold block">Rozgrywający (R)</span>
-                            <span className="font-bold text-sky-300">{event.lineup.setter}</span>
+                            <span className="font-bold text-sky-800">{event.lineup.setter}</span>
                           </div>
-                          <div className="p-2 rounded-xl bg-slate-100 border border-slate-200">
+                          <div className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs">
                             <span className="text-[10px] text-slate-500 font-bold block">Atakujący (A)</span>
-                            <span className="font-bold text-rose-300">{event.lineup.opposite}</span>
+                            <span className="font-bold text-rose-800">{event.lineup.opposite}</span>
                           </div>
-                          <div className="p-2 rounded-xl bg-slate-100 border border-slate-200">
+                          <div className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs">
                             <span className="text-[10px] text-slate-500 font-bold block">Przyjmujący (P1, P2)</span>
-                            <span className="font-bold text-emerald-300">{event.lineup.outsideHitters?.join(', ')}</span>
+                            <span className="font-bold text-emerald-800">{event.lineup.outsideHitters?.join(', ')}</span>
                           </div>
-                          <div className="p-2 rounded-xl bg-slate-100 border border-slate-200">
+                          <div className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs">
                             <span className="text-[10px] text-slate-500 font-bold block">Środkowi (Ś1, Ś2)</span>
-                            <span className="font-bold text-purple-300">{event.lineup.middleBlockers?.join(', ')}</span>
+                            <span className="font-bold text-purple-800">{event.lineup.middleBlockers?.join(', ')}</span>
                           </div>
-                          <div className="p-2 rounded-xl bg-slate-100 border border-slate-200">
+                          <div className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs">
                             <span className="text-[10px] text-slate-500 font-bold block">Libero (L)</span>
-                            <span className="font-bold text-amber-300">{event.lineup.libero}</span>
+                            <span className="font-bold text-amber-900">{event.lineup.libero}</span>
                           </div>
-                          <div className="p-2 rounded-xl bg-slate-100 border border-slate-200">
+                          <div className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs">
                             <span className="text-[10px] text-slate-500 font-bold block">Rezerwowi</span>
-                            <span className="font-medium text-slate-500 truncate block">{event.lineup.reserves?.slice(0, 3).join(', ') || 'Brak'}</span>
+                            <span className="font-medium text-slate-600 truncate block">{event.lineup.reserves?.slice(0, 3).join(', ') || 'Brak'}</span>
                           </div>
                         </div>
                       </div>
                     )}
 
                     {/* Step 2: Wynik Sparingi (Score & Sets) */}
-                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center">
+                          <span className="w-6 h-6 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center">
                             2
                           </span>
                           <h4 className="text-xs font-black uppercase text-slate-900 tracking-wider">
@@ -2817,7 +2704,7 @@ function RozgrywkiContent() {
                         {canManage && (
                           <button
                             onClick={() => openResultModal(event)}
-                            className="text-xs text-amber-400 hover:underline font-bold"
+                            className="text-xs text-amber-800 hover:text-amber-900 hover:underline font-bold"
                           >
                             {isFinished ? 'Edytuj wynik' : 'Wpisz wynik'}
                           </button>
@@ -2826,8 +2713,8 @@ function RozgrywkiContent() {
 
                       {isFinished ? (
                         <div className="space-y-4 pt-1">
-                          <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                            <div className="text-3xl font-black font-mono text-emerald-400">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+                            <div className="text-3xl font-black font-mono text-slate-900 bg-slate-100 px-4 py-2 rounded-xl border border-slate-200 self-start">
                               {event.result!.teamSetsWon} : {event.result!.opponentSetsWon}
                             </div>
                             <div>
@@ -2838,7 +2725,7 @@ function RozgrywkiContent() {
                                 {event.result!.sets.map(s => (
                                   <span
                                     key={s.setNumber}
-                                    className="px-2 py-0.5 rounded-lg text-xs font-mono font-bold bg-slate-50 border border-slate-200 text-slate-900"
+                                    className="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-slate-100 border border-slate-200 text-slate-800"
                                   >
                                     Set {s.setNumber}: {s.teamScore}-{s.opponentScore}
                                   </span>
@@ -2848,14 +2735,14 @@ function RozgrywkiContent() {
                           </div>
 
                           {event.result!.mvp && (
-                            <div className="flex items-center gap-2 text-xs text-amber-300 font-bold">
-                              <Trophy className="w-4 h-4 text-amber-400" />
+                            <div className="flex items-center gap-2 text-xs text-amber-900 font-bold bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                              <Trophy className="w-4 h-4 text-amber-600" />
                               <span>MVP Sparingi: <strong>{event.result!.mvp}</strong></span>
                             </div>
                           )}
 
                           {event.result!.notes && (
-                            <p className="text-xs text-slate-600 italic bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <p className="text-xs text-slate-700 italic bg-white p-3 rounded-xl border border-slate-200">
                               💬 Wnioski pomeczowe: {event.result!.notes}
                             </p>
                           )}
@@ -2872,17 +2759,17 @@ function RozgrywkiContent() {
                       const linkedTactics = tactics.filter(t => t.eventId === event.id || t.matchId === event.id);
                       if (linkedTactics.length === 0) return null;
                       return (
-                        <div className="p-4 rounded-2xl bg-gradient-to-r from-sky-950/30 via-slate-900/60 to-[#0c1016] border border-sky-200 space-y-3">
+                        <div className="p-4 sm:p-5 rounded-2xl bg-sky-50/60 border border-sky-200 space-y-3">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <Compass className="w-4 h-4 text-sky-400" />
-                              <h4 className="text-xs font-black uppercase text-sky-300 tracking-wider">
+                              <Compass className="w-4 h-4 text-sky-600" />
+                              <h4 className="text-xs font-black uppercase text-sky-900 tracking-wider">
                                 📸 Zrzuty Taktyczne & Wytyczne Trenera na ten Mecz ({linkedTactics.length})
                               </h4>
                             </div>
                             <a
                               href={`/taktyka?eventId=${event.id}&type=SPARING`}
-                              className="text-xs text-sky-400 hover:text-sky-300 font-bold flex items-center gap-1"
+                              className="text-xs text-sky-700 hover:text-sky-900 hover:underline font-bold flex items-center gap-1"
                             >
                               <span>Otwórz w Tablicy Taktycznej</span>
                               <ChevronRight className="w-3.5 h-3.5" />
@@ -2893,11 +2780,11 @@ function RozgrywkiContent() {
                             {linkedTactics.map(tac => {
                               const acceptedPosts = (tac.posts || []).filter(p => p.status === 'ZAAKCEPTOWANY');
                               return (
-                                <div key={tac.id} className="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5">
+                                <div key={tac.id} className="p-3 bg-white border border-slate-200 rounded-2xl space-y-2.5 shadow-xs">
                                   {tac.drawingData && (
                                     <div className="aspect-[16/10] bg-slate-100 rounded-xl overflow-hidden border border-slate-200 relative">
                                       <img src={tac.drawingData} alt={tac.title} className="w-full h-full object-contain" />
-                                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-slate-50 text-[10px] font-black text-amber-400 border border-slate-300">
+                                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-white text-[10px] font-black text-amber-800 border border-slate-300 shadow-2xs">
                                         {tac.rotation} • {tac.phase}
                                       </div>
                                     </div>
@@ -2911,7 +2798,7 @@ function RozgrywkiContent() {
                                     )}
                                     <a
                                       href={`/taktyka?eventId=${event.id}&tacticId=${tac.id}`}
-                                      className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-400 hover:text-sky-300 mt-1.5"
+                                      className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-700 hover:text-sky-900 mt-1.5"
                                     >
                                       <span>Załaduj ten zrzut na tablicę →</span>
                                     </a>
@@ -2919,13 +2806,13 @@ function RozgrywkiContent() {
 
                                   {/* Accepted player posts */}
                                   {acceptedPosts.length > 0 && (
-                                    <div className="p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-200 space-y-1">
-                                      <span className="text-[10px] font-black uppercase text-emerald-400 flex items-center gap-1">
-                                        <Sparkles className="w-3 h-3 text-emerald-400" />
+                                    <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 space-y-1">
+                                      <span className="text-[10px] font-black uppercase text-emerald-800 flex items-center gap-1">
+                                        <Sparkles className="w-3 h-3 text-emerald-600" />
                                         Zaakceptowane uwagi zawodników do meczu:
                                       </span>
                                       {acceptedPosts.map(p => (
-                                        <div key={p.id} className="text-[11px] text-slate-600 pl-1">
+                                        <div key={p.id} className="text-[11px] text-slate-700 pl-1">
                                           • <strong className="text-slate-900">{p.authorName}:</strong> {p.content}
                                         </div>
                                       ))}
@@ -3049,13 +2936,6 @@ function RozgrywkiContent() {
                 <BarChart3 className="w-3.5 h-3.5" />
                 <span>Statystyki & VolleyStation</span>
               </button>
-              <Link
-                href="/galeria"
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white/60 shrink-0 transition whitespace-nowrap"
-              >
-                <Camera className="w-3.5 h-3.5 text-sky-600" />
-                <span>Galeria zdjęć ➔</span>
-              </Link>
             </div>
 
             {canManage && (
@@ -4217,16 +4097,16 @@ function RozgrywkiContent() {
                                     key={team.teamName || tIdx}
                                     className={`rounded-2xl border p-4 space-y-3 ${
                                       isAngels
-                                        ? 'bg-sky-950/20 border-sky-200 shadow-lg'
-                                        : 'bg-slate-50 border-slate-200'
+                                        ? 'bg-sky-50 border-sky-300 shadow-sm'
+                                        : 'bg-white border-slate-200 shadow-xs'
                                     }`}
                                   >
                                     <div className="flex items-center justify-between pb-2 border-b border-slate-200">
                                       <h5 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                                        {isAngels && <span className="w-2 h-2 rounded-full bg-sky-400" />}
+                                        {isAngels && <span className="w-2 h-2 rounded-full bg-sky-600" />}
                                         {team.teamName}
                                       </h5>
-                                      <span className="text-xs font-mono font-black text-amber-400">
+                                      <span className="text-xs font-mono font-black text-amber-800">
                                         {team.totals?.points || 0} pkt
                                       </span>
                                     </div>
@@ -4237,7 +4117,7 @@ function RozgrywkiContent() {
                                           <tr>
                                             <th className="p-1.5 w-7 text-center">#</th>
                                             <th className="p-1.5">Zawodnik</th>
-                                            <th className="p-1.5 text-center font-black text-amber-400">ABS</th>
+                                            <th className="p-1.5 text-center font-black text-amber-700">ABS</th>
                                             <th className="p-1.5 text-center">Ata</th>
                                             <th className="p-1.5 text-center">Blk</th>
                                             <th className="p-1.5 text-center">Ser</th>
@@ -4329,20 +4209,13 @@ function RozgrywkiContent() {
                 onClick={() => setTurniejSubTab('drabinki')}
                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                   turniejSubTab === 'drabinki'
-                    ? 'bg-purple-500 text-slate-900 shadow-md'
-                    : 'text-slate-500 hover:text-slate-900'
+                    ? 'bg-purple-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <Award className="w-3.5 h-3.5" />
                 Turnieje & Drabinki ({tournamentsList.length})
               </button>
-              <Link
-                href="/galeria"
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-100/80 transition"
-              >
-                <Camera className="w-3.5 h-3.5 text-purple-400" />
-                <span>Galeria zdjęć ➔</span>
-              </Link>
             </div>
 
             {canManage && (
@@ -5202,35 +5075,35 @@ function RozgrywkiContent() {
             <form onSubmit={handleAddPhoto} className="space-y-4">
               {/* Wybór kategorii dopasowany do aktywnej zakładki */}
               {activeTab === 'liga' ? (
-                <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-200 flex items-center justify-between text-xs">
+                <div className="p-3 rounded-xl bg-sky-50 border border-sky-200 flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-sky-400" />
+                    <span className="w-2 h-2 rounded-full bg-sky-600" />
                     <span className="font-bold text-slate-900">Galeria Ligowa LALS</span>
                     <span className="text-slate-500 text-[11px] hidden sm:inline">(Zdjęcia trafią wyłącznie do sekcji ligowej)</span>
                   </div>
-                  <span className="text-[10px] font-mono text-sky-300 font-bold px-2 py-0.5 rounded bg-sky-500/20 border border-sky-200">
+                  <span className="text-[10px] font-mono text-sky-800 font-bold px-2.5 py-0.5 rounded-lg bg-sky-100 border border-sky-300">
                     MECZ LIGOWY
                   </span>
                 </div>
               ) : activeTab === 'sparingi' ? (
-                <div className="p-3 rounded-xl bg-amber-950/40 border border-amber-200 flex items-center justify-between text-xs">
+                <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-amber-400" />
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
                     <span className="font-bold text-slate-900">Fotorelacje ze Sparingów</span>
                     <span className="text-slate-500 text-[11px] hidden sm:inline">(Zdjęcia trafią wyłącznie do sekcji sparingowej)</span>
                   </div>
-                  <span className="text-[10px] font-mono text-amber-300 font-bold px-2 py-0.5 rounded bg-amber-500/20 border border-amber-200">
+                  <span className="text-[10px] font-mono text-amber-900 font-bold px-2.5 py-0.5 rounded-lg bg-amber-100 border border-amber-300">
                     SPARING
                   </span>
                 </div>
               ) : activeTab === 'turnieje' ? (
-                <div className="p-3 rounded-xl bg-purple-950/40 border border-purple-200 flex items-center justify-between text-xs">
+                <div className="p-3 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-purple-400" />
+                    <span className="w-2 h-2 rounded-full bg-purple-600" />
                     <span className="font-bold text-slate-900">Fotorelacje Turniejowe</span>
                     <span className="text-slate-500 text-[11px] hidden sm:inline">(Zdjęcia trafią wyłącznie do sekcji turniejowej)</span>
                   </div>
-                  <span className="text-[10px] font-mono text-purple-300 font-bold px-2 py-0.5 rounded bg-purple-500/20 border border-purple-200">
+                  <span className="text-[10px] font-mono text-purple-900 font-bold px-2.5 py-0.5 rounded-lg bg-purple-100 border border-purple-300">
                     TURNIEJ
                   </span>
                 </div>
@@ -5556,13 +5429,13 @@ function RozgrywkiContent() {
 
             {/* Warnings if missing positions */}
             {generatedLineup.missingWarnings && generatedLineup.missingWarnings.length > 0 && (
-              <div className="p-3 rounded-2xl bg-amber-950/30 border border-amber-500/40 text-amber-200 text-xs space-y-1">
+              <div className="p-3 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs space-y-1">
                 <div className="font-bold flex items-center gap-1.5">
-                  <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
+                  <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
                   <span>Uwagi do składu:</span>
                 </div>
                 {generatedLineup.missingWarnings.map((w: string, i: number) => (
-                  <p key={i} className="text-[11px] text-amber-300/90 pl-5">• {w}</p>
+                  <p key={i} className="text-[11px] text-amber-800 font-medium pl-5">• {w}</p>
                 ))}
               </div>
             )}
@@ -6064,14 +5937,14 @@ function RozgrywkiContent() {
                   </label>
 
                   {scheduleOcrLoading && (
-                    <div className="p-4 rounded-xl bg-sky-950/40 border border-sky-200 space-y-2">
-                      <div className="flex items-center justify-between text-xs text-sky-300 font-bold">
+                    <div className="p-4 rounded-xl bg-sky-50 border border-sky-200 space-y-2">
+                      <div className="flex items-center justify-between text-xs text-sky-800 font-bold">
                         <span>{scheduleOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
                         <span className="font-mono">{scheduleOcrProgress}%</span>
                       </div>
-                      <div className="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                      <div className="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
                         <div
-                          className="bg-sky-500 h-full transition-all duration-300 rounded-full"
+                          className="bg-sky-600 h-full transition-all duration-300 rounded-full"
                           style={{ width: `${Math.max(5, scheduleOcrProgress)}%` }}
                         />
                       </div>
@@ -6112,15 +5985,15 @@ function RozgrywkiContent() {
                     {/* Rozegrane mecze */}
                     {parsedMatchesToImport.length > 0 && (
                       <div className="space-y-2">
-                        <span className="text-[11px] font-black uppercase text-emerald-400 tracking-wider flex items-center gap-1.5">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span className="text-[11px] font-black uppercase text-emerald-800 tracking-wider flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                           Rozegrane mecze z wynikiem ({parsedMatchesToImport.length}):
                         </span>
                         <div className="space-y-1.5">
                           {parsedMatchesToImport.map((m, idx) => (
                             <div
                               key={idx}
-                              className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-200 flex items-center justify-between text-xs"
+                              className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs"
                             >
                               <div>
                                 <span className="font-bold text-slate-900">
@@ -6130,7 +6003,7 @@ function RozgrywkiContent() {
                                   {m.date.replace('T', ' ')} • {m.sets?.map((s: any) => `${s.teamScore}:${s.opponentScore}`).join(', ')}
                                 </span>
                               </div>
-                              <span className="px-2.5 py-1 rounded-lg bg-emerald-500 text-slate-950 font-black text-xs font-mono">
+                              <span className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-black text-xs font-mono shadow-xs">
                                 {m.teamSetsWon}:{m.opponentSetsWon}
                               </span>
                             </div>
@@ -6142,15 +6015,15 @@ function RozgrywkiContent() {
                     {/* Przyszłe mecze terminarza */}
                     {parsedFixturesToImport.length > 0 && (
                       <div className="space-y-2">
-                        <span className="text-[11px] font-black uppercase text-sky-400 tracking-wider flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5" />
+                        <span className="text-[11px] font-black uppercase text-sky-800 tracking-wider flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5 text-sky-600" />
                           Przyszłe mecze do terminarza ({parsedFixturesToImport.length}):
                         </span>
                         <div className="space-y-1.5">
                           {parsedFixturesToImport.map((f, idx) => (
                             <div
                               key={idx}
-                              className="p-3 rounded-xl bg-sky-950/20 border border-sky-200 flex items-center justify-between text-xs"
+                              className="p-3 rounded-xl bg-sky-50 border border-sky-200 flex items-center justify-between text-xs"
                             >
                               <div>
                                 <span className="font-bold text-slate-900">{f.title}</span>
@@ -6158,7 +6031,7 @@ function RozgrywkiContent() {
                                   {f.date.replace('T', ' ')} • {f.location}
                                 </span>
                               </div>
-                              <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-sky-500/20 text-sky-300 border border-sky-200">
+                              <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-sky-100 text-sky-800 border border-sky-300">
                                 Terminarz
                               </span>
                             </div>
@@ -6252,16 +6125,16 @@ function RozgrywkiContent() {
                   href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 hover:text-slate-900 border border-sky-200 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
+                  className="px-3 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-300 text-xs font-bold flex items-center gap-1.5 transition shadow-xs"
                 >
-                  <ExternalLink className="w-3.5 h-3.5 text-sky-400" />
+                  <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
                   <span>Otwórz: panel.volleystation.com/schedule ↗</span>
                 </a>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-sky-950/20 border border-sky-200 text-xs text-slate-600 space-y-1.5">
-                <div className="font-bold text-sky-400 flex items-center gap-1.5">
-                  <Info className="w-4 h-4 shrink-0" />
+              <div className="p-3.5 rounded-xl bg-sky-50 border border-sky-200 text-xs text-slate-700 space-y-1.5">
+                <div className="font-bold text-sky-800 flex items-center gap-1.5">
+                  <Info className="w-4 h-4 text-sky-600 shrink-0" />
                   Jak zaimportować dane w 5 sekund:
                 </div>
                 <ol className="list-decimal list-inside space-y-1 text-slate-600 pl-1">
@@ -7150,14 +7023,14 @@ Punkty
                     </div>
 
                     {tableOcrLoading && (
-                      <div className="p-3 rounded-xl bg-sky-950/40 border border-sky-200 space-y-1.5">
-                        <div className="flex items-center justify-between text-xs text-sky-300">
+                      <div className="p-3 rounded-xl bg-sky-50 border border-sky-200 space-y-1.5">
+                        <div className="flex items-center justify-between text-xs text-sky-800">
                           <span className="font-bold">{tableOcrStatus || 'Rozpoznawanie tekstu ze zdjęcia...'}</span>
                           <span className="font-mono font-bold">{tableOcrProgress}%</span>
                         </div>
-                        <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                        <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
                           <div
-                            className="bg-sky-500 h-full transition-all duration-300 rounded-full"
+                            className="bg-sky-600 h-full transition-all duration-300 rounded-full"
                             style={{ width: `${Math.max(5, tableOcrProgress)}%` }}
                           />
                         </div>

@@ -671,14 +671,37 @@ function EventsAttendanceContent() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
+          {/* Quick Shortcuts to Sparingi, Liga and Taktyka */}
+          <Link
+            href="/rozgrywki?tab=sparingi"
+            className="px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition"
+          >
+            <Swords className="w-4 h-4 text-amber-600" />
+            <span>Sparingi ⚔️</span>
+          </Link>
+          <Link
+            href="/rozgrywki?tab=liga"
+            className="px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition"
+          >
+            <img src="/lals_logo.png" alt="LALS" className="w-4 h-4 rounded-full bg-white p-0.5 object-contain" />
+            <span>Liga LALS 🏆</span>
+          </Link>
+          <Link
+            href="/taktyka"
+            className="px-3.5 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition"
+          >
+            <Target className="w-4 h-4 text-purple-600" />
+            <span>Taktyka 🎯</span>
+          </Link>
+
           {/* Przełącznik widoku: Lista vs Kalendarz */}
-          <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-1 shadow-sm">
+          <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-1 shadow-xs">
             <button
               type="button"
               onClick={() => setViewMode('list')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
                 viewMode === 'list'
-                  ? 'bg-white text-slate-900 shadow-sm border border-slate-200'
+                  ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -690,7 +713,7 @@ function EventsAttendanceContent() {
               onClick={() => setViewMode('calendar')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
                 viewMode === 'calendar'
-                  ? 'bg-white text-slate-900 shadow-sm border border-slate-200'
+                  ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -1277,8 +1300,10 @@ function EventsAttendanceContent() {
                       onClick={() => setExpandedEventId(isExpanded ? null : event.id)}
                       className="p-4 sm:p-5 cursor-pointer flex flex-col gap-3.5 select-none group"
                     >
-                      {/* Góra: Data, Odznaki typu, Czysty tytuł, Lokalizacja, Licznik pozycji */}
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                      {/* Góra: Data, Odznaki typu, Czysty tytuł, Lokalizacja + Duże Przyciski Akcji po Prawej */}
+                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 flex-1 min-w-0">
+                        {/* Lewa strona: Data + Tytuł + Szczegóły */}
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
                         {/* Compact Date Box - themed by event type */}
                         <div className={`w-fit sm:w-28 shrink-0 px-3 py-1.5 rounded-xl ${theme.dateBoxBg} border ${theme.dateBoxBorder} flex items-center sm:flex-col sm:justify-center text-left sm:text-center gap-2 sm:gap-0.5 transition shadow-sm`}>
                           <span className={`text-[10px] font-black uppercase tracking-wider ${theme.dateDayText}`}>
@@ -1348,6 +1373,95 @@ function EventsAttendanceContent() {
                           </div>
                         </div>
                       </div>
+
+                      {/* Prawa strona nagłówka: Duże, widoczne przyciski Akcji (Sparing / Mecz LALS / Taktyka) */}
+                      <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+                        {isLeagueMatch ? (
+                          <>
+                            <Link
+                              href="/rozgrywki?tab=liga"
+                              onClick={e => e.stopPropagation()}
+                              className="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition"
+                              title="Przejdź do oficjalnego meczu i tabeli LALS"
+                            >
+                              <img src="/lals_logo.png" alt="LALS" className="w-4 h-4 rounded-full bg-white p-0.5 object-contain" />
+                              <span>Mecz LALS ↗</span>
+                            </Link>
+                            <Link
+                              href={`/taktyka?eventId=${event.id}&type=MECZ_LIGOWY`}
+                              onClick={e => e.stopPropagation()}
+                              className="px-3 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition"
+                              title="Otwórz założenia taktyczne"
+                            >
+                              <Target className="w-4 h-4 text-sky-600" />
+                              <span>Taktyka 🎯</span>
+                            </Link>
+                          </>
+                        ) : event.type === 'SPARING' ? (
+                          <>
+                            <Link
+                              href="/rozgrywki?tab=sparingi"
+                              onClick={e => e.stopPropagation()}
+                              className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition"
+                              title="Przejdź do protokołu i sparingów w rozgrywkach"
+                            >
+                              <Swords className="w-4 h-4 text-slate-950" />
+                              <span>Sparing ⚔️</span>
+                            </Link>
+                            <Link
+                              href={`/taktyka?eventId=${event.id}&type=SPARING`}
+                              onClick={e => e.stopPropagation()}
+                              className="px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition"
+                              title="Otwórz założenia sparingowe i taktykę"
+                            >
+                              <Target className="w-4 h-4 text-amber-600" />
+                              <span>Taktyka 🎯</span>
+                            </Link>
+                          </>
+                        ) : event.type === 'TRENING' ? (
+                          <>
+                            <Link
+                              href={`/trening?eventId=${event.id}`}
+                              onClick={e => e.stopPropagation()}
+                              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition"
+                              title="Otwórz rozpiskę treningu"
+                            >
+                              <Volleyball className="w-4 h-4" />
+                              <span>Trening 📋</span>
+                            </Link>
+                            <Link
+                              href={`/taktyka?eventId=${event.id}&type=TRENING`}
+                              onClick={e => e.stopPropagation()}
+                              className="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition"
+                              title="Otwórz tablicę taktyczną dla tego treningu"
+                            >
+                              <Target className="w-4 h-4 text-emerald-600" />
+                              <span>Taktyka 🎯</span>
+                            </Link>
+                          </>
+                        ) : (
+                          <>
+                            <Link
+                              href="/rozgrywki?tab=turnieje"
+                              onClick={e => e.stopPropagation()}
+                              className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition"
+                              title="Przejdź do turnieju i drabinki"
+                            >
+                              <Trophy className="w-4 h-4" />
+                              <span>Turniej 🏆</span>
+                            </Link>
+                          </>
+                        )}
+
+                        <div
+                          className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-all duration-200 ml-1 ${
+                            isExpanded ? 'rotate-180 bg-slate-200 border-slate-300 text-slate-900' : 'bg-slate-100 border-slate-200 text-slate-500 group-hover:text-slate-900'
+                          }`}
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                        </div>
+                      </div>
+                    </div>
 
                       {/* Dolny pasek pod kreską: grafika LALS po lewej na poziomie oddaj głos */}
                       <div className="flex flex-wrap items-center justify-between gap-2.5 shrink-0 pt-2.5 border-t border-slate-200">
