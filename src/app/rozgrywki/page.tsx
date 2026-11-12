@@ -72,10 +72,27 @@ import {
   VolleyballSet,
   TacticalPlay,
   TournamentMatch,
-  TournamentPhase
+  TournamentPhase,
+  VolleyStationScheduleMatch
 } from '@/lib/types';
 import { recognizeTextFromImage } from '@/lib/ocr';
-import { parseVolleyStationTable, parseVolleyStationSchedule } from '@/lib/volleystation-parser';
+import { parseVolleyStationTable, parseVolleyStationSchedule, cleanTeamName } from '@/lib/volleystation-parser';
+
+function formatVolleyDate(dateStr: string): string {
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const formatted = d.toLocaleDateString('pl-PL', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      weekday: 'long'
+    });
+    return formatted.replace(/, ([a-ząćęłńóśźż])/i, (_, l) => `, ${l.toUpperCase()}`);
+  } catch {
+    return dateStr;
+  }
+}
 
 type TabType = 'sparingi' | 'liga' | 'turnieje';
 type LigaSubTab = 'tabela' | 'wyniki' | 'statystyki' | 'zdjecia';
@@ -110,6 +127,23 @@ const getPhaseBadge = (phase?: string) => {
     </span>
   );
 };
+
+function TeamShieldBadge({ name, isAngels = false }: { name: string; isAngels?: boolean }) {
+  if (isAngels) {
+    return (
+      <div className="w-8 h-8 rounded-xl bg-sky-600 text-white font-black text-sm flex items-center justify-center shadow-sm shrink-0 border border-sky-400">
+        👼
+      </div>
+    );
+  }
+  const clean = cleanTeamName(name);
+  const initial = (clean[0] || '?').toUpperCase();
+  return (
+    <div className="w-8 h-8 rounded-xl bg-slate-800 text-white font-black text-sm flex items-center justify-center shadow-sm shrink-0 border border-slate-700">
+      {initial}
+    </div>
+  );
+}
 
 function RozgrywkiContent() {
   const { user } = useAuth();
@@ -148,6 +182,10 @@ function RozgrywkiContent() {
   const [leaguePhases, setLeaguePhases] = useState<LeaguePhase[]>([]);
   const [activeLeaguePhaseId, setActiveLeaguePhaseId] = useState<string>('faza_1');
   const [tableDetailedView, setTableDetailedView] = useState<boolean>(true);
+  const [leagueSchedule, setLeagueSchedule] = useState<VolleyStationScheduleMatch[]>([]);
+  const [leagueScheduleScope, setLeagueScheduleScope] = useState<'ALL' | 'ANGELS'>('ALL');
+  const [leagueScheduleStatus, setLeagueScheduleStatus] = useState<'ALL' | 'UPCOMING' | 'FINISHED'>('ALL');
+  const [parsedScheduleMatchesToImport, setParsedScheduleMatchesToImport] = useState<VolleyStationScheduleMatch[]>([]);
 
   // Dynamic LALS Phases & Groups Modals
   const [showCreatePhaseModal, setShowCreatePhaseModal] = useState(false);
@@ -485,6 +523,7 @@ function RozgrywkiContent() {
         setActiveLeaguePhaseId(l.activeLeaguePhaseId || 'faza_1');
         setImportPhaseTargetId(l.activeLeaguePhaseId || 'faza_1');
         setLeagueTable(l.leagueTable || []);
+        setLeagueSchedule(l.leagueSchedule || []);
         setLeaguePhotos(l.leaguePhotos || []);
       }
       if (tacRes.ok) {
@@ -1528,6 +1567,7 @@ function RozgrywkiContent() {
     // 1. Spróbuj oficjalnego parsera terminarza VolleyStation (obsługuje [Runda: ...], daty po polsku, godziny po południu)
     const vsSchedule = parseVolleyStationSchedule(text);
     if (vsSchedule.length > 0) {
+      setParsedScheduleMatchesToImport(vsSchedule);
       vsSchedule.forEach(sm => {
         const isAngelsHome = sm.homeTeam.toLowerCase().includes('angel');
         const isAngelsAway = sm.awayTeam.toLowerCase().includes('angel');
@@ -1741,7 +1781,8 @@ function RozgrywkiContent() {
         body: JSON.stringify({
           action: 'BATCH_IMPORT',
           matchesToImport: parsedMatchesToImport,
-          fixturesToImport: parsedFixturesToImport
+          fixturesToImport: parsedFixturesToImport,
+          scheduleMatches: parsedScheduleMatchesToImport
         })
       });
       const data = await res.json();
@@ -1751,6 +1792,7 @@ function RozgrywkiContent() {
         setRawScheduleInput('');
         setParsedMatchesToImport([]);
         setParsedFixturesToImport([]);
+        setParsedScheduleMatchesToImport([]);
         await fetchData();
       } else {
         alert(data.error || 'Błąd importu');
@@ -1859,6 +1901,203 @@ function RozgrywkiContent() {
     if (statusFilter === 'FINISHED' && !isFinished) return false;
     return true;
   });
+
+  // Zunifikowany oficjalny terminarz i wyniki meczów ligowych LALS (zgodny z VolleyStation)
+  const unifiedLeagueSchedule = useMemo(() => {
+    const items: Array<{
+      id: string;
+      round?: number;
+      matchNumber?: number;
+      homeTeam: string;
+      awayTeam: string;
+      date: string;
+      dateHeader: string;
+      timeStr?: string;
+      isFinished: boolean;
+      homeSetsWon?: number;
+      awaySetsWon?: number;
+      isAngels: boolean;
+      isWin?: boolean;
+      url?: string;
+      sets?: VolleyballSet[];
+      mvp?: string;
+      notes?: string;
+      phaseId?: string;
+    }> = [];
+
+    const norm = (s: string) => cleanTeamName(s || '').toLowerCase().trim();
+
+    // 1. Dodaj mecze z oficjalnego leagueSchedule (VolleyStation)
+    (leagueSchedule || []).forEach(sm => {
+      const isHomeAngels = norm(sm.homeTeam).includes('angel');
+      const isAwayAngels = norm(sm.awayTeam).includes('angel');
+      const isAngels = isHomeAngels || isAwayAngels;
+      const isFinished = Boolean(sm.isFinished && sm.homeSetsWon !== undefined && sm.awaySetsWon !== undefined);
+
+      let isWin: boolean | undefined = undefined;
+      if (isFinished && isAngels) {
+        isWin = isHomeAngels
+          ? (sm.homeSetsWon! > sm.awaySetsWon!)
+          : (sm.awaySetsWon! > sm.homeSetsWon!);
+      }
+
+      // Połącz z ewentualnym szczegółowym raportem setów w matches
+      const matchedLocal = matches.find(m =>
+        m.matchType === 'Mecz ligowy' &&
+        m.date.slice(0, 10) === (sm.date || '').slice(0, 10) &&
+        (norm(m.opponent) === norm(sm.awayTeam) || norm(m.opponent) === norm(sm.homeTeam))
+      );
+
+      items.push({
+        id: `vs_${sm.matchNumber || sm.round}_${norm(sm.homeTeam)}_${norm(sm.awayTeam)}`,
+        round: sm.round,
+        matchNumber: sm.matchNumber,
+        homeTeam: cleanTeamName(sm.homeTeam),
+        awayTeam: cleanTeamName(sm.awayTeam),
+        date: sm.date || '2026-11-15T18:00:00',
+        dateHeader: sm.dateStr || formatVolleyDate(sm.date || '2026-11-15T18:00:00'),
+        timeStr: sm.timeStr || (sm.date && sm.date.includes('T') ? sm.date.slice(11, 16) : '18:00'),
+        isFinished,
+        homeSetsWon: sm.homeSetsWon,
+        awaySetsWon: sm.awaySetsWon,
+        isAngels,
+        isWin,
+        url: sm.url,
+        sets: matchedLocal?.sets,
+        mvp: matchedLocal?.mvp,
+        notes: matchedLocal?.notes,
+        phaseId: matchedLocal?.leaguePhaseId || 'faza_1'
+      });
+    });
+
+    // 2. Dodaj mecze z matches (jeśli jakiegoś brakuje w leagueSchedule)
+    matches.filter(m => m.matchType === 'Mecz ligowy').forEach(m => {
+      const alreadyPresent = items.some(it =>
+        it.date.slice(0, 10) === m.date.slice(0, 10) &&
+        (norm(it.awayTeam) === norm(m.opponent) || norm(it.homeTeam) === norm(m.opponent))
+      );
+      if (!alreadyPresent) {
+        const isAngelsWin = m.teamSetsWon > m.opponentSetsWon;
+        const homeName = m.isHome ? 'Angels ZTP' : m.opponent;
+        const awayName = m.isHome ? m.opponent : 'Angels ZTP';
+        const homeSets = m.isHome ? m.teamSetsWon : m.opponentSetsWon;
+        const awaySets = m.isHome ? m.opponentSetsWon : m.teamSetsWon;
+
+        const rMatch = m.notes?.match(/Runda\s*(\d+)/i);
+        const nrMatch = m.notes?.match(/Nr\s*(\d+)/i);
+        const urlMatch = m.notes?.match(/https?:\/\/[^\s\)]+/);
+
+        items.push({
+          id: m.id,
+          round: rMatch ? parseInt(rMatch[1], 10) : undefined,
+          matchNumber: nrMatch ? parseInt(nrMatch[1], 10) : undefined,
+          homeTeam: cleanTeamName(homeName),
+          awayTeam: cleanTeamName(awayName),
+          date: m.date,
+          dateHeader: formatVolleyDate(m.date),
+          timeStr: m.date.includes('T') ? m.date.slice(11, 16) : '18:00',
+          isFinished: true,
+          homeSetsWon: homeSets,
+          awaySetsWon: awaySets,
+          isAngels: true,
+          isWin: isAngelsWin,
+          sets: m.sets,
+          mvp: m.mvp,
+          notes: m.notes,
+          url: urlMatch ? urlMatch[0] : undefined,
+          phaseId: m.leaguePhaseId || 'faza_1'
+        });
+      }
+    });
+
+    // 3. Dodaj nadchodzące mecze z events (jeśli nie ma ich w leagueSchedule)
+    events.filter(e => e.type === 'MECZ').forEach(e => {
+      const alreadyPresent = items.some(it =>
+        it.date.slice(0, 10) === e.date.slice(0, 10) &&
+        (norm(it.awayTeam) === norm(e.opponent || '') || norm(it.homeTeam) === norm(e.opponent || ''))
+      );
+      if (!alreadyPresent && e.opponent) {
+        let homeName = 'Angels ZTP';
+        let awayName = e.opponent;
+        if (e.opponent.includes(' vs ')) {
+          const parts = e.opponent.split(' vs ');
+          homeName = parts[0];
+          awayName = parts[1];
+        }
+
+        const rMatch = e.description?.match(/Runda\s*(\d+)/i);
+        const nrMatch = e.description?.match(/Nr\s*(\d+)/i);
+
+        items.push({
+          id: e.id,
+          round: rMatch ? parseInt(rMatch[1], 10) : undefined,
+          matchNumber: nrMatch ? parseInt(nrMatch[1], 10) : undefined,
+          homeTeam: cleanTeamName(homeName),
+          awayTeam: cleanTeamName(awayName),
+          date: e.date,
+          dateHeader: formatVolleyDate(e.date),
+          timeStr: e.date.includes('T') ? e.date.slice(11, 16) : '18:00',
+          isFinished: false,
+          isAngels: norm(homeName).includes('angel') || norm(awayName).includes('angel'),
+          phaseId: 'faza_1'
+        });
+      }
+    });
+
+    return items;
+  }, [leagueSchedule, matches, events]);
+
+  const filteredUnifiedSchedule = useMemo(() => {
+    return unifiedLeagueSchedule.filter(item => {
+      // 1. Filtr fazy
+      if (selectedPhaseFilter !== 'ALL') {
+        const itemPhase = item.phaseId || 'faza_1';
+        if (itemPhase !== selectedPhaseFilter) return false;
+      }
+
+      // 2. Filtr zakresu (Wszyscy vs Tylko Angels)
+      if (leagueScheduleScope === 'ANGELS' && !item.isAngels) return false;
+
+      // 3. Filtr statusu (Wszystkie vs Terminarz vs Wyniki)
+      if (leagueScheduleStatus === 'UPCOMING' && item.isFinished) return false;
+      if (leagueScheduleStatus === 'FINISHED' && !item.isFinished) return false;
+
+      // 4. Wyszukiwanie
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchesQuery =
+          item.homeTeam.toLowerCase().includes(q) ||
+          item.awayTeam.toLowerCase().includes(q) ||
+          (item.round && `runda ${item.round}`.includes(q)) ||
+          (item.matchNumber && `nr ${item.matchNumber}`.includes(q));
+        if (!matchesQuery) return false;
+      }
+
+      return true;
+    });
+  }, [unifiedLeagueSchedule, selectedPhaseFilter, leagueScheduleScope, leagueScheduleStatus, searchQuery]);
+
+  // Grupowanie meczów ligowych według daty (dokładnie jak w VolleyStation)
+  const groupedScheduleByDate = useMemo(() => {
+    const map = new Map<string, { dateHeader: string; timestamp: number; matches: typeof filteredUnifiedSchedule }>();
+
+    filteredUnifiedSchedule.forEach(m => {
+      const header = m.dateHeader || formatVolleyDate(m.date);
+      if (!map.has(header)) {
+        const ts = m.date ? new Date(m.date).getTime() : 0;
+        map.set(header, { dateHeader: header, timestamp: isNaN(ts) ? 0 : ts, matches: [] });
+      }
+      map.get(header)!.matches.push(m);
+    });
+
+    const groups = Array.from(map.values());
+    if (leagueScheduleStatus === 'UPCOMING') {
+      groups.sort((a, b) => a.timestamp - b.timestamp);
+    } else {
+      groups.sort((a, b) => b.timestamp - a.timestamp);
+    }
+    return groups;
+  }, [filteredUnifiedSchedule, leagueScheduleStatus]);
 
   const [sparringsPage, setSparringsPage] = useState(1);
   const [tournamentsPage, setTournamentsPage] = useState(1);
@@ -2095,7 +2334,7 @@ function RozgrywkiContent() {
             onClick={() => setActiveTab('liga')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
               activeTab === 'liga'
-                ? 'bg-sky-600 text-slate-900 shadow-sm'
+                ? 'bg-sky-600 text-white font-bold shadow-sm'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
             }`}
           >
@@ -2119,7 +2358,7 @@ function RozgrywkiContent() {
             onClick={() => setActiveTab('turnieje')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
               activeTab === 'turnieje'
-                ? 'bg-purple-600 text-slate-900 shadow-sm'
+                ? 'bg-purple-600 text-white font-bold shadow-sm'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
             }`}
           >
@@ -2758,44 +2997,44 @@ function RozgrywkiContent() {
       {activeTab === 'liga' && (
         <div className="space-y-6">
           {/* Liga Subtabs (Tabela, Wyniki, Statystyki, Zdjęcia) */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-200">
-            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200 overflow-x-auto scrollbar-none max-w-full shrink-0">
               <button
                 onClick={() => setLigaSubTab('tabela')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition ${
                   ligaSubTab === 'tabela'
-                    ? 'bg-sky-600 text-slate-900 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-sky-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                 }`}
               >
                 <Trophy className="w-3.5 h-3.5" />
-                Tabela Ligowa
+                <span>Tabela Ligowa</span>
               </button>
               <button
                 onClick={() => setLigaSubTab('wyniki')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition ${
                   ligaSubTab === 'wyniki'
-                    ? 'bg-sky-600 text-slate-900 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-sky-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                 }`}
               >
                 <Volleyball className="w-3.5 h-3.5" />
-                Wyniki & Terminarz
+                <span>Wyniki & Terminarz</span>
               </button>
               <button
                 onClick={() => setLigaSubTab('statystyki')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition ${
                   ligaSubTab === 'statystyki'
-                    ? 'bg-sky-600 text-slate-900 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-sky-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                 }`}
               >
                 <BarChart3 className="w-3.5 h-3.5" />
-                Statystyki & VolleyStation
+                <span>Statystyki & VolleyStation</span>
               </button>
               <Link
                 href="/galeria"
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white/60 transition"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white/60 shrink-0 transition"
               >
                 <Camera className="w-3.5 h-3.5 text-sky-600" />
                 <span>Galeria zdjęć ➔</span>
@@ -2803,26 +3042,27 @@ function RozgrywkiContent() {
             </div>
 
             {canManage && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 {ligaSubTab === 'wyniki' && (
-                  <div className="flex items-center gap-2">
+                  <>
                     <button
                       type="button"
                       onClick={() => setShowImportScheduleModal(true)}
-                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-50 hover:bg-slate-100 text-sky-800 border border-slate-200 transition shadow-sm"
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm"
                     >
                       <Upload className="w-3.5 h-3.5 text-sky-600" />
-                      <span>Import Terminarza / Wyników (Tekst / Zdjęcie)</span>
+                      <span className="hidden sm:inline">Import Terminarza / Wyników</span>
+                      <span className="sm:hidden">Import LALS</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setShowAddMatchModal(true)}
-                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-slate-900 transition shadow-sm"
+                      className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm"
                     >
                       <Plus className="w-3.5 h-3.5" />
-                      Dodaj Wynik Meczu
+                      <span>Dodaj Wynik Meczu</span>
                     </button>
-                  </div>
+                  </>
                 )}
                 {ligaSubTab === 'zdjecia' && (
                   <button
@@ -2833,10 +3073,10 @@ function RozgrywkiContent() {
                       setPhotoSeriesList([]);
                       setShowAddPhotoModal(true);
                     }}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-slate-900 transition shadow-sm"
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm"
                   >
                     <Camera className="w-3.5 h-3.5" />
-                    + Dodaj Zdjęcia z Meczu LALS
+                    <span>+ Dodaj Zdjęcia z Meczu LALS</span>
                   </button>
                 )}
               </div>
@@ -2845,10 +3085,10 @@ function RozgrywkiContent() {
 
           {/* SubTab 1: TABELA LIGOWA */}
           {ligaSubTab === 'tabela' && (
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 shadow-sm space-y-5 text-slate-800">
+            <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-7 shadow-sm space-y-5 text-slate-800">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-200">
                 <div className="flex items-center gap-3.5">
-                  <div className="w-14 h-14 rounded-full p-0.5 bg-slate-50 border border-slate-200 shadow-sm shrink-0 overflow-hidden">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full p-0.5 bg-slate-50 border border-slate-200 shadow-sm shrink-0 overflow-hidden">
                     <img
                       src="/lals_logo.png"
                       alt="Logo LALS"
@@ -2857,10 +3097,10 @@ function RozgrywkiContent() {
                   </div>
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-lg sm:text-xl font-black text-slate-900 uppercase tracking-tight">
+                      <h3 className="text-base sm:text-xl font-black text-slate-900 uppercase tracking-tight">
                         Lubońska Amatorska Liga Siatkówki (LALS)
                       </h3>
-                      <span className="px-2 py-0.5 rounded-lg text-[10px] font-black uppercase bg-emerald-50 text-emerald-800 border border-emerald-300">
+                      <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase bg-emerald-50 text-emerald-800 border border-emerald-300">
                         {currentLeaguePhase?.shortName || 'Faza I'}: {currentLeaguePhase?.advancementSpots === 3 ? 'Top 3 Awans' : 'Grupa Finałowa'}
                       </span>
                     </div>
@@ -2874,7 +3114,7 @@ function RozgrywkiContent() {
                   {canManage && !isArchiveMode && (
                     <button
                       onClick={() => handleOpenEditTable(currentLeaguePhase?.id || 'faza_1')}
-                      className="px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 transition flex items-center gap-1.5 shadow-sm"
+                      className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 transition flex items-center gap-1.5 shadow-sm"
                     >
                       <Edit3 className="w-3.5 h-3.5 text-sky-600" />
                       <span>Edytuj Tabelę</span>
@@ -2885,19 +3125,20 @@ function RozgrywkiContent() {
                     href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-bold text-sky-700 transition flex items-center gap-1.5 self-start sm:self-auto shrink-0 shadow-sm"
+                    className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-sky-700 transition flex items-center gap-1.5 shrink-0 shadow-sm"
                   >
                     <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
-                    <span>Terminarz LALS w VolleyStation ↗</span>
+                    <span>VolleyStation ↗</span>
                   </a>
                 </div>
               </div>
 
               {/* Dynamic Phase Switcher & Group Management Ribbon */}
-              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-3 shadow-sm">
-                <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1 lg:pb-0 flex-wrap">
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 shadow-sm">
+                {/* Row 1: Smooth Phase Tabs Scroll */}
+                <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-0.5">
                   <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider shrink-0 mr-1 flex items-center gap-1">
-                    <Layers className="w-3 h-3 text-sky-600" /> Faza / Grupa:
+                    <Layers className="w-3.5 h-3.5 text-sky-600" /> Faza:
                   </span>
                   {(leaguePhases.length > 0 ? leaguePhases : [
                     { id: 'faza_1', name: 'Faza I: Grupa Eliminacyjna', shortName: 'Faza I (Eliminacje)', advancementSpots: 3, advancementTargetName: 'Grupa Finałowa' },
@@ -2910,20 +3151,24 @@ function RozgrywkiContent() {
                         key={phase.id}
                         type="button"
                         onClick={() => handleSwitchPhase(phase.id)}
-                        className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-2 shrink-0 border ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 border ${
                           isSelected
-                            ? 'bg-sky-50 text-sky-800 border-sky-300 shadow-sm ring-1 ring-sky-300'
-                            : 'bg-white text-slate-600 hover:text-slate-900 border-slate-200 hover:bg-slate-100'
+                            ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
+                            : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-100'
                         }`}
                       >
-                        <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-sky-600 animate-pulse' : 'bg-slate-400'}`}></span>
+                        <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-white animate-pulse' : 'bg-slate-400'}`}></span>
                         <span>{phase.shortName || phase.name}</span>
                         {spots > 0 ? (
-                          <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">
+                          <span className={`px-1.5 py-0.2 rounded text-[9px] font-mono font-bold ${
+                            isSelected ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-800 border border-emerald-300'
+                          }`}>
                             Awans: {spots}
                           </span>
                         ) : (
-                          <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-50 text-amber-800 border border-amber-300">
+                          <span className={`px-1.5 py-0.2 rounded text-[9px] font-mono font-bold ${
+                            isSelected ? 'bg-white/20 text-white' : 'bg-amber-50 text-amber-800 border border-amber-300'
+                          }`}>
                             Finał
                           </span>
                         )}
@@ -2932,14 +3177,15 @@ function RozgrywkiContent() {
                   })}
                 </div>
 
-                <div className="flex items-center gap-2 text-[11px] text-slate-500 shrink-0 flex-wrap">
+                {/* Row 2: View Controls and Phase Management */}
+                <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-slate-200/80">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-slate-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-sm">
-                      Drużyn w grupie: <strong className="text-slate-900 font-mono">{leagueTable.length}</strong>
+                    <span className="text-xs text-slate-600 font-medium">
+                      Drużyn w grupie: <strong className="text-slate-900 font-mono font-bold">{leagueTable.length}</strong>
                     </span>
 
                     {/* Przełącznik widoku tabeli */}
-                    <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-xl border border-slate-200 text-xs">
+                    <div className="flex items-center gap-1 bg-slate-200/70 p-0.5 rounded-xl text-xs">
                       <button
                         type="button"
                         onClick={() => setTableDetailedView(false)}
@@ -2953,13 +3199,13 @@ function RozgrywkiContent() {
                         type="button"
                         onClick={() => setTableDetailedView(true)}
                         className={`px-2.5 py-1 rounded-lg font-bold transition text-xs flex items-center gap-1.5 ${
-                          tableDetailedView ? 'bg-sky-600 text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                          tableDetailedView ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
                         }`}
                         title="Pełna tabela zgodna z oficjalnym systemem VolleyStation"
                       >
                         <span>Pełna VolleyStation</span>
                         <span className={`text-[9px] px-1 py-0.2 rounded font-mono font-black ${
-                          tableDetailedView ? 'bg-white/20 text-slate-900' : 'bg-slate-200 text-slate-700'
+                          tableDetailedView ? 'bg-white/20 text-white' : 'bg-slate-300 text-slate-700'
                         }`}>
                           LIVE
                         </span>
@@ -2968,7 +3214,7 @@ function RozgrywkiContent() {
                   </div>
 
                   {canManage && !isArchiveMode && (
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 flex-wrap">
                       <button
                         type="button"
                         onClick={() => handleOpenConfigPhase(activeLeaguePhaseId)}
@@ -3003,34 +3249,48 @@ function RozgrywkiContent() {
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs text-left">
+              {/* Mobile Swipe Hint */}
+              <div className="sm:hidden flex items-center justify-between px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-500 font-medium">
+                <span>Tabela ligowa LALS</span>
+                <span className="text-sky-600 font-bold flex items-center gap-1">Przesuń tabelę w prawo &rarr;</span>
+              </div>
+
+              {/* Responsive Table Container */}
+              <div className="overflow-x-auto -mx-2 sm:mx-0 rounded-2xl border border-slate-200 bg-white shadow-sm scrollbar-thin">
+                <table className={`w-full text-xs text-left whitespace-nowrap ${tableDetailedView ? 'min-w-[960px]' : 'min-w-[620px]'}`}>
                   <thead className="bg-slate-50 text-slate-600 uppercase font-black tracking-wider text-[10px] border-b border-slate-200">
                     {tableDetailedView ? (
                       <>
                         <tr>
-                          <th rowSpan={2} className="py-2.5 px-3 border-r border-slate-200 text-center">Poz.</th>
-                          <th rowSpan={2} className="py-2.5 px-4 border-r border-slate-200">Drużyna</th>
+                          <th rowSpan={2} className="py-2.5 px-3 border-r border-slate-200 text-center sticky left-0 bg-slate-50 z-20 w-10">Poz.</th>
+                          <th rowSpan={2} className="py-2.5 px-4 border-r border-slate-200 sticky left-10 bg-slate-50 z-20 min-w-[190px]">Drużyna</th>
                           <th rowSpan={2} className="py-2.5 px-3 text-center font-black text-slate-900 border-r border-slate-200">Punkty</th>
                           <th colSpan={3} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Mecze</th>
-                          <th colSpan={3} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Sety</th>
-                          <th colSpan={3} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Punkty</th>
+                          <th colSpan={2} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Sety</th>
+                          <th colSpan={2} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Punkty</th>
+                          <th colSpan={2} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Stosunek</th>
                           <th colSpan={6} className="py-1 px-2 text-center border-b border-r border-slate-200 bg-slate-100/70 text-slate-700 font-bold">Wynik</th>
                           <th rowSpan={2} className="py-2.5 px-3 text-center">Forma</th>
                         </tr>
                         <tr className="border-b border-slate-200 text-[9px]">
+                          {/* Mecze */}
                           <th className="py-1.5 px-2 text-center text-slate-500">Rozegr.</th>
                           <th className="py-1.5 px-2 text-center text-emerald-700">Wygr.</th>
                           <th className="py-1.5 px-2 text-center text-rose-600 border-r border-slate-200">Przegr.</th>
 
+                          {/* Sety */}
                           <th className="py-1.5 px-2 text-center text-emerald-700">Wygr.</th>
-                          <th className="py-1.5 px-2 text-center text-rose-600">Przegr.</th>
-                          <th className="py-1.5 px-2 text-center text-sky-700 border-r border-slate-200">Stosunek</th>
+                          <th className="py-1.5 px-2 text-center text-rose-600 border-r border-slate-200">Przegr.</th>
 
+                          {/* Punkty */}
                           <th className="py-1.5 px-2 text-center text-emerald-700">Wygr.</th>
-                          <th className="py-1.5 px-2 text-center text-rose-600">Przegr.</th>
-                          <th className="py-1.5 px-2 text-center text-sky-700 border-r border-slate-200">Stosunek</th>
+                          <th className="py-1.5 px-2 text-center text-rose-600 border-r border-slate-200">Przegr.</th>
 
+                          {/* Stosunek */}
+                          <th className="py-1.5 px-2 text-center text-sky-700">Sety</th>
+                          <th className="py-1.5 px-2 text-center text-sky-700 border-r border-slate-200">Punkty</th>
+
+                          {/* Wynik */}
                           <th className="py-1.5 px-1.5 text-center text-slate-700 font-mono">3-0</th>
                           <th className="py-1.5 px-1.5 text-center text-slate-700 font-mono">3-1</th>
                           <th className="py-1.5 px-1.5 text-center text-slate-700 font-mono">3-2</th>
@@ -3041,12 +3301,12 @@ function RozgrywkiContent() {
                       </>
                     ) : (
                       <tr>
-                        <th className="py-3 px-3">Poz.</th>
-                        <th className="py-3 px-4">Drużyna</th>
-                        <th className="py-3 px-2 text-center">Mecze</th>
-                        <th className="py-3 px-2 text-center font-black text-slate-900">Punkty</th>
-                        <th className="py-3 px-3 text-center">Sety (W:P)</th>
-                        <th className="py-3 px-3 text-center">Małe Punkty</th>
+                        <th className="py-3 px-3 text-center sticky left-0 bg-slate-50 z-20 w-10 border-r border-slate-200">Poz.</th>
+                        <th className="py-3 px-4 sticky left-10 bg-slate-50 z-20 min-w-[190px] border-r border-slate-200">Drużyna</th>
+                        <th className="py-3 px-2 text-center font-black text-slate-900 border-r border-slate-200">Punkty</th>
+                        <th className="py-3 px-2 text-center border-r border-slate-200">Mecze</th>
+                        <th className="py-3 px-3 text-center border-r border-slate-200">Sety (W:P)</th>
+                        <th className="py-3 px-3 text-center border-r border-slate-200">Małe Punkty</th>
                         <th className="py-3 px-4 text-center">Forma</th>
                       </tr>
                     )}
@@ -3072,17 +3332,16 @@ function RozgrywkiContent() {
                         ? (typeof team.pointRatio === 'number' ? team.pointRatio.toFixed(4) : team.pointRatio)
                         : (team.pointsLost > 0 ? (team.pointsWon / team.pointsLost).toFixed(4) : (team.pointsWon > 0 ? 'MAX' : '-'));
 
+                      const rowBg = isAngels ? 'bg-sky-50 font-bold' : isAdvancing ? 'bg-emerald-50/20' : 'bg-white';
+                      const stickyCellBg = isAngels ? 'bg-sky-50' : isAdvancing ? 'bg-emerald-50/30' : 'bg-white';
+
                       return (
                         <React.Fragment key={team.id || idx}>
-                          <tr
-                            className={`hover:bg-slate-50 transition ${
-                              isAngels ? 'bg-sky-50 font-bold' : ''
-                            } ${isAdvancing && !isAngels ? 'bg-emerald-50/30' : ''}`}
-                          >
-                            <td className="py-3 px-3 text-center">
+                          <tr className={`hover:bg-slate-50 transition ${rowBg}`}>
+                            <td className={`py-3 px-3 text-center sticky left-0 ${stickyCellBg} z-10 border-r border-slate-100`}>
                               <span className={`w-6 h-6 rounded-lg inline-flex items-center justify-center font-black text-xs ${
                                 isAdvancing
-                                  ? 'bg-emerald-600 text-slate-900 shadow-sm'
+                                  ? 'bg-emerald-600 text-white shadow-sm'
                                   : isGoldMedalist
                                   ? 'bg-amber-400 text-slate-950 font-black'
                                   : isMedalist && team.position === 2
@@ -3095,35 +3354,32 @@ function RozgrywkiContent() {
                               </span>
                             </td>
 
-                            <td className="py-3 px-4 font-sans font-black text-slate-900 text-sm flex items-center gap-2 flex-wrap">
-                              {team.teamUrl ? (
-                                <a
-                                  href={team.teamUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="hover:underline hover:text-sky-600 transition flex items-center gap-1.5"
-                                  title="Otwórz profil drużyny na VolleyStation"
-                                >
+                            <td className={`py-3 px-4 font-sans font-bold text-slate-900 text-sm sticky left-10 ${stickyCellBg} z-10 border-r border-slate-200`}>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                {team.teamUrl ? (
+                                  <a
+                                    href={team.teamUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="hover:underline hover:text-sky-600 transition flex items-center gap-1.5"
+                                    title="Otwórz profil drużyny na VolleyStation"
+                                  >
+                                    <span>{team.teamName}</span>
+                                  </a>
+                                ) : (
                                   <span>{team.teamName}</span>
-                                </a>
-                              ) : (
-                                <span>{team.teamName}</span>
-                              )}
-                              {isAngels && (
-                                <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-sky-100 text-sky-800 border border-sky-300">
-                                  Nasz Klub
-                                </span>
-                              )}
-                              {isAdvancing && (
-                                <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1">
-                                  <span>🟢 Awans ({currentLeaguePhase?.advancementTargetName || 'Finał'})</span>
-                                </span>
-                              )}
-                              {isGoldMedalist && (
-                                <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-50 text-amber-800 border border-amber-300">
-                                  🥇 Mistrz LALS
-                                </span>
-                              )}
+                                )}
+                                {isAngels && (
+                                  <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-sky-100 text-sky-800 border border-sky-300">
+                                    Nasz Klub
+                                  </span>
+                                )}
+                                {isAdvancing && (
+                                  <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300 hidden md:inline-flex">
+                                    🟢 Awans
+                                  </span>
+                                )}
+                              </div>
                             </td>
 
                             {tableDetailedView ? (
@@ -3137,12 +3393,14 @@ function RozgrywkiContent() {
 
                                 {/* Sety */}
                                 <td className="py-3 px-2 text-center text-emerald-700 font-bold">{team.setsWon}</td>
-                                <td className="py-3 px-2 text-center text-rose-600">{team.setsLost}</td>
-                                <td className="py-3 px-2 text-center text-sky-700 border-r border-slate-200">{setRatioStr}</td>
+                                <td className="py-3 px-2 text-center text-rose-600 border-r border-slate-200">{team.setsLost}</td>
 
                                 {/* Punkty */}
                                 <td className="py-3 px-2 text-center text-emerald-700">{team.pointsWon}</td>
-                                <td className="py-3 px-2 text-center text-rose-600">{team.pointsLost}</td>
+                                <td className="py-3 px-2 text-center text-rose-600 border-r border-slate-200">{team.pointsLost}</td>
+
+                                {/* Stosunek */}
+                                <td className="py-3 px-2 text-center text-sky-700">{setRatioStr}</td>
                                 <td className="py-3 px-2 text-center text-sky-700 border-r border-slate-200">{pointRatioStr}</td>
 
                                 {/* Wyniki */}
@@ -3155,12 +3413,12 @@ function RozgrywkiContent() {
                               </>
                             ) : (
                               <>
-                                <td className="py-3.5 px-2 text-center text-slate-700">{team.matchesPlayed}</td>
-                                <td className="py-3.5 px-2 text-center text-sm font-black text-slate-900">{team.points}</td>
-                                <td className="py-3.5 px-3 text-center text-slate-700">
+                                <td className="py-3 px-2 text-center text-sm font-black text-slate-900 border-r border-slate-200">{team.points}</td>
+                                <td className="py-3 px-2 text-center text-slate-700 border-r border-slate-200">{team.matchesPlayed}</td>
+                                <td className="py-3 px-3 text-center text-slate-700 border-r border-slate-200">
                                   {team.setsWon} : {team.setsLost}
                                 </td>
-                                <td className="py-3.5 px-3 text-center text-slate-600">
+                                <td className="py-3 px-3 text-center text-slate-600 border-r border-slate-200">
                                   {team.pointsWon} : {team.pointsLost}
                                 </td>
                               </>
@@ -3191,7 +3449,7 @@ function RozgrywkiContent() {
                                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
                                     <span>▲ STREFA AWANSU: {advSpots} {advSpots === 1 ? 'DRUŻYNA AWANSUJE' : advSpots < 5 ? 'DRUŻYNY AWANSUJĄ' : 'DRUŻYN AWANSUJE'} DO: {currentLeaguePhase?.advancementTargetName || 'KOLEJNEJ FAZY'} ▲</span>
                                   </div>
-                                  <span className="text-[10px] font-mono text-emerald-400/80 lowercase">
+                                  <span className="text-[10px] font-mono text-emerald-600 lowercase hidden sm:inline">
                                     miejsca 1–{advSpots} &rarr; {currentLeaguePhase?.advancementTargetName || 'kolejny etap'}
                                   </span>
                                 </div>
@@ -3208,7 +3466,7 @@ function RozgrywkiContent() {
               {/* Informative Rules Footer */}
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 text-slate-600">
-                  <Info className="w-4 h-4 text-sky-400 shrink-0" />
+                  <Info className="w-4 h-4 text-sky-600 shrink-0" />
                   <span>
                     <strong>Format grupy:</strong> W tej grupie występuje <strong>{leagueTable.length} zespołów</strong>.{' '}
                     {currentLeaguePhase?.advancementSpots && currentLeaguePhase.advancementSpots > 0 ? (
@@ -3234,222 +3492,334 @@ function RozgrywkiContent() {
 
           {/* SubTab 2: WYNIKI I TERMINARZ */}
           {ligaSubTab === 'wyniki' && (
-            <div className="space-y-4">
-              {/* Phase Filter for Matches */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-2xl bg-white border border-slate-200 shadow-sm">
-                <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
-                  <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider shrink-0 mr-1">
-                    Filtruj wg Fazy:
-                  </span>
-                  <button
-                    onClick={() => setSelectedPhaseFilter('ALL')}
-                    className={`px-3 py-1 rounded-xl text-xs font-black transition shrink-0 ${
-                      selectedPhaseFilter === 'ALL'
-                        ? 'bg-sky-600 text-slate-900 shadow-sm'
-                        : 'bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200'
-                    }`}
-                  >
-                    Wszystkie fazy ({matches.filter(m => m.matchType === 'Mecz ligowy').length})
-                  </button>
-                  {(leaguePhases.length > 0 ? leaguePhases : [
-                    { id: 'faza_1', name: 'Faza I: Grupa Eliminacyjna', shortName: 'Faza I' },
-                    { id: 'faza_2', name: 'Faza II: Grupa Finałowa', shortName: 'Faza II' }
-                  ]).map((p: any) => {
-                    const count = matches.filter(m => m.matchType === 'Mecz ligowy' && (m.leaguePhaseId === p.id || (!m.leaguePhaseId && p.id === 'faza_1'))).length;
-                    return (
-                      <button
-                        key={p.id}
-                        onClick={() => setSelectedPhaseFilter(p.id)}
-                        className={`px-3 py-1 rounded-xl text-xs font-black transition shrink-0 flex items-center gap-1.5 ${
-                          selectedPhaseFilter === p.id
-                            ? p.id === 'faza_1'
-                              ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-sm'
-                              : 'bg-amber-50 text-amber-800 border border-amber-300 shadow-sm'
-                            : 'bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200'
-                        }`}
-                      >
-                        <span>{p.shortName || p.name}</span>
-                        <span className="text-[10px] opacity-75 font-mono">({count})</span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div className="text-[11px] text-slate-500">
-                  Pokazano: <strong className="text-slate-900 font-mono">{leagueMatchesList.length}</strong> spotkań
-                </div>
-              </div>
-
-              {leagueMatchesList.length === 0 ? (
-                <div className="bg-white border border-slate-200 rounded-3xl p-8 text-center text-slate-500 shadow-sm">
-                  Brak meczów ligowych spełniających kryteria.
-                </div>
-              ) : (
-                paginatedLeagueMatches.map(match => {
-                  const isExpanded = Boolean(expandedMatches[match.id]);
-                  const isWin = match.teamSetsWon > match.opponentSetsWon;
-
-                  return (
-                    <div
-                      key={match.id}
-                      className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm hover:border-sky-300 transition-all duration-200"
-                    >
-                      {/* Zwijany Nagłówek Meczu Ligowego */}
-                      <div
-                        onClick={() => toggleMatch(match.id)}
-                        className="p-5 sm:p-6 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 select-none hover:bg-slate-50 transition group"
-                      >
-                        <div className="space-y-1.5 flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="px-2 py-0.5 rounded-lg text-[10px] font-black uppercase bg-sky-50 text-sky-800 border border-sky-200">
-                              {match.isHome ? 'Mecz Domowy' : 'Wyjazd'}
-                            </span>
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100 border border-slate-200 text-slate-700">
-                              <img src="/lals_logo.png" alt="LALS" className="w-3.5 h-3.5 rounded-full object-contain" />
-                              <span>LALS</span>
-                            </span>
-                            <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border ${
-                              match.leaguePhaseId === 'faza_2'
-                                ? 'bg-amber-50 text-amber-800 border-amber-300'
-                                : 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                            }`}>
-                              {match.leaguePhaseId === 'faza_2' ? 'Faza II (Finałowa)' : 'Faza I (Eliminacje)'}
-                            </span>
-                            <span className="text-xs text-slate-500">
-                              {new Date(match.date).toLocaleDateString('pl-PL')} • {match.location}
-                            </span>
-                          </div>
-
-                          <h3 className="text-lg sm:text-xl font-black text-slate-900 group-hover:text-sky-600 transition truncate">
-                            Angels ZTP vs {match.opponent}
-                          </h3>
-                        </div>
-
-                        {/* Wynik i Chevron po prawej */}
-                        <div className="flex items-center justify-between md:justify-end gap-4 shrink-0 pt-2 md:pt-0 border-t border-slate-100 md:border-t-0">
-                          <div className="text-right">
-                            <span className={`text-2xl sm:text-3xl font-black font-mono block leading-tight ${isWin ? 'text-emerald-700' : 'text-rose-600'}`}>
-                              {match.teamSetsWon} : {match.opponentSetsWon}
-                            </span>
-                            <span className={`text-[10px] font-black uppercase tracking-widest ${isWin ? 'text-emerald-700' : 'text-rose-600'}`}>
-                              {isWin ? 'ZWYCIĘSTWO' : 'PORAŻKA'}
-                            </span>
-                          </div>
-
-                          <div
-                            className={`w-9 h-9 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 transition-all duration-200 ${
-                              isExpanded ? 'rotate-180 bg-sky-50 text-sky-600 border-sky-300' : 'group-hover:text-slate-800 group-hover:bg-slate-100'
-                            }`}
-                          >
-                            <ChevronDown className="w-4 h-4" />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Rozwijana zawartość meczu ligowego */}
-                      {isExpanded && (
-                        <div className="p-5 sm:p-6 border-t border-slate-100 space-y-4 bg-slate-50/50 animate-fadeIn">
-                          {/* Sety */}
-                          <div className="space-y-1.5">
-                            <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider">
-                              Przebieg i Wyniki Setów:
-                            </span>
-                            <div className="flex flex-wrap gap-2">
-                              {match.sets.map(s => (
-                                <span
-                                  key={s.setNumber}
-                                  className="px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-white border border-slate-200 text-slate-800 shadow-sm"
-                                >
-                                  Set {s.setNumber}: <strong className="text-slate-900">{s.teamScore}</strong>:<strong className="text-slate-900">{s.opponentScore}</strong>
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-
-                          {match.mvp && (
-                            <div className="text-xs text-amber-900 font-bold flex items-center gap-2 p-2.5 rounded-xl bg-amber-50 border border-amber-200">
-                              <Trophy className="w-4 h-4 text-amber-600 shrink-0" />
-                              <span>Najlepszy zawodnik meczu (MVP): <strong className="text-slate-900">{match.mvp}</strong></span>
-                            </div>
-                          )}
-
-                          {match.notes && (
-                            <div className="text-xs text-slate-600 p-3 rounded-xl bg-white border border-slate-200">
-                              <span className="text-[10px] font-black uppercase text-slate-500 block mb-1">Raport meczowy i uwagi:</span>
-                              {match.notes}
-                            </div>
-                          )}
-
-                          {/* Auto-Linked Tactical Snapshots to this League Match */}
-                          {(() => {
-                            const linked = tactics.filter(t => t.matchId === match.id);
-                            if (linked.length === 0) return null;
-                            return (
-                              <div className="pt-3 border-t border-slate-200 w-full space-y-2.5">
-                                <div className="flex items-center justify-between">
-                                  <span className="text-[11px] font-black uppercase text-sky-700 flex items-center gap-1.5">
-                                    <Compass className="w-3.5 h-3.5" />
-                                    📸 Zrzut Taktyczny Trenera do tego Meczu: {linked[0].title}
-                                  </span>
-                                  <a href={`/taktyka?matchId=${match.id}&tacticId=${linked[0].id}`} className="text-[11px] text-sky-600 font-bold hover:underline">
-                                    Zobacz w tablicy →
-                                  </a>
-                                </div>
-                                {linked[0].drawingData && (
-                                  <div className="aspect-[21/9] bg-white rounded-xl overflow-hidden border border-slate-200 max-h-36 shadow-sm">
-                                    <img src={linked[0].drawingData} alt={linked[0].title} className="w-full h-full object-contain" />
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })()}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
-              )}
-
-              {/* League Matches Pagination Controls */}
-              {totalLeagueMatchesPages > 1 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-white border border-slate-200 rounded-2xl shadow-lg">
-                  <span className="text-xs text-slate-500 font-medium">
-                    Wyświetlanie <span className="text-slate-900 font-bold">{((leagueMatchesPage - 1) * LEAGUE_MATCHES_PER_PAGE) + 1}</span>–<span className="text-slate-900 font-bold">{Math.min(leagueMatchesPage * LEAGUE_MATCHES_PER_PAGE, leagueMatchesList.length)}</span> z <span className="text-slate-900 font-bold">{leagueMatchesList.length}</span> meczów ligowych
-                  </span>
-                  <div className="flex items-center gap-1.5">
+            <div className="space-y-5">
+              {/* Filter Toolbar for Matches & Schedule */}
+              <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3">
+                {/* Row 1: Scope & Status Toggles */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                  <div className="flex items-center gap-1.5 p-1 bg-slate-100 border border-slate-200 rounded-2xl overflow-x-auto scrollbar-none shrink-0">
                     <button
-                      onClick={() => setLeagueMatchesPage(p => Math.max(1, p - 1))}
-                      disabled={leagueMatchesPage === 1}
-                      className="p-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed transition"
-                      title="Poprzednia strona"
+                      type="button"
+                      onClick={() => setLeagueScheduleScope('ALL')}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 ${
+                        leagueScheduleScope === 'ALL'
+                          ? 'bg-sky-600 text-white shadow-sm'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
                     >
-                      <ChevronLeft className="w-4 h-4" />
+                      🌐 Cała Liga LALS ({unifiedLeagueSchedule.length})
                     </button>
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: totalLeagueMatchesPages }).map((_, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => setLeagueMatchesPage(idx + 1)}
-                          className={`min-w-[28px] h-7 px-2 rounded-lg text-xs font-black transition ${
-                            leagueMatchesPage === idx + 1
-                              ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/20'
-                              : 'bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-900'
-                          }`}
-                        >
-                          {idx + 1}
-                        </button>
-                      ))}
-                    </div>
                     <button
-                      onClick={() => setLeagueMatchesPage(p => Math.min(totalLeagueMatchesPages, p + 1))}
-                      disabled={leagueMatchesPage === totalLeagueMatchesPages}
-                      className="p-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed transition"
-                      title="Następna strona"
+                      type="button"
+                      onClick={() => setLeagueScheduleScope('ANGELS')}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
+                        leagueScheduleScope === 'ANGELS'
+                          ? 'bg-sky-600 text-white shadow-sm'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
                     >
-                      <ChevronRight className="w-4 h-4" />
+                      <span>👼 Tylko Angels ZTP</span>
+                      <span className="font-mono text-[11px]">({unifiedLeagueSchedule.filter(m => m.isAngels).length})</span>
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-2xl border border-slate-200 text-xs overflow-x-auto scrollbar-none shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setLeagueScheduleStatus('ALL')}
+                      className={`px-3 py-1.5 rounded-xl font-bold transition shrink-0 ${
+                        leagueScheduleStatus === 'ALL' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      Wszystkie ({filteredUnifiedSchedule.length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLeagueScheduleStatus('UPCOMING')}
+                      className={`px-3 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-1 ${
+                        leagueScheduleStatus === 'UPCOMING' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <span>📅 Terminarz</span>
+                      <span className="text-[10px] opacity-75 font-mono">({unifiedLeagueSchedule.filter(m => !m.isFinished && (leagueScheduleScope === 'ALL' || m.isAngels)).length})</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLeagueScheduleStatus('FINISHED')}
+                      className={`px-3 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-1 ${
+                        leagueScheduleStatus === 'FINISHED' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <span>🏆 Wyniki</span>
+                      <span className="text-[10px] opacity-75 font-mono">({unifiedLeagueSchedule.filter(m => m.isFinished && (leagueScheduleScope === 'ALL' || m.isAngels)).length})</span>
                     </button>
                   </div>
                 </div>
+
+                {/* Row 2: Phase filter pills & match counts */}
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-2.5 border-t border-slate-100 text-xs">
+                  <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5">
+                    <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider shrink-0 mr-1 flex items-center gap-1">
+                      <Layers className="w-3 h-3 text-sky-600" /> Faza:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedPhaseFilter('ALL')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold transition shrink-0 border ${
+                        selectedPhaseFilter === 'ALL'
+                          ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
+                          : 'bg-slate-50 text-slate-600 hover:text-slate-900 border-slate-200'
+                      }`}
+                    >
+                      Wszystkie fazy
+                    </button>
+                    {(leaguePhases.length > 0 ? leaguePhases : [
+                      { id: 'faza_1', name: 'Faza I: Grupa Eliminacyjna', shortName: 'Faza I' },
+                      { id: 'faza_2', name: 'Faza II: Grupa Finałowa', shortName: 'Faza II' }
+                    ]).map((p: any) => {
+                      const isSel = selectedPhaseFilter === p.id;
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => setSelectedPhaseFilter(p.id)}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-bold transition shrink-0 border ${
+                            isSel
+                              ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
+                              : 'bg-slate-50 text-slate-600 hover:text-slate-900 border-slate-200'
+                          }`}
+                        >
+                          {p.shortName || p.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="text-[11px] text-slate-500 font-medium">
+                    Pokazano: <strong className="text-slate-900 font-mono font-bold">{filteredUnifiedSchedule.length}</strong> spotkań w <strong className="text-slate-900 font-mono font-bold">{groupedScheduleByDate.length}</strong> terminach
+                  </div>
+                </div>
+              </div>
+
+              {/* Grouped Matches by Date (VolleyStation Format) */}
+              {groupedScheduleByDate.length === 0 ? (
+                <div className="bg-white border border-slate-200 rounded-3xl p-10 text-center text-slate-500 shadow-sm space-y-2">
+                  <Volleyball className="w-10 h-10 text-slate-400 mx-auto stroke-[1.5]" />
+                  <p className="font-bold text-slate-700">Brak spotkań spełniających wybrane kryteria.</p>
+                  <p className="text-xs text-slate-500">Zmień filtry lub zaimportuj terminarz i wyniki za pomocą przycisku &quot;Import Terminarza / Wyników&quot; powyżej.</p>
+                </div>
+              ) : (
+                groupedScheduleByDate.map(group => (
+                  <div key={group.dateHeader} className="space-y-2.5">
+                    {/* Date Header Pill */}
+                    <div className="flex items-center gap-2 px-1 text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wide">
+                      <Calendar className="w-4 h-4 text-sky-600 shrink-0" />
+                      <span>{group.dateHeader}</span>
+                      <span className="text-[11px] font-mono text-slate-500 lowercase font-normal">
+                        ({group.matches.length} {group.matches.length === 1 ? 'mecz' : group.matches.length < 5 ? 'mecze' : 'meczów'})
+                      </span>
+                    </div>
+
+                    {/* Card container for this date */}
+                    <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden divide-y divide-slate-100">
+                      {group.matches.map(m => {
+                        const isExpanded = Boolean(expandedMatches[m.id]);
+                        const isOurTeamHome = m.homeTeam.toLowerCase().includes('angel');
+                        const isOurTeamAway = m.awayTeam.toLowerCase().includes('angel');
+                        const isAngels = isOurTeamHome || isOurTeamAway;
+
+                        return (
+                          <div
+                            key={m.id}
+                            className={`transition ${isAngels ? 'bg-sky-50/40 hover:bg-sky-50/70' : 'hover:bg-slate-50/70'}`}
+                          >
+                            {/* Desktop / Tablet Match Row */}
+                            <div
+                              onClick={() => toggleMatch(m.id)}
+                              className="hidden sm:flex items-center justify-between p-3.5 sm:px-5 cursor-pointer select-none group"
+                            >
+                              {/* Left: Round & Match Number */}
+                              <div className="w-20 lg:w-24 shrink-0 border-r border-slate-200 pr-3 mr-3 text-left leading-tight">
+                                <span className="text-[11px] text-slate-600 font-mono block">
+                                  {m.round ? `Runda: ${m.round}` : 'LALS'}
+                                </span>
+                                <span className="text-[11px] text-slate-700 font-mono font-bold block">
+                                  {m.matchNumber ? `Nr ${m.matchNumber}` : 'Mecz'}
+                                </span>
+                              </div>
+
+                              {/* Center: Team A, Crest, Center Pill, Crest, Team B */}
+                              <div className="flex-1 flex items-center justify-between gap-3 px-2 min-w-0">
+                                {/* Home Team (Right-aligned) */}
+                                <div className="flex items-center justify-end gap-2.5 flex-1 min-w-0 text-right">
+                                  <span className={`text-sm truncate font-bold ${isOurTeamHome ? 'text-sky-700 font-black' : 'text-slate-900'}`}>
+                                    {m.homeTeam}
+                                  </span>
+                                  <TeamShieldBadge name={m.homeTeam} isAngels={isOurTeamHome} />
+                                </div>
+
+                                {/* Center Pill: Score or Time */}
+                                <div className="shrink-0 flex items-center justify-center min-w-[76px]">
+                                  {m.isFinished && m.homeSetsWon !== undefined && m.awaySetsWon !== undefined ? (
+                                    <div className="px-3.5 py-1 rounded-lg bg-slate-900 text-white font-mono font-black text-sm tracking-widest text-center shadow-sm">
+                                      {m.homeSetsWon} : {m.awaySetsWon}
+                                    </div>
+                                  ) : (
+                                    <div className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-bold text-xs text-center border border-slate-200 whitespace-nowrap">
+                                      {m.timeStr || '18:00'}
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Away Team (Left-aligned) */}
+                                <div className="flex items-center justify-start gap-2.5 flex-1 min-w-0 text-left">
+                                  <TeamShieldBadge name={m.awayTeam} isAngels={isOurTeamAway} />
+                                  <span className={`text-sm truncate font-bold ${isOurTeamAway ? 'text-sky-700 font-black' : 'text-slate-900'}`}>
+                                    {m.awayTeam}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Right: Actions / Links / Chevron */}
+                              <div className="shrink-0 flex items-center gap-2 pl-3">
+                                {m.url && (
+                                  <a
+                                    href={m.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={e => e.stopPropagation()}
+                                    className="p-1.5 rounded-lg text-slate-600 hover:text-sky-600 hover:bg-slate-100 transition"
+                                    title="Zobacz oficjalny mecz w VolleyStation"
+                                  >
+                                    <ExternalLink className="w-3.5 h-3.5" />
+                                  </a>
+                                )}
+                                <div
+                                  className={`w-7 h-7 rounded-lg flex items-center justify-center text-slate-600 transition duration-200 ${
+                                    isExpanded ? 'rotate-180 bg-sky-50 text-sky-600' : 'group-hover:text-slate-800'
+                                  }`}
+                                >
+                                  <ChevronDown className="w-3.5 h-3.5" />
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Mobile Match Card */}
+                            <div
+                              onClick={() => toggleMatch(m.id)}
+                              className="sm:hidden flex flex-col gap-2 p-3.5 cursor-pointer select-none"
+                            >
+                              <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-1.5">
+                                <span className="text-[10px] font-mono font-bold text-slate-600 uppercase">
+                                  {m.round ? `Runda ${m.round}` : 'LALS'} • {m.matchNumber ? `Nr ${m.matchNumber}` : 'Oficjalny mecz'}
+                                </span>
+                                {m.isFinished && m.homeSetsWon !== undefined && m.awaySetsWon !== undefined ? (
+                                  <span className="px-2.5 py-0.5 rounded-md bg-slate-900 text-white font-mono font-black text-xs tracking-wider">
+                                    {m.homeSetsWon} : {m.awaySetsWon}
+                                  </span>
+                                ) : (
+                                  <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200">
+                                    {m.timeStr || '18:00'}
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Team Rows */}
+                              <div className="space-y-1.5 pt-0.5">
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    <TeamShieldBadge name={m.homeTeam} isAngels={isOurTeamHome} />
+                                    <span className={`text-xs truncate font-bold ${isOurTeamHome ? 'text-sky-700 font-black' : 'text-slate-900'}`}>
+                                      {m.homeTeam}
+                                    </span>
+                                  </div>
+                                  {m.isFinished && m.homeSetsWon !== undefined && (
+                                    <span className="font-mono font-black text-slate-900 text-sm shrink-0">
+                                      {m.homeSetsWon}
+                                    </span>
+                                  )}
+                                </div>
+
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    <TeamShieldBadge name={m.awayTeam} isAngels={isOurTeamAway} />
+                                    <span className={`text-xs truncate font-bold ${isOurTeamAway ? 'text-sky-700 font-black' : 'text-slate-900'}`}>
+                                      {m.awayTeam}
+                                    </span>
+                                  </div>
+                                  {m.isFinished && m.awaySetsWon !== undefined && (
+                                    <span className="font-mono font-black text-slate-900 text-sm shrink-0">
+                                      {m.awaySetsWon}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Expanded Details Accordion */}
+                            {isExpanded && (
+                              <div className="p-4 sm:p-5 border-t border-slate-100 bg-slate-50/60 space-y-3.5 text-xs animate-fadeIn">
+                                {m.sets && m.sets.length > 0 && (
+                                  <div className="space-y-1.5">
+                                    <span className="text-[10px] font-black uppercase text-slate-600 tracking-wider">
+                                      Wyniki setów:
+                                    </span>
+                                    <div className="flex flex-wrap gap-2">
+                                      {m.sets.map(s => (
+                                        <span
+                                          key={s.setNumber}
+                                          className="px-2.5 py-1 rounded-lg font-mono font-bold bg-white border border-slate-200 text-slate-800 shadow-sm"
+                                        >
+                                          Set {s.setNumber}: <strong>{s.teamScore}</strong>:<strong>{s.opponentScore}</strong>
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {m.mvp && (
+                                  <div className="text-xs text-amber-900 font-bold flex items-center gap-2 p-2.5 rounded-xl bg-amber-50 border border-amber-200">
+                                    <Trophy className="w-4 h-4 text-amber-600 shrink-0" />
+                                    <span>MVP meczu: <strong className="text-slate-900">{m.mvp}</strong></span>
+                                  </div>
+                                )}
+
+                                {m.notes && (
+                                  <div className="text-xs text-slate-600 p-2.5 rounded-xl bg-white border border-slate-200">
+                                    <span className="text-[10px] font-black uppercase text-slate-600 block mb-1">Uwagi meczowe:</span>
+                                    {m.notes}
+                                  </div>
+                                )}
+
+                                <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-200">
+                                  {m.url ? (
+                                    <a
+                                      href={m.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-xs font-bold text-sky-700 hover:text-sky-900 hover:underline flex items-center gap-1.5"
+                                    >
+                                      <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
+                                      <span>Otwórz oficjalny protokół na VolleyStation ↗</span>
+                                    </a>
+                                  ) : (
+                                    <span className="text-[11px] text-slate-600">Oficjalny terminarz rozgrywek ligowych LALS</span>
+                                  )}
+
+                                  {isAngels && (
+                                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-300">
+                                      👼 Mecz z udziałem Angels ZTP
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))
               )}
             </div>
           )}
@@ -3461,8 +3831,8 @@ function RozgrywkiContent() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 bg-white border border-slate-200 rounded-3xl shadow-sm">
                 <div>
                   <h3 className="text-lg sm:text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-sky-400" />
-                    Statystyki VolleyStation & Liderzy Ligi
+                    <BarChart3 className="w-5 h-5 text-sky-600" />
+                    <span>Statystyki VolleyStation & Liderzy Ligi</span>
                   </h3>
                   <p className="text-xs text-slate-500 mt-1">
                     Oficjalne dane meczowe, protokoły punktowe i rankingi indywidualne z ligi LALS.
@@ -3474,7 +3844,7 @@ function RozgrywkiContent() {
                     <button
                       type="button"
                       onClick={() => setShowVolleyStationImportModal(true)}
-                      className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-400 hover:to-sky-500 text-slate-950 font-black text-xs flex items-center gap-1.5 transition shadow-lg shadow-sky-500/20"
+                      className="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm"
                     >
                       <Upload className="w-4 h-4 stroke-[2.5]" />
                       <span>Importuj z VolleyStation</span>
@@ -3485,9 +3855,9 @@ function RozgrywkiContent() {
                     href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
                     target="_blank"
                     rel="noreferrer"
-                    className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-100 text-sky-300 hover:text-slate-900 border border-slate-200 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
+                    className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
                   >
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
                     <span>Terminarz LALS (VolleyStation) ↗</span>
                   </a>
                 </div>
@@ -3495,10 +3865,10 @@ function RozgrywkiContent() {
 
               {/* 4 Summary KPI Cards for Angels ZTP */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-lg">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">Mecze w LALS</span>
-                    <Volleyball className="w-4 h-4 text-sky-400" />
+                    <Volleyball className="w-4 h-4 text-sky-600" />
                   </div>
                   <div className="text-2xl font-black text-slate-900 font-athletic">
                     {leagueReports.length}
@@ -3508,12 +3878,12 @@ function RozgrywkiContent() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-lg">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">Lider Punktowy (ABS)</span>
-                    <Crown className="w-4 h-4 text-amber-400" />
+                    <Crown className="w-4 h-4 text-amber-500" />
                   </div>
-                  <div className="text-xl sm:text-2xl font-black text-amber-400 truncate font-athletic">
+                  <div className="text-xl sm:text-2xl font-black text-amber-600 truncate font-athletic">
                     {leaderboards?.angelsScorers?.[0]?.name || 'Brak danych'}
                   </div>
                   <div className="text-[10px] text-slate-500 mt-0.5">
@@ -3523,12 +3893,12 @@ function RozgrywkiContent() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-lg">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">Król Bloku (Blk)</span>
-                    <Shield className="w-4 h-4 text-emerald-400" />
+                    <Shield className="w-4 h-4 text-emerald-600" />
                   </div>
-                  <div className="text-xl sm:text-2xl font-black text-emerald-400 truncate font-athletic">
+                  <div className="text-xl sm:text-2xl font-black text-emerald-700 truncate font-athletic">
                     {leaderboards?.angelsBlockers?.[0]?.name || 'Brak danych'}
                   </div>
                   <div className="text-[10px] text-slate-500 mt-0.5">
@@ -3538,12 +3908,12 @@ function RozgrywkiContent() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-lg">
+                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">As Serwisowy (Ser)</span>
-                    <Zap className="w-4 h-4 text-rose-400" />
+                    <Zap className="w-4 h-4 text-rose-500" />
                   </div>
-                  <div className="text-xl sm:text-2xl font-black text-rose-400 truncate font-athletic">
+                  <div className="text-xl sm:text-2xl font-black text-rose-600 truncate font-athletic">
                     {leaderboards?.angelsServers?.[0]?.name || 'Brak danych'}
                   </div>
                   <div className="text-[10px] text-slate-500 mt-0.5">
@@ -3559,7 +3929,7 @@ function RozgrywkiContent() {
                 <div className="p-5 sm:p-6 bg-white border border-slate-200 rounded-3xl shadow-sm space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
                     <div className="flex items-center gap-2">
-                      <Trophy className="w-5 h-5 text-amber-400" />
+                      <Trophy className="w-5 h-5 text-amber-500" />
                       <h4 className="text-base font-black text-slate-900 uppercase tracking-tight">
                         Rankingi Indywidualne
                       </h4>
@@ -3571,8 +3941,8 @@ function RozgrywkiContent() {
                         onClick={() => setLeaderboardScope('ANGELS')}
                         className={`px-3 py-1.5 rounded-lg font-bold transition ${
                           leaderboardScope === 'ANGELS'
-                            ? 'bg-sky-500 text-slate-950 shadow'
-                            : 'text-slate-500 hover:text-slate-900'
+                            ? 'bg-sky-600 text-white shadow-sm'
+                            : 'text-slate-600 hover:text-slate-900'
                         }`}
                       >
                         👼 Tylko Angels ZTP
@@ -3582,8 +3952,8 @@ function RozgrywkiContent() {
                         onClick={() => setLeaderboardScope('LIGA')}
                         className={`px-3 py-1.5 rounded-lg font-bold transition ${
                           leaderboardScope === 'LIGA'
-                            ? 'bg-amber-500 text-slate-950 shadow'
-                            : 'text-slate-500 hover:text-slate-900'
+                            ? 'bg-amber-500 text-slate-950 font-bold shadow-sm'
+                            : 'text-slate-600 hover:text-slate-900'
                         }`}
                       >
                         🌐 Cała Liga LALS
@@ -3595,18 +3965,18 @@ function RozgrywkiContent() {
                     {/* 1. Najwięcej Punktów */}
                     <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-black uppercase text-amber-400 flex items-center gap-1.5">
-                          <Crown className="w-3.5 h-3.5" /> Punkty (ABS)
+                        <span className="text-xs font-bold uppercase text-amber-700 flex items-center gap-1.5">
+                          <Crown className="w-3.5 h-3.5 text-amber-500" /> Punkty (ABS)
                         </span>
                       </div>
                       <div className="space-y-1.5">
                         {((leaderboardScope === 'ANGELS' ? leaderboards.angelsScorers : leaderboards.topScorers) || []).slice(0, 5).map((p: any, idx: number) => (
-                          <div key={p.name} className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-slate-50 border border-slate-200">
+                          <div key={p.name} className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-white border border-slate-200">
                             <div className="flex items-center gap-2 truncate">
-                              <span className={`w-4 text-center font-bold font-mono ${idx === 0 ? 'text-amber-400' : 'text-slate-500'}`}>{idx + 1}.</span>
+                              <span className={`w-4 text-center font-bold font-mono ${idx === 0 ? 'text-amber-600 font-black' : 'text-slate-500'}`}>{idx + 1}.</span>
                               <span className="font-bold text-slate-900 truncate">{p.name}</span>
                             </div>
-                            <span className="font-mono font-black text-amber-400 shrink-0">{p.totalPoints} pkt</span>
+                            <span className="font-mono font-black text-amber-700 shrink-0">{p.totalPoints} pkt</span>
                           </div>
                         ))}
                       </div>
@@ -3615,18 +3985,18 @@ function RozgrywkiContent() {
                     {/* 2. Punkty z Ataku */}
                     <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-black uppercase text-sky-400 flex items-center gap-1.5">
-                          <Target className="w-3.5 h-3.5" /> Atak (Ata)
+                        <span className="text-xs font-bold uppercase text-sky-700 flex items-center gap-1.5">
+                          <Target className="w-3.5 h-3.5 text-sky-600" /> Atak (Ata)
                         </span>
                       </div>
                       <div className="space-y-1.5">
                         {((leaderboardScope === 'ANGELS' ? leaderboards.angelsAttackers : leaderboards.topAttackers) || []).slice(0, 5).map((p: any, idx: number) => (
-                          <div key={p.name} className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-slate-50 border border-slate-200">
+                          <div key={p.name} className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-white border border-slate-200">
                             <div className="flex items-center gap-2 truncate">
-                              <span className={`w-4 text-center font-bold font-mono ${idx === 0 ? 'text-sky-400' : 'text-slate-500'}`}>{idx + 1}.</span>
+                              <span className={`w-4 text-center font-bold font-mono ${idx === 0 ? 'text-sky-700 font-black' : 'text-slate-500'}`}>{idx + 1}.</span>
                               <span className="font-bold text-slate-900 truncate">{p.name}</span>
                             </div>
-                            <span className="font-mono font-black text-sky-400 shrink-0">{p.totalAttack} pkt</span>
+                            <span className="font-mono font-black text-sky-700 shrink-0">{p.totalAttack} pkt</span>
                           </div>
                         ))}
                       </div>
@@ -3635,18 +4005,18 @@ function RozgrywkiContent() {
                     {/* 3. Bloki Punktowe */}
                     <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-black uppercase text-emerald-400 flex items-center gap-1.5">
-                          <Shield className="w-3.5 h-3.5" /> Blok (Blk)
+                        <span className="text-xs font-bold uppercase text-emerald-800 flex items-center gap-1.5">
+                          <Shield className="w-3.5 h-3.5 text-emerald-600" /> Blok (Blk)
                         </span>
                       </div>
                       <div className="space-y-1.5">
                         {((leaderboardScope === 'ANGELS' ? leaderboards.angelsBlockers : leaderboards.topBlockers) || []).slice(0, 5).map((p: any, idx: number) => (
-                          <div key={p.name} className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-slate-50 border border-slate-200">
+                          <div key={p.name} className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-white border border-slate-200">
                             <div className="flex items-center gap-2 truncate">
-                              <span className={`w-4 text-center font-bold font-mono ${idx === 0 ? 'text-emerald-400' : 'text-slate-500'}`}>{idx + 1}.</span>
+                              <span className={`w-4 text-center font-bold font-mono ${idx === 0 ? 'text-emerald-700 font-black' : 'text-slate-500'}`}>{idx + 1}.</span>
                               <span className="font-bold text-slate-900 truncate">{p.name}</span>
                             </div>
-                            <span className="font-mono font-black text-emerald-400 shrink-0">{p.totalBlock} blk</span>
+                            <span className="font-mono font-black text-emerald-700 shrink-0">{p.totalBlock} blk</span>
                           </div>
                         ))}
                       </div>
@@ -3655,18 +4025,18 @@ function RozgrywkiContent() {
                     {/* 4. Asy Serwisowe */}
                     <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-black uppercase text-rose-400 flex items-center gap-1.5">
-                          <Zap className="w-3.5 h-3.5" /> Zagrywka (Ser)
+                        <span className="text-xs font-bold uppercase text-rose-700 flex items-center gap-1.5">
+                          <Zap className="w-3.5 h-3.5 text-rose-500" /> Zagrywka (Ser)
                         </span>
                       </div>
                       <div className="space-y-1.5">
                         {((leaderboardScope === 'ANGELS' ? leaderboards.angelsServers : leaderboards.topServers) || []).slice(0, 5).map((p: any, idx: number) => (
-                          <div key={p.name} className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-slate-50 border border-slate-200">
+                          <div key={p.name} className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-white border border-slate-200">
                             <div className="flex items-center gap-2 truncate">
-                              <span className={`w-4 text-center font-bold font-mono ${idx === 0 ? 'text-rose-400' : 'text-slate-500'}`}>{idx + 1}.</span>
+                              <span className={`w-4 text-center font-bold font-mono ${idx === 0 ? 'text-rose-700 font-black' : 'text-slate-500'}`}>{idx + 1}.</span>
                               <span className="font-bold text-slate-900 truncate">{p.name}</span>
                             </div>
-                            <span className="font-mono font-black text-rose-400 shrink-0">{p.totalServe} asów</span>
+                            <span className="font-mono font-black text-rose-700 shrink-0">{p.totalServe} asów</span>
                           </div>
                         ))}
                       </div>
@@ -3679,14 +4049,14 @@ function RozgrywkiContent() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between px-1">
                   <h4 className="text-base font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-sky-400" />
-                    Protokoły Meczowe VolleyStation ({leagueReports.length})
+                    <FileText className="w-4 h-4 text-sky-600" />
+                    <span>Protokoły Meczowe VolleyStation ({leagueReports.length})</span>
                   </h4>
                 </div>
 
                 {leagueReports.length === 0 ? (
-                  <div className="p-12 text-center bg-white border border-slate-200 rounded-3xl space-y-3">
-                    <BarChart3 className="w-12 h-12 text-slate-600 mx-auto" />
+                  <div className="p-12 text-center bg-white border border-slate-200 rounded-3xl space-y-3 shadow-sm">
+                    <BarChart3 className="w-12 h-12 text-slate-400 mx-auto" />
                     <h5 className="text-base font-bold text-slate-900">Brak zapisanych protokołów</h5>
                     <p className="text-xs text-slate-500 max-w-md mx-auto">
                       Użyj przycisku &quot;Importuj z VolleyStation&quot; powyżej, aby wkleić statystyki lub terminarz skopiowany bezpośrednio ze strony ligi.
@@ -3695,7 +4065,7 @@ function RozgrywkiContent() {
                       <button
                         type="button"
                         onClick={() => setShowVolleyStationImportModal(true)}
-                        className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black transition"
+                        className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold transition shadow-sm"
                       >
                         Wklej dane z VolleyStation
                       </button>
@@ -3721,14 +4091,14 @@ function RozgrywkiContent() {
                           className="p-4 sm:p-5 cursor-pointer hover:bg-slate-50 transition flex flex-col md:flex-row md:items-center justify-between gap-3 select-none"
                         >
                           <div className="flex items-center gap-3.5 min-w-0">
-                            <div className="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-200 flex items-center justify-center shrink-0">
-                              <Volleyball className="w-5 h-5 text-sky-400" />
+                            <div className="w-10 h-10 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center shrink-0">
+                              <Volleyball className="w-5 h-5 text-sky-600" />
                             </div>
 
                             <div className="min-w-0 space-y-1">
                               <div className="flex flex-wrap items-center gap-2">
                                 {(rep.round || rep.matchNumber) && (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-black bg-slate-100 text-sky-400 border border-slate-200">
+                                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-sky-800 border border-slate-200">
                                     {rep.round ? `Runda ${rep.round}` : ''} {rep.matchNumber ? `Nr ${rep.matchNumber}` : ''}
                                   </span>
                                 )}
@@ -3736,10 +4106,10 @@ function RozgrywkiContent() {
                                   {new Date(rep.date).toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
                                 </span>
                                 {ourSets !== undefined && oppSets !== undefined && (
-                                  <span className={`px-2 py-0.5 rounded text-[10px] font-black border ${
+                                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
                                     isWin
-                                      ? 'bg-emerald-500/15 text-emerald-300 border-emerald-200'
-                                      : 'bg-rose-500/15 text-rose-300 border-rose-200'
+                                      ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                                      : 'bg-rose-50 text-rose-800 border-rose-300'
                                   }`}>
                                     {isWin ? '✓ Wygrana' : '✗ Przegrana'}
                                   </span>
@@ -3756,28 +4126,28 @@ function RozgrywkiContent() {
                           <div className="flex flex-wrap items-center gap-2.5">
                             {/* Sets score breakdown */}
                             {rep.sets && rep.sets.length > 0 && (
-                              <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-slate-600 bg-slate-50 px-2.5 py-1 rounded-xl border border-slate-200">
+                              <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-slate-700 bg-slate-50 px-2.5 py-1 rounded-xl border border-slate-200">
                                 {rep.sets.map((s, idx) => (
                                   <span key={s.setNumber}>
-                                    {idx > 0 && <span className="text-slate-600">, </span>}
-                                    <span className={s.homeScore > s.awayScore ? 'text-sky-300 font-black' : 'text-slate-500'}>{s.homeScore}</span>
-                                    :<span className={s.awayScore > s.homeScore ? 'text-sky-300 font-black' : 'text-slate-500'}>{s.awayScore}</span>
+                                    {idx > 0 && <span className="text-slate-400">, </span>}
+                                    <span className={s.homeScore > s.awayScore ? 'text-sky-700 font-black' : 'text-slate-600'}>{s.homeScore}</span>
+                                    :<span className={s.awayScore > s.homeScore ? 'text-sky-700 font-black' : 'text-slate-600'}>{s.awayScore}</span>
                                   </span>
                                 ))}
                               </div>
                             )}
 
                             {rep.duration && (
-                              <span className="px-2 py-1 rounded-xl bg-slate-100 text-[10px] font-bold text-slate-500 border border-slate-200 flex items-center gap-1">
-                                <Clock className="w-3 h-3 text-sky-400" />
-                                {rep.duration}
+                              <span className="px-2 py-1 rounded-xl bg-slate-50 text-[10px] font-bold text-slate-600 border border-slate-200 flex items-center gap-1">
+                                <Clock className="w-3 h-3 text-sky-600" />
+                                <span>{rep.duration}</span>
                               </span>
                             )}
 
                             {rep.mvp && (
-                              <span className="px-2 py-1 rounded-xl bg-amber-500/15 text-[10px] font-bold text-amber-300 border border-amber-200 flex items-center gap-1">
-                                <Crown className="w-3 h-3 text-amber-400" />
-                                {rep.mvp.name}
+                              <span className="px-2 py-1 rounded-xl bg-amber-50 text-[10px] font-bold text-amber-900 border border-amber-300 flex items-center gap-1">
+                                <Crown className="w-3 h-3 text-amber-600" />
+                                <span>MVP: {rep.mvp.name}</span>
                               </span>
                             )}
 
@@ -3787,7 +4157,7 @@ function RozgrywkiContent() {
                                 target="_blank"
                                 rel="noreferrer"
                                 onClick={e => e.stopPropagation()}
-                                className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-100 text-sky-400 border border-slate-200 transition"
+                                className="p-1.5 rounded-xl bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition"
                                 title="Otwórz oficjalny protokół w VolleyStation"
                               >
                                 <ExternalLink className="w-3.5 h-3.5" />
@@ -3801,7 +4171,7 @@ function RozgrywkiContent() {
                                   e.stopPropagation();
                                   handleDeleteReport(rep.id);
                                 }}
-                                className="p-1.5 rounded-xl bg-slate-100 hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 border border-slate-200 transition"
+                                className="p-1.5 rounded-xl bg-white hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 transition"
                                 title="Usuń ten raport"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />

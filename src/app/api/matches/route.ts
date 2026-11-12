@@ -193,13 +193,36 @@ export async function POST(request: Request) {
         importedTableCount = body.tableToImport.length;
       }
 
+      // 4. Zapisz oficjalny terminarz & wyniki VolleyStation
+      let importedScheduleCount = 0;
+      if (Array.isArray(body.scheduleMatches) && body.scheduleMatches.length > 0) {
+        if (!db.leagueSchedule) db.leagueSchedule = [];
+        body.scheduleMatches.forEach((sm: any) => {
+          if (!sm.homeTeam || !sm.awayTeam) return;
+          const idx = db.leagueSchedule!.findIndex(
+            existing =>
+              (sm.matchNumber && existing.matchNumber === sm.matchNumber) ||
+              (existing.round === sm.round &&
+               existing.homeTeam.toLowerCase() === sm.homeTeam.toLowerCase() &&
+               existing.awayTeam.toLowerCase() === sm.awayTeam.toLowerCase())
+          );
+          if (idx >= 0) {
+            db.leagueSchedule![idx] = { ...db.leagueSchedule![idx], ...sm };
+          } else {
+            db.leagueSchedule!.push(sm);
+          }
+          importedScheduleCount++;
+        });
+      }
+
       writeDatabase(db);
       return NextResponse.json({
         success: true,
         importedMatchesCount,
         importedFixturesCount,
         importedTableCount,
-        message: `Zaimportowano pomyślnie: ${importedMatchesCount} wyników meczów, ${importedFixturesCount} jednostek terminarza${importedTableCount > 0 ? ` oraz tabelę z ${importedTableCount} drużynami` : ''}!`
+        importedScheduleCount,
+        message: `Zaimportowano pomyślnie: ${importedMatchesCount} wyników meczów, ${importedFixturesCount} jednostek terminarza${importedScheduleCount > 0 ? `, ${importedScheduleCount} meczów z VolleyStation` : ''}${importedTableCount > 0 ? ` oraz tabelę z ${importedTableCount} drużynami` : ''}!`
       });
     }
 

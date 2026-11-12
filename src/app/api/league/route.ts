@@ -1,7 +1,273 @@
 import { NextResponse } from 'next/server';
 import { readDatabase, writeDatabase, getEffectiveDatabase, getActiveSeasonIdFromRequest } from '@/lib/db';
 import { getServerUser } from '@/lib/auth';
-import { LeagueTableTeam, LeaguePhoto, LeaguePhase } from '@/lib/types';
+import { LeagueTableTeam, LeaguePhoto, LeaguePhase, VolleyStationScheduleMatch } from '@/lib/types';
+
+const DEFAULT_LALS_SCHEDULE: VolleyStationScheduleMatch[] = [
+  // 4 października 2026, Niedziela
+  {
+    round: 2,
+    matchNumber: 1850,
+    homeTeam: 'Coco Jumbo',
+    awayTeam: 'Czelendż',
+    homeSetsWon: 3,
+    awaySetsWon: 1,
+    isFinished: true,
+    timeStr: '17:00',
+    date: '2026-10-04T17:00:00',
+    dateStr: '4 października 2026, Niedziela',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583851/'
+  },
+  {
+    round: 2,
+    matchNumber: 1848,
+    homeTeam: 'Afera Volley',
+    awayTeam: 'Gladiatorzy BUD-WENT',
+    homeSetsWon: 0,
+    awaySetsWon: 3,
+    isFinished: true,
+    timeStr: '18:30',
+    date: '2026-10-04T18:30:00',
+    dateStr: '4 października 2026, Niedziela',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583852/'
+  },
+  {
+    round: 2,
+    matchNumber: 1849,
+    homeTeam: 'Volleyboars',
+    awayTeam: 'Koty Broniszewice',
+    homeSetsWon: 3,
+    awaySetsWon: 0,
+    isFinished: true,
+    timeStr: '20:00',
+    date: '2026-10-04T20:00:00',
+    dateStr: '4 października 2026, Niedziela',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583853/'
+  },
+  // 18 października 2026, Niedziela
+  {
+    round: 5,
+    matchNumber: 1889,
+    homeTeam: 'Volleyboars',
+    awayTeam: 'Coco Jumbo',
+    homeSetsWon: 0,
+    awaySetsWon: 3,
+    isFinished: true,
+    timeStr: '17:00',
+    date: '2026-10-18T17:00:00',
+    dateStr: '18 października 2026, Niedziela',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583848/'
+  },
+  {
+    round: 5,
+    matchNumber: 1887,
+    homeTeam: 'Angels ZTP',
+    awayTeam: 'Koty Broniszewice',
+    homeSetsWon: 3,
+    awaySetsWon: 0,
+    isFinished: true,
+    timeStr: '18:30',
+    date: '2026-10-18T18:30:00',
+    dateStr: '18 października 2026, Niedziela',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583849/'
+  },
+  {
+    round: 5,
+    matchNumber: 1888,
+    homeTeam: 'Afera Volley',
+    awayTeam: 'Czelendż',
+    homeSetsWon: 3,
+    awaySetsWon: 0,
+    isFinished: true,
+    timeStr: '20:00',
+    date: '2026-10-18T20:00:00',
+    dateStr: '18 października 2026, Niedziela',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583850/'
+  },
+  // 31 października 2026, Sobota
+  {
+    round: 7,
+    matchNumber: 1926,
+    homeTeam: 'Gladiatorzy BUD-WENT',
+    awayTeam: 'Angels ZTP',
+    homeSetsWon: 3,
+    awaySetsWon: 2,
+    isFinished: true,
+    timeStr: '17:00',
+    date: '2026-10-31T17:00:00',
+    dateStr: '31 października 2026, Sobota',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583864/'
+  },
+  {
+    round: 7,
+    matchNumber: 1925,
+    homeTeam: 'Koty Broniszewice',
+    awayTeam: 'Afera Volley',
+    homeSetsWon: 0,
+    awaySetsWon: 3,
+    isFinished: true,
+    timeStr: '18:30',
+    date: '2026-10-31T18:30:00',
+    dateStr: '31 października 2026, Sobota',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583846/'
+  },
+  {
+    round: 7,
+    matchNumber: 1924,
+    homeTeam: 'Czelendż',
+    awayTeam: 'Volleyboars',
+    homeSetsWon: 1,
+    awaySetsWon: 3,
+    isFinished: true,
+    timeStr: '20:00',
+    date: '2026-10-31T20:00:00',
+    dateStr: '31 października 2026, Sobota',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583847/'
+  },
+  // 8 listopada 2026, Niedziela
+  {
+    round: 9,
+    matchNumber: 1949,
+    homeTeam: 'Coco Jumbo',
+    awayTeam: 'Gladiatorzy BUD-WENT',
+    homeSetsWon: 0,
+    awaySetsWon: 3,
+    isFinished: true,
+    timeStr: '17:00',
+    date: '2026-11-08T17:00:00',
+    dateStr: '8 listopada 2026, Niedziela',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584337/'
+  },
+  {
+    round: 9,
+    matchNumber: 1950,
+    homeTeam: 'Czelendż',
+    awayTeam: 'Koty Broniszewice',
+    homeSetsWon: 0,
+    awaySetsWon: 3,
+    isFinished: true,
+    timeStr: '18:30',
+    date: '2026-11-08T18:30:00',
+    dateStr: '8 listopada 2026, Niedziela',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584338/'
+  },
+  {
+    round: 9,
+    matchNumber: 1948,
+    homeTeam: 'Volleyboars',
+    awayTeam: 'Angels ZTP',
+    homeSetsWon: 0,
+    awaySetsWon: 3,
+    isFinished: true,
+    timeStr: '20:00',
+    date: '2026-11-08T20:00:00',
+    dateStr: '8 listopada 2026, Niedziela',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584336/'
+  },
+  // 15 listopada 2026, Niedziela (Terminarz)
+  {
+    round: 11,
+    matchNumber: 1971,
+    homeTeam: 'Gladiatorzy BUD-WENT',
+    awayTeam: 'Czelendż',
+    isFinished: false,
+    timeStr: '17:00',
+    date: '2026-11-15T17:00:00',
+    dateStr: '15 listopada 2026, Niedziela',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584359/'
+  },
+  {
+    round: 11,
+    matchNumber: 1972,
+    homeTeam: 'Angels ZTP',
+    awayTeam: 'Coco Jumbo',
+    isFinished: false,
+    timeStr: '18:30',
+    date: '2026-11-15T18:30:00',
+    dateStr: '15 listopada 2026, Niedziela',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584360/'
+  },
+  {
+    round: 11,
+    matchNumber: 1973,
+    homeTeam: 'Afera Volley',
+    awayTeam: 'Volleyboars',
+    isFinished: false,
+    timeStr: '20:00',
+    date: '2026-11-15T20:00:00',
+    dateStr: '15 listopada 2026, Niedziela',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584361/'
+  },
+  // 29 listopada 2026, Niedziela (Terminarz)
+  {
+    round: 13,
+    matchNumber: 1996,
+    homeTeam: 'Coco Jumbo',
+    awayTeam: 'Afera Volley',
+    isFinished: false,
+    timeStr: '12:30',
+    date: '2026-11-29T12:30:00',
+    dateStr: '29 listopada 2026, Niedziela',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584384/'
+  },
+  {
+    round: 13,
+    matchNumber: 1997,
+    homeTeam: 'Czelendż',
+    awayTeam: 'Angels ZTP',
+    isFinished: false,
+    timeStr: '17:00',
+    date: '2026-11-29T17:00:00',
+    dateStr: '29 listopada 2026, Niedziela',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584385/'
+  },
+  // 13 grudnia 2026, Niedziela (Terminarz)
+  {
+    round: 16,
+    matchNumber: 2036,
+    homeTeam: 'Gladiatorzy BUD-WENT',
+    awayTeam: 'Volleyboars',
+    isFinished: false,
+    timeStr: '12:30',
+    date: '2026-12-13T12:30:00',
+    dateStr: '13 grudnia 2026, Niedziela',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584428/'
+  },
+  {
+    round: 16,
+    matchNumber: 2037,
+    homeTeam: 'Angels ZTP',
+    awayTeam: 'Afera Volley',
+    isFinished: false,
+    timeStr: '15:30',
+    date: '2026-12-13T15:30:00',
+    dateStr: '13 grudnia 2026, Niedziela',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584423/'
+  },
+  {
+    round: 16,
+    matchNumber: 2035,
+    homeTeam: 'Koty Broniszewice',
+    awayTeam: 'Coco Jumbo',
+    isFinished: false,
+    timeStr: '17:00',
+    date: '2026-12-13T17:00:00',
+    dateStr: '13 grudnia 2026, Niedziela',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584422/'
+  },
+  // 20 grudnia 2026, Niedziela (Terminarz)
+  {
+    round: 18,
+    matchNumber: 2057,
+    homeTeam: 'Koty Broniszewice',
+    awayTeam: 'Gladiatorzy BUD-WENT',
+    isFinished: false,
+    timeStr: '18:30',
+    date: '2026-12-20T18:30:00',
+    dateStr: '20 grudnia 2026, Niedziela',
+    url: 'https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2584443/'
+  }
+];
 
 const DEFAULT_LALS_PHASES: LeaguePhase[] = [
   {
@@ -313,6 +579,7 @@ export async function GET(request: Request) {
     advancementTargetName: currentPhase.advancementTargetName || 'Awans do Grupy Finałowej (Top 3)',
     leagueTable,
     leaguePhotos,
+    leagueSchedule: (db.leagueSchedule && db.leagueSchedule.length > 0) ? db.leagueSchedule : DEFAULT_LALS_SCHEDULE,
     matches: leagueMatches
   });
 }
