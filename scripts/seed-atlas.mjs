@@ -52,10 +52,11 @@ async function run() {
       console.log(`Zapisano ${localDb.fees.length} składek w kolekcji 'fees'`);
     }
 
-    if (Array.isArray(localDb.tacticalPlays) && localDb.tacticalPlays.length > 0) {
+    const tacticsList = localDb.tactics || localDb.tacticalPlays || [];
+    if (Array.isArray(tacticsList) && tacticsList.length > 0) {
       await db.collection('tactics').deleteMany({});
-      await db.collection('tactics').insertMany(localDb.tacticalPlays.map(t => ({ ...t, _id: t.id })));
-      console.log(`Zapisano ${localDb.tacticalPlays.length} zagrywek w kolekcji 'tactics'`);
+      await db.collection('tactics').insertMany(tacticsList.map(t => ({ ...t, _id: t.id })));
+      console.log(`Zapisano ${tacticsList.length} wariantów taktycznych w kolekcji 'tactics'`);
     }
 
     if (localDb.lalsTable && Array.isArray(localDb.lalsTable)) {

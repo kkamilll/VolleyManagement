@@ -584,7 +584,7 @@
       "id": "evt_1793959274090",
       "title": "d",
       "type": "SPARING",
-      "status": "ANKIETA",
+      "status": "ZAKONCZONY",
       "date": "2026-11-14T11:01",
       "location": "Hala Sportowa OSiR, ul. Sportowa 5",
       "opponent": "ffdsf",
@@ -593,7 +593,33 @@
       "actualAttendees": [],
       "createdById": "usr_trener",
       "createdByName": "Hubert",
-      "createdAt": "2026-11-06T10:01:14.090Z"
+      "createdAt": "2026-11-06T10:01:14.090Z",
+      "result": {
+        "teamSetsWon": 3,
+        "opponentSetsWon": 1,
+        "sets": [
+          {
+            "setNumber": 1,
+            "teamScore": 25,
+            "opponentScore": 21
+          },
+          {
+            "setNumber": 2,
+            "teamScore": 25,
+            "opponentScore": 19
+          },
+          {
+            "setNumber": 3,
+            "teamScore": 22,
+            "opponentScore": 25
+          },
+          {
+            "setNumber": 4,
+            "teamScore": 25,
+            "opponentScore": 18
+          }
+        ]
+      }
     },
     {
       "id": "evt_1793983444232",

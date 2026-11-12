@@ -168,6 +168,7 @@ export interface EventItem {
   createdById: string;
   createdByName: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 // VolleyStation League Stats Types
@@ -301,6 +302,7 @@ export interface Fee {
   createdById: string;
   createdByName: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface FeePayment {
@@ -442,6 +444,7 @@ export interface TacticalPlay {
   createdById: string;
   createdByName: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface ScoutingKeyPlayer {

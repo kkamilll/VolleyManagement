@@ -330,6 +330,9 @@ function TacticsContent() {
   const [selectedTactic, setSelectedTactic] = useState<TacticalPlay | null>(null);
   const [showScopeFilters, setShowScopeFilters] = useState(false);
   const [scopeFilter, setScopeFilter] = useState<'WSZYSTKIE' | TacticScope>('WSZYSTKIE');
+  const [playbookCategory, setPlaybookCategory] = useState<'WSZYSTKIE' | 'MECZE_LALS' | 'SPARINGI' | 'OGOLNA' | 'TRENING'>('WSZYSTKIE');
+  const [playbookMatchFilter, setPlaybookMatchFilter] = useState<string>('WSZYSCY');
+  const [playbookSearch, setPlaybookSearch] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
   // Unit context selector state: 'GENERAL' | 'EVENT_<id>' | 'MATCH_<id>'
@@ -560,16 +563,17 @@ function TacticsContent() {
           const target = tacs.find((t: TacticalPlay) => t.id === queryTacticId);
           if (target) {
             loadSavedTactic(target);
-          } else if (tacs.length > 0 && !selectedTactic) {
-            setSelectedTactic(tacs[0]);
           }
         } else if (queryEventId) {
           const eventTacs = tacs.filter((t: TacticalPlay) => t.eventId === queryEventId);
           if (eventTacs.length > 0) {
             loadSavedTactic(eventTacs[0]);
           }
-        } else if (!selectedTactic && tacs.length > 0) {
-          setSelectedTactic(tacs[0]);
+        } else if (queryMatchId) {
+          const matchTacs = tacs.filter((t: TacticalPlay) => t.matchId === queryMatchId);
+          if (matchTacs.length > 0) {
+            loadSavedTactic(matchTacs[0]);
+          }
         }
       }
       if (evtRes.ok) {
@@ -966,6 +970,10 @@ function TacticsContent() {
         ? tactic.courtPositions.map(p => ({ ...p, y: Math.round(52 + p.y * 0.44) }))
         : tactic.courtPositions;
       setPositions([...adapted]);
+    } else {
+      if (ROTATION_DEFAULTS[tactic.rotation] && ROTATION_DEFAULTS[tactic.rotation][tactic.phase]) {
+        setPositions([...ROTATION_DEFAULTS[tactic.rotation][tactic.phase]]);
+      }
     }
     const canvas = canvasRef.current;
     if (canvas) {
@@ -980,6 +988,64 @@ function TacticsContent() {
           img.src = tactic.drawingData;
         }
       }
+    }
+    setTacticsSection('board');
+  };
+
+  // Start fresh clean draft on the board
+  const handleStartNewDraft = () => {
+    setSelectedTactic(null);
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    setHistory([]);
+    applyPreset(rotation, phase);
+  };
+
+  // 1-Click Update of current loaded tactic (overwrites canvas & player positions)
+  const handleQuickUpdateCurrentTactic = async () => {
+    if (!selectedTactic) return;
+    setSaving(true);
+    try {
+      const canvas = canvasRef.current;
+      const drawingData = canvas ? canvas.toDataURL('image/png') : undefined;
+
+      const res = await fetch('/api/tactics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'UPDATE_TACTIC',
+          tactic: {
+            id: selectedTactic.id,
+            title: selectedTactic.title,
+            phase,
+            rotation,
+            courtPositions: positions,
+            directives: positions.map(p => `${p.name}: ${p.task || 'Pozycja w strefie'}`),
+            drawingData,
+            tacticalNotes: selectedTactic.tacticalNotes
+          }
+        })
+      });
+
+      if (res.ok) {
+        const d = await res.json();
+        if (d.tactic) {
+          setSelectedTactic(d.tactic);
+          setTactics(prev => prev.map(t => (t.id === d.tactic.id ? d.tactic : t)));
+        }
+        alert('Taktyka została pomyślnie zaktualizowana!');
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Błąd aktualizacji taktyki');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Błąd podczas zapisywania zmian');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -1442,13 +1508,217 @@ function TacticsContent() {
     });
   }, [tactics, isLockedToUnit, queryEventId, queryMatchId, queryTacticId, activeTargetEvent, activeTargetMatch]);
 
+  // Comprehensive helper to get context & metadata for any tactic
+  const getTacticTargetInfo = (tac: TacticalPlay) => {
+    if (tac.matchId) {
+      const m = matches.find(match => match.id === tac.matchId);
+      if (m) {
+        return {
+          type: 'MECZ_LIGOWY' as const,
+          category: 'MECZE_LALS' as const,
+          label: `Mecz LALS vs ${m.opponent}`,
+          opponent: m.opponent,
+          date: m.date,
+          badgeColor: 'sky',
+          icon: '🏆',
+          isMatch: true
+        };
+      }
+    }
+    if (tac.eventId) {
+      const e = events.find(evt => evt.id === tac.eventId);
+      if (e) {
+        const isLalsMatch = e.type === 'MECZ' || tac.scope === 'MECZ_LIGOWY';
+        return {
+          type: (isLalsMatch ? 'MECZ_LIGOWY' : e.type) as any,
+          category: isLalsMatch ? ('MECZE_LALS' as const) : e.type === 'TRENING' ? ('TRENING' as const) : ('SPARINGI' as const),
+          label: e.title || (e.opponent ? `vs ${e.opponent}` : 'Wydarzenie'),
+          opponent: e.opponent || tac.targetOpponent,
+          date: e.date,
+          badgeColor: isLalsMatch ? 'sky' : e.type === 'SPARING' ? 'amber' : e.type === 'TRENING' ? 'emerald' : 'purple',
+          icon: isLalsMatch ? '🏆' : e.type === 'SPARING' ? '⚔️' : e.type === 'TRENING' ? '🏐' : '🥇',
+          isMatch: isLalsMatch
+        };
+      }
+    }
+    if (tac.targetOpponent) {
+      const isLals = tac.scope === 'MECZ_LIGOWY';
+      return {
+        type: (tac.scope || 'MECZ_LIGOWY') as any,
+        category: isLals ? ('MECZE_LALS' as const) : ('SPARINGI' as const),
+        label: `${isLals ? 'Mecz LALS' : 'Sparing'} vs ${tac.targetOpponent}`,
+        opponent: tac.targetOpponent,
+        date: null,
+        badgeColor: isLals ? 'sky' : 'amber',
+        icon: isLals ? '🏆' : '⚔️',
+        isMatch: isLals
+      };
+    }
+    if (tac.scope === 'MECZ_LIGOWY') {
+      return {
+        type: 'MECZ_LIGOWY' as const,
+        category: 'MECZE_LALS' as const,
+        label: 'Mecz Ligowy LALS',
+        opponent: null,
+        date: null,
+        badgeColor: 'sky',
+        icon: '🏆',
+        isMatch: true
+      };
+    }
+    if (tac.scope === 'SPARING') {
+      return {
+        type: 'SPARING' as const,
+        category: 'SPARINGI' as const,
+        label: 'Sparing Zespołu',
+        opponent: null,
+        date: null,
+        badgeColor: 'amber',
+        icon: '⚔️',
+        isMatch: false
+      };
+    }
+    if (tac.scope === 'TURNIEJ') {
+      return {
+        type: 'TURNIEJ' as const,
+        category: 'SPARINGI' as const,
+        label: 'Turniej Zespołu',
+        opponent: null,
+        date: null,
+        badgeColor: 'purple',
+        icon: '🥇',
+        isMatch: false
+      };
+    }
+    if (tac.scope === 'TRENING') {
+      return {
+        type: 'TRENING' as const,
+        category: 'TRENING' as const,
+        label: 'Trening Zespołu',
+        opponent: null,
+        date: null,
+        badgeColor: 'emerald',
+        icon: '🏐',
+        isMatch: false
+      };
+    }
+    return {
+      type: 'OGOLNA' as const,
+      category: 'OGOLNA' as const,
+      label: 'Baza Ogólna 5-1 Zespołu',
+      opponent: null,
+      date: null,
+      badgeColor: 'slate',
+      icon: '📘',
+      isMatch: false
+    };
+  };
+
+  // Unique match/event list for dropdown filter
+  const availableMatchOptions = useMemo(() => {
+    const list: { key: string; label: string; date?: string; type: 'MECZ' | 'SPARING' | 'OGOLNA' }[] = [
+      { key: 'WSZYSCY', label: 'Wszystkie mecze i rywale', type: 'OGOLNA' },
+      { key: 'OGOLNA', label: '📘 Tylko Baza Ogólna 5-1 Zespołu', type: 'OGOLNA' }
+    ];
+
+    matches.forEach(m => {
+      const dateStr = m.date ? new Date(m.date).toLocaleDateString('pl-PL') : '';
+      list.push({
+        key: `MATCH_${m.id}`,
+        label: `🏆 Mecz LALS: vs ${m.opponent}${dateStr ? ` (${dateStr})` : ''}`,
+        date: m.date,
+        type: 'MECZ'
+      });
+    });
+
+    events
+      .filter(e => e.type === 'SPARING' || e.type === 'MECZ' || e.type === 'TURNIEJ')
+      .forEach(e => {
+        const dateStr = e.date ? new Date(e.date).toLocaleDateString('pl-PL') : '';
+        list.push({
+          key: `EVENT_${e.id}`,
+          label: `${e.type === 'MECZ' ? '🏆' : '⚔️'} ${e.title}${e.opponent ? ` vs ${e.opponent}` : ''}${dateStr ? ` (${dateStr})` : ''}`,
+          date: e.date,
+          type: e.type === 'MECZ' ? 'MECZ' : 'SPARING'
+        });
+      });
+
+    return list;
+  }, [matches, events]);
+
+  // Accurate counts for playbook category tabs
+  const categoryCounts = useMemo(() => {
+    let lals = 0;
+    let sparing = 0;
+    let ogolna = 0;
+    let trening = 0;
+
+    tactics.forEach(tac => {
+      const target = getTacticTargetInfo(tac);
+      if (target.isMatch || tac.scope === 'MECZ_LIGOWY') lals++;
+      else if (target.category === 'SPARINGI') sparing++;
+      else if (target.category === 'TRENING') trening++;
+      else ogolna++;
+    });
+
+    return {
+      all: tactics.length,
+      lals,
+      sparing,
+      ogolna,
+      trening
+    };
+  }, [tactics, matches, events]);
+
   const filteredTactics = useMemo(() => {
     if (isLockedToUnit) {
       return unitTactics;
     }
-    if (scopeFilter === 'WSZYSTKIE') return tactics;
-    return tactics.filter(t => t.scope === scopeFilter);
-  }, [isLockedToUnit, unitTactics, tactics, scopeFilter]);
+
+    return tactics.filter(tac => {
+      const target = getTacticTargetInfo(tac);
+
+      // 1. Category Filter
+      if (playbookCategory !== 'WSZYSTKIE') {
+        if (playbookCategory === 'MECZE_LALS') {
+          if (!target.isMatch && tac.scope !== 'MECZ_LIGOWY') return false;
+        } else if (playbookCategory === 'SPARINGI') {
+          if (target.category !== 'SPARINGI') return false;
+        } else if (playbookCategory === 'OGOLNA') {
+          if (target.category !== 'OGOLNA' && (tac.matchId || tac.eventId)) return false;
+        } else if (playbookCategory === 'TRENING') {
+          if (target.category !== 'TRENING') return false;
+        }
+      }
+
+      // 2. Specific Match/Event Dropdown Filter
+      if (playbookMatchFilter !== 'WSZYSCY') {
+        if (playbookMatchFilter === 'OGOLNA') {
+          if (tac.matchId || tac.eventId || tac.targetOpponent) return false;
+        } else if (playbookMatchFilter.startsWith('MATCH_')) {
+          const mId = playbookMatchFilter.replace('MATCH_', '');
+          if (tac.matchId !== mId) return false;
+        } else if (playbookMatchFilter.startsWith('EVENT_')) {
+          const eId = playbookMatchFilter.replace('EVENT_', '');
+          if (tac.eventId !== eId) return false;
+        }
+      }
+
+      // 3. Search Query Filter
+      if (playbookSearch.trim()) {
+        const q = playbookSearch.toLowerCase();
+        const inTitle = (tac.title || '').toLowerCase().includes(q);
+        const inDesc = (tac.description || '').toLowerCase().includes(q);
+        const inTarget = (target.label || '').toLowerCase().includes(q);
+        const inOpponent = (target.opponent || '').toLowerCase().includes(q);
+        const inRot = (tac.rotation || '').toLowerCase().includes(q);
+        const inPhase = (tac.phase || '').toLowerCase().includes(q);
+        if (!inTitle && !inDesc && !inTarget && !inOpponent && !inRot && !inPhase) return false;
+      }
+
+      return true;
+    });
+  }, [isLockedToUnit, unitTactics, tactics, playbookCategory, playbookMatchFilter, playbookSearch, matches, events]);
 
   return (
     <div className="w-full max-w-[2000px] mx-auto px-2 sm:px-6 lg:px-10 xl:px-12 pt-4 sm:pt-6 pb-24 md:pb-12 space-y-3 sm:space-y-4">
@@ -1571,6 +1841,114 @@ function TacticsContent() {
 
       {tacticsSection === 'board' && (
         <>
+
+      {/* ACTIVE TACTIC STATUS BANNER - Eliminates guesswork on whether this is a saved tactic or a draft */}
+      {selectedTactic ? (
+        (() => {
+          const target = getTacticTargetInfo(selectedTactic);
+          return (
+            <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-sky-950/80 via-[#0c1424] to-slate-900 border-2 border-sky-400/50 shadow-2xl shadow-sky-950/50 space-y-3">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="flex items-start gap-3.5 min-w-0">
+                  <div className="w-11 h-11 rounded-2xl bg-sky-500/20 text-sky-400 border border-sky-400/40 flex items-center justify-center text-2xl shrink-0 shadow-lg shadow-sky-500/20">
+                    🎯
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-sky-500 text-slate-950 shadow-sm">
+                        Wczytana Taktyka
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-800/90 text-sky-300 border border-sky-500/30">
+                        {target.icon} {target.label} {target.date ? `(${new Date(target.date).toLocaleDateString('pl-PL')})` : ''}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-800 text-amber-300 border border-slate-700">
+                        {selectedTactic.rotation} • {selectedTactic.phase}
+                      </span>
+                    </div>
+                    <h2 className="text-base sm:text-lg font-black text-white mt-1 truncate">
+                      {selectedTactic.title}
+                    </h2>
+                    {selectedTactic.description && (
+                      <p className="text-xs text-slate-300 line-clamp-1 mt-0.5">
+                        {selectedTactic.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap shrink-0">
+                  {canEdit && (
+                    <>
+                      <button
+                        onClick={handleQuickUpdateCurrentTactic}
+                        disabled={saving}
+                        className="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-sky-500/25"
+                        title="Nadpisz zmiany (pozycje graczy i rysunki pisakiem) w tej taktyce"
+                      >
+                        <Save className="w-3.5 h-3.5" />
+                        <span>{saving ? 'Zapisywanie...' : 'Zapisz zmiany w tej taktyce'}</span>
+                      </button>
+
+                      <button
+                        onClick={handleOpenSaveModal}
+                        className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition flex items-center gap-1.5"
+                        title="Zapisz ten schemat jako nową kopię dla innego meczu"
+                      >
+                        <Camera className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Klonuj / Nowa</span>
+                      </button>
+                    </>
+                  )}
+
+                  <button
+                    onClick={handleStartNewDraft}
+                    className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 text-xs font-bold transition flex items-center gap-1.5"
+                    title="Odłącz tablicę i zacznij czysty, niezapisany szkic"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Nowy czysty szkic</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })()
+      ) : (
+        <div className="p-3.5 sm:p-4 rounded-3xl bg-slate-900/60 border border-slate-800 shadow-md">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-slate-800 text-slate-300 border border-slate-700 flex items-center justify-center text-lg shrink-0">
+                📋
+              </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-800 text-slate-400 border border-slate-700">
+                    Nowy Szkic (Niezapisany)
+                  </span>
+                  <span className="text-xs font-bold text-amber-400">
+                    Domyślne pozycje FIVB 5-1: {rotation} • {phase}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Możesz swobodnie przestawiać zawodników i rysować pisakiem. Aby zachować ten wariant, kliknij "Zapisz do Playbooka".
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              {canEdit && (
+                <button
+                  onClick={handleOpenSaveModal}
+                  className="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-sky-500/20"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>Zapisz do Playbooka / Meczu</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Dedicated Tactical Context Switcher Bar */}
       <div className="p-3.5 sm:p-4 rounded-3xl bg-[#0b0e14] border border-slate-800 shadow-xl space-y-3">
@@ -2673,119 +3051,265 @@ function TacticsContent() {
 
       {/* SEKCJA 3: BAZA ZAPISANYCH ZRZUTÓW TAKTYCZNYCH (PLAYBOOK) */}
       {tacticsSection === 'playbook' && (
-      <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center border border-amber-500/30">
+      <div className="bg-[#0b0e14] border border-slate-800 rounded-3xl p-4 sm:p-6 shadow-2xl space-y-5">
+        {/* Playbook Header & Summary */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/15 text-amber-400 flex items-center justify-center border border-amber-500/30 shrink-0 shadow-lg shadow-amber-500/10">
               <Target className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-black uppercase text-white tracking-wide flex items-center gap-2">
-                {isLockedToUnit ? 'Zrzuty Dedykowane dla Tego Wydarzenia' : 'Baza Zapisanych Zrzutów i Schematów Taktycznych'}
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  {filteredTactics.length} schematów
+              <h3 className="text-base sm:text-lg font-black uppercase text-white tracking-wide flex items-center gap-2">
+                <span>Playbook & Zapisane Schematy</span>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  {filteredTactics.length} z {tactics.length}
                 </span>
               </h3>
               <p className="text-xs text-slate-400">
-                {isLockedToUnit
-                  ? activeTargetEvent?.title || (activeTargetMatch ? `Mecz vs ${activeTargetMatch.opponent}` : 'Zablokowana sesja meczowa')
-                  : 'Biblioteka zrzutów taktycznych, wariantów rozegrania i schematów przyjęcia dla Angels ZTP.'}
+                Wszystkie zapisane warianty gry, rozrysowane pod konkretne mecze ligowe LALS, sparingi i bazę ogólną 5-1.
               </p>
             </div>
           </div>
 
-          {!isLockedToUnit && (
-            <div className="flex items-center gap-1 overflow-x-auto pb-1 text-xs">
-              {(['WSZYSTKIE', 'TRENING', 'OGOLNA', 'SPARING', 'MECZ_LIGOWY', 'TURNIEJ'] as const).map(sc => (
-                <button
-                  key={sc}
-                  onClick={() => setScopeFilter(sc)}
-                  className={`px-2.5 py-1 rounded-xl font-bold whitespace-nowrap transition border ${
-                    scopeFilter === sc
-                      ? 'bg-amber-500 text-slate-950 border-amber-400 font-black'
-                      : 'bg-slate-900 text-slate-400 border-slate-800 hover:bg-slate-800 hover:text-white'
-                  }`}
-                >
-                  {sc === 'WSZYSTKIE'
-                    ? 'Wszystkie'
-                    : sc === 'TRENING'
-                    ? '🏐 Treningi'
-                    : sc === 'OGOLNA'
-                    ? '🌐 Ogólne'
-                    : sc === 'SPARING'
-                    ? '⚔️ Sparingi'
-                    : sc === 'MECZ_LIGOWY'
-                    ? '🏆 Liga LALS'
-                    : '🥇 Turnieje'}
-                </button>
+          <button
+            onClick={() => {
+              handleStartNewDraft();
+              setTacticsSection('board');
+            }}
+            className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs transition flex items-center justify-center gap-1.5 shadow-md shadow-sky-500/20 shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Rozrysuj Nowy Schemat</span>
+          </button>
+        </div>
+
+        {/* Category Tabs: Wszystkie, Mecze LALS, Sparingi, Baza Ogólna, Treningi */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          {[
+            { id: 'WSZYSTKIE', label: 'Wszystkie', count: categoryCounts.all, icon: '🌟' },
+            { id: 'MECZE_LALS', label: 'Mecze Ligowe LALS', count: categoryCounts.lals, icon: '🏆' },
+            { id: 'SPARINGI', label: 'Sparingi i Turnieje', count: categoryCounts.sparing, icon: '⚔️' },
+            { id: 'OGOLNA', label: 'Baza Ogólna 5-1', count: categoryCounts.ogolna, icon: '📘' },
+            { id: 'TRENING', label: 'Treningi', count: categoryCounts.trening, icon: '🏐' }
+          ].map(cat => {
+            const isActive = playbookCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setPlaybookCategory(cat.id as any)}
+                className={`px-3.5 py-2 rounded-xl text-xs font-black transition border flex items-center gap-2 whitespace-nowrap shrink-0 ${
+                  isActive
+                    ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md shadow-amber-500/20'
+                    : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                <span>{cat.icon}</span>
+                <span>{cat.label}</span>
+                <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                  isActive ? 'bg-slate-950/30 text-slate-950 font-black' : 'bg-slate-800 text-slate-400'
+                }`}>
+                  {cat.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Dual Filter Bar: Match/Opponent Dropdown & Text Search */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-2xl bg-slate-900/50 border border-slate-800">
+          <div>
+            <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">
+              Filtruj wg konkretnego meczu / rywala:
+            </label>
+            <select
+              value={playbookMatchFilter}
+              onChange={e => setPlaybookMatchFilter(e.target.value)}
+              className="w-full bg-slate-900 border border-slate-700 hover:border-slate-600 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-amber-400"
+            >
+              {availableMatchOptions.map(opt => (
+                <option key={opt.key} value={opt.key}>
+                  {opt.label}
+                </option>
               ))}
-            </div>
-          )}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1">
+              Szukaj w tytule, opisie lub rotacji:
+            </label>
+            <input
+              type="text"
+              value={playbookSearch}
+              onChange={e => setPlaybookSearch(e.target.value)}
+              placeholder="np. P1, Gladiatorzy, Przyjęcie, pipe..."
+              className="w-full bg-slate-900 border border-slate-700 hover:border-slate-600 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+            />
+          </div>
         </div>
 
         {/* Tactic Cards Responsive Grid */}
         {filteredTactics.length === 0 ? (
-          <div className="text-center py-8 px-4 bg-slate-900/40 rounded-2xl border border-dashed border-slate-800 space-y-2">
-            <Target className="w-8 h-8 text-amber-400/60 mx-auto" />
-            <p className="text-xs font-bold text-slate-300">
-              {isLockedToUnit ? 'Brak dedykowanych zrzutów dla tego wydarzenia' : 'Brak zapisanych taktyk w tej kategorii'}
+          <div className="text-center py-12 px-4 bg-slate-900/30 rounded-2xl border border-dashed border-slate-800 space-y-3">
+            <Target className="w-10 h-10 text-amber-400/50 mx-auto" />
+            <h4 className="text-sm font-bold text-white">
+              Brak schematów taktycznych spełniających te kryteria
+            </h4>
+            <p className="text-xs text-slate-400 max-w-md mx-auto">
+              Zmień filtr meczu, wyczyść pole wyszukiwania lub rozrysuj nowy schemat taktyczny na tablicy.
             </p>
-            <p className="text-[11px] text-slate-500">
-              Rozrysuj tablicę i kliknij "Zapisz ten zrzut" powyżej, aby zapisać wariant taktyczny.
-            </p>
+            <div className="flex items-center justify-center gap-2 pt-2">
+              {(playbookCategory !== 'WSZYSTKIE' || playbookMatchFilter !== 'WSZYSCY' || playbookSearch) && (
+                <button
+                  onClick={() => {
+                    setPlaybookCategory('WSZYSTKIE');
+                    setPlaybookMatchFilter('WSZYSCY');
+                    setPlaybookSearch('');
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition"
+                >
+                  Wyczyść filtry
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  handleStartNewDraft();
+                  setTacticsSection('board');
+                }}
+                className="px-3.5 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black transition flex items-center gap-1"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Przejdź na tablicę</span>
+              </button>
+            </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {filteredTactics.map(tac => {
               const isSelected = selectedTactic?.id === tac.id;
+              const target = getTacticTargetInfo(tac);
+
               return (
                 <div
                   key={tac.id}
-                  className={`p-4 rounded-2xl border transition flex flex-col justify-between space-y-3 ${
+                  className={`rounded-2xl border transition-all flex flex-col justify-between overflow-hidden shadow-lg ${
                     isSelected
-                      ? 'bg-amber-500/15 border-amber-400 text-white shadow-xl ring-2 ring-amber-400/30'
-                      : 'bg-slate-900/70 border-slate-800 text-slate-300 hover:bg-slate-900 hover:border-slate-700'
+                      ? 'bg-slate-900/90 border-sky-400 shadow-sky-500/20 ring-2 ring-sky-400/40'
+                      : 'bg-slate-900/60 border-slate-800 hover:border-slate-700 hover:bg-slate-900/80'
                   }`}
                 >
-                  <div className="space-y-1.5">
-                    <div className="flex items-start justify-between gap-2">
-                      <h4 className={`font-black text-sm tracking-wide ${isSelected ? 'text-amber-400' : 'text-white'}`}>
-                        {tac.title}
-                      </h4>
-                      <span className="shrink-0 px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-slate-800 text-amber-300 border border-slate-700">
-                        {tac.rotation} • {tac.phase}
-                      </span>
+                  {/* Card Match Context Header */}
+                  <div className={`px-4 py-2.5 flex items-center justify-between border-b ${
+                    target.isMatch
+                      ? 'bg-sky-950/60 border-sky-500/20 text-sky-300'
+                      : target.category === 'SPARINGI'
+                      ? 'bg-amber-950/60 border-amber-500/20 text-amber-300'
+                      : target.category === 'TRENING'
+                      ? 'bg-emerald-950/60 border-emerald-500/20 text-emerald-300'
+                      : 'bg-slate-800/80 border-slate-700/80 text-slate-300'
+                  }`}>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-base shrink-0">{target.icon}</span>
+                      <div className="min-w-0">
+                        <div className="text-[10px] font-black uppercase tracking-wider opacity-80 truncate">
+                          {target.isMatch
+                            ? 'Mecz Ligowy LALS'
+                            : target.category === 'SPARINGI'
+                            ? 'Sparing / Turniej'
+                            : target.category === 'TRENING'
+                            ? 'Trening Zespołu'
+                            : 'Baza Ogólna 5-1'}
+                        </div>
+                        <div className="text-xs font-black text-white truncate">
+                          {target.opponent ? `vs ${target.opponent}` : target.label}
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-2 text-[10.5px] text-slate-400 flex-wrap">
-                      <span className="px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-300 font-bold border border-sky-500/20">
-                        {tac.scope === 'OGOLNA'
-                          ? 'Ogólna'
-                          : tac.scope === 'TRENING'
-                          ? 'Trening'
-                          : tac.scope === 'SPARING'
-                          ? 'Sparing'
-                          : tac.scope === 'MECZ_LIGOWY'
-                          ? 'Mecz LALS'
-                          : 'Turniej'}
-                      </span>
-                      <span>{new Date(tac.createdAt).toLocaleDateString('pl-PL')}</span>
+                    <div className="flex items-center gap-1.5 shrink-0 text-right">
+                      {target.date && (
+                        <span className="text-[10px] font-mono font-bold text-slate-400">
+                          {new Date(target.date).toLocaleDateString('pl-PL')}
+                        </span>
+                      )}
+                      {isSelected && (
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-sky-500 text-slate-950 shadow-sm">
+                          Aktywna
+                        </span>
+                      )}
                     </div>
-
-                    {tac.description && (
-                      <p className="text-[11px] text-slate-400 line-clamp-2 pt-1">
-                        {tac.description}
-                      </p>
-                    )}
                   </div>
 
-                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-800/80">
+                  {/* Card Body */}
+                  <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <h4 className={`font-black text-sm sm:text-base leading-snug tracking-tight ${
+                          isSelected ? 'text-sky-300' : 'text-white'
+                        }`}>
+                          {tac.title}
+                        </h4>
+                        <span className="shrink-0 px-2 py-0.5 rounded-md text-[10px] font-mono font-black uppercase bg-slate-800 text-amber-300 border border-slate-700">
+                          {tac.rotation} • {tac.phase}
+                        </span>
+                      </div>
+
+                      {/* Canvas Drawing Thumbnail if present */}
+                      {tac.drawingData ? (
+                        <div className="relative rounded-xl overflow-hidden bg-slate-950 border border-slate-800 h-28 flex items-center justify-center group">
+                          <img
+                            src={tac.drawingData}
+                            alt="Rysunek taktyczny"
+                            className="w-full h-full object-contain"
+                          />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-xs font-bold text-white gap-1 pointer-events-none">
+                            <Eye className="w-4 h-4 text-sky-400" />
+                            <span>Podgląd rozrysowania</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="rounded-xl bg-slate-950/60 border border-slate-800/80 px-3 py-2 flex items-center gap-2 text-slate-400 text-xs">
+                          <Compass className="w-4 h-4 text-slate-500 shrink-0" />
+                          <span className="text-[11px] truncate">
+                            {tac.courtPositions?.length || 6} graczy na pozycjach • Czyste boisko
+                          </span>
+                        </div>
+                      )}
+
+                      {tac.description && (
+                        <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed">
+                          {tac.description}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Metadata: Author, Date, Discussion count */}
+                    <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-800/60 flex-wrap gap-2">
+                      <span className="truncate">
+                        {tac.createdByName ? `Autor: ${tac.createdByName}` : 'Sztab Angels ZTP'}
+                      </span>
+                      <div className="flex items-center gap-3 shrink-0">
+                        {tac.posts && tac.posts.length > 0 && (
+                          <span className="flex items-center gap-1 text-emerald-400 font-bold">
+                            <MessageSquare className="w-3 h-3" />
+                            <span>{tac.posts.length}</span>
+                          </span>
+                        )}
+                        <span className="font-mono text-slate-400">
+                          {new Date(tac.createdAt).toLocaleDateString('pl-PL')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card Actions Footer */}
+                  <div className="p-3 bg-slate-950/60 border-t border-slate-800 flex items-center justify-between gap-2">
                     <button
                       onClick={() => loadSavedTactic(tac)}
-                      className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                      className={`flex-1 py-2 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 shadow-sm ${
                         isSelected
-                          ? 'bg-amber-500 text-slate-950 font-black shadow-md'
-                          : 'bg-slate-800 hover:bg-slate-700 text-slate-200'
+                          ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/20'
+                          : 'bg-slate-800 hover:bg-slate-700 text-white'
                       }`}
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
@@ -2795,10 +3319,10 @@ function TacticsContent() {
                     {canEdit && (
                       <button
                         onClick={() => handleDeleteTactic(tac.id)}
-                        className="p-1.5 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-slate-700 transition"
-                        title="Usuń ten zrzut"
+                        className="p-2 rounded-xl bg-slate-800/80 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-slate-700 transition"
+                        title="Usuń ten wariant taktyczny"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     )}
                   </div>
@@ -3451,109 +3975,161 @@ function TacticsContent() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-black uppercase text-slate-300 mb-1">
-                    Przypisz do rozgrywek
-                  </label>
-                  <select
-                    value={tacticScope}
-                    onChange={e => setTacticScope(e.target.value as TacticScope)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-400"
-                  >
-                    <option value="TRENING">Do konkretnego treningu</option>
-                    <option value="SPARING">Do konkretnego sparingu</option>
-                    <option value="MECZ_LIGOWY">Do meczu ligowego LALS</option>
-                    <option value="TURNIEJ">Do turnieju</option>
-                    <option value="OGOLNA">Taktyka ogólna</option>
-                  </select>
+              <div>
+                <label className="block text-xs font-black uppercase text-slate-300 mb-1.5">
+                  1. Gdzie przypisać ten wariant taktyczny? *
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2.5">
+                  {[
+                    { id: 'MECZ_LIGOWY', label: '🏆 Mecz LALS' },
+                    { id: 'SPARING', label: '⚔️ Sparing' },
+                    { id: 'TRENING', label: '🏐 Trening' },
+                    { id: 'OGOLNA', label: '📘 Baza 5-1' }
+                  ].map(s => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => {
+                        const sc = s.id as TacticScope;
+                        setTacticScope(sc);
+                        if (sc === 'MECZ_LIGOWY') {
+                          if (matches.length > 0 && !linkedMatchId) setLinkedMatchId(matches[0].id);
+                          setLinkedEventId('');
+                        } else if (sc === 'SPARING') {
+                          const ev = events.find(e => e.type === 'SPARING' || e.type === 'TURNIEJ');
+                          if (ev) setLinkedEventId(ev.id);
+                          setLinkedMatchId('');
+                        } else if (sc === 'TRENING') {
+                          const ev = events.find(e => e.type === 'TRENING');
+                          if (ev) setLinkedEventId(ev.id);
+                          setLinkedMatchId('');
+                        } else {
+                          setLinkedMatchId('');
+                          setLinkedEventId('');
+                        }
+                      }}
+                      className={`py-2 px-2 rounded-xl text-xs font-bold transition border text-center ${
+                        tacticScope === s.id
+                          ? 'bg-sky-500 text-slate-950 border-sky-400 font-black shadow-md shadow-sky-500/20'
+                          : 'bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800'
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
                 </div>
 
-                <div>
-                  <label className="block text-xs font-black uppercase text-slate-300 mb-1">
-                    Wybierz jednostkę *
-                  </label>
-                  {tacticScope === 'TRENING' ? (
-                    <select
-                      required
-                      value={linkedEventId}
-                      onChange={e => setLinkedEventId(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-400"
-                    >
-                      <option value="">Wybierz trening z listy...</option>
-                      {events
-                        .filter(e => e.type === 'TRENING')
-                        .map(e => (
-                          <option key={e.id} value={e.id}>
-                            {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} — {e.title}
-                          </option>
-                        ))}
-                    </select>
-                  ) : tacticScope === 'SPARING' ? (
-                    <select
-                      required
-                      value={linkedEventId}
-                      onChange={e => setLinkedEventId(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-400"
-                    >
-                      <option value="">Wybierz sparing z listy...</option>
-                      {events
-                        .filter(e => e.type === 'SPARING')
-                        .map(e => (
-                          <option key={e.id} value={e.id}>
-                            {e.title} ({e.opponent || 'Sparing'})
-                          </option>
-                        ))}
-                    </select>
-                  ) : tacticScope === 'MECZ_LIGOWY' ? (
+                {tacticScope === 'MECZ_LIGOWY' && (
+                  <div className="space-y-1">
+                    <label className="block text-[11px] font-bold text-slate-400">
+                      Wybierz konkretny mecz ligowy LALS:
+                    </label>
                     <select
                       required
                       value={linkedMatchId}
-                      onChange={e => setLinkedMatchId(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-400"
+                      onChange={e => {
+                        setLinkedMatchId(e.target.value);
+                        const m = matches.find(match => match.id === e.target.value);
+                        if (m) {
+                          setTacticTitle(`Plan vs ${m.opponent} • R${rotation} (${phase})`);
+                        }
+                      }}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-400 font-bold"
                     >
-                      <option value="">Wybierz mecz ligowy...</option>
+                      <option value="">Wybierz mecz ligowy z listy...</option>
                       {matches.map(m => (
                         <option key={m.id} value={m.id}>
-                          vs {m.opponent} ({new Date(m.date).toLocaleDateString('pl-PL')})
+                          🏆 vs {m.opponent} ({new Date(m.date).toLocaleDateString('pl-PL')})
                         </option>
                       ))}
                     </select>
-                  ) : tacticScope === 'TURNIEJ' ? (
+                  </div>
+                )}
+
+                {tacticScope === 'SPARING' && (
+                  <div className="space-y-1">
+                    <label className="block text-[11px] font-bold text-slate-400">
+                      Wybierz sparing z terminarza:
+                    </label>
                     <select
                       required
                       value={linkedEventId}
-                      onChange={e => setLinkedEventId(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-400"
+                      onChange={e => {
+                        setLinkedEventId(e.target.value);
+                        const ev = events.find(event => event.id === e.target.value);
+                        if (ev) {
+                          setTacticTitle(`Sparing: ${ev.opponent || ev.title} • R${rotation} (${phase})`);
+                        }
+                      }}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-400 font-bold"
                     >
-                      <option value="">Wybierz turniej...</option>
-                      {events
-                        .filter(e => e.type === 'TURNIEJ')
-                        .map(e => (
-                          <option key={e.id} value={e.id}>
-                            {e.title}
-                          </option>
-                        ))}
+                      <option value="">Wybierz sparing z listy...</option>
+                      {events.filter(e => e.type === 'SPARING' || e.type === 'TURNIEJ').map(e => (
+                        <option key={e.id} value={e.id}>
+                          ⚔️ {e.title} {e.opponent ? `(vs ${e.opponent})` : ''} ({new Date(e.date).toLocaleDateString('pl-PL')})
+                        </option>
+                      ))}
                     </select>
-                  ) : (
-                    <input
-                      disabled
-                      value="Taktyka ogólna (baza)"
-                      className="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-3 py-2 text-slate-500 text-xs"
-                    />
-                  )}
-                </div>
+                  </div>
+                )}
+
+                {tacticScope === 'TRENING' && (
+                  <div className="space-y-1">
+                    <label className="block text-[11px] font-bold text-slate-400">
+                      Wybierz trening z terminarza:
+                    </label>
+                    <select
+                      required
+                      value={linkedEventId}
+                      onChange={e => {
+                        setLinkedEventId(e.target.value);
+                        const ev = events.find(event => event.id === e.target.value);
+                        if (ev) {
+                          setTacticTitle(`Trening: ${ev.title} • R${rotation} (${phase})`);
+                        }
+                      }}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-400 font-bold"
+                    >
+                      <option value="">Wybierz trening z listy...</option>
+                      {events.filter(e => e.type === 'TRENING').map(e => (
+                        <option key={e.id} value={e.id}>
+                          🏐 {new Date(e.date).toLocaleDateString('pl-PL')} — {e.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {tacticScope === 'OGOLNA' && (
+                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-400">
+                    📘 Schemat zostanie zapisany w <strong>Ogólnej Bazie 5-1</strong> i będzie dostępny jako podręcznikowy wariant dla całego zespołu.
+                  </div>
+                )}
               </div>
 
               <div>
                 <label className="block text-xs font-black uppercase text-slate-300 mb-1">
-                  Komentarz trenera & instrukcje przedmeczowe
+                  2. Tytuł wariantu taktycznego *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={tacticTitle}
+                  onChange={e => setTacticTitle(e.target.value)}
+                  placeholder="np. Plan vs Gladiatorzy: Obrona skrzydła i kontra P1"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-400 font-bold"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-black uppercase text-slate-300 mb-1">
+                  3. Wytyczne i komentarz przedmeczowy (opcjonalnie)
                 </label>
                 <textarea
-                  rows={3}
+                  rows={2}
                   value={tacticComment}
                   onChange={e => setTacticComment(e.target.value)}
-                  placeholder="np. Skrzydłowi zamykają prostą, libero gra na 6. metrze, atakujący schodzi do bloku opcjonalnie..."
+                  placeholder="np. Skrzydłowi zamykają prostą, libero asekuruje na 6. metrze..."
                   className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white text-xs focus:outline-none focus:border-sky-400"
                 />
               </div>

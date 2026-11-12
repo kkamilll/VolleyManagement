@@ -116,6 +116,62 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // 2b. Coach updates existing tactic directly (overwrites positions / drawing / title)
+    if (body.type === 'UPDATE_TACTIC') {
+      const canManage = user.role === 'KIEROWNIK' || user.role === 'TRENER' || user.isCaptain || hasPermission(user, 'canManageTactics');
+      if (!canManage) {
+        return NextResponse.json({ error: 'Brak uprawnień trenera/kapitana do edycji taktyki' }, { status: 403 });
+      }
+
+      if (!db.tactics) db.tactics = [];
+
+      const { id, title, phase, rotation, scope, targetOpponent, matchId, eventId, description, courtPositions, directives, drawingData, tacticalNotes } = body.tactic || {};
+      if (!id) {
+        return NextResponse.json({ error: 'Brak ID taktyki do aktualizacji' }, { status: 400 });
+      }
+
+      const tacticIndex = db.tactics.findIndex(t => t.id === id);
+      if (tacticIndex === -1) {
+        return NextResponse.json({ error: 'Nie znaleziono taktyki' }, { status: 404 });
+      }
+
+      const existing = db.tactics[tacticIndex];
+
+      // Resolve opponent if matchId or eventId provided
+      let resolvedOpponent = targetOpponent || existing.targetOpponent;
+      if (matchId) {
+        const m = (db.matches || []).find((match: any) => match.id === matchId);
+        if (m) resolvedOpponent = m.opponent;
+      } else if (eventId) {
+        const ev = (db.events || []).find((e: any) => e.id === eventId);
+        if (ev && ev.opponent) resolvedOpponent = ev.opponent;
+      }
+
+      db.tactics[tacticIndex] = {
+        ...existing,
+        title: title ? title.trim() : existing.title,
+        phase: phase || existing.phase,
+        rotation: rotation || existing.rotation,
+        scope: scope || existing.scope,
+        targetOpponent: resolvedOpponent,
+        matchId: matchId !== undefined ? (matchId || undefined) : existing.matchId,
+        eventId: eventId !== undefined ? (eventId || undefined) : existing.eventId,
+        description: description !== undefined ? description.trim() : existing.description,
+        courtPositions: courtPositions || existing.courtPositions,
+        directives: Array.isArray(directives) ? directives.filter(Boolean) : existing.directives,
+        drawingData: drawingData !== undefined ? drawingData : existing.drawingData,
+        tacticalNotes: tacticalNotes !== undefined ? tacticalNotes : existing.tacticalNotes,
+        updatedAt: new Date().toISOString()
+      };
+
+      writeDatabase(db);
+      return NextResponse.json({
+        success: true,
+        tactic: db.tactics[tacticIndex],
+        message: 'Taktyka została pomyślnie zaktualizowana!'
+      });
+    }
+
     // 3. Create or Save Tactic (Requires staff permission)
     const canManage = user.role === 'KIEROWNIK' || user.role === 'TRENER' || user.isCaptain || hasPermission(user, 'canManageTactics');
     if (!canManage) {
@@ -143,13 +199,22 @@ export async function POST(req: NextRequest) {
       }
       const validScope: TacticScope = scope || detectedScope;
 
+      let resolvedOpponent = targetOpponent ? targetOpponent.trim() : undefined;
+      if (!resolvedOpponent && matchId) {
+        const m = (db.matches || []).find((match: any) => match.id === matchId);
+        if (m) resolvedOpponent = m.opponent;
+      } else if (!resolvedOpponent && eventId) {
+        const ev = (db.events || []).find((e: any) => e.id === eventId);
+        if (ev && ev.opponent) resolvedOpponent = ev.opponent;
+      }
+
       const newTactic: TacticalPlay = {
         id: `tac_${Date.now()}`,
         title: title.trim(),
         phase: phase || 'PRZYJECIE',
         rotation: rotation || 'P1',
         scope: validScope,
-        targetOpponent: targetOpponent ? targetOpponent.trim() : undefined,
+        targetOpponent: resolvedOpponent,
         matchId: matchId || undefined,
         eventId: eventId || undefined,
         description: description ? description.trim() : '',
