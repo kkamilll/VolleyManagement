@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#07090c',
+  themeColor: '#f6f8fb',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -44,15 +44,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pl" className="dark">
+    <html lang="pl" className="theme-light light">
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Angels ZTP" />
       </head>
-      <body className="font-sans antialiased flex flex-col min-h-screen bg-[#05070b] text-slate-100 selection:bg-sky-500 selection:text-slate-950 relative">
+      <body className="font-sans antialiased flex flex-col min-h-screen bg-[#f6f8fb] text-slate-900 selection:bg-sky-500 selection:text-white relative">
         {/* Dynamic Cyber-Athletic Court Background */}
         <div className="cyber-court-bg" />
         <div className="court-lines-overlay" />

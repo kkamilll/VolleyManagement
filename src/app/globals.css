@@ -3,15 +3,15 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 243, 244, 246;
-  --background-start-rgb: 5, 7, 10;
-  --background-end-rgb: 10, 14, 22;
+  --foreground-rgb: 15, 23, 42;
+  --background-start-rgb: 246, 248, 251;
+  --background-end-rgb: 241, 245, 249;
 }
 
 html,
 body {
-  color: #f1f5f9;
-  background-color: #0e121b;
+  color: #0f172a;
+  background-color: #f6f8fb;
   min-height: 100vh;
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
@@ -20,80 +20,162 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* --- LIGHT THEME (Jasny, czysty, nowoczesny styl sportowy) --- */
+/* ==========================================================================
+   1. PRIMARY BRIGHT / LIGHT SPORTS THEME (Domyślna jasna kolorystyka)
+   ========================================================================== */
 html.theme-light,
 body.theme-light,
-.theme-light body {
-  color: #0f172a !important;
-  background-color: #f6f8fb !important;
+.theme-light body,
+html.light,
+body.light,
+html:not(.dark),
+body:not(.dark) {
+  color: #0f172a;
+  background-color: #f6f8fb;
 }
 
-.theme-light .cyber-court-bg {
-  background-color: #f6f8fb !important;
+/* Light Court Background */
+.cyber-court-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-color: #f6f8fb;
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.07) 0%, transparent 60%),
-    linear-gradient(rgba(148, 163, 184, 0.15) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.15) 1px, transparent 1px) !important;
-  background-size: 100% 100%, 36px 36px, 36px 36px !important;
+    radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.09) 0%, transparent 60%),
+    radial-gradient(circle at 100% 100%, rgba(14, 165, 233, 0.05) 0%, transparent 40%),
+    linear-gradient(rgba(148, 163, 184, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.16) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+  background-position: 0 0, 0 0, -1px -1px, -1px -1px;
 }
 
-.theme-light .court-lines-overlay {
+.court-lines-overlay {
   display: none !important;
 }
 
-.theme-light .cyber-card {
+/* Clean High-Contrast Sports Cards */
+.cyber-card {
   background: #ffffff !important;
   color: #0f172a !important;
   border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03) !important;
+  box-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03) !important;
+  transition: all 0.2s ease-in-out;
 }
 
-.theme-light .cyber-card:hover {
+.cyber-card:hover {
   border-color: #38bdf8 !important;
-  box-shadow: 0 8px 24px -4px rgba(2, 132, 199, 0.12) !important;
+  box-shadow: 0 8px 25px -4px rgba(2, 132, 199, 0.15), 0 0 12px -3px rgba(56, 189, 248, 0.2) !important;
   transform: translateY(-2px);
 }
 
-.theme-light .cyber-card-gold {
+.cyber-card-gold {
   background: #fffdf5 !important;
   color: #0f172a !important;
   border: 1px solid #fde68a !important;
   box-shadow: 0 4px 16px -2px rgba(245, 158, 11, 0.08) !important;
+  transition: all 0.2s ease-in-out;
 }
 
-.theme-light .glass-panel {
+.cyber-card-gold:hover {
+  border-color: #f59e0b !important;
+  box-shadow: 0 8px 24px -4px rgba(245, 158, 11, 0.18) !important;
+  transform: translateY(-2px);
+}
+
+.glass-panel {
   background: #ffffff !important;
   border: 1px solid #e2e8f0 !important;
 }
 
-.theme-light header {
+/* Header, Footer & Navigation in Light Mode */
+header {
   background-color: rgba(255, 255, 255, 0.95) !important;
   border-bottom: 1px solid #e2e8f0 !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04) !important;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04) !important;
   color: #0f172a !important;
 }
 
-.theme-light .text-white {
+footer {
+  background-color: #ffffff !important;
+  border-top: 1px solid #e2e8f0 !important;
+  color: #64748b !important;
+}
+
+nav.fixed.bottom-0 {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  border-top: 1px solid #e2e8f0 !important;
+  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.06) !important;
+}
+
+/* Typography Overrides for Light Theme */
+.theme-light h1, .theme-light h2, .theme-light h3, .theme-light h4,
+.light h1, .light h2, .light h3, .light h4,
+html:not(.dark) h1, html:not(.dark) h2, html:not(.dark) h3, html:not(.dark) h4 {
   color: #0f172a !important;
 }
 
+.theme-light .text-white,
+.light .text-white,
+html:not(.dark) .text-white {
+  color: #0f172a;
+}
+
+.theme-light .text-slate-100,
 .theme-light .text-slate-200,
-.theme-light .text-slate-300 {
+.theme-light .text-slate-300,
+.light .text-slate-100,
+.light .text-slate-200,
+.light .text-slate-300,
+html:not(.dark) .text-slate-100,
+html:not(.dark) .text-slate-200,
+html:not(.dark) .text-slate-300 {
   color: #334155 !important;
 }
 
 .theme-light .text-slate-400,
-.theme-light .text-slate-500 {
+.theme-light .text-slate-500,
+.light .text-slate-400,
+.light .text-slate-500,
+html:not(.dark) .text-slate-400,
+html:not(.dark) .text-slate-500 {
   color: #64748b !important;
 }
 
+/* Background Utility Overrides in Light Mode */
 .theme-light .bg-slate-900,
 .theme-light .bg-slate-950,
-.theme-light .bg-[#0b0e14],
-.theme-light .bg-[#0d121c],
-.theme-light .bg-[#07090e],
-.theme-light .bg-[#0c1016],
-.theme-light .bg-[#050811] {
+.theme-light .bg-\[\#05070b\],
+.theme-light .bg-\[\#07090c\],
+.theme-light .bg-\[\#0b0e14\],
+.theme-light .bg-\[\#0d121c\],
+.theme-light .bg-\[\#07090e\],
+.theme-light .bg-\[\#0c1016\],
+.theme-light .bg-\[\#050811\],
+.theme-light .bg-\[\#0e121b\],
+.theme-light .bg-\[\#141a26\],
+.light .bg-slate-900,
+.light .bg-slate-950,
+.light .bg-\[\#05070b\],
+.light .bg-\[\#07090c\],
+.light .bg-\[\#0b0e14\],
+.light .bg-\[\#0d121c\],
+.light .bg-\[\#07090e\],
+.light .bg-\[\#0c1016\],
+.light .bg-\[\#050811\],
+.light .bg-\[\#0e121b\],
+.light .bg-\[\#141a26\],
+html:not(.dark) .bg-slate-900,
+html:not(.dark) .bg-slate-950,
+html:not(.dark) .bg-\[\#05070b\],
+html:not(.dark) .bg-\[\#07090c\],
+html:not(.dark) .bg-\[\#0b0e14\],
+html:not(.dark) .bg-\[\#0d121c\],
+html:not(.dark) .bg-\[\#07090e\],
+html:not(.dark) .bg-\[\#0c1016\],
+html:not(.dark) .bg-\[\#050811\],
+html:not(.dark) .bg-\[\#0e121b\],
+html:not(.dark) .bg-\[\#141a26\] {
   background-color: #ffffff !important;
   border-color: #e2e8f0 !important;
   color: #0f172a !important;
@@ -103,7 +185,35 @@ body.theme-light,
 .theme-light .bg-slate-800\/80,
 .theme-light .bg-slate-800\/60,
 .theme-light .bg-slate-900\/80,
-.theme-light .bg-slate-900\/90 {
+.theme-light .bg-slate-900\/90,
+.theme-light .bg-slate-900\/70,
+.theme-light .bg-slate-900\/60,
+.theme-light .bg-slate-900\/50,
+.theme-light .bg-slate-950\/80,
+.theme-light .bg-slate-950\/70,
+.theme-light .bg-slate-950\/60,
+.light .bg-slate-800,
+.light .bg-slate-800\/80,
+.light .bg-slate-800\/60,
+.light .bg-slate-900\/80,
+.light .bg-slate-900\/90,
+.light .bg-slate-900\/70,
+.light .bg-slate-900\/60,
+.light .bg-slate-900\/50,
+.light .bg-slate-950\/80,
+.light .bg-slate-950\/70,
+.light .bg-slate-950\/60,
+html:not(.dark) .bg-slate-800,
+html:not(.dark) .bg-slate-800\/80,
+html:not(.dark) .bg-slate-800\/60,
+html:not(.dark) .bg-slate-900\/80,
+html:not(.dark) .bg-slate-900\/90,
+html:not(.dark) .bg-slate-900\/70,
+html:not(.dark) .bg-slate-900\/60,
+html:not(.dark) .bg-slate-900\/50,
+html:not(.dark) .bg-slate-950\/80,
+html:not(.dark) .bg-slate-950\/70,
+html:not(.dark) .bg-slate-950\/60 {
   background-color: #f1f5f9 !important;
   border-color: #cbd5e1 !important;
   color: #0f172a !important;
@@ -112,47 +222,207 @@ body.theme-light,
 .theme-light .bg-black\/40,
 .theme-light .bg-black\/50,
 .theme-light .bg-black\/60,
-.theme-light .bg-black\/70 {
+.theme-light .bg-black\/70,
+.light .bg-black\/40,
+.light .bg-black\/50,
+.light .bg-black\/60,
+.light .bg-black\/70,
+html:not(.dark) .bg-black\/40,
+html:not(.dark) .bg-black\/50,
+html:not(.dark) .bg-black\/60,
+html:not(.dark) .bg-black\/70 {
   background-color: #f8fafc !important;
   border-color: #e2e8f0 !important;
 }
 
+/* Modals Backdrop in Light Mode */
+.theme-light .fixed.inset-0.bg-black\/80,
+.theme-light .fixed.inset-0.bg-black\/85,
+.light .fixed.inset-0.bg-black\/80,
+.light .fixed.inset-0.bg-black\/85,
+html:not(.dark) .fixed.inset-0.bg-black\/80,
+html:not(.dark) .fixed.inset-0.bg-black\/85 {
+  background-color: rgba(15, 23, 42, 0.45) !important;
+}
+
+/* Borders in Light Mode */
 .theme-light .border-slate-800,
 .theme-light .border-slate-700,
-.theme-light .border-slate-800\/80 {
+.theme-light .border-slate-800\/80,
+.theme-light .border-slate-800\/60,
+.theme-light .border-slate-800\/90,
+.theme-light .divide-slate-800,
+.theme-light .divide-slate-800\/60,
+.light .border-slate-800,
+.light .border-slate-700,
+.light .border-slate-800\/80,
+.light .border-slate-800\/60,
+.light .border-slate-800\/90,
+.light .divide-slate-800,
+.light .divide-slate-800\/60,
+html:not(.dark) .border-slate-800,
+html:not(.dark) .border-slate-700,
+html:not(.dark) .border-slate-800\/80,
+html:not(.dark) .border-slate-800\/60,
+html:not(.dark) .border-slate-800\/90,
+html:not(.dark) .divide-slate-800,
+html:not(.dark) .divide-slate-800\/60 {
   border-color: #e2e8f0 !important;
 }
 
-.theme-light .text-gradient-cyan {
+/* Form Controls in Light Mode */
+.theme-light input:not([type="checkbox"]):not([type="radio"]),
+.theme-light textarea,
+.theme-light select,
+.light input:not([type="checkbox"]):not([type="radio"]),
+.light textarea,
+.light select,
+html:not(.dark) input:not([type="checkbox"]):not([type="radio"]),
+html:not(.dark) textarea,
+html:not(.dark) select {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+.theme-light input::placeholder,
+.theme-light textarea::placeholder,
+.light input::placeholder,
+.light textarea::placeholder,
+html:not(.dark) input::placeholder,
+html:not(.dark) textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Table Headers in Light Mode */
+.theme-light table thead,
+.light table thead,
+html:not(.dark) table thead {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+}
+
+.theme-light table tbody tr:hover,
+.light table tbody tr:hover,
+html:not(.dark) table tbody tr:hover {
+  background-color: #f0f9ff !important;
+}
+
+/* Text Gradients in Light Mode */
+.theme-light .text-gradient-cyan,
+.light .text-gradient-cyan,
+html:not(.dark) .text-gradient-cyan {
   background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
 }
 
-.theme-light .neon-pill-cyan {
+.theme-light .text-gradient-gold,
+.light .text-gradient-gold,
+html:not(.dark) .text-gradient-gold {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+.theme-light .text-gradient-fire,
+.light .text-gradient-fire,
+html:not(.dark) .text-gradient-fire {
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Neon Athletic Pills in Light Mode */
+.theme-light .neon-pill-cyan,
+.light .neon-pill-cyan,
+html:not(.dark) .neon-pill-cyan {
   background: #e0f2fe !important;
   color: #0369a1 !important;
   border-color: #7dd3fc !important;
 }
 
-.theme-light .neon-pill-gold {
+.theme-light .neon-pill-gold,
+.light .neon-pill-gold,
+html:not(.dark) .neon-pill-gold {
   background: #fef3c7 !important;
   color: #b45309 !important;
   border-color: #fde68a !important;
 }
 
-.theme-light .neon-pill-emerald {
+.theme-light .neon-pill-emerald,
+.light .neon-pill-emerald,
+html:not(.dark) .neon-pill-emerald {
   background: #d1fae5 !important;
   color: #047857 !important;
   border-color: #6ee7b7 !important;
 }
 
-/* --- ELEVATED MODERN DARK THEME (Nie za ciemno, czytelny slate-navy) --- */
-.cyber-court-bg {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
+/* Preserving high contrast for primary gradient buttons */
+.theme-light .bg-sky-500,
+.theme-light .bg-sky-600,
+.theme-light .bg-emerald-500,
+.theme-light .bg-emerald-600,
+.theme-light .bg-rose-500,
+.theme-light .bg-purple-500,
+.light .bg-sky-500,
+.light .bg-sky-600,
+.light .bg-emerald-500,
+.light .bg-emerald-600,
+.light .bg-rose-500,
+.light .bg-purple-500,
+html:not(.dark) .bg-sky-500,
+html:not(.dark) .bg-sky-600,
+html:not(.dark) .bg-emerald-500,
+html:not(.dark) .bg-emerald-600,
+html:not(.dark) .bg-rose-500,
+html:not(.dark) .bg-purple-500 {
+  color: #ffffff !important;
+}
+
+.theme-light .bg-sky-500 *,
+.theme-light .bg-emerald-500 *,
+.theme-light .bg-rose-500 *,
+.theme-light .bg-purple-500 *,
+.light .bg-sky-500 *,
+.light .bg-emerald-500 *,
+.light .bg-rose-500 *,
+.light .bg-purple-500 *,
+html:not(.dark) .bg-sky-500 *,
+html:not(.dark) .bg-emerald-500 *,
+html:not(.dark) .bg-rose-500 *,
+html:not(.dark) .bg-purple-500 * {
+  color: inherit;
+}
+
+/* Scrollbar in Light Theme */
+.theme-light ::-webkit-scrollbar-track,
+.light ::-webkit-scrollbar-track,
+html:not(.dark) ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+.theme-light ::-webkit-scrollbar-thumb,
+.light ::-webkit-scrollbar-thumb,
+html:not(.dark) ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+.theme-light ::-webkit-scrollbar-thumb:hover,
+.light ::-webkit-scrollbar-thumb:hover,
+html:not(.dark) ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ==========================================================================
+   2. DARK THEME (Dla opcjonalnego przełączenia na ciemny motyw)
+   ========================================================================== */
+html.dark,
+body.dark {
+  color: #f1f5f9;
+  background-color: #0e121b;
+}
+
+.dark .cyber-court-bg {
   background-color: #0e121b;
   background-image: 
     radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.16) 0%, transparent 60%),
@@ -160,11 +430,10 @@ body.theme-light,
     linear-gradient(rgba(56, 189, 248, 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
   background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
-  background-position: 0 0, 0 0, -1px -1px, -1px -1px;
 }
 
-/* Constellation subtle overlay */
-.court-lines-overlay {
+.dark .court-lines-overlay {
+  display: block;
   position: fixed;
   inset: 0;
   pointer-events: none;
@@ -173,59 +442,45 @@ body.theme-light,
   opacity: 0.9;
 }
 
-/* Solid high-contrast athletic cards */
-.cyber-card {
-  background: #141a26;
-  border: 1px solid rgba(56, 189, 248, 0.22);
-  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.5);
-  transition: all 0.2s ease-in-out;
+.dark .cyber-card {
+  background: #141a26 !important;
+  color: #f1f5f9 !important;
+  border: 1px solid rgba(56, 189, 248, 0.22) !important;
+  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.5) !important;
 }
 
-.cyber-card:hover {
-  border-color: rgba(56, 189, 248, 0.5);
-  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.65), 0 0 16px -4px rgba(56, 189, 248, 0.25);
-  transform: translateY(-2px);
+.dark .cyber-card-gold {
+  background: #1c1812 !important;
+  color: #f1f5f9 !important;
+  border: 1px solid rgba(245, 158, 11, 0.35) !important;
 }
 
-.cyber-card-gold {
-  background: #1c1812;
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.5);
-  transition: all 0.2s ease-in-out;
+.dark .glass-panel {
+  background: #161e2e !important;
+  border: 1px solid rgba(148, 163, 184, 0.2) !important;
 }
 
-.cyber-card-gold:hover {
-  border-color: rgba(245, 158, 11, 0.6);
-  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.65), 0 0 16px -4px rgba(245, 158, 11, 0.3);
-  transform: translateY(-2px);
+.dark header {
+  background-color: rgba(5, 7, 11, 0.9) !important;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.2) !important;
 }
 
-/* Subtle Glass Panel */
-.glass-panel {
-  background: #161e2e;
-  border: 1px solid rgba(148, 163, 184, 0.2);
+.dark footer {
+  background-color: #030509 !important;
+  border-top: 1px solid rgba(56, 189, 248, 0.2) !important;
 }
 
-/* --- ATHLETIC TEXT GRADIENTS --- */
-.text-gradient-cyan {
-  background: linear-gradient(135deg, #ffffff 40%, #38bdf8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.dark nav.fixed.bottom-0 {
+  background-color: rgba(5, 8, 17, 0.92) !important;
+  border-top: 1px solid rgba(56, 189, 248, 0.2) !important;
 }
 
-.text-gradient-gold {
-  background: linear-gradient(135deg, #ffffff 30%, #fde68a 60%, #f59e0b 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Common Athletic Utilities */
+.font-athletic {
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
-.text-gradient-fire {
-  background: linear-gradient(135deg, #ffffff 30%, #fed7aa 60%, #f97316 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* --- REFINED SHADOWS --- */
 .glow-cyan {
   box-shadow: 0 4px 16px -2px rgba(2, 132, 199, 0.35);
 }
@@ -238,59 +493,6 @@ body.theme-light,
   box-shadow: 0 4px 16px -2px rgba(16, 185, 129, 0.35);
 }
 
-/* --- HIGH-CONTRAST ATHLETIC PILL BADGES --- */
-.neon-pill-cyan {
-  background: #082f49;
-  color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.45);
-  font-weight: 700;
-}
-
-.neon-pill-gold {
-  background: #451a03;
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.45);
-  font-weight: 700;
-}
-
-.neon-pill-emerald {
-  background: #022c22;
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.45);
-  font-weight: 700;
-}
-
-/* Varsity Athletic Typography */
-.font-athletic {
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-/* Custom scrollbar in Cyber Athletic neon style */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #05070a;
-}
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #1e293b 0%, #0369a1 100%);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #334155 0%, #0284c7 100%);
-}
-
-/* Sticky Column */
-.sticky-col {
-  position: sticky;
-  left: 0;
-  z-index: 10;
-  background-color: #0a0e16;
-}
-
-/* Touch & Mobile Ergonomics */
 * {
   -webkit-tap-highlight-color: transparent;
 }
@@ -301,7 +503,6 @@ body.theme-light,
   }
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -315,17 +516,4 @@ body.theme-light,
 
 .animate-fadeIn {
   animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes pulseGlow {
-  0%, 100% {
-    box-shadow: 0 0 15px -2px rgba(14, 165, 233, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 25px 2px rgba(14, 165, 233, 0.55);
-  }
-}
-
-.animate-pulseGlow {
-  animation: pulseGlow 2.5s infinite;
 }

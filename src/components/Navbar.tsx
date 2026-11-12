@@ -48,9 +48,11 @@ export default function Navbar() {
       const initial = saved || 'light';
       setTheme(initial);
       if (initial === 'light') {
-        document.documentElement.classList.add('theme-light');
+        document.documentElement.classList.add('theme-light', 'light');
+        document.documentElement.classList.remove('dark');
       } else {
-        document.documentElement.classList.remove('theme-light');
+        document.documentElement.classList.remove('theme-light', 'light');
+        document.documentElement.classList.add('dark');
       }
     }
   }, []);
@@ -61,9 +63,11 @@ export default function Navbar() {
     if (typeof window !== 'undefined') {
       localStorage.setItem('angels_theme', next);
       if (next === 'light') {
-        document.documentElement.classList.add('theme-light');
+        document.documentElement.classList.add('theme-light', 'light');
+        document.documentElement.classList.remove('dark');
       } else {
-        document.documentElement.classList.remove('theme-light');
+        document.documentElement.classList.remove('theme-light', 'light');
+        document.documentElement.classList.add('dark');
       }
     }
   };
