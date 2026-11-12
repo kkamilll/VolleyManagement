@@ -30,6 +30,8 @@ import {
   Download,
   FolderArchive,
   Camera,
+  Compass,
+  FileText,
   Sun,
   Moon
 } from 'lucide-react';
@@ -324,29 +326,55 @@ export default function Navbar() {
               Kadra
             </a>
 
-            <a
-              href="/taktyka"
-              className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
-                pathname === '/taktyka' || pathname.startsWith('/coach')
-                  ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <Target className="w-4 h-4 text-sky-400" />
-              Taktyka
-            </a>
+            {/* Taktyka & Trening with dropdown */}
+            <div className="relative group shrink-0">
+              <a
+                href="/taktyka"
+                className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
+                  pathname.startsWith('/taktyka') || pathname.startsWith('/trening') || pathname.startsWith('/coach')
+                    ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Target className="w-4 h-4 text-sky-400" />
+                <span>Taktyka & Trening</span>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition" />
+              </a>
 
-            <a
-              href="/trening"
-              className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
-                pathname === '/trening'
-                  ? 'bg-sky-500/20 text-sky-200 border border-sky-500/40 shadow-sm shadow-sky-500/20'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <Volleyball className="w-4 h-4 text-emerald-400" />
-              Treningi
-            </a>
+              {/* Submenu Dropdown */}
+              <div className="absolute left-0 top-full pt-1.5 hidden group-hover:block z-50">
+                <div className="w-60 bg-[#090d16] border border-sky-500/30 rounded-2xl shadow-2xl p-1.5 space-y-0.5 backdrop-blur-2xl">
+                  <a
+                    href="/taktyka?tab=board"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-200 hover:text-sky-300 hover:bg-slate-800/80 transition"
+                  >
+                    <Compass className="w-4 h-4 text-sky-400" />
+                    <span>Tablica Taktyczna (5-1)</span>
+                  </a>
+                  <a
+                    href="/taktyka?tab=playbook"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-200 hover:text-amber-300 hover:bg-slate-800/80 transition"
+                  >
+                    <Target className="w-4 h-4 text-amber-400" />
+                    <span>Baza Wariantów (Playbook)</span>
+                  </a>
+                  <a
+                    href="/taktyka?tab=training"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-200 hover:text-emerald-300 hover:bg-slate-800/80 transition"
+                  >
+                    <Volleyball className="w-4 h-4 text-emerald-400" />
+                    <span>Plany Treningowe & Warsztat</span>
+                  </a>
+                  <a
+                    href="/taktyka?tab=debrief"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-200 hover:text-purple-300 hover:bg-slate-800/80 transition"
+                  >
+                    <FileText className="w-4 h-4 text-purple-400" />
+                    <span>Odprawa & Wnioski Trenera</span>
+                  </a>
+                </div>
+              </div>
+            </div>
 
             <a
               href="/galeria"

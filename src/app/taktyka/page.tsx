@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useSeasonArchive } from '@/lib/season-archive-context';
+import { TrainingPlannerContent } from '@/components/TrainingPlanner';
 import {
   Target,
   Pencil,
@@ -287,8 +288,25 @@ function TacticsContent() {
   const { isArchiveMode } = useSeasonArchive();
   const canEdit = !isArchiveMode && Boolean(user && (user.role === 'TRENER' || user.role === 'KIEROWNIK' || user.isCaptain));
 
-  // Section switcher for mobile ergonomics (Tablica / Playbook / Materiały / Forum)
-  const [tacticsSection, setTacticsSection] = useState<'board' | 'playbook' | 'materials' | 'forum'>('board');
+  // Section switcher for unified Taktyka & Trening Hub (Tablica / Playbook / Materiały / Treningi / Odprawa / Forum)
+  const [tacticsSection, setTacticsSection] = useState<'board' | 'playbook' | 'materials' | 'training' | 'debrief' | 'forum'>('board');
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'training' || tab === 'trening' || tab === 'treningi') {
+      setTacticsSection('training');
+    } else if (tab === 'debrief' || tab === 'wnioski' || tab === 'odprawa') {
+      setTacticsSection('debrief');
+    } else if (tab === 'playbook' || tab === 'warianty') {
+      setTacticsSection('playbook');
+    } else if (tab === 'materials' || tab === 'pdf') {
+      setTacticsSection('materials');
+    } else if (tab === 'forum' || tab === 'dyskusja') {
+      setTacticsSection('forum');
+    } else if (tab === 'board' || tab === 'taktyka') {
+      setTacticsSection('board');
+    }
+  }, [searchParams]);
 
   // Tactical board state
   const courtContainerRef = useRef<HTMLDivElement | null>(null);
@@ -1722,24 +1740,24 @@ function TacticsContent() {
 
   return (
     <div className="w-full max-w-[2000px] mx-auto px-2 sm:px-6 lg:px-10 xl:px-12 pt-4 sm:pt-6 pb-24 md:pb-12 space-y-3 sm:space-y-4">
-      {/* Top Header - Ultra-compact, elegant and responsive Pro Cyber Athletic */}
-      <div className="flex items-center justify-between gap-3 pb-3 border-b border-sky-500/20">
+      {/* Top Header - Unified Taktyka & Trening Hub */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-sky-500/20">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-sky-500/10 border border-sky-400/40 flex items-center justify-center text-sky-400 shrink-0 shadow-lg shadow-sky-500/20">
-            <Compass className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-400/40 flex items-center justify-center text-sky-400 shrink-0 shadow-lg shadow-sky-500/20">
+            <Target className="w-5 h-5" />
           </div>
           <div>
             <h1 className="text-base sm:text-2xl font-black text-white uppercase tracking-tight font-athletic leading-tight">
-              Tablica <span className="text-gradient-cyan">Taktyczna</span>
+              Taktyka & <span className="text-gradient-cyan">Treningi</span>
             </h1>
             <span className="hidden sm:inline-block text-[11px] text-slate-400 font-medium">
-              System 5-1 • Pełne boisko siatkarskie • Rysowanie & Przepisy FIVB
+              Centrum Taktyczne • Rozpiski Treningowe • Tablica 5-1 • Wnioski i Odprawa
             </span>
           </div>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          {canEdit ? (
+          {tacticsSection === 'board' && canEdit && (
             <>
               <button
                 onClick={handleResetPositions}
@@ -1758,91 +1776,113 @@ function TacticsContent() {
                 <span>Zapisz Zrzut</span>
               </button>
             </>
-          ) : isArchiveMode ? (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-950/40 border border-purple-500/30 text-purple-200 text-xs font-bold shadow-sm">
-              <span>🔒 Archiwum: Tylko do odczytu</span>
-            </div>
-          ) : (
+          )}
+
+          {tacticsSection === 'materials' && canEdit && (
             <button
-              onClick={() => setShowRequestEditModal(true)}
-              className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-black uppercase tracking-wider transition shadow-md bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-amber-500/20"
+              onClick={() => setShowAddMaterialModal(true)}
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-black uppercase tracking-wider transition shadow-md bg-sky-500 hover:bg-sky-400 text-slate-950 shadow-sky-500/20"
             >
-              <span>✋ Poproś o edycję / Zgłoś uwagę</span>
+              <Plus className="w-3.5 h-3.5" />
+              <span>Dodaj Materiał / PDF</span>
             </button>
+          )}
+
+          {!canEdit && (
+            isArchiveMode ? (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-950/40 border border-purple-500/30 text-purple-200 text-xs font-bold shadow-sm">
+                <span>🔒 Archiwum: Tylko do odczytu</span>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowRequestEditModal(true)}
+                className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-black uppercase tracking-wider transition shadow-md bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-amber-500/20"
+              >
+                <span>✋ Poproś o edycję / Zgłoś uwagę</span>
+              </button>
+            )
           )}
         </div>
       </div>
 
-      {/* Sub-navigation tabs: Tablica Taktyczna vs Playbook & Scouting vs Rozpiski Treningowe */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-800/80 pb-2">
-        <Link
-          href="/taktyka"
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm"
+      {/* 6 Clean Subpage Tabs (Taktyka & Treningi) */}
+      <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-inner overflow-x-auto scrollbar-none">
+        <button
+          type="button"
+          onClick={() => setTacticsSection('board')}
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black transition whitespace-nowrap shrink-0 border ${
+            tacticsSection === 'board'
+              ? 'bg-sky-500/20 text-sky-300 border-sky-500/50 shadow-md shadow-sky-500/10 ring-1 ring-sky-500/30'
+              : 'bg-slate-950 text-slate-400 hover:text-white border-slate-800'
+          }`}
         >
           <Compass className="w-4 h-4 text-sky-400 shrink-0" />
-          <span>Tablica Taktyczna</span>
-        </Link>
-        <Link
-          href="/trening"
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-400 hover:text-emerald-300 hover:bg-slate-800/60 border border-emerald-500/30 transition shadow-sm"
-        >
-          <Volleyball className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>Rozpiski Treningowe & Warsztat</span>
-        </Link>
-        <Link
-          href="/coach"
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent transition"
+          <span>Tablica Taktyczna (5-1)</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setTacticsSection('playbook')}
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black transition whitespace-nowrap shrink-0 border ${
+            tacticsSection === 'playbook'
+              ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-md shadow-amber-500/10 ring-1 ring-amber-500/30'
+              : 'bg-slate-950 text-slate-400 hover:text-white border-slate-800'
+          }`}
         >
           <Target className="w-4 h-4 text-amber-400 shrink-0" />
-          <span>Playbook & Scouting</span>
-        </Link>
-      </div>
+          <span>Baza Wariantów ({tactics.length})</span>
+        </button>
 
-      {/* 4 Clean Tactical View Switchers - No Text Overload */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
         <button
-          onClick={() => setTacticsSection('board')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition shrink-0 ${
-            tacticsSection === 'board'
-              ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/20'
-              : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
-          }`}
-        >
-          <Compass className="w-3.5 h-3.5" />
-          <span>Tablica & Boisko</span>
-        </button>
-        <button
-          onClick={() => setTacticsSection('playbook')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition shrink-0 ${
-            tacticsSection === 'playbook'
-              ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-              : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
-          }`}
-        >
-          <Target className="w-3.5 h-3.5" />
-          <span>Playbook ({tactics.length})</span>
-        </button>
-        <button
+          type="button"
           onClick={() => setTacticsSection('materials')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition shrink-0 ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black transition whitespace-nowrap shrink-0 border ${
             tacticsSection === 'materials'
-              ? 'bg-rose-500 text-white shadow-md shadow-rose-500/20'
-              : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+              ? 'bg-rose-500/20 text-rose-300 border-rose-500/50 shadow-md shadow-rose-500/10 ring-1 ring-rose-500/30'
+              : 'bg-slate-950 text-slate-400 hover:text-white border-slate-800'
           }`}
         >
-          <FileText className="w-3.5 h-3.5" />
+          <FileText className="w-4 h-4 text-rose-400 shrink-0" />
           <span>Materiały PDF ({materials.length})</span>
         </button>
+
         <button
-          onClick={() => setTacticsSection('forum')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition shrink-0 ${
-            tacticsSection === 'forum'
-              ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
-              : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white'
+          type="button"
+          onClick={() => setTacticsSection('training')}
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black transition whitespace-nowrap shrink-0 border ${
+            tacticsSection === 'training'
+              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-md shadow-emerald-500/10 ring-1 ring-emerald-500/30'
+              : 'bg-slate-950 text-slate-400 hover:text-white border-slate-800'
           }`}
         >
-          <MessageSquare className="w-3.5 h-3.5" />
-          <span>Dyskusja ({selectedTactic?.posts?.length || 0})</span>
+          <Volleyball className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>Plany Treningowe & Warsztat</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setTacticsSection('debrief')}
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black transition whitespace-nowrap shrink-0 border ${
+            tacticsSection === 'debrief'
+              ? 'bg-purple-500/20 text-purple-300 border-purple-500/50 shadow-md shadow-purple-500/10 ring-1 ring-purple-500/30'
+              : 'bg-slate-950 text-slate-400 hover:text-white border-slate-800'
+          }`}
+        >
+          <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0" />
+          <span>Wnioski & Odprawa</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setTacticsSection('forum')}
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black transition whitespace-nowrap shrink-0 border ${
+            tacticsSection === 'forum'
+              ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/50 shadow-md shadow-indigo-500/10 ring-1 ring-indigo-500/30'
+              : 'bg-slate-950 text-slate-400 hover:text-white border-slate-800'
+          }`}
+        >
+          <MessageSquare className="w-4 h-4 text-indigo-400 shrink-0" />
+          <span>Dyskusja Zespołu</span>
         </button>
       </div>
 
@@ -3731,6 +3771,20 @@ function TacticsContent() {
           </div>
         )}
       </div>
+      )}
+
+      {/* SEKCJA: WARSZTAT TRENERA - PLANY TRENINGOWE */}
+      {tacticsSection === 'training' && (
+        <div className="space-y-4 animate-in fade-in duration-200">
+          <TrainingPlannerContent defaultTab="EXERCISES" hideHeader={true} />
+        </div>
+      )}
+
+      {/* SEKCJA: ODPRAWA & WNIOSKI TRENERA PO TRENINGU / MECZU */}
+      {tacticsSection === 'debrief' && (
+        <div className="space-y-4 animate-in fade-in duration-200">
+          <TrainingPlannerContent defaultTab="CONCLUSIONS" hideHeader={true} />
+        </div>
       )}
 
       {/* Modal: Dodaj Materiał Taktyczny (PDF / Grafika) */}
