@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { title, type, date, endDate, location, opponent, description, costPerPerson, tournamentMatches } = body;
+    const { title, type, date, endDate, location, opponent, description, costPerPerson, tournamentMatches, status, result } = body;
 
     if (!title || !type || !date || !location) {
       return NextResponse.json({ error: 'Uzupełnij wymagane pola (Tytuł, typ wydarzenia, data, miejsce)' }, { status: 400 });
@@ -43,13 +43,14 @@ export async function POST(request: Request) {
       id: `evt_${Date.now()}`,
       title: title.trim(),
       type: type as EventType,
-      status: 'ANKIETA',
+      status: (status as EventStatus) || (result ? 'ZAKONCZONY' : 'ANKIETA'),
       date,
       endDate: endDate || undefined,
       location: location.trim(),
       opponent: opponent ? opponent.trim() : undefined,
       description: description ? description.trim() : '',
       costPerPerson: costPerPerson ? Number(costPerPerson) : undefined,
+      result: result || undefined,
       attendees: [],
       actualAttendees: [],
       tournamentMatches: Array.isArray(tournamentMatches) ? tournamentMatches : undefined,

@@ -22,6 +22,7 @@ import {
   Sparkles,
   LayoutGrid,
   Target,
+  Swords,
   ArrowUpRight,
   CheckCircle2,
   AlertCircle,
@@ -282,6 +283,9 @@ function RozgrywkiContent() {
   const [eventOpponent, setEventOpponent] = useState('');
   const [eventDescription, setEventDescription] = useState('');
   const [eventCost, setEventCost] = useState('0');
+  const [eventIncludeResult, setEventIncludeResult] = useState(false);
+  const [eventResultSetsTeam, setEventResultSetsTeam] = useState(3);
+  const [eventResultSetsOpp, setEventResultSetsOpp] = useState(1);
   const [submittingEvent, setSubmittingEvent] = useState(false);
 
   // Tournament Match & Phase states
@@ -666,18 +670,36 @@ function RozgrywkiContent() {
     e.preventDefault();
     setSubmittingEvent(true);
     try {
+      const isSparing = eventTypeToCreate === 'SPARING';
+      const fallbackTitle = isSparing
+        ? (eventOpponent ? `Sparing vs ${eventOpponent}` : 'Sparing kontrolny')
+        : (eventTitle || 'Turniej siatkarski');
+      const finalTitle = eventTitle.trim() || fallbackTitle;
+      const isSparingWithScore = isSparing && eventIncludeResult;
+
       const res = await fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: eventTitle,
+          title: finalTitle,
           type: eventTypeToCreate,
           date: eventDate,
           endDate: eventEndDate || undefined,
           location: eventLocation,
           opponent: eventOpponent || undefined,
           description: eventDescription,
-          costPerPerson: Number(eventCost) || 0
+          costPerPerson: Number(eventCost) || 0,
+          status: isSparingWithScore ? 'ZAKONCZONY' : 'ANKIETA',
+          result: isSparingWithScore ? {
+            teamSetsWon: eventResultSetsTeam,
+            opponentSetsWon: eventResultSetsOpp,
+            sets: [
+              { setNumber: 1, teamScore: 25, opponentScore: 21 },
+              { setNumber: 2, teamScore: 25, opponentScore: 20 },
+              { setNumber: 3, teamScore: 25, opponentScore: 22 }
+            ],
+            notes: eventDescription || undefined
+          } : undefined
         })
       });
       const data = await res.json();
@@ -687,8 +709,9 @@ function RozgrywkiContent() {
         setEventOpponent('');
         setEventDescription('');
         setEventCost('0');
+        setEventIncludeResult(false);
         await fetchData();
-        alert(data.message || 'Wydarzenie zostało utworzone!');
+        alert(data.message || (isSparingWithScore ? 'Sparing wraz z wynikiem został zapisany!' : 'Wydarzenie zostało utworzone!'));
       } else {
         alert(data.error || 'Błąd tworzenia wydarzenia');
       }
@@ -2119,6 +2142,33 @@ function RozgrywkiContent() {
   const totalSparringsPages = Math.ceil(sparringsList.length / SPARRINGS_PER_PAGE) || 1;
   const paginatedSparrings = sparringsList.slice((sparringsPage - 1) * SPARRINGS_PER_PAGE, sparringsPage * SPARRINGS_PER_PAGE);
 
+  const handleOpenAddSparingResult = () => {
+    const unfinished = sparringsList.find(s => !s.result);
+    if (unfinished) {
+      openResultModal(unfinished);
+    } else if (sparringsList.length > 0) {
+      openResultModal(sparringsList[0]);
+    } else {
+      setEventTypeToCreate('SPARING');
+      setEventTitle('Sparing kontrolny');
+      setEventOpponent('');
+      setEventLocation('Hala Sportowa OSiR, ul. Sportowa 5');
+      setEventDate(new Date().toISOString().slice(0, 16));
+      setEventIncludeResult(true);
+      setShowAddEventModal(true);
+    }
+  };
+
+  const handleOpenCreateSparing = () => {
+    setEventTypeToCreate('SPARING');
+    setEventTitle('Sparing kontrolny');
+    setEventOpponent('');
+    setEventLocation('Hala Sportowa OSiR, ul. Sportowa 5');
+    setEventDate(new Date(Date.now() + 86400000 * 3).toISOString().slice(0, 16));
+    setEventIncludeResult(false);
+    setShowAddEventModal(true);
+  };
+
   const totalTournamentsPages = Math.ceil(tournamentsList.length / TOURNAMENTS_PER_PAGE) || 1;
   const paginatedTournaments = tournamentsList.slice((tournamentsPage - 1) * TOURNAMENTS_PER_PAGE, tournamentsPage * TOURNAMENTS_PER_PAGE);
 
@@ -2351,7 +2401,7 @@ function RozgrywkiContent() {
               <div className="flex items-center gap-2 overflow-x-auto scrollbar-none shrink-0 self-start sm:self-auto py-0.5">
                 <button
                   type="button"
-                  onClick={() => setShowAddMatchModal(true)}
+                  onClick={handleOpenAddSparingResult}
                   className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
                 >
                   <Plus className="w-3.5 h-3.5 text-amber-600" />
@@ -2359,11 +2409,7 @@ function RozgrywkiContent() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setEventTypeToCreate('SPARING');
-                    setEventTitle('Sparing kontrolny');
-                    setShowAddEventModal(true);
-                  }}
+                  onClick={handleOpenCreateSparing}
                   className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm whitespace-nowrap shrink-0"
                 >
                   <Calendar className="w-3.5 h-3.5" />
@@ -4887,46 +4933,69 @@ function RozgrywkiContent() {
 
       {/* Modal: Wprowadzanie / Edycja Wyniku */}
       {resultModalEvent && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-lg shadow-sm space-y-4">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-200">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-lg shadow-2xl space-y-4">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
               <h3 className="text-base font-black uppercase text-slate-900 flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-amber-400" />
+                <Trophy className="w-5 h-5 text-amber-500" />
                 Wynik Spotkania: {resultModalEvent.title}
               </h3>
-              <button onClick={() => setResultModalEvent(null)} className="text-slate-500 hover:text-slate-900">✕</button>
+              <button onClick={() => setResultModalEvent(null)} className="text-slate-400 hover:text-slate-700 font-black">✕</button>
             </div>
 
             <form onSubmit={handleSaveResult} className="space-y-4">
-              {/* Informacyjny banner o opcjonalności Live Score */}
-              <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200/90 flex items-start gap-2.5">
-                <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              {/* Szybki wybór meczu sparingowego jeśli jest ich więcej */}
+              {resultModalEvent.type === 'SPARING' && sparringsList.length > 1 && (
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
+                    Wybierz sparing do edycji:
+                  </label>
+                  <select
+                    value={resultModalEvent.id}
+                    onChange={(e) => {
+                      const found = sparringsList.find(s => s.id === e.target.value);
+                      if (found) openResultModal(found);
+                    }}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-amber-500 focus:bg-white"
+                  >
+                    {sparringsList.map(s => (
+                      <option key={s.id} value={s.id}>
+                        {s.opponent ? `vs ${s.opponent}` : s.title} ({new Date(s.date).toLocaleDateString('pl-PL')}) {s.result ? `[${s.result.teamSetsWon}:${s.result.opponentSetsWon}]` : '[Oczekuje na wynik]'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Informacyjny banner */}
+              <div className="p-3 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-start gap-2.5">
+                <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                 <p className="leading-relaxed">
-                  Możesz wpisać końcowy wynik sparingu bezpośrednio tutaj po meczu. Prowadzenie <strong>Live Score</strong> (punkt po punkcie w trakcie gry) jest w pełni opcjonalne.
+                  Wpisz końcowy rezultat sparingu (sety oraz małe punkty). Dane zaktualizują się w terminarzu i statystykach.
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1">Sety Angels ZTP</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Sety Angels ZTP</label>
                   <input
                     type="number"
                     min={0}
                     max={5}
                     value={resTeamSets}
                     onChange={e => setResTeamSets(Number(e.target.value))}
-                    className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-center text-xl font-mono font-black text-emerald-400 focus:outline-none focus:border-amber-400"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-center text-xl font-mono font-black text-emerald-600 focus:outline-none focus:border-amber-500 focus:bg-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1">Sety Rywala</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Sety Rywala</label>
                   <input
                     type="number"
                     min={0}
                     max={5}
                     value={resOppSets}
                     onChange={e => setResOppSets(Number(e.target.value))}
-                    className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-center text-xl font-mono font-black text-rose-400 focus:outline-none focus:border-amber-400"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-center text-xl font-mono font-black text-rose-600 focus:outline-none focus:border-amber-500 focus:bg-white"
                   />
                 </div>
               </div>
@@ -4934,7 +5003,7 @@ function RozgrywkiContent() {
               {/* Set by set inputs */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="block text-xs font-bold text-slate-600">Małe punkty w setach:</label>
+                  <label className="block text-xs font-bold text-slate-700">Małe punkty w setach:</label>
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
@@ -4942,7 +5011,7 @@ function RozgrywkiContent() {
                         const nextNum = resSetsList.length + 1;
                         setResSetsList([...resSetsList, { setNumber: nextNum, teamScore: 25, opponentScore: 20 }]);
                       }}
-                      className="px-2 py-0.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-200 text-sky-300 text-[11px] font-bold"
+                      className="px-2.5 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 border border-sky-300 text-sky-800 text-[11px] font-bold transition"
                     >
                       + Dodaj set
                     </button>
@@ -4950,7 +5019,7 @@ function RozgrywkiContent() {
                       <button
                         type="button"
                         onClick={() => setResSetsList(resSetsList.slice(0, -1))}
-                        className="px-2 py-0.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-200 text-rose-300 text-[11px] font-bold"
+                        className="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 border border-rose-300 text-rose-800 text-[11px] font-bold transition"
                       >
                         - Usuń set
                       </button>
@@ -4959,7 +5028,7 @@ function RozgrywkiContent() {
                 </div>
                 {resSetsList.map((set, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-xs">
-                    <span className="w-14 font-bold text-slate-500">Set {idx + 1}:</span>
+                    <span className="w-14 font-bold text-slate-600">Set {idx + 1}:</span>
                     <input
                       type="number"
                       value={set.teamScore}
@@ -4968,9 +5037,9 @@ function RozgrywkiContent() {
                         copy[idx].teamScore = Number(e.target.value);
                         setResSetsList(copy);
                       }}
-                      className="w-20 bg-slate-100 border border-slate-300 rounded-lg p-1.5 text-center font-mono font-bold text-slate-900 focus:outline-none focus:border-amber-400"
+                      className="w-20 bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-center font-mono font-bold text-slate-900 focus:outline-none focus:border-amber-500 focus:bg-white"
                     />
-                    <span className="text-slate-500 font-bold">-</span>
+                    <span className="text-slate-400 font-bold">-</span>
                     <input
                       type="number"
                       value={set.opponentScore}
@@ -4979,18 +5048,18 @@ function RozgrywkiContent() {
                         copy[idx].opponentScore = Number(e.target.value);
                         setResSetsList(copy);
                       }}
-                      className="w-20 bg-slate-100 border border-slate-300 rounded-lg p-1.5 text-center font-mono font-bold text-slate-900 focus:outline-none focus:border-amber-400"
+                      className="w-20 bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-center font-mono font-bold text-slate-900 focus:outline-none focus:border-amber-500 focus:bg-white"
                     />
                   </div>
                 ))}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1">MVP Meczu</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">MVP Meczu</label>
                 <select
                   value={resMvp}
                   onChange={e => setResMvp(e.target.value)}
-                  className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 focus:bg-white"
                 >
                   <option value="">Wybierz MVP spośród zawodników...</option>
                   {players.map(p => (
@@ -5003,40 +5072,40 @@ function RozgrywkiContent() {
 
               {resultModalEvent.type === 'TURNIEJ' && (
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1">Miejsce końcowe w turnieju</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Miejsce końcowe w turnieju</label>
                   <input
                     type="text"
                     value={resTournamentRank}
                     onChange={e => setResTournamentRank(e.target.value)}
                     placeholder="np. 1. miejsce (Złoty puchar)"
-                    className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 focus:bg-white"
                   />
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1">Notatki trenera / wnioski</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Notatki trenera / wnioski</label>
                 <textarea
                   rows={2}
                   value={resNotes}
                   onChange={e => setResNotes(e.target.value)}
                   placeholder="Kluczowe zagrania, elementy do poprawy..."
-                  className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 focus:bg-white"
                 />
               </div>
 
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setResultModalEvent(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-900"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition"
                 >
                   Anuluj
                 </button>
                 <button
                   type="submit"
                   disabled={submittingResult}
-                  className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition"
+                  className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm"
                 >
                   {submittingResult ? 'Zapisywanie...' : 'Zapisz Wynik'}
                 </button>
@@ -5050,86 +5119,204 @@ function RozgrywkiContent() {
 
       {/* Modal: Dodaj Wydarzenie (Sparing / Turniej) */}
       {showAddEventModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-lg shadow-sm space-y-4">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-200">
-              <h3 className="text-base font-black uppercase text-slate-900">
-                Nowy {eventTypeToCreate === 'SPARING' ? 'Sparing' : 'Turniej'}
-              </h3>
-              <button onClick={() => setShowAddEventModal(false)} className="text-slate-500 hover:text-slate-900">✕</button>
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-lg shadow-2xl space-y-4">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                  eventTypeToCreate === 'SPARING' ? 'bg-amber-100 text-amber-800' : 'bg-purple-100 text-purple-800'
+                }`}>
+                  {eventTypeToCreate === 'SPARING' ? <Swords className="w-4 h-4" /> : <Trophy className="w-4 h-4" />}
+                </div>
+                <div>
+                  <h3 className="text-base font-black uppercase text-slate-900">
+                    {eventTypeToCreate === 'SPARING' ? 'Nowy Sparing Kontrolny' : 'Nowy Turniej Siatkarski'}
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    {eventTypeToCreate === 'SPARING' ? 'Mecz towarzyski zespołu Angels ZTP' : 'Wprowadź dane turnieju'}
+                  </p>
+                </div>
+              </div>
+              <button onClick={() => setShowAddEventModal(false)} className="text-slate-400 hover:text-slate-700 font-black">✕</button>
             </div>
 
             <form onSubmit={handleCreateEvent} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1">Tytuł wydarzenia *</label>
-                <input
-                  type="text"
-                  required
-                  value={eventTitle}
-                  onChange={e => setEventTitle(e.target.value)}
-                  className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
-                />
-              </div>
+              {eventTypeToCreate === 'SPARING' ? (
+                <>
+                  {/* Przeciwnik */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Przeciwnik (drużyna rywali) *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="np. KS Siatkarz, Trefl II, Volley Team"
+                      value={eventOpponent}
+                      onChange={e => {
+                        const val = e.target.value;
+                        setEventOpponent(val);
+                        setEventTitle(val ? `Sparing vs ${val}` : 'Sparing kontrolny');
+                      }}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 focus:bg-white"
+                    />
+                  </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1">Przeciwnik / Zaproszone zespoły</label>
-                <input
-                  type="text"
-                  placeholder="np. Trefl Gdańsk II"
-                  value={eventOpponent}
-                  onChange={e => setEventOpponent(e.target.value)}
-                  className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
-                />
-              </div>
+                  {/* Data & Miejsce */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Data i godzina *</label>
+                      <input
+                        type="datetime-local"
+                        required
+                        value={eventDate}
+                        onChange={e => setEventDate(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 focus:bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Miejsce / Hala *</label>
+                      <input
+                        type="text"
+                        required
+                        value={eventLocation}
+                        onChange={e => setEventLocation(e.target.value)}
+                        placeholder="Hala Sportowa OSiR, ul. Sportowa 5"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 focus:bg-white"
+                      />
+                    </div>
+                  </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1">Data i godzina *</label>
-                  <input
-                    type="datetime-local"
-                    required
-                    value={eventDate}
-                    onChange={e => setEventDate(e.target.value)}
-                    className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-600 mb-1">Miejsce / Hala *</label>
-                  <input
-                    type="text"
-                    required
-                    value={eventLocation}
-                    onChange={e => setEventLocation(e.target.value)}
-                    className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
-                  />
-                </div>
-              </div>
+                  {/* Szybkie wpisanie wyniku jeśli sparing już rozegrany */}
+                  <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-3">
+                    <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={eventIncludeResult}
+                        onChange={e => setEventIncludeResult(e.target.checked)}
+                        className="w-4 h-4 text-amber-600 rounded border-slate-300 focus:ring-amber-500"
+                      />
+                      <span className="text-xs font-bold text-slate-800">
+                        Sparing już rozegrany – wpisz wynik od razu (sety)
+                      </span>
+                    </label>
+                    {eventIncludeResult && (
+                      <div className="pt-2 border-t border-amber-200/60 grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-700 mb-1">Sety Angels ZTP</label>
+                          <input
+                            type="number"
+                            min={0}
+                            max={5}
+                            value={eventResultSetsTeam}
+                            onChange={e => setEventResultSetsTeam(Number(e.target.value))}
+                            className="w-full bg-white border border-slate-300 rounded-xl p-2 text-center text-lg font-mono font-black text-emerald-600 focus:outline-none focus:border-amber-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-700 mb-1">Sety Rywala</label>
+                          <input
+                            type="number"
+                            min={0}
+                            max={5}
+                            value={eventResultSetsOpp}
+                            onChange={e => setEventResultSetsOpp(Number(e.target.value))}
+                            className="w-full bg-white border border-slate-300 rounded-xl p-2 text-center text-lg font-mono font-black text-rose-600 focus:outline-none focus:border-amber-500"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1">Opis / Zbiórka</label>
-                <textarea
-                  rows={2}
-                  value={eventDescription}
-                  onChange={e => setEventDescription(e.target.value)}
-                  placeholder="Godzina zbiórki, stroje meczowe..."
-                  className="w-full bg-slate-100 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-900"
-                />
-              </div>
+                  {/* Informacje dodatkowe */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Informacje dodatkowe / zbiórka (opcjonalne)</label>
+                    <textarea
+                      rows={2}
+                      value={eventDescription}
+                      onChange={e => setEventDescription(e.target.value)}
+                      placeholder="Godzina zbiórki, stroje, rozgrzewka..."
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-amber-500 focus:bg-white"
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Nazwa turnieju *</label>
+                    <input
+                      type="text"
+                      required
+                      value={eventTitle}
+                      onChange={e => setEventTitle(e.target.value)}
+                      placeholder="np. Puchar Burmistrza Lubonia"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-purple-500 focus:bg-white"
+                    />
+                  </div>
 
-              <div className="flex justify-end gap-2 pt-2">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Zaproszone zespoły</label>
+                    <input
+                      type="text"
+                      placeholder="np. Angels ZTP, KS Poznań, Volley Team..."
+                      value={eventOpponent}
+                      onChange={e => setEventOpponent(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-purple-500 focus:bg-white"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Data rozpoczęcia *</label>
+                      <input
+                        type="datetime-local"
+                        required
+                        value={eventDate}
+                        onChange={e => setEventDate(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-purple-500 focus:bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Miejsce / Hala *</label>
+                      <input
+                        type="text"
+                        required
+                        value={eventLocation}
+                        onChange={e => setEventLocation(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-purple-500 focus:bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Opis / Zasady turnieju</label>
+                    <textarea
+                      rows={2}
+                      value={eventDescription}
+                      onChange={e => setEventDescription(e.target.value)}
+                      placeholder="System rozgrywek, harmonogram, nagrody..."
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-purple-500 focus:bg-white"
+                    />
+                  </div>
+                </>
+              )}
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setShowAddEventModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-900"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition"
                 >
                   Anuluj
                 </button>
                 <button
                   type="submit"
                   disabled={submittingEvent}
-                  className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-sky-500 hover:bg-sky-400 text-slate-950 transition"
+                  className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-slate-950 transition shadow-sm ${
+                    eventTypeToCreate === 'SPARING'
+                      ? 'bg-amber-500 hover:bg-amber-400'
+                      : 'bg-purple-600 hover:bg-purple-500 text-white'
+                  }`}
                 >
-                  Utwórz
+                  {submittingEvent ? 'Tworzenie...' : eventTypeToCreate === 'SPARING' ? 'Utwórz Sparing' : 'Utwórz Turniej'}
                 </button>
               </div>
             </form>
