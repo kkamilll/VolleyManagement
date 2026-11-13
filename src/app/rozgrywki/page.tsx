@@ -2416,79 +2416,155 @@ function RozgrywkiContent() {
                 const maybeCount = event.attendees.filter(a => a.status === 'NIEPEWNE' && a.userRole === 'ZAWODNIK').length;
                 const myAttendance = event.attendees.find(a => a.userId === user?.id);
                 const isFinished = Boolean(event.result);
-
                 const isExpanded = Boolean(expandedSparrings[event.id]);
+
+                // Obliczanie czy do sparingu przypisana jest taktyka
+                const cleanOpponent = event.opponent?.trim();
+                const sparingTactics = tactics.filter(
+                  t => t.eventId === event.id ||
+                       t.matchId === event.id ||
+                       (t.scope === 'SPARING' && t.eventId === event.id) ||
+                       (cleanOpponent && t.targetOpponent && t.targetOpponent.toLowerCase().includes(cleanOpponent.toLowerCase()))
+                );
+                const hasTactic = sparingTactics.length > 0;
 
                 return (
                   <div
                     key={event.id}
-                    className="bg-white border border-slate-200 hover:border-amber-300 rounded-3xl overflow-hidden shadow-sm transition-all duration-200"
+                    className={`bg-white border ${
+                      isExpanded ? 'border-amber-400 shadow-md' : 'border-slate-200 hover:border-amber-300 shadow-sm'
+                    } border-l-[6px] border-l-amber-500 rounded-2xl overflow-hidden transition-all duration-200`}
                   >
                     {/* Zwijany Nagłówek Karty Sparingowej */}
                     <div
                       onClick={() => toggleSparring(event.id)}
-                      className="p-5 sm:p-6 cursor-pointer flex flex-col lg:flex-row lg:items-center justify-between gap-4 select-none hover:bg-slate-50 transition group"
+                      className="p-4 sm:p-5 cursor-pointer flex flex-col gap-3.5 select-none hover:bg-amber-50/10 transition group"
                     >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2 flex-wrap">
-                          <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase bg-amber-100 text-amber-900 border border-amber-300 shadow-xs">
-                            SPARING
-                          </span>
-                          {isFinished ? (
-                            <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1 shadow-xs">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-700" /> Zakończony
+                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 flex-1 min-w-0">
+                        {/* Lewa strona: Data Box + Tytuł + Szczegóły */}
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                          {/* Compact Date Box */}
+                          <div className="w-fit sm:w-28 shrink-0 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 flex items-center sm:flex-col sm:justify-center text-left sm:text-center gap-2 sm:gap-0.5 transition shadow-2xs">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-700">
+                              {new Date(event.date).toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' })}
                             </span>
-                          ) : (
-                            <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase bg-amber-50 text-amber-800 border border-amber-200">
-                              Zgłoszenia w toku
-                            </span>
-                          )}
-                          {event.liveScore?.isLive && (
-                            <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase bg-rose-50 text-rose-700 border border-rose-300 flex items-center gap-1.5 animate-pulse shadow-xs">
-                              <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping" />
-                              🔴 NA ŻYWO: Set {event.liveScore.currentSet} ({event.liveScore.teamCurrentScore}:{event.liveScore.opponentCurrentScore})
-                            </span>
-                          )}
-                        </div>
-                        <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-amber-700 transition tracking-tight truncate">
-                          {event.title} {event.opponent ? `vs ${event.opponent}` : ''}
-                        </h3>
-                        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600 mt-2 font-medium">
-                          <span className="flex items-center gap-1.5">
-                            <Clock className="w-4 h-4 text-sky-600" />
-                            {new Date(event.date).toLocaleString('pl-PL', { dateStyle: 'long', timeStyle: 'short' })}
-                          </span>
-                          <span className="flex items-center gap-1.5">
-                            <MapPin className="w-4 h-4 text-rose-600" />
-                            {event.location}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Prawa strona nagłówka: Wynik, Licznik obecnych i Przełącznik Chevron */}
-                      <div className="flex items-center justify-between lg:justify-end gap-3 shrink-0 pt-2 lg:pt-0 border-t border-slate-200 lg:border-t-0">
-                        {isFinished && event.result && (
-                          <div className="text-right px-4 py-1.5 rounded-2xl bg-slate-900 text-white shadow-sm">
-                            <span className="text-xl font-mono font-black text-white block leading-tight">
-                              {event.result.teamSetsWon} : {event.result.opponentSetsWon}
-                            </span>
-                            <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest block">
-                              Wynik
+                            <span className="text-xs font-mono font-bold flex items-center gap-1 sm:justify-center text-amber-950">
+                              <Clock className="w-3 h-3 text-amber-600" />
+                              {new Date(event.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
-                        )}
 
-                        <span className="px-3.5 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 flex items-center gap-1.5 shadow-xs">
-                          <Users className="w-4 h-4 text-amber-600" />
-                          <span>{yesCount} obecnych</span>
-                        </span>
+                          {/* Title and details */}
+                          <div className="space-y-1.5 min-w-0 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs">
+                                ⚔️ SPARING
+                              </span>
+                              {isFinished ? (
+                                <span className="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1 shadow-2xs">
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-700" /> Zakończony
+                                </span>
+                              ) : (
+                                <span className="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-50 text-amber-800 border border-amber-200">
+                                  Zgłoszenia w toku
+                                </span>
+                              )}
+                              {event.liveScore?.isLive && (
+                                <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-rose-50 text-rose-700 border border-rose-300 flex items-center gap-1.5 animate-pulse shadow-2xs">
+                                  <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping" />
+                                  🔴 NA ŻYWO: Set {event.liveScore.currentSet} ({event.liveScore.teamCurrentScore}:{event.liveScore.opponentCurrentScore})
+                                </span>
+                              )}
+                            </div>
 
-                        <div
-                          className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-all duration-200 ${
-                            isExpanded ? 'rotate-180 bg-amber-100 text-amber-900 border-amber-300' : 'bg-slate-100 border-slate-200 text-slate-500 group-hover:text-slate-900 group-hover:border-slate-300'
-                          }`}
+                            <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-amber-700 transition tracking-tight truncate">
+                              {event.title} {cleanOpponent && !event.title.toLowerCase().includes(cleanOpponent.toLowerCase()) ? `vs ${cleanOpponent}` : ''}
+                            </h3>
+
+                            <div className="flex items-center gap-3 text-xs text-slate-500 truncate">
+                              <span className="flex items-center gap-1 truncate">
+                                <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                                <span className="truncate">{event.location}</span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Prawa strona nagłówka: Wynik, Taktyka, Terminarz, Obecność, Chevron */}
+                        <div 
+                          onClick={e => e.stopPropagation()} 
+                          className="flex flex-wrap items-center justify-between lg:justify-end gap-2.5 shrink-0 pt-2 lg:pt-0 border-t border-slate-100 lg:border-t-0"
                         >
-                          <ChevronDown className="w-4 h-4" />
+                          {isFinished && event.result && (
+                            <div className="text-right px-3.5 py-1 rounded-xl bg-slate-900 text-white shadow-xs">
+                              <span className="text-lg font-mono font-black text-white block leading-tight">
+                                {event.result.teamSetsWon} : {event.result.opponentSetsWon}
+                              </span>
+                              <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest block">
+                                Wynik
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Przycisk Taktyki – podświetlony gdy jest taktyka, wyszarzony gdy jej brak */}
+                          {hasTactic ? (
+                            <Link
+                              href={`/taktyka?eventId=${event.id}&type=SPARING`}
+                              className="px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition"
+                              title={`Założenia taktyczne sparingu (${sparingTactics.length})`}
+                            >
+                              <Target className="w-4 h-4 text-sky-600" />
+                              <span>Taktyka 🎯</span>
+                            </Link>
+                          ) : canManage ? (
+                            <Link
+                              href={`/taktyka?eventId=${event.id}&type=SPARING`}
+                              className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-600 border border-slate-200 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition opacity-60 hover:opacity-100"
+                              title="Brak taktyki – kliknij, aby utworzyć założenia dla tego sparingu"
+                            >
+                              <Target className="w-4 h-4 text-slate-400" />
+                              <span>Taktyka</span>
+                            </Link>
+                          ) : (
+                            <div
+                              className="px-3.5 py-2 rounded-xl bg-slate-100 text-slate-400 border border-slate-200 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 opacity-40 cursor-not-allowed select-none"
+                              title="Brak taktyki dla tego sparingu"
+                            >
+                              <Target className="w-4 h-4 text-slate-400" />
+                              <span>Taktyka</span>
+                            </div>
+                          )}
+
+                          {/* Przycisk przejścia do Terminarza & Frekwencji */}
+                          <Link
+                            href="/events"
+                            className="px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-2xs transition"
+                            title="Otwórz w terminarzu zespołu"
+                          >
+                            <Calendar className="w-3.5 h-3.5 text-sky-600" />
+                            <span className="hidden sm:inline">Terminarz</span>
+                          </Link>
+
+                          {/* Badge obecności */}
+                          <span className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center gap-1.5 shadow-2xs">
+                            <Users className="w-3.5 h-3.5 text-amber-600" />
+                            <span>{yesCount} obecnych</span>
+                          </span>
+
+                          {/* Chevron Toggle */}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleSparring(event.id);
+                            }}
+                            className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-all duration-200 ${
+                              isExpanded ? 'rotate-180 bg-amber-100 text-amber-900 border-amber-300' : 'bg-slate-50 border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300'
+                            }`}
+                            title={isExpanded ? 'Zwiń szczegóły' : 'Rozwiń szczegóły'}
+                          >
+                            <ChevronDown className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -4282,82 +4358,153 @@ function RozgrywkiContent() {
 
                 const availablePhases = TOURNAMENT_PHASES.filter(ph => matches.some(m => m.phase === ph.id));
 
+                // Obliczanie czy do turnieju przypisana jest taktyka
+                const tournamentTactics = tactics.filter(
+                  t => t.eventId === event.id ||
+                       t.matchId === event.id ||
+                       (t.scope === 'TURNIEJ' && t.eventId === event.id)
+                );
+                const hasTournamentTactic = tournamentTactics.length > 0;
+
                 return (
                   <div
                     key={event.id}
-                    className="bg-white border border-slate-200 hover:border-purple-300 rounded-3xl overflow-hidden shadow-sm transition-all duration-300"
+                    className={`bg-white border ${
+                      isExpanded ? 'border-purple-400 shadow-md' : 'border-slate-200 hover:border-purple-300 shadow-sm'
+                    } border-l-[6px] border-l-purple-500 rounded-2xl overflow-hidden transition-all duration-200`}
                   >
                     {/* Zwijany Nagłówek Turnieju */}
                     <div
                       onClick={() => toggleTournament(event.id)}
-                      className="p-5 sm:p-6 cursor-pointer flex flex-col lg:flex-row lg:items-center justify-between gap-4 select-none hover:bg-slate-50 transition group"
+                      className="p-4 sm:p-5 cursor-pointer flex flex-col gap-3.5 select-none hover:bg-purple-50/10 transition group"
                     >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                          <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-black uppercase bg-purple-50 text-purple-800 border border-purple-200">
-                            🏆 TURNIEJ
-                          </span>
-                          {isFinished ? (
-                            <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-black uppercase bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1">
-                              <CheckCircle2 className="w-3 h-3" /> Rozegrany
+                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 flex-1 min-w-0">
+                        {/* Lewa strona: Data Box + Tytuł + Szczegóły */}
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                          {/* Compact Date Box */}
+                          <div className="w-fit sm:w-28 shrink-0 px-3 py-1.5 rounded-xl bg-purple-50 border border-purple-200 flex items-center sm:flex-col sm:justify-center text-left sm:text-center gap-2 sm:gap-0.5 transition shadow-2xs">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-purple-700">
+                              {new Date(event.date).toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' })}
                             </span>
-                          ) : (
-                            <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-black uppercase bg-amber-50 text-amber-800 border border-amber-300 animate-pulse">
-                              Zgłoszenia otwarte
-                            </span>
-                          )}
-                          {totalMatches > 0 && (
-                            <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                              {totalMatches} {totalMatches === 1 ? 'mecz' : totalMatches < 5 ? 'mecze' : 'meczów'}
-                            </span>
-                          )}
-                        </div>
-
-                        <h3 className="text-xl sm:text-2xl font-black text-slate-900 group-hover:text-purple-700 transition tracking-tight truncate">
-                          {event.title}
-                        </h3>
-
-                        <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 mt-2">
-                          <span className="flex items-center gap-1.5 text-slate-700 font-medium">
-                            <Calendar className="w-4 h-4 text-purple-600" />
-                            {new Date(event.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' })}
-                          </span>
-                          <span className="flex items-center gap-1.5 text-slate-700 font-medium">
-                            <MapPin className="w-4 h-4 text-rose-500" />
-                            {event.location}
-                          </span>
-                          {event.costPerPerson && (
-                            <span className="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-slate-100 border border-slate-200 text-slate-700">
-                              💰 {event.costPerPerson} zł / os.
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Prawa strona nagłówka turnieju: Wynik/Puchar, Liczba zgłoszonych, Chevron */}
-                      <div className="flex items-center justify-between lg:justify-end gap-3 shrink-0 pt-2 lg:pt-0 border-t border-slate-200 lg:border-t-0">
-                        {event.result?.tournamentRank && (
-                          <div className="text-right px-3 py-1.5 rounded-2xl bg-purple-50 border border-purple-200 shadow-2xs">
-                            <span className="text-xs sm:text-sm font-black text-purple-900 block leading-tight">
-                              {event.result.tournamentRank}
-                            </span>
-                            <span className="text-[9px] font-black text-purple-700 uppercase tracking-widest block">
-                              Miejsce końcowe
+                            <span className="text-xs font-mono font-bold flex items-center gap-1 sm:justify-center text-purple-950">
+                              <Calendar className="w-3 h-3 text-purple-600" />
+                              {new Date(event.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
-                        )}
 
-                        <span className="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                          <Users className="w-3.5 h-3.5 text-purple-600" />
-                          <span>{yesCount} chętnych</span>
-                        </span>
+                          {/* Title and details */}
+                          <div className="space-y-1.5 min-w-0 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-purple-100 text-purple-900 border border-purple-300 shadow-2xs">
+                                🏆 TURNIEJ
+                              </span>
+                              {isFinished ? (
+                                <span className="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1 shadow-2xs">
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-700" /> Rozegrany
+                                </span>
+                              ) : (
+                                <span className="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-50 text-amber-800 border border-amber-200">
+                                  Zgłoszenia otwarte
+                                </span>
+                              )}
+                              {totalMatches > 0 && (
+                                <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                  {totalMatches} {totalMatches === 1 ? 'mecz' : totalMatches < 5 ? 'mecze' : 'meczów'}
+                                </span>
+                              )}
+                            </div>
 
-                        <div
-                          className={`w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 transition-all duration-200 ${
-                            isExpanded ? 'rotate-180 bg-purple-50 text-purple-700 border-purple-300' : 'group-hover:text-slate-900 group-hover:border-slate-300'
-                          }`}
+                            <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-purple-700 transition tracking-tight truncate">
+                              {event.title}
+                            </h3>
+
+                            <div className="flex items-center gap-3 text-xs text-slate-500 truncate">
+                              <span className="flex items-center gap-1 truncate">
+                                <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                                <span className="truncate">{event.location}</span>
+                              </span>
+                              {event.costPerPerson && (
+                                <span className="text-slate-400">• 💰 {event.costPerPerson} zł / os.</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Prawa strona nagłówka turnieju: Wynik/Puchar, Taktyka, Terminarz, Obecność, Chevron */}
+                        <div 
+                          onClick={e => e.stopPropagation()} 
+                          className="flex flex-wrap items-center justify-between lg:justify-end gap-2.5 shrink-0 pt-2 lg:pt-0 border-t border-slate-100 lg:border-t-0"
                         >
-                          <ChevronDown className="w-4 h-4" />
+                          {event.result?.tournamentRank && (
+                            <div className="text-right px-3.5 py-1 rounded-xl bg-purple-900 text-white shadow-xs">
+                              <span className="text-sm font-black text-white block leading-tight">
+                                {event.result.tournamentRank}
+                              </span>
+                              <span className="text-[9px] font-black text-purple-200 uppercase tracking-widest block">
+                                Puchar / Miejsce
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Przycisk Taktyki – podświetlony gdy jest taktyka, wyszarzony gdy jej brak */}
+                          {hasTournamentTactic ? (
+                            <Link
+                              href={`/taktyka?eventId=${event.id}&type=TURNIEJ`}
+                              className="px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition"
+                              title={`Założenia taktyczne turnieju (${tournamentTactics.length})`}
+                            >
+                              <Target className="w-4 h-4 text-sky-600" />
+                              <span>Taktyka 🎯</span>
+                            </Link>
+                          ) : canManage ? (
+                            <Link
+                              href={`/taktyka?eventId=${event.id}&type=TURNIEJ`}
+                              className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-600 border border-slate-200 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition opacity-60 hover:opacity-100"
+                              title="Brak taktyki – kliknij, aby utworzyć założenia dla tego turnieju"
+                            >
+                              <Target className="w-4 h-4 text-slate-400" />
+                              <span>Taktyka</span>
+                            </Link>
+                          ) : (
+                            <div
+                              className="px-3.5 py-2 rounded-xl bg-slate-100 text-slate-400 border border-slate-200 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 opacity-40 cursor-not-allowed select-none"
+                              title="Brak taktyki dla tego turnieju"
+                            >
+                              <Target className="w-4 h-4 text-slate-400" />
+                              <span>Taktyka</span>
+                            </div>
+                          )}
+
+                          {/* Przycisk przejścia do Terminarza & Frekwencji */}
+                          <Link
+                            href="/events"
+                            className="px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-2xs transition"
+                            title="Otwórz w terminarzu zespołu"
+                          >
+                            <Calendar className="w-3.5 h-3.5 text-sky-600" />
+                            <span className="hidden sm:inline">Terminarz</span>
+                          </Link>
+
+                          {/* Badge obecności */}
+                          <span className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center gap-1.5 shadow-2xs">
+                            <Users className="w-3.5 h-3.5 text-purple-600" />
+                            <span>{yesCount} chętnych</span>
+                          </span>
+
+                          {/* Chevron Toggle */}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleTournament(event.id);
+                            }}
+                            className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-all duration-200 ${
+                              isExpanded ? 'rotate-180 bg-purple-100 text-purple-900 border-purple-300' : 'bg-slate-50 border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300'
+                            }`}
+                            title={isExpanded ? 'Zwiń szczegóły' : 'Rozwiń szczegóły'}
+                          >
+                            <ChevronDown className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
                     </div>
