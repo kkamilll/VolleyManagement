@@ -3144,7 +3144,7 @@ function RozgrywkiContent() {
                         Lubońska Amatorska Liga Siatkówki (LALS)
                       </h3>
                       <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase bg-emerald-50 text-emerald-800 border border-emerald-300">
-                        {currentLeaguePhase?.shortName || 'Faza I'}: {currentLeaguePhase?.advancementSpots === 3 ? 'Top 3 Awans' : 'Grupa Finałowa'}
+                        {currentLeaguePhase?.shortName || 'Tabela Ligowa'}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 mt-0.5">
@@ -3154,96 +3154,47 @@ function RozgrywkiContent() {
                 </div>
               </div>
 
-              {/* Dynamic Phase Switcher & Group Management Ribbon */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 shadow-sm">
-                {/* Row 1: Smooth Phase Tabs Scroll */}
-                <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-0.5">
-                  <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider shrink-0 mr-1 flex items-center gap-1">
-                    <Layers className="w-3.5 h-3.5 text-sky-600" /> Faza:
-                  </span>
-                  {(leaguePhases.length > 0 ? leaguePhases : [
-                    { id: 'faza_1', name: 'Faza I: Grupa Eliminacyjna', shortName: 'Faza I (Eliminacje)', advancementSpots: 3, advancementTargetName: 'Grupa Finałowa' },
-                    { id: 'faza_2', name: 'Faza II: Grupa Finałowa', shortName: 'Faza II (Grupa Finałowa)', advancementSpots: 1, advancementTargetName: 'Mistrz LALS' }
-                  ]).map((phase: any) => {
-                    const isSelected = (phase.id === activeLeaguePhaseId);
-                    const spots = phase.advancementSpots ?? 0;
-                    return (
-                      <button
-                        key={phase.id}
-                        type="button"
-                        onClick={() => handleSwitchPhase(phase.id)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 border ${
-                          isSelected
-                            ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
-                            : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-100'
-                        }`}
-                      >
-                        <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-white animate-pulse' : 'bg-slate-400'}`}></span>
-                        <span>{phase.shortName || phase.name}</span>
-                        {spots > 0 ? (
-                          <span className={`px-1.5 py-0.2 rounded text-[9px] font-mono font-bold ${
-                            isSelected ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-800 border border-emerald-300'
-                          }`}>
-                            Awans: {spots}
-                          </span>
-                        ) : (
-                          <span className={`px-1.5 py-0.2 rounded text-[9px] font-mono font-bold ${
-                            isSelected ? 'bg-white/20 text-white' : 'bg-amber-50 text-amber-800 border border-amber-300'
-                          }`}>
-                            Finał
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Row 2: Phase Info and Phase Management */}
-                <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-slate-200/80">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs text-slate-600 font-medium">
-                      Drużyn w grupie: <strong className="text-slate-900 font-mono font-bold">{leagueTable.length}</strong>
+              {/* Tabela Controls Bar */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-slate-50 border border-slate-200 rounded-2xl">
+                {/* Opcjonalny przełącznik tabel jeśli w bazie jest więcej niż jedna */}
+                {leaguePhases.length > 1 ? (
+                  <div className="flex items-center gap-1.5 p-1 bg-white rounded-xl border border-slate-200 overflow-x-auto scrollbar-none">
+                    <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider px-2 flex items-center gap-1">
+                      <Layers className="w-3.5 h-3.5 text-sky-600" /> Tabela:
                     </span>
-                    <span className="text-slate-300">•</span>
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-sky-50 text-sky-800 border border-sky-200">
-                      <span>Oficjalna Tabela VolleyStation</span>
-                      <span className="text-[9px] px-1 py-0.2 rounded font-mono font-black bg-sky-600 text-white">LIVE</span>
-                    </span>
+                    {leaguePhases.map((phase: any) => {
+                      const isSelected = (phase.id === activeLeaguePhaseId);
+                      return (
+                        <button
+                          key={phase.id}
+                          type="button"
+                          onClick={() => handleSwitchPhase(phase.id)}
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition shrink-0 ${
+                            isSelected
+                              ? 'bg-sky-600 text-white shadow-xs'
+                              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                          }`}
+                        >
+                          {phase.shortName || phase.name}
+                        </button>
+                      );
+                    })}
                   </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-700">Tabela ligowa</span>
+                  </div>
+                )}
 
-                  {canManage && !isArchiveMode && (
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <button
-                        type="button"
-                        onClick={() => handleOpenConfigPhase(activeLeaguePhaseId)}
-                        className="px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold transition flex items-center gap-1 border border-slate-200 shadow-sm"
-                        title="Zmień nazwę, awanse lub usuń tę fazę"
-                      >
-                        <Settings className="w-3 h-3 text-sky-600" />
-                        <span>Ustawienia Fazy</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handleOpenSplitPhase(activeLeaguePhaseId)}
-                        className="px-2.5 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-800 text-xs font-bold transition flex items-center gap-1 border border-purple-200 shadow-sm"
-                        title="Automatycznie wydziel nową grupę (np. miejsca 1-4 lub 5-8) z przeniesieniem punktów"
-                      >
-                        <GitFork className="w-3 h-3 text-purple-600" />
-                        <span>Podziel Grupę</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={handleOpenCreatePhase}
-                        className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold transition flex items-center gap-1 border border-emerald-200 shadow-sm"
-                        title="Dodaj nową fazę / grupę od zera"
-                      >
-                        <Plus className="w-3 h-3 text-emerald-600" />
-                        <span>Nowa Faza</span>
-                      </button>
-                    </div>
-                  )}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs text-slate-600 font-medium">
+                    Drużyn w tabeli: <strong className="text-slate-900 font-mono font-bold">{leagueTable.length}</strong>
+                  </span>
+                  <span className="text-slate-300">•</span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-sky-800 border border-slate-200 shadow-2xs">
+                    <span>Oficjalna Tabela VolleyStation</span>
+                    <span className="text-[9px] px-1 py-0.2 rounded font-mono font-black bg-sky-600 text-white">LIVE</span>
+                  </span>
                 </div>
               </div>
 
@@ -6784,342 +6735,6 @@ function RozgrywkiContent() {
         </div>
       )}
 
-      {/* MODAL: TWORZENIE NOWEJ FAZY / GRUPY */}
-      {showCreatePhaseModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-100 border border-slate-200 rounded-2xl max-w-lg w-full p-5 shadow-sm space-y-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-200 flex items-center justify-center text-emerald-400">
-                  <Plus className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black text-slate-900">Nowa Faza / Grupa Ligowa</h3>
-                  <p className="text-xs text-slate-500">Dodaj nową fazę rozgrywek (np. Grupa B, Finały, Play-off)</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowCreatePhaseModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div>
-                <label className="block text-slate-500 font-bold mb-1">Pełna nazwa fazy:</label>
-                <input
-                  type="text"
-                  value={newPhaseName}
-                  onChange={e => setNewPhaseName(e.target.value)}
-                  placeholder="np. Faza II: Grupa Pocieszenia (Miejsca 5-8)"
-                  className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-500 font-bold mb-1">Krótka nazwa (na przycisk):</label>
-                <input
-                  type="text"
-                  value={newPhaseShortName}
-                  onChange={e => setNewPhaseShortName(e.target.value)}
-                  placeholder="np. Miejsca 5-8 lub Grupa B"
-                  className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-500 font-bold mb-1">Miejsca z awansem (0 = finał):</label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="16"
-                    value={newPhaseAdvSpots}
-                    onChange={e => setNewPhaseAdvSpots(parseInt(e.target.value) || 0)}
-                    className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-mono font-bold focus:border-sky-500 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-500 font-bold mb-1">Cel awansu:</label>
-                  <input
-                    type="text"
-                    value={newPhaseAdvTarget}
-                    onChange={e => setNewPhaseAdvTarget(e.target.value)}
-                    placeholder="np. Grupa Finałowa lub Mistrz"
-                    className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-2 border-t border-slate-200 flex items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setShowCreatePhaseModal(false)}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-600"
-              >
-                Anuluj
-              </button>
-              <button
-                type="button"
-                onClick={handleCreatePhase}
-                disabled={creatingPhase || !newPhaseName.trim()}
-                className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-xs flex items-center gap-2 disabled:opacity-50 transition"
-              >
-                {creatingPhase ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                <span>Utwórz Fazę</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: PODZIAŁ GRUPY (SPLIT) */}
-      {showSplitPhaseModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-100 border border-slate-200 rounded-2xl max-w-lg w-full p-5 shadow-sm space-y-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-200 flex items-center justify-center text-purple-400">
-                  <GitFork className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black text-slate-900">Podział Grupy LALS</h3>
-                  <p className="text-xs text-slate-500">Wydziel nową fazę ze wskazanego zakresu miejsc</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowSplitPhaseModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div>
-                <label className="block text-slate-500 font-bold mb-1">Faza źródłowa:</label>
-                <select
-                  value={splitSourcePhaseId}
-                  onChange={e => setSplitSourcePhaseId(e.target.value)}
-                  className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
-                >
-                  {leaguePhases.map(ph => (
-                    <option key={ph.id} value={ph.id}>{ph.name} ({ph.table?.length || 0} drużyn)</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-500 font-bold mb-1">Pozycja od:</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={splitStartRank}
-                    onChange={e => setSplitStartRank(parseInt(e.target.value) || 1)}
-                    className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-mono font-bold focus:border-sky-500 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-500 font-bold mb-1">Pozycja do:</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={splitEndRank}
-                    onChange={e => setSplitEndRank(parseInt(e.target.value) || 1)}
-                    className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-mono font-bold focus:border-sky-500 outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-slate-500 font-bold mb-1">Nazwa nowo powstałej fazy:</label>
-                <input
-                  type="text"
-                  value={splitPhaseName}
-                  onChange={e => setSplitPhaseName(e.target.value)}
-                  placeholder="np. Grupa Mistrzowska (Miejsca 1-4)"
-                  className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-500 font-bold mb-1">Krótka nazwa:</label>
-                <input
-                  type="text"
-                  value={splitPhaseShortName}
-                  onChange={e => setSplitPhaseShortName(e.target.value)}
-                  placeholder="np. Mistrzowska (1-4)"
-                  className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
-                />
-              </div>
-
-              <label className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-50">
-                <input
-                  type="checkbox"
-                  checked={splitCarryOverStats}
-                  onChange={e => setSplitCarryOverStats(e.target.checked)}
-                  className="rounded text-purple-500 focus:ring-0"
-                />
-                <span className="text-slate-600">
-                  <strong>Przenieś punkty i sety</strong> z poprzedniej fazy (odznaczenie = reset do 0:0)
-                </span>
-              </label>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-500 font-bold mb-1">Awans z nowej grupy (0 = finał):</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={splitAdvSpots}
-                    onChange={e => setSplitAdvSpots(parseInt(e.target.value) || 0)}
-                    className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-mono font-bold focus:border-sky-500 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-500 font-bold mb-1">Cel awansu / Tytuł:</label>
-                  <input
-                    type="text"
-                    value={splitAdvTarget}
-                    onChange={e => setSplitAdvTarget(e.target.value)}
-                    placeholder="np. Mistrz Ligi LALS"
-                    className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-2 border-t border-slate-200 flex items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setShowSplitPhaseModal(false)}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-600"
-              >
-                Anuluj
-              </button>
-              <button
-                type="button"
-                onClick={handleSplitPhase}
-                disabled={splittingPhase || !splitPhaseName.trim()}
-                className="px-5 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-slate-900 font-black text-xs flex items-center gap-2 disabled:opacity-50 transition"
-              >
-                {splittingPhase ? <Loader2 className="w-4 h-4 animate-spin" /> : <GitFork className="w-4 h-4" />}
-                <span>Podziel i Utwórz Fazę</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: KONFIGURACJA I USUWANIE FAZY */}
-      {showConfigPhaseModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-100 border border-slate-200 rounded-2xl max-w-lg w-full p-5 shadow-sm space-y-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-sky-500/10 border border-sky-200 flex items-center justify-center text-sky-400">
-                  <Settings className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black text-slate-900">Konfiguracja Fazy Ligowej</h3>
-                  <p className="text-xs text-slate-500">Edytuj nazwę, reguły awansu lub usuń fazę</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowConfigPhaseModal(false)}
-                className="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div>
-                <label className="block text-slate-500 font-bold mb-1">Pełna nazwa fazy:</label>
-                <input
-                  type="text"
-                  value={configPhaseName}
-                  onChange={e => setConfigPhaseName(e.target.value)}
-                  className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-500 font-bold mb-1">Krótka nazwa:</label>
-                <input
-                  type="text"
-                  value={configPhaseShortName}
-                  onChange={e => setConfigPhaseShortName(e.target.value)}
-                  className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-500 font-bold mb-1">Miejsca awansujące (0 = finał):</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={configPhaseAdvSpots}
-                    onChange={e => setConfigPhaseAdvSpots(parseInt(e.target.value) || 0)}
-                    className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-mono font-bold focus:border-sky-500 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-500 font-bold mb-1">Cel awansu / Etap:</label>
-                  <input
-                    type="text"
-                    value={configPhaseAdvTarget}
-                    onChange={e => setConfigPhaseAdvTarget(e.target.value)}
-                    placeholder="np. Grupa Finałowa"
-                    className="w-full rounded-xl bg-slate-50 border border-slate-200 p-2.5 text-slate-900 font-bold focus:border-sky-500 outline-none"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
-              {leaguePhases.length > 1 ? (
-                <button
-                  type="button"
-                  onClick={() => handleDeletePhase(configPhaseId)}
-                  className="px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-200 text-xs font-bold flex items-center gap-1.5 transition"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Usuń tę fazę</span>
-                </button>
-              ) : <div />}
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowConfigPhaseModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-600"
-                >
-                  Anuluj
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSavePhaseConfig}
-                  disabled={updatingPhaseConfig || !configPhaseName.trim()}
-                  className="px-5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs flex items-center gap-2 disabled:opacity-50 transition"
-                >
-                  {updatingPhaseConfig ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  <span>Zapisz Zmiany</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* MODAL EDYCJI TABELI LIGOWEJ */}
       {showEditTableModal && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
@@ -7138,11 +6753,7 @@ function RozgrywkiContent() {
                     </span>
                   </h3>
                   <p className="text-xs text-slate-500">
-                    {(() => {
-                      const p = leaguePhases.find(ph => ph.id === editingTablePhaseId);
-                      const spots = p?.advancementSpots ?? 0;
-                      return `${p?.name || 'Faza ligowa'} • ${tableRows.length} zespołów • ${spots > 0 ? `Miejsca 1–${spots} awansują (${p?.advancementTargetName || 'Finał'})` : 'Faza medalowa / końcowa'}`;
-                    })()}
+                    {leaguePhases.find(ph => ph.id === editingTablePhaseId)?.name || 'Tabela ligowa'} • {tableRows.length} zespołów • Wklej dane bezpośrednio ze strony ligi lub Excela
                   </p>
                 </div>
               </div>
@@ -7158,26 +6769,32 @@ function RozgrywkiContent() {
             {/* Faza wybór */}
             <div className="p-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-500">Edytowana faza:</span>
-                <div className="flex gap-1.5">
-                  {leaguePhases.map(ph => (
-                    <button
-                      key={ph.id}
-                      type="button"
-                      onClick={() => {
-                        setEditingTablePhaseId(ph.id);
-                        setTableRows(ph.table ? JSON.parse(JSON.stringify(ph.table)) : []);
-                      }}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
-                        editingTablePhaseId === ph.id
-                          ? 'bg-sky-500 text-slate-950 font-black'
-                          : 'bg-slate-100 text-slate-500 hover:text-slate-900 border border-slate-200'
-                      }`}
-                    >
-                      {ph.shortName}
-                    </button>
-                  ))}
-                </div>
+                {leaguePhases.length > 1 ? (
+                  <>
+                    <span className="text-xs font-bold text-slate-500">Edytowana tabela:</span>
+                    <div className="flex gap-1.5">
+                      {leaguePhases.map(ph => (
+                        <button
+                          key={ph.id}
+                          type="button"
+                          onClick={() => {
+                            setEditingTablePhaseId(ph.id);
+                            setTableRows(ph.table ? JSON.parse(JSON.stringify(ph.table)) : []);
+                          }}
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
+                            editingTablePhaseId === ph.id
+                              ? 'bg-sky-500 text-slate-950 font-black'
+                              : 'bg-slate-100 text-slate-500 hover:text-slate-900 border border-slate-200'
+                          }`}
+                        >
+                          {ph.shortName}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <span className="text-xs font-bold text-slate-700">Tabela ligowa ({tableRows.length} drużyn)</span>
+                )}
               </div>
 
               <button
