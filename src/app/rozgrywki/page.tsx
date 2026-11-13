@@ -2900,8 +2900,8 @@ function RozgrywkiContent() {
       {/* 2. TAB: LIGA */}
       {activeTab === 'liga' && (
         <div className="space-y-6">
-          {/* Liga Subtabs (Tabela, Wyniki, Statystyki, Zdjęcia) */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+          {/* Liga Subtabs (Tabela, Wyniki, Statystyki) */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
             <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200 overflow-x-auto scrollbar-none max-w-full">
               <button
                 onClick={() => setLigaSubTab('tabela')}
@@ -2938,50 +2938,76 @@ function RozgrywkiContent() {
               </button>
             </div>
 
-            {canManage && (
-              <div className="flex items-center gap-2 overflow-x-auto scrollbar-none shrink-0 self-start lg:self-auto py-0.5">
-                {ligaSubTab === 'tabela' && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => handleOpenEditTable(currentLeaguePhase?.id || 'faza_1', 'text')}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
-                    >
-                      <Upload className="w-3.5 h-3.5 text-sky-600" />
-                      <span>Import Tabeli</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleOpenEditTable(currentLeaguePhase?.id || 'faza_1')}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
-                    >
-                      <Edit3 className="w-3.5 h-3.5" />
-                      <span>Edytuj Tabelę</span>
-                    </button>
-                  </>
-                )}
-                {ligaSubTab === 'wyniki' && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => setShowImportScheduleModal(true)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
-                    >
-                      <Upload className="w-3.5 h-3.5 text-sky-600" />
-                      <span>Import Terminarza</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowAddMatchModal(true)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>Dodaj Wynik</span>
-                    </button>
-                  </>
-                )}
-                {ligaSubTab === 'statystyki' && (
-                  <>
+            <div className="flex items-center gap-2 overflow-x-auto scrollbar-none shrink-0 self-start sm:self-auto py-0.5 flex-nowrap">
+              {ligaSubTab === 'tabela' && (
+                <>
+                  {canManage && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEditTable(currentLeaguePhase?.id || 'faza_1', 'text')}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                      >
+                        <Upload className="w-3.5 h-3.5 text-sky-600" />
+                        <span>Import Tabeli</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEditTable(currentLeaguePhase?.id || 'faza_1')}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>Edytuj Tabelę</span>
+                      </button>
+                    </>
+                  )}
+                  <a
+                    href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
+                    <span>VolleyStation ↗</span>
+                  </a>
+                </>
+              )}
+              {ligaSubTab === 'wyniki' && (
+                <>
+                  {canManage && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setShowImportScheduleModal(true)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                      >
+                        <Upload className="w-3.5 h-3.5 text-sky-600" />
+                        <span>Import Terminarza</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowAddMatchModal(true)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Dodaj Wynik</span>
+                      </button>
+                    </>
+                  )}
+                  <a
+                    href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
+                    <span>VolleyStation ↗</span>
+                  </a>
+                </>
+              )}
+              {ligaSubTab === 'statystyki' && (
+                <>
+                  {canManage && (
                     <button
                       type="button"
                       onClick={() => setShowVolleyStationImportModal(true)}
@@ -2990,35 +3016,19 @@ function RozgrywkiContent() {
                       <Upload className="w-3.5 h-3.5" />
                       <span>Import Statystyk</span>
                     </button>
-                    <a
-                      href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
-                      <span>VolleyStation ↗</span>
-                    </a>
-                  </>
-                )}
-                {ligaSubTab === 'zdjecia' && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPhotoCategory('MECZ');
-                      setPhotoTitle('');
-                      setPhotoMatch('');
-                      setPhotoSeriesList([]);
-                      setShowAddPhotoModal(true);
-                    }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
+                  )}
+                  <a
+                    href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
                   >
-                    <Camera className="w-3.5 h-3.5" />
-                    <span>+ Dodaj Zdjęcia</span>
-                  </button>
-                )}
-              </div>
-            )}
+                    <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
+                    <span>VolleyStation ↗</span>
+                  </a>
+                </>
+              )}
+            </div>
           </div>
 
           {/* SubTab 1: TABELA LIGOWA */}
@@ -3046,28 +3056,6 @@ function RozgrywkiContent() {
                       Oficjalne rozgrywki LALS • Klasyfikacja punktowa, bilans setów i małych punktów.
                     </p>
                   </div>
-                </div>
-
-                <div className="flex items-center gap-2 flex-wrap">
-                  {canManage && !isArchiveMode && (
-                    <button
-                      onClick={() => handleOpenEditTable(currentLeaguePhase?.id || 'faza_1')}
-                      className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 transition flex items-center gap-1.5 shadow-sm"
-                    >
-                      <Edit3 className="w-3.5 h-3.5 text-sky-600" />
-                      <span>Edytuj Tabelę</span>
-                    </button>
-                  )}
-
-                  <a
-                    href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-bold text-sky-700 transition flex items-center gap-1.5 shrink-0 shadow-sm"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
-                    <span>VolleyStation ↗</span>
-                  </a>
                 </div>
               </div>
 
