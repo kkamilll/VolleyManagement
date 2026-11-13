@@ -651,55 +651,66 @@ function EventsAttendanceContent() {
   return (
     <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 pt-6 sm:pt-8 pb-20 md:pb-16 space-y-6 sm:space-y-8">
       {/* 1. Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 shrink-0 shadow-sm">
-            <Calendar className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight font-athletic">
-                Terminarz & Frekwencja
-              </h1>
-              {isCoach && (
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-sky-50 text-sky-700 border border-sky-200">
-                  Tryb Trenera
-                </span>
-              )}
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 shrink-0 shadow-sm">
+              <Calendar className="w-5 h-5" />
             </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight font-athletic whitespace-nowrap">
+                  Terminarz & Frekwencja
+                </h1>
+                {isCoach && (
+                  <span className="px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider bg-sky-100 text-sky-800 border border-sky-300 shrink-0">
+                    Trener
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Shortcuts to Sparingi, Liga and Taktyka */}
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5">
+            <Link
+              href="/rozgrywki?tab=sparingi"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-xs uppercase tracking-wider shadow-2xs hover:shadow-xs transition shrink-0 whitespace-nowrap"
+              title="Przejdź do modułu sparingów"
+            >
+              <Swords className="w-3.5 h-3.5 text-amber-600" />
+              <span>Sparingi</span>
+              <span className="text-[10px] opacity-75 font-mono">⚔️</span>
+            </Link>
+            <Link
+              href="/rozgrywki?tab=liga"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-bold text-xs uppercase tracking-wider shadow-2xs hover:shadow-xs transition shrink-0 whitespace-nowrap"
+              title="Przejdź do oficjalnej ligi LALS"
+            >
+              <img src="/lals_logo.png" alt="LALS" className="w-3.5 h-3.5 rounded-full bg-white p-0.5 object-contain shrink-0" />
+              <span>Liga LALS</span>
+              <span className="text-[10px] opacity-75 font-mono">🏆</span>
+            </Link>
+            <Link
+              href="/taktyka"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 font-bold text-xs uppercase tracking-wider shadow-2xs hover:shadow-xs transition shrink-0 whitespace-nowrap"
+              title="Przejdź do tablicy taktycznej"
+            >
+              <Target className="w-3.5 h-3.5 text-purple-600" />
+              <span>Taktyka</span>
+              <span className="text-[10px] opacity-75 font-mono">🎯</span>
+            </Link>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
-          {/* Quick Shortcuts to Sparingi, Liga and Taktyka */}
-          <Link
-            href="/rozgrywki?tab=sparingi"
-            className="px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition"
-          >
-            <Swords className="w-4 h-4 text-amber-600" />
-            <span>Sparingi ⚔️</span>
-          </Link>
-          <Link
-            href="/rozgrywki?tab=liga"
-            className="px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition"
-          >
-            <img src="/lals_logo.png" alt="LALS" className="w-4 h-4 rounded-full bg-white p-0.5 object-contain" />
-            <span>Liga LALS 🏆</span>
-          </Link>
-          <Link
-            href="/taktyka"
-            className="px-3.5 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition"
-          >
-            <Target className="w-4 h-4 text-purple-600" />
-            <span>Taktyka 🎯</span>
-          </Link>
-
+        {/* Right Controls: View Switcher + Primary Action Button */}
+        <div className="flex items-center gap-2.5 shrink-0 self-start xl:self-auto">
           {/* Przełącznik widoku: Lista vs Kalendarz */}
-          <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-1 shadow-xs">
+          <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-1 shadow-2xs">
             <button
               type="button"
               onClick={() => setViewMode('list')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition ${
                 viewMode === 'list'
                   ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
                   : 'text-slate-600 hover:text-slate-900'
@@ -711,7 +722,7 @@ function EventsAttendanceContent() {
             <button
               type="button"
               onClick={() => setViewMode('calendar')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition ${
                 viewMode === 'calendar'
                   ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
                   : 'text-slate-600 hover:text-slate-900'
@@ -724,8 +735,9 @@ function EventsAttendanceContent() {
 
           {canManage && (
             <button
+              type="button"
               onClick={() => setShowCreateModal(true)}
-              className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider transition flex items-center gap-1.5 shadow-sm"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider transition shadow-sm whitespace-nowrap shrink-0"
             >
               <Plus className="w-4 h-4 stroke-[3]" />
               <span>Nowa Jednostka</span>
