@@ -33,14 +33,20 @@ import {
   X,
   Play,
   Share2,
-  Printer
+  Printer,
+  FileText,
+  Download,
+  Upload,
+  Swords,
+  Target
 } from 'lucide-react';
 import {
   TrainingPlan,
   TrainingExercise,
   TrainingConclusion,
   TrainingComment,
-  EventItem
+  EventItem,
+  TacticalMaterial
 } from '@/lib/types';
 
 export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?: 'EXERCISES' | 'CONCLUSIONS' | 'COMMENTS'; hideHeader?: boolean } = {}) {
@@ -64,7 +70,19 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
   const [loading, setLoading] = useState(true);
 
   // Active sub-tab inside the selected plan
-  const [activeTab, setActiveTab] = useState<'EXERCISES' | 'CONCLUSIONS' | 'COMMENTS'>(defaultTab || 'EXERCISES');
+  const [activeTab, setActiveTab] = useState<'EXERCISES' | 'MATERIALS' | 'CONCLUSIONS' | 'COMMENTS'>(defaultTab || 'EXERCISES');
+
+  // Materials & Event Type Filter
+  const [materials, setMaterials] = useState<TacticalMaterial[]>([]);
+  const [eventTypeFilter, setEventTypeFilter] = useState<'ALL' | 'TRENING' | 'SPARING' | 'MECZ'>('ALL');
+  const [showAddMaterialModal, setShowAddMaterialModal] = useState(false);
+  const [matTitle, setMatTitle] = useState('');
+  const [matType, setMatType] = useState<'PDF' | 'IMAGE'>('PDF');
+  const [matFileUrl, setMatFileUrl] = useState('');
+  const [matFileName, setMatFileName] = useState('');
+  const [matFileSize, setMatFileSize] = useState('');
+  const [matDescription, setMatDescription] = useState('');
+  const [savingMaterial, setSavingMaterial] = useState(false);
 
   useEffect(() => {
     if (defaultTab) {
@@ -116,25 +134,31 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
   const [commentContent, setCommentContent] = useState('');
   const [savingComment, setSavingComment] = useState(false);
 
-  // Fetch training plans
+  // Fetch training plans & events & materials
   const fetchPlans = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/trainings');
-      if (res.ok) {
-        const d = await res.json();
-        const pList = d.plans || [];
+      const [tRes, tacRes] = await Promise.all([
+        fetch('/api/trainings'),
+        fetch('/api/tactics')
+      ]);
+
+      let allEvents: EventItem[] = [];
+      let pList: TrainingPlan[] = [];
+
+      if (tRes.ok) {
+        const d = await tRes.json();
+        pList = d.plans || [];
         setPlans(pList);
-        setEvents(d.events || []);
         setPlayers(d.players || []);
 
-        const evList = (d.events || []).filter((e: EventItem) => e.type === 'TRENING');
-        setEvents(evList);
+        allEvents = (d.events || []).sort((a: EventItem, b: EventItem) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        setEvents(allEvents);
 
         let targetEventId = queryEventId;
-        if (!targetEventId && evList.length > 0) {
-          const upcoming = evList.find((e: EventItem) => new Date(e.date).getTime() >= Date.now() - 3600000 * 3);
-          targetEventId = (upcoming || evList[0]).id;
+        if (!targetEventId && allEvents.length > 0) {
+          const upcoming = allEvents.find((e: EventItem) => new Date(e.date).getTime() >= Date.now() - 3600000 * 3);
+          targetEventId = (upcoming || allEvents[0]).id;
         }
 
         if (targetEventId) {
@@ -150,10 +174,106 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
           setSelectedPlan(pList[0]);
         }
       }
+
+      if (tacRes.ok) {
+        const td = await tacRes.json();
+        setMaterials(td.materials || []);
+      }
     } catch (e) {
       console.error(e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleMaterialFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setMatFileName(file.name);
+    setMatFileSize(`${(file.size / 1024 / 1024).toFixed(2)} MB`);
+
+    if (file.type === 'application/pdf') {
+      setMatType('PDF');
+    } else {
+      setMatType('IMAGE');
+    }
+
+    if (!matTitle) {
+      setMatTitle(file.name.replace(/\.[^/.]+$/, ''));
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setMatFileUrl(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveMaterial = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!matTitle.trim() || !matFileUrl.trim()) {
+      alert('Podaj tytuł materiału oraz wybierz plik PDF lub link!');
+      return;
+    }
+    setSavingMaterial(true);
+    try {
+      const scopeType = activeEvent?.type === 'SPARING' ? 'SPARING' :
+        activeEvent?.type === 'MECZ' ? 'MECZ_LIGOWY' : 'TRENING';
+
+      const res = await fetch('/api/tactics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'ADD_MATERIAL',
+          material: {
+            title: matTitle.trim(),
+            type: matType,
+            fileUrl: matFileUrl,
+            fileName: matFileName || undefined,
+            fileSize: matFileSize || undefined,
+            scope: scopeType,
+            eventId: activeEvent?.id,
+            description: matDescription.trim() || undefined
+          }
+        })
+      });
+
+      if (res.ok) {
+        const d = await res.json();
+        if (d.material) {
+          setMaterials(prev => [d.material, ...prev]);
+        }
+        setShowAddMaterialModal(false);
+        setMatTitle('');
+        setMatFileUrl('');
+        setMatFileName('');
+        setMatFileSize('');
+        setMatDescription('');
+        alert('Materiał został pomyślnie dodany!');
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Błąd zapisu materiału');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Błąd połączenia');
+    } finally {
+      setSavingMaterial(false);
+    }
+  };
+
+  const handleDeleteMaterial = async (matId: string) => {
+    if (!confirm('Czy na pewno chcesz usunąć ten materiał?')) return;
+    try {
+      const res = await fetch(`/api/tactics?id=${matId}&type=MATERIAL`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        setMaterials(prev => prev.filter(m => m.id !== matId));
+      }
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -393,6 +513,12 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
     setCreating(true);
     try {
       const timeStr = ev.date.includes('T') ? ev.date.split('T')[1].slice(0, 5) : '19:30';
+      const isSparing = ev.type === 'SPARING';
+      const isMatch = ev.type === 'MECZ' || Boolean(ev.opponent && ev.title.toLowerCase().includes('lals'));
+      const defaultGoal = isMatch ? `Założenia taktyczne na mecz z ${ev.opponent || 'rywalem ligowym LALS'}`
+        : isSparing ? `Sprawdzenie ustawień i założeń w sparingu z ${ev.opponent || 'rywalem'}`
+        : 'Doskonalenie techniki i założeń taktycznych';
+
       const res = await fetch('/api/trainings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -404,8 +530,8 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
             time: timeStr ? `${timeStr} - ${parseInt(timeStr.split(':')[0]) + 1}:${timeStr.split(':')[1] || '00'}` : '19:30 - 21:00',
             location: ev.location,
             durationMinutes: 90,
-            mainGoal: 'Doskonalenie techniki i założeń taktycznych',
-            intensity: 'WYSOKA',
+            mainGoal: defaultGoal,
+            intensity: isMatch ? 'MECZOWA' : isSparing ? 'WYSOKA' : 'SREDNIA',
             equipmentNeeded: '16 piłek Mikasa V200W, pachołki, tablica taktyczna',
             eventId: ev.id
           }
@@ -547,18 +673,34 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
     }
   };
 
-  // List of all training events from Terminarz
-  const trainingEvents: EventItem[] = events
-    .filter(e => e.type === 'TRENING')
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  // Filtered list of events from Terminarz (Treningi, Sparingi, Mecze)
+  const filteredEvents: EventItem[] = useMemo(() => {
+    return events.filter(e => {
+      if (eventTypeFilter === 'ALL') return true;
+      if (eventTypeFilter === 'TRENING') return e.type === 'TRENING';
+      if (eventTypeFilter === 'SPARING') return e.type === 'SPARING';
+      if (eventTypeFilter === 'MECZ') return e.type === 'MECZ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals'));
+      return true;
+    });
+  }, [events, eventTypeFilter]);
+
+  const trainingsCount = useMemo(() => events.filter(e => e.type === 'TRENING').length, [events]);
+  const sparringsCount = useMemo(() => events.filter(e => e.type === 'SPARING').length, [events]);
+  const matchesCount = useMemo(() => events.filter(e => e.type === 'MECZ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals'))).length, [events]);
 
   // Currently active event from Terminarz
-  const activeEvent: EventItem | null = trainingEvents.find(e => e.id === selectedEventId) || trainingEvents[0] || null;
+  const activeEvent: EventItem | null = filteredEvents.find(e => e.id === selectedEventId) || filteredEvents[0] || null;
 
   // Active plan associated with this event (or fallback to selectedPlan)
   const activePlan: TrainingPlan | null = activeEvent
     ? (plans.find(p => p.eventId === activeEvent.id || p.id === activeEvent.id) || null)
     : (selectedPlan || plans[0] || null);
+
+  // Materials linked to this active event
+  const eventMaterials: TacticalMaterial[] = useMemo(() => {
+    if (!activeEvent) return materials;
+    return materials.filter(m => m.eventId === activeEvent.id || !m.eventId);
+  }, [materials, activeEvent]);
 
   return (
     <div className="w-full max-w-[2000px] mx-auto px-2 sm:px-6 lg:px-10 xl:px-12 pt-4 sm:pt-6 pb-24 md:pb-12 space-y-4">
@@ -571,30 +713,30 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
             </div>
             <div>
               <h1 className="text-base sm:text-2xl font-black text-slate-900 uppercase tracking-tight font-athletic leading-tight">
-                Warsztat Trenera • <span className="text-gradient-cyan">Rozpiski Treningowe</span>
+                Założenia & Plany • <span className="text-gradient-cyan">Treningi, Sparingi, Mecze</span>
               </h1>
               <span className="hidden sm:inline-block text-[11px] text-slate-500 font-medium">
-                Planowanie jednostek • Rysowanie ćwiczeń na boisku • Grafiki & Wideo • Wnioski i ocena po treningu
+                Rozpiski ćwiczeń z rysunkami boiska • Założenia meczowe • Załączniki PDF & Wideo • Wnioski i ocena
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <Link
-              href="/taktyka"
-              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 text-xs font-bold transition flex items-center gap-1.5"
+              href="/taktyka?tab=board"
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 text-xs font-bold transition flex items-center gap-1.5"
             >
-              <Compass className="w-3.5 h-3.5 text-sky-400" />
-              <span>Tablica Taktyczna</span>
+              <Compass className="w-3.5 h-3.5 text-sky-600" />
+              <span>Tablica & Brudnopis</span>
             </Link>
 
             {canManage && (
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-sky-500/20"
+                className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs transition flex items-center gap-1.5 shadow-sm"
               >
                 <Plus className="w-4 h-4" />
-                <span>Rozpisz Nowy Trening</span>
+                <span>Nowa Rozpiska</span>
               </button>
             )}
           </div>
@@ -603,49 +745,99 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
 
       {/* Main Layout Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* Left Column: Training Plans Selector List (Tied to Terminarz) */}
+        {/* Left Column: Events Selector List (Treningi, Sparingi, Mecze) */}
         <div className="lg:col-span-4 xl:col-span-3 space-y-3">
           <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-sm space-y-3">
             <div className="flex items-center justify-between pb-2 border-b border-slate-200">
               <div>
                 <span className="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-1.5">
                   <Calendar className="w-4 h-4 text-sky-600" />
-                  Treningi z Terminarza ({trainingEvents.length})
+                  Wydarzenia ({filteredEvents.length})
                 </span>
-                <p className="text-[10px] text-slate-500">Wybierz jednostkę do rozpiski</p>
+                <p className="text-[10px] text-slate-500">Wybierz jednostkę z Terminarza</p>
               </div>
               <Link
                 href="/events"
                 className="text-[11px] font-bold text-sky-700 hover:text-sky-900 flex items-center gap-1 bg-sky-50 hover:bg-sky-100 px-2.5 py-1 rounded-xl border border-sky-200 transition shadow-sm"
-                title="Przejdź do Terminarza, aby dodać nowy trening"
+                title="Przejdź do Terminarza"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Terminarz</span>
               </Link>
             </div>
 
-            {trainingEvents.length === 0 ? (
+            {/* Filter Pills: Wszystkie, Treningi, Sparingi, Mecze */}
+            <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto scrollbar-none">
+              <button
+                type="button"
+                onClick={() => setEventTypeFilter('ALL')}
+                className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                  eventTypeFilter === 'ALL'
+                    ? 'bg-sky-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                }`}
+              >
+                Wszystkie ({events.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setEventTypeFilter('TRENING')}
+                className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                  eventTypeFilter === 'TRENING'
+                    ? 'bg-sky-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                }`}
+              >
+                🏋️ Treningi ({trainingsCount})
+              </button>
+              <button
+                type="button"
+                onClick={() => setEventTypeFilter('SPARING')}
+                className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                  eventTypeFilter === 'SPARING'
+                    ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                }`}
+              >
+                ⚔️ Sparingi ({sparringsCount})
+              </button>
+              <button
+                type="button"
+                onClick={() => setEventTypeFilter('MECZ')}
+                className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                  eventTypeFilter === 'MECZ'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                }`}
+              >
+                🏐 Mecze ({matchesCount})
+              </button>
+            </div>
+
+            {filteredEvents.length === 0 ? (
               <div className="text-center py-8 px-3 bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-2">
                 <Volleyball className="w-8 h-8 text-sky-500 mx-auto" />
-                <p className="text-xs font-bold text-slate-700">Brak treningów w Terminarzu.</p>
-                <p className="text-[11px] text-slate-500">Treningi dodaje się w Terminarzu z frekwencją, a tutaj rozpisuje się ćwiczenia i założenia.</p>
+                <p className="text-xs font-bold text-slate-700">Brak wydarzeń w tej kategorii.</p>
+                <p className="text-[11px] text-slate-500">Dodaj jednostkę w Terminarzu klubu, aby rozpisać dla niej założenia taktyczne.</p>
                 <Link
                   href="/events"
                   className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-black shadow-sm transition mt-1"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Zaplanuj Trening w Terminarzu</span>
+                  <span>Przejdź do Terminarza</span>
                 </Link>
               </div>
             ) : (
               <div className="space-y-2 max-h-[calc(100vh-280px)] overflow-y-auto pr-1 scrollbar-thin">
-                {trainingEvents.map(ev => {
+                {filteredEvents.map(ev => {
                   const isSelected = activeEvent?.id === ev.id;
                   const plan = plans.find(p => p.eventId === ev.id || p.id === ev.id);
                   const exCount = plan?.exercises?.length || 0;
                   const conclCount = plan?.conclusions?.length || 0;
                   const attendeesCount = ev.attendees?.filter(a => a.status === 'BEDE').length || 0;
                   const evDate = new Date(ev.date);
+                  const isSparing = ev.type === 'SPARING';
+                  const isMatch = ev.type === 'MECZ' || Boolean(ev.opponent && ev.title.toLowerCase().includes('lals'));
 
                   return (
                     <div
@@ -657,20 +849,41 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
                       }}
                       className={`p-3 rounded-2xl border transition cursor-pointer text-left space-y-1.5 ${
                         isSelected
-                          ? 'bg-sky-50 border-sky-400 ring-2 ring-sky-300 text-slate-900 shadow-sm'
+                          ? isSparing
+                            ? 'bg-amber-50/50 border-amber-400 ring-2 ring-amber-300 text-slate-900 shadow-sm'
+                            : isMatch
+                            ? 'bg-indigo-50/50 border-indigo-400 ring-2 ring-indigo-300 text-slate-900 shadow-sm'
+                            : 'bg-sky-50 border-sky-400 ring-2 ring-sky-300 text-slate-900 shadow-sm'
                           : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700'
                       }`}
                     >
                       <div className="flex items-center justify-between text-[10px]">
-                        <span className="font-mono font-bold text-sky-700 flex items-center gap-1">
+                        <span className="font-mono font-bold text-slate-700 flex items-center gap-1">
                           <Clock className="w-3 h-3 text-sky-600" />
                           {evDate.toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' })} • {evDate.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
                         </span>
-                        <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
-                          plan ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-amber-100 text-amber-800 border border-amber-300'
-                        }`}>
-                          {plan ? `✓ Rozpisany (${exCount})` : 'Do rozpisania'}
-                        </span>
+
+                        <div className="flex items-center gap-1">
+                          {isSparing ? (
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-100 text-amber-900 border border-amber-300">
+                              ⚔️ Sparing
+                            </span>
+                          ) : isMatch ? (
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-indigo-100 text-indigo-900 border border-indigo-300">
+                              🏐 LALS
+                            </span>
+                          ) : (
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-sky-100 text-sky-800 border border-sky-300">
+                              🏋️ Trening
+                            </span>
+                          )}
+
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
+                            plan ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-600 border border-slate-200'
+                          }`}>
+                            {plan ? `✓ Rozpisany (${exCount})` : 'Do rozpisania'}
+                          </span>
+                        </div>
                       </div>
 
                       <h4 className="font-black text-xs line-clamp-1 text-slate-900">
@@ -712,7 +925,7 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
 
                 <div className="space-y-1.5 max-w-lg mx-auto">
                   <span className="px-3 py-1 rounded-full text-xs font-black uppercase bg-sky-100 text-sky-800 border border-sky-200">
-                    Wybrany Trening z Terminarza
+                    {activeEvent.type === 'SPARING' ? 'Wybrany Sparing' : activeEvent.type === 'MECZ' ? 'Wybrany Mecz Ligowy LALS' : 'Wybrany Trening z Terminarza'}
                   </span>
                   <h3 className="text-xl font-black text-slate-900 mt-2">{activeEvent.title}</h3>
                   <p className="text-xs text-slate-500">
@@ -720,13 +933,13 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
                   </p>
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold mt-2">
                     <Users className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Deklaracje z Terminarza: {activeEvent.attendees?.filter(a => a.status === 'BEDE').length || 0} zawodników na tak</span>
+                    <span>Deklaracje z Terminarza: {activeEvent.attendees?.filter(a => a.status === 'BEDE').length || 0} obecnych</span>
                   </div>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 max-w-md mx-auto text-xs text-slate-600 space-y-3">
                   <p>
-                    Ten trening został zaplanowany w Terminarzu, ale nie posiada jeszcze dodanej rozpiski ćwiczeń, tablicy i wniosków trenera.
+                    Ta jednostka nie posiada jeszcze rozpisanych założeń taktycznych, ćwiczeń i materiałów.
                   </p>
                   {canManage && (
                     <button
@@ -735,34 +948,38 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
                       className="w-full px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider transition shadow-sm flex items-center justify-center gap-2"
                     >
                       <Plus className="w-4 h-4" />
-                      <span>{creating ? 'Tworzenie rozpiski...' : 'Rozpisz ćwiczenia dla tego treningu'}</span>
+                      <span>{creating ? 'Tworzenie rozpiski...' : activeEvent.type === 'SPARING' ? 'Rozpisz założenia dla tego sparingu' : activeEvent.type === 'MECZ' ? 'Rozpisz taktykę na ten mecz ligowy' : 'Rozpisz ćwiczenia dla tego treningu'}</span>
                     </button>
                   )}
                 </div>
               </div>
             ) : (
               <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center text-slate-500 space-y-3 shadow-sm">
-                <Volleyball className="w-12 h-12 text-slate-600 mx-auto" />
-                <h3 className="text-base font-bold text-slate-900">Wybierz jednostkę treningową z listy po lewej</h3>
-                <p className="text-xs">Treningi pobierane są bezpośrednio z Terminarza klubu. Kliknij jednostkę, aby sprawdzić ćwiczenia, tablicę i wnioski.</p>
+                <Volleyball className="w-12 h-12 text-slate-400 mx-auto" />
+                <h3 className="text-base font-bold text-slate-900">Wybierz jednostkę z listy po lewej</h3>
+                <p className="text-xs">Wydarzenia pobierane są z Terminarza (treningi, sparingi, mecze LALS). Kliknij jednostkę, aby przygotować taktykę, ćwiczenia i materiały.</p>
               </div>
             )
           ) : (
             <div className="space-y-4">
-              {/* Training Plan Header Card */}
-              <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-white via-white to-slate-50 border border-sky-200 shadow-sm space-y-3">
+              {/* Event Plan Header Card */}
+              <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-white via-white to-slate-50 border border-slate-200 shadow-sm space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-sky-500 text-slate-950">
-                        Plan Treningowy
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                        activeEvent?.type === 'SPARING' ? 'bg-amber-500 text-slate-950 font-bold' :
+                        activeEvent?.type === 'MECZ' ? 'bg-indigo-600 text-white' :
+                        'bg-sky-600 text-white'
+                      }`}>
+                        {activeEvent?.type === 'SPARING' ? 'Założenia Sparingowe' : activeEvent?.type === 'MECZ' ? 'Plan Meczowy LALS' : 'Plan Treningowy'}
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-sky-300 border border-sky-200 flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-sky-800 border border-slate-200 flex items-center gap-1">
+                        <Calendar className="w-3 h-3 text-sky-600" />
                         {new Date(activePlan.date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' })}
                       </span>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-mono text-slate-600 bg-slate-100 border border-slate-300 flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-amber-400" />
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono text-slate-700 bg-slate-100 border border-slate-200 flex items-center gap-1 font-bold">
+                        <Clock className="w-3 h-3 text-amber-600" />
                         {activePlan.time || '19:30 - 21:00'} ({activePlan.durationMinutes} min)
                       </span>
                     </div>
@@ -773,11 +990,11 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
 
                     <div className="flex items-center gap-2 text-xs text-slate-600 flex-wrap">
                       <span className="flex items-center gap-1 text-slate-500">
-                        <MapPin className="w-3.5 h-3.5 text-rose-400" />
+                        <MapPin className="w-3.5 h-3.5 text-rose-500" />
                         {activePlan.location || 'Hala POSiR'}
                       </span>
-                      <span className="text-slate-600">•</span>
-                      <span className="text-amber-300 font-bold">
+                      <span className="text-slate-300">•</span>
+                      <span className="text-amber-800 font-bold">
                         Intensywność: {activePlan.intensity}
                       </span>
                     </div>
@@ -787,20 +1004,20 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
                     {canManage && (
                       <button
                         onClick={() => handleOpenExerciseModal()}
-                        className="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-sky-500/20"
+                        className="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs transition flex items-center gap-1.5 shadow-sm"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                        <span>Dodaj Ćwiczenie</span>
+                        <span>Dodaj Ćwiczenie / Założenie</span>
                       </button>
                     )}
                   </div>
                 </div>
 
                 {/* Main Goals & Equipment */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-200 text-xs">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-100 text-xs">
                   <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-sky-400">
-                      🎯 Główny cel treningu:
+                    <span className="text-[10px] font-black uppercase tracking-wider text-sky-700">
+                      🎯 Główny cel jednostki:
                     </span>
                     <p className="text-slate-900 font-bold leading-snug">
                       {activePlan.mainGoal}
@@ -830,8 +1047,8 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
                 </div>
               </div>
 
-              {/* Sub-tabs: Ćwiczenia / Wnioski / Dyskusja */}
-              <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+              {/* Sub-tabs: Ćwiczenia / Materiały & Załączniki / Wnioski / Dyskusja */}
+              <div className="flex items-center gap-2 border-b border-slate-200 pb-2 flex-wrap">
                 <button
                   onClick={() => setActiveTab('EXERCISES')}
                   className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
@@ -841,6 +1058,18 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
                   }`}
                 >
                   <span>📋 Ćwiczenia & Rozpiska ({activePlan.exercises?.length || 0})</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('MATERIALS')}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                    activeTab === 'MATERIALS'
+                      ? 'bg-rose-600 text-white shadow-sm'
+                      : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
+                  }`}
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>📁 Materiały & Załączniki ({eventMaterials.length})</span>
                 </button>
 
                 <button
@@ -1006,6 +1235,117 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
                                     </button>
                                   )}
                                 </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* TAB: MATERIALS & ATTACHMENTS */}
+              {activeTab === 'MATERIALS' && (
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-white rounded-3xl border border-slate-200 shadow-sm">
+                    <div>
+                      <h4 className="text-xs font-black uppercase text-slate-800 tracking-wider flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-rose-500" />
+                        <span>Materiały Taktyczne, PDF & Scouting dla tej jednostki</span>
+                      </h4>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Załączone pliki PDF, rozpiski taktyczne, analizy rywali oraz materiały wideo.
+                      </p>
+                    </div>
+
+                    {canManage && (
+                      <button
+                        onClick={() => setShowAddMaterialModal(true)}
+                        className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition flex items-center gap-1.5 shadow-sm shrink-0"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Dodaj Materiał / Załącznik PDF</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {eventMaterials.length === 0 ? (
+                    <div className="text-center py-12 px-4 bg-slate-50 rounded-3xl border border-dashed border-slate-200 space-y-3">
+                      <FileText className="w-10 h-10 text-rose-400/40 mx-auto" />
+                      <p className="text-xs font-bold text-slate-600">
+                        Brak załączonych materiałów do tej jednostki.
+                      </p>
+                      <p className="text-[11px] text-slate-400 max-w-sm mx-auto">
+                        Możesz dodać plik PDF (np. raport taktyczny, scouting rywala) lub grafikę z założeniami.
+                      </p>
+                      {canManage && (
+                        <button
+                          onClick={() => setShowAddMaterialModal(true)}
+                          className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition inline-flex items-center gap-1.5 shadow-sm"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>+ Dodaj pierwszy materiał</span>
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {eventMaterials.map(mat => (
+                        <div
+                          key={mat.id}
+                          className="p-4 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 shadow-sm flex flex-col justify-between gap-3 group transition"
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+                              {mat.type === 'PDF' ? <FileText className="w-5 h-5" /> : <ImageIcon className="w-5 h-5" />}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-rose-100 text-rose-700">
+                                  {mat.type}
+                                </span>
+                                {mat.fileSize && (
+                                  <span className="text-[10px] text-slate-400 font-mono">
+                                    {mat.fileSize}
+                                  </span>
+                                )}
+                              </div>
+                              <h5 className="text-sm font-black text-slate-900 mt-1 truncate">
+                                {mat.title}
+                              </h5>
+                              {mat.description && (
+                                <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">
+                                  {mat.description}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                            <span className="text-[10px] text-slate-400">
+                              {mat.uploadedAt ? new Date(mat.uploadedAt).toLocaleDateString('pl-PL') : ''}
+                            </span>
+                            <div className="flex items-center gap-1.5">
+                              {mat.fileUrl && (
+                                <a
+                                  href={mat.fileUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center gap-1 transition"
+                                >
+                                  <Download className="w-3.5 h-3.5" />
+                                  <span>Otwórz / Pobierz</span>
+                                </a>
+                              )}
+                              {canManage && (
+                                <button
+                                  onClick={() => handleDeleteMaterial(mat.id)}
+                                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
+                                  title="Usuń materiał"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
                               )}
                             </div>
                           </div>
@@ -1327,6 +1667,132 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
                   className="px-5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black shadow-md shadow-sky-500/20"
                 >
                   {creating ? 'Tworzenie...' : 'Stwórz Rozpiskę'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: ADD MATERIAL */}
+      {showAddMaterialModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-lg shadow-xl relative space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <h3 className="text-base font-black uppercase text-slate-900 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-rose-500" />
+                <span>Dodaj Materiał / Załącznik</span>
+              </h3>
+              <button
+                onClick={() => setShowAddMaterialModal(false)}
+                className="text-slate-500 hover:text-slate-900"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveMaterial} className="space-y-3 text-xs">
+              <div>
+                <label className="block text-[11px] font-black uppercase text-slate-600 mb-1">
+                  Tytuł materiału *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={matTitle}
+                  onChange={e => setMatTitle(e.target.value)}
+                  placeholder="np. Scouting rywala - strefy zagrywki i atak ze skrzydła"
+                  className="w-full bg-slate-100 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold focus:outline-none focus:border-rose-400"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-black uppercase text-slate-600 mb-1">
+                  Typ załącznika
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setMatType('PDF')}
+                    className={`py-2 px-3 rounded-xl font-bold text-xs border text-center transition ${
+                      matType === 'PDF'
+                        ? 'bg-rose-50 border-rose-300 text-rose-700'
+                        : 'bg-slate-50 border-slate-200 text-slate-600'
+                    }`}
+                  >
+                    📄 Dokument PDF
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMatType('IMAGE')}
+                    className={`py-2 px-3 rounded-xl font-bold text-xs border text-center transition ${
+                      matType === 'IMAGE'
+                        ? 'bg-rose-50 border-rose-300 text-rose-700'
+                        : 'bg-slate-50 border-slate-200 text-slate-600'
+                    }`}
+                  >
+                    🖼️ Grafika / Obraz
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-black uppercase text-slate-600 mb-1">
+                  Wgraj plik (PDF lub Obraz) *
+                </label>
+                <input
+                  type="file"
+                  accept={matType === 'PDF' ? '.pdf,application/pdf' : 'image/*'}
+                  onChange={handleMaterialFileUpload}
+                  className="w-full bg-slate-100 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-rose-600 file:text-white file:font-bold file:text-xs hover:file:bg-rose-500 cursor-pointer"
+                />
+                {matFileName && (
+                  <p className="text-[11px] text-emerald-600 font-bold mt-1">
+                    ✓ Wybrano: {matFileName} ({matFileSize})
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-black uppercase text-slate-600 mb-1">
+                  Lub podaj bezpośredni link URL (opcjonalnie)
+                </label>
+                <input
+                  type="url"
+                  value={matFileUrl.startsWith('data:') ? '' : matFileUrl}
+                  onChange={e => setMatFileUrl(e.target.value)}
+                  placeholder="https://... (np. link do chmury Google Drive / Dropbox)"
+                  className="w-full bg-slate-100 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 focus:outline-none focus:border-rose-400"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-black uppercase text-slate-600 mb-1">
+                  Krótki opis / instrukcja dla zawodników
+                </label>
+                <textarea
+                  rows={2}
+                  value={matDescription}
+                  onChange={e => setMatDescription(e.target.value)}
+                  placeholder="np. Zwróćcie uwagę na kierunki ataku numeru 7 i rotację P4..."
+                  className="w-full bg-slate-100 border border-slate-300 rounded-xl p-3 text-slate-900 focus:outline-none focus:border-rose-400"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setShowAddMaterialModal(false)}
+                  className="px-4 py-2 rounded-xl text-slate-500 hover:text-slate-900"
+                >
+                  Anuluj
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingMaterial || !matFileUrl}
+                  className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black shadow-sm disabled:opacity-50"
+                >
+                  {savingMaterial ? 'Zapisywanie...' : 'Zapisz Materiał'}
                 </button>
               </div>
             </form>

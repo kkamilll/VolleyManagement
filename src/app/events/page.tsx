@@ -651,8 +651,8 @@ function EventsAttendanceContent() {
   return (
     <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 pt-6 sm:pt-8 pb-20 md:pb-16 space-y-6 sm:space-y-8">
       {/* 1. Header Bar */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-slate-200">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 shrink-0 shadow-sm">
               <Calendar className="w-5 h-5" />
@@ -680,7 +680,6 @@ function EventsAttendanceContent() {
             >
               <Swords className="w-3.5 h-3.5 text-amber-600" />
               <span>Sparingi</span>
-              <span className="text-[10px] opacity-75 font-mono">⚔️</span>
             </Link>
             <Link
               href="/rozgrywki?tab=liga"
@@ -689,7 +688,6 @@ function EventsAttendanceContent() {
             >
               <img src="/lals_logo.png" alt="LALS" className="w-3.5 h-3.5 rounded-full bg-white p-0.5 object-contain shrink-0" />
               <span>Liga LALS</span>
-              <span className="text-[10px] opacity-75 font-mono">🏆</span>
             </Link>
             <Link
               href="/taktyka"
@@ -698,13 +696,12 @@ function EventsAttendanceContent() {
             >
               <Target className="w-3.5 h-3.5 text-purple-600" />
               <span>Taktyka</span>
-              <span className="text-[10px] opacity-75 font-mono">🎯</span>
             </Link>
           </div>
         </div>
 
         {/* Right Controls: View Switcher + Primary Action Button */}
-        <div className="flex items-center gap-2.5 shrink-0 self-start xl:self-auto">
+        <div className="flex items-center gap-2.5 shrink-0 self-start md:self-auto flex-wrap sm:flex-nowrap">
           {/* Przełącznik widoku: Lista vs Kalendarz */}
           <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-1 shadow-2xs">
             <button

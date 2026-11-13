@@ -1735,7 +1735,7 @@ function TacticsContent() {
         </div>
       </div>
 
-      {/* GŁÓWNY PODZIAŁ: 1. Taktyka Meczowa vs 2. Warsztat Treningowy (z Terminarza) */}
+      {/* GŁÓWNY PODZIAŁ MODUŁU TAKTYKI */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-1.5 rounded-2xl bg-slate-100 border border-slate-200 shadow-sm">
         <div className="flex items-center gap-1.5 w-full sm:w-auto">
           <button
@@ -1752,7 +1752,7 @@ function TacticsContent() {
             }`}
           >
             <Compass className="w-4 h-4" />
-            <span>Taktyka Meczowa & Schematy (5-1)</span>
+            <span>🎨 Tablica & Brudnopis Taktyczny</span>
           </button>
 
           <button
@@ -1765,21 +1765,21 @@ function TacticsContent() {
             }`}
           >
             <Volleyball className="w-4 h-4" />
-            <span>Warsztat Treningowy (z Terminarza)</span>
+            <span>📋 Założenia & Plany (Treningi, Sparingi, Mecze)</span>
           </button>
         </div>
 
         {/* Pomocnicza informacja o kontekście */}
         <div className="text-[11px] text-slate-500 font-medium px-2 hidden lg:flex items-center gap-1.5">
           {tacticsSection === 'training' || tacticsSection === 'debrief' ? (
-            <span>🏐 Jednostki i ćwiczenia powiązane z Terminarzem drużyny</span>
+            <span>🏐 Założenia, ćwiczenia (pisanie & rysowanie) i materiały PDF dla meczów i treningów</span>
           ) : (
-            <span>🧭 Rotacje P1-P6, playbook wariantów i odprawy meczowe LALS</span>
+            <span>🎨 Interaktywny brudnopis: przesuwaj graczy, rywali, piłkę i rysuj pisakiem</span>
           )}
         </div>
       </div>
 
-      {/* POD-ZAKŁADKI TAKTYKI MECZOWEJ (Tylko dla modułu Taktyki Meczowej) */}
+      {/* POD-ZAKŁADKI DLA TABLICY I BRUDNOPISU */}
       {(tacticsSection === 'board' || tacticsSection === 'playbook' || tacticsSection === 'materials' || tacticsSection === 'forum') && (
         <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl bg-white border border-slate-200 shadow-sm overflow-x-auto scrollbar-none">
           <button
@@ -1792,7 +1792,7 @@ function TacticsContent() {
             }`}
           >
             <Compass className="w-3.5 h-3.5 text-sky-600 shrink-0" />
-            <span>Tablica Boiskowa (5-1)</span>
+            <span>Tablica & Brudnopis (5-1)</span>
           </button>
 
           <button
@@ -1805,7 +1805,7 @@ function TacticsContent() {
             }`}
           >
             <Target className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-            <span>Baza Wariantów / Playbook ({tactics.length})</span>
+            <span>Baza Schematów / Playbook ({tactics.length})</span>
           </button>
 
           <button
@@ -1818,7 +1818,7 @@ function TacticsContent() {
             }`}
           >
             <FileText className="w-3.5 h-3.5 text-rose-600 shrink-0" />
-            <span>Materiały PDF ({materials.length})</span>
+            <span>Wszystkie Materiały PDF ({materials.length})</span>
           </button>
 
           <button
@@ -1831,7 +1831,7 @@ function TacticsContent() {
             }`}
           >
             <MessageSquare className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-            <span>Sugestie i Uwagi Zawodników</span>
+            <span>Sugestie i Uwagi Drużyny</span>
           </button>
         </div>
       )}
@@ -2278,8 +2278,8 @@ function TacticsContent() {
                       }
                       className={`h-8 px-2 rounded-xl text-xs font-black transition border font-mono flex items-center justify-center ${
                         rotation === r
-                          ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md shadow-amber-500/20'
-                          : 'bg-slate-900 text-slate-300 border-slate-200 hover:bg-slate-800 hover:text-white'
+                          ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-sm'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 hover:text-slate-900 shadow-2xs'
                       }`}
                     >
                       {r}
@@ -2305,8 +2305,8 @@ function TacticsContent() {
                       onClick={() => applyPreset(rotation, p.id as TacticalPhase)}
                       className={`h-8 px-1.5 xs:px-2 sm:px-2.5 rounded-xl text-[10px] xs:text-[11px] sm:text-xs font-black transition border flex items-center justify-center whitespace-nowrap ${
                         phase === p.id
-                          ? 'bg-sky-500 text-slate-950 border-sky-400 shadow-md shadow-sky-500/20'
-                          : 'bg-slate-900 text-slate-300 border-slate-200 hover:bg-slate-800 hover:text-white'
+                          ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 hover:text-slate-900 shadow-2xs'
                       }`}
                     >
                       {p.label}
@@ -2321,11 +2321,11 @@ function TacticsContent() {
               {!canEdit && !isSandboxMode ? (
                 <div className="w-full flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-200 text-slate-300 text-xs font-bold flex items-center gap-1.5 shadow-sm">
-                      <Lock className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="px-2.5 py-1 rounded-xl bg-slate-100 border border-slate-300 text-slate-700 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
+                      <Lock className="w-3.5 h-3.5 text-amber-500" />
                       <span>Widok Zawodnika (Tylko odczyt)</span>
                     </span>
-                    <span className="text-[11px] text-slate-400 hidden lg:inline">
+                    <span className="text-[11px] text-slate-500 hidden lg:inline">
                       Tablica w trybie podglądu założeń trenera. Kliknij zawodnika, aby sprawdzić jego zadania na boisku.
                     </span>
                   </div>
@@ -2344,20 +2344,20 @@ function TacticsContent() {
                     <button
                       type="button"
                       onClick={() => setIsSandboxMode(true)}
-                      className="px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-200 text-xs font-bold flex items-center gap-1.5 transition"
+                      className="px-2.5 py-1 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-bold flex items-center gap-1.5 transition shadow-2xs"
                       title="Włącz brudnopis do lokalnych testów i rysunków bez zmian w taktyce trenera"
                     >
-                      <FlaskConical className="w-3.5 h-3.5 text-amber-400" />
+                      <FlaskConical className="w-3.5 h-3.5 text-amber-500" />
                       <span>Włącz brudnopis</span>
                     </button>
 
                     {/* Opponents & Ball Toggles for player exploration */}
                     <button
                       onClick={() => setShowOpponents(!showOpponents)}
-                      className={`px-1.5 py-1 rounded-lg border text-[11px] font-bold transition flex items-center gap-1 ${
+                      className={`px-2 py-1 rounded-lg border text-[11px] font-bold transition flex items-center gap-1 ${
                         showOpponents
-                          ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                          : 'bg-slate-900 text-slate-500 border-slate-200'
+                          ? 'bg-rose-100 text-rose-800 border-rose-300'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
                       }`}
                       title="Pokaż/ukryj blok i obronę przeciwnika"
                     >
@@ -2367,10 +2367,10 @@ function TacticsContent() {
 
                     <button
                       onClick={() => setShowBall(!showBall)}
-                      className={`px-1.5 py-1 rounded-lg border text-[11px] font-bold transition flex items-center gap-1 ${
+                      className={`px-2 py-1 rounded-lg border text-[11px] font-bold transition flex items-center gap-1 ${
                         showBall
-                          ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                          : 'bg-slate-900 text-slate-500 border-slate-200'
+                          ? 'bg-amber-100 text-amber-800 border-amber-300'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
                       }`}
                       title="Pokaż/ukryj piłkę"
                     >
@@ -2382,15 +2382,15 @@ function TacticsContent() {
               ) : (
                 <>
                   {!canEdit && isSandboxMode && (
-                    <div className="w-full mb-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs flex items-center justify-between gap-2 shadow-sm">
+                    <div className="w-full mb-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-center justify-between gap-2 shadow-2xs">
                       <span className="flex items-center gap-1.5 font-bold">
-                        <FlaskConical className="w-4 h-4 text-amber-400" />
+                        <FlaskConical className="w-4 h-4 text-amber-600" />
                         <span>Tryb Brudnopisu: Rysujesz i testujesz lokalnie (Twoje zmiany nie nadpisują założeń trenera)</span>
                       </span>
                       <button
                         type="button"
                         onClick={() => setIsSandboxMode(false)}
-                        className="px-2.5 py-0.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs font-bold border border-slate-700 transition"
+                        className="px-2.5 py-0.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold border border-slate-300 transition"
                       >
                         ✕ Wyłącz brudnopis
                       </button>
@@ -2403,8 +2403,8 @@ function TacticsContent() {
                       onClick={() => setActiveTool('move')}
                       className={`h-7 px-2.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition border ${
                         activeTool === 'move'
-                          ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 border-amber-300 shadow-sm'
-                          : 'bg-slate-900 text-slate-300 border-slate-200 hover:text-white'
+                          ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 border-amber-400 shadow-sm'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 shadow-2xs'
                       }`}
                       title="Przesuwaj: chwyć i przeciągaj zawodników i piłkę"
                     >
@@ -2416,8 +2416,8 @@ function TacticsContent() {
                       onClick={() => { setActiveTool('pen'); setLineWidth(3); }}
                       className={`h-7 px-2 rounded-lg text-xs font-bold flex items-center gap-1 transition border ${
                         activeTool === 'pen'
-                          ? 'bg-sky-500 text-slate-950 border-sky-400 shadow-sm'
-                          : 'bg-slate-900 text-slate-400 border-slate-200 hover:text-white'
+                          ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 shadow-2xs'
                       }`}
                       title="Pisak: rysowanie linii i notatek"
                     >
@@ -2429,8 +2429,8 @@ function TacticsContent() {
                       onClick={() => setActiveTool('arrow')}
                       className={`h-7 px-2 rounded-lg text-xs font-bold flex items-center gap-1 transition border ${
                         activeTool === 'arrow'
-                          ? 'bg-sky-500 text-slate-950 border-sky-400 shadow-sm'
-                          : 'bg-slate-900 text-slate-400 border-slate-200 hover:text-white'
+                          ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 shadow-2xs'
                       }`}
                       title="Strzałka: trajektoria ataku lub przemieszczenia"
                     >
@@ -2442,8 +2442,8 @@ function TacticsContent() {
                       onClick={() => setActiveTool('eraser')}
                       className={`h-7 px-2 rounded-lg text-xs font-bold flex items-center gap-1 transition border ${
                         activeTool === 'eraser'
-                          ? 'bg-rose-500 text-white border-rose-400 shadow-sm'
-                          : 'bg-slate-900 text-slate-400 border-slate-200 hover:text-white'
+                          ? 'bg-rose-600 text-white border-rose-600 shadow-sm'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 shadow-2xs'
                       }`}
                       title="Gumka"
                     >
@@ -2458,9 +2458,9 @@ function TacticsContent() {
                     <div className="flex items-center gap-1 px-1">
                       {[
                         { hex: '#facc15', label: 'Żółty' },
-                        { hex: '#38bdf8', label: 'Błękitny' },
-                        { hex: '#f43f5e', label: 'Czerwony' },
-                        { hex: '#ffffff', label: 'Biały' }
+                        { hex: '#0284c7', label: 'Błękitny' },
+                        { hex: '#e11d48', label: 'Czerwony' },
+                        { hex: '#0f172a', label: 'Ciemny' }
                       ].map(c => (
                         <button
                           key={c.hex}
@@ -2469,7 +2469,7 @@ function TacticsContent() {
                             if (activeTool === 'move') setActiveTool('pen');
                           }}
                           className={`w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full border transition ${
-                            drawColor === c.hex ? 'border-white scale-110 ring-2 ring-white/30' : 'border-slate-700 opacity-80 hover:opacity-100'
+                            drawColor === c.hex ? 'border-sky-500 scale-110 ring-2 ring-sky-300' : 'border-slate-300 opacity-80 hover:opacity-100'
                           }`}
                           style={{ backgroundColor: c.hex }}
                           title={c.label}
@@ -2477,12 +2477,12 @@ function TacticsContent() {
                       ))}
                     </div>
 
-                    <div className="h-4 w-px bg-slate-800 mx-0.5" />
+                    <div className="h-4 w-px bg-slate-300 mx-0.5" />
 
                     {/* Undo & Clear */}
                     <button
                       onClick={handleUndo}
-                      className="p-1 rounded-lg bg-slate-900 text-slate-300 hover:text-white border border-slate-200 transition"
+                      className="p-1 rounded-lg bg-white text-slate-700 hover:text-slate-900 border border-slate-300 hover:bg-slate-100 shadow-2xs transition"
                       title="Cofnij rysunek"
                     >
                       <Undo2 className="w-3.5 h-3.5" />
@@ -2490,7 +2490,7 @@ function TacticsContent() {
 
                     <button
                       onClick={handleClearDrawing}
-                      className="p-1 rounded-lg bg-slate-900 text-rose-400 hover:text-rose-300 border border-slate-200 transition"
+                      className="p-1 rounded-lg bg-white text-rose-600 hover:text-rose-700 border border-slate-300 hover:bg-rose-50 shadow-2xs transition"
                       title="Wyczyść rysunki"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -2499,10 +2499,10 @@ function TacticsContent() {
                     {/* Opponents & Ball Toggles */}
                     <button
                       onClick={() => setShowOpponents(!showOpponents)}
-                      className={`px-1.5 py-1 rounded-lg border text-[11px] font-bold transition flex items-center gap-1 ${
+                      className={`px-2 py-1 rounded-lg border text-[11px] font-bold transition flex items-center gap-1 ${
                         showOpponents
-                          ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                          : 'bg-slate-900 text-slate-500 border-slate-200'
+                          ? 'bg-rose-100 text-rose-800 border-rose-300'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
                       }`}
                       title="Pokaż/ukryj blok i obronę przeciwnika"
                     >
@@ -2512,10 +2512,10 @@ function TacticsContent() {
 
                     <button
                       onClick={() => setShowBall(!showBall)}
-                      className={`px-1.5 py-1 rounded-lg border text-[11px] font-bold transition flex items-center gap-1 ${
+                      className={`px-2 py-1 rounded-lg border text-[11px] font-bold transition flex items-center gap-1 ${
                         showBall
-                          ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                          : 'bg-slate-900 text-slate-500 border-slate-200'
+                          ? 'bg-amber-100 text-amber-800 border-amber-300'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
                       }`}
                       title="Pokaż/ukryj piłkę"
                     >
@@ -2526,10 +2526,10 @@ function TacticsContent() {
                     {/* 5-1 diagonals info button */}
                     <button
                       onClick={() => setShowDiagonalsHint(!showDiagonalsHint)}
-                      className={`px-1.5 py-1 rounded-lg border text-[11px] font-bold transition flex items-center gap-1 ${
+                      className={`px-2 py-1 rounded-lg border text-[11px] font-bold transition flex items-center gap-1 ${
                         showDiagonalsHint
-                          ? 'bg-sky-500/20 text-sky-300 border-sky-500/40'
-                          : 'bg-slate-900 text-slate-400 border-slate-200 hover:text-white'
+                          ? 'bg-sky-100 text-sky-800 border-sky-300'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
                       }`}
                       title="Pokaż przekątne systemu 5-1"
                     >
