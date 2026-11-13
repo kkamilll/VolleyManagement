@@ -202,7 +202,14 @@ export default function Navbar() {
   useEffect(() => {
     fetchAnnouncements();
     const interval = setInterval(fetchAnnouncements, 15000);
-    return () => clearInterval(interval);
+
+    const onRead = () => fetchAnnouncements();
+    window.addEventListener('announcementRead', onRead);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('announcementRead', onRead);
+    };
   }, [user]);
 
   useEffect(() => {

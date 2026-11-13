@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import BottomNav from '@/components/BottomNav';
 import Footer from '@/components/Footer';
 import PwaInstallPrompt from '@/components/PwaInstallPrompt';
+import UnreadAnnouncementPopup from '@/components/UnreadAnnouncementPopup';
 
 export const metadata: Metadata = {
   title: 'Angels ZTP Volleyball Team',
@@ -61,6 +62,7 @@ export default function RootLayout({
           <AuthProvider>
             <SeasonArchiveProvider>
               <ArchiveModeBanner />
+              <UnreadAnnouncementPopup />
               <Navbar />
               <main className="flex-1 pb-24 md:pb-16">
                 {children}
