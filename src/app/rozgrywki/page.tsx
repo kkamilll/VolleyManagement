@@ -2338,64 +2338,37 @@ function RozgrywkiContent() {
       {/* 1. TAB: SPARINGI */}
       {activeTab === 'sparingi' && (
         <div className="space-y-6">
-          {/* Sparing Subtabs (Mecze & Protokoły) */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200">
-            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200">
-              <button
-                onClick={() => setSparingSubTab('mecze')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
-                  sparingSubTab === 'mecze'
-                    ? 'bg-amber-500 text-slate-950 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <Calendar className="w-3.5 h-3.5" />
-                Mecze & Protokoły ({sparringsList.length})
-              </button>
+          {/* Sparing Actions Toolbar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-black uppercase text-slate-700 tracking-wider flex items-center gap-1.5">
+                <Calendar className="w-4 h-4 text-amber-600" />
+                Mecze kontrolne ({sparringsList.length})
+              </span>
             </div>
 
             {canManage && (
               <div className="flex items-center gap-2 overflow-x-auto scrollbar-none shrink-0 self-start sm:self-auto py-0.5">
-                {sparingSubTab === 'mecze' && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => setShowAddMatchModal(true)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
-                    >
-                      <Plus className="w-3.5 h-3.5 text-amber-600" />
-                      <span>Dodaj Wynik</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEventTypeToCreate('SPARING');
-                        setEventTitle('Sparing kontrolny');
-                        setShowAddEventModal(true);
-                      }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm whitespace-nowrap shrink-0"
-                    >
-                      <Calendar className="w-3.5 h-3.5" />
-                      <span>Utwórz Sparing</span>
-                    </button>
-                  </>
-                )}
-                {sparingSubTab === 'zdjecia' && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPhotoCategory('SPARING');
-                      setPhotoTitle('');
-                      setPhotoMatch('');
-                      setPhotoSeriesList([]);
-                      setShowAddPhotoModal(true);
-                    }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm whitespace-nowrap shrink-0"
-                  >
-                    <Camera className="w-3.5 h-3.5" />
-                    <span>+ Dodaj Zdjęcia</span>
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => setShowAddMatchModal(true)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                >
+                  <Plus className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Dodaj Wynik</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEventTypeToCreate('SPARING');
+                    setEventTitle('Sparing kontrolny');
+                    setShowAddEventModal(true);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm whitespace-nowrap shrink-0"
+                >
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>Utwórz Sparing</span>
+                </button>
               </div>
             )}
           </div>
@@ -4266,64 +4239,37 @@ function RozgrywkiContent() {
       {/* 3. TAB: TURNIEJE */}
       {activeTab === 'turnieje' && (
         <div className="space-y-6">
-          {/* Turniej Subtabs (Drabinki & Wyniki, Zdjęcia z Turniejów) */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-200">
-            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200">
-              <button
-                onClick={() => setTurniejSubTab('drabinki')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition ${
-                  turniejSubTab === 'drabinki'
-                    ? 'bg-purple-600 text-white shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <Award className="w-3.5 h-3.5" />
+          {/* Turniej Actions Toolbar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-black uppercase text-slate-700 tracking-wider flex items-center gap-1.5">
+                <Award className="w-4 h-4 text-purple-600" />
                 Turnieje & Drabinki ({tournamentsList.length})
-              </button>
+              </span>
             </div>
 
             {canManage && (
               <div className="flex items-center gap-2 overflow-x-auto scrollbar-none shrink-0 self-start sm:self-auto py-0.5">
-                {turniejSubTab === 'drabinki' && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => setShowAddMatchModal(true)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
-                    >
-                      <Plus className="w-3.5 h-3.5 text-purple-600" />
-                      <span>Dodaj Wynik</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEventTypeToCreate('TURNIEJ');
-                        setEventTitle('Turniej Siatkarski');
-                        setShowAddEventModal(true);
-                      }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-purple-600 hover:bg-purple-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
-                    >
-                      <Award className="w-3.5 h-3.5" />
-                      <span>Utwórz Turniej</span>
-                    </button>
-                  </>
-                )}
-                {turniejSubTab === 'zdjecia' && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPhotoCategory('TURNIEJ');
-                      setPhotoTitle('');
-                      setPhotoMatch('');
-                      setPhotoSeriesList([]);
-                      setShowAddPhotoModal(true);
-                    }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-purple-600 hover:bg-purple-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
-                  >
-                    <Camera className="w-3.5 h-3.5" />
-                    <span>+ Dodaj Zdjęcia</span>
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => setShowAddMatchModal(true)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                >
+                  <Plus className="w-3.5 h-3.5 text-purple-600" />
+                  <span>Dodaj Wynik</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEventTypeToCreate('TURNIEJ');
+                    setEventTitle('Turniej Siatkarski');
+                    setShowAddEventModal(true);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-purple-600 hover:bg-purple-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
+                >
+                  <Award className="w-3.5 h-3.5" />
+                  <span>Utwórz Turniej</span>
+                </button>
               </div>
             )}
           </div>
