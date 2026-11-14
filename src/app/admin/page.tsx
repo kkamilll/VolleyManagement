@@ -43,7 +43,9 @@ import {
   RefreshCw,
   Upload,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  FileText,
+  Printer
 } from 'lucide-react';
 import { User, Role, UserPermissions, SeasonArchive } from '@/lib/types';
 
@@ -1167,20 +1169,33 @@ function AdminCenterContent() {
                     />
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (!seasonNameInput.trim()) {
-                        alert('Wpisz nazwę sezonu przed archiwizacją.');
-                        return;
-                      }
-                      setShowArchiveConfirm(true);
-                    }}
-                    className="sm:self-end px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider transition shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2"
-                  >
-                    <FolderArchive className="w-4 h-4" />
-                    <span>Zakończ i Zarchiwizuj Sezon</span>
-                  </button>
+                  <div className="flex flex-col sm:flex-row items-center gap-2 sm:self-end">
+                    <a
+                      href="/admin/raport-sezonu?id=current"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-amber-500/40 text-amber-300 font-black text-xs sm:text-sm uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2"
+                      title="Otwórz oficjalne podsumowanie sezonu gotowe do druku lub zapisu jako PDF"
+                    >
+                      <FileText className="w-4 h-4 text-amber-400" />
+                      <span>Raport Sezonu (PDF / Druk)</span>
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!seasonNameInput.trim()) {
+                          alert('Wpisz nazwę sezonu przed archiwizacją.');
+                          return;
+                        }
+                        setShowArchiveConfirm(true);
+                      }}
+                      className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider transition shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2"
+                    >
+                      <FolderArchive className="w-4 h-4" />
+                      <span>Zakończ i Zarchiwizuj Sezon</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -1343,6 +1358,17 @@ function AdminCenterContent() {
                           </div>
 
                           <div className="flex items-center gap-1.5">
+                            <a
+                              href={`/admin/raport-sezonu?id=${s.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-2.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-black transition flex items-center gap-1.5 shadow-sm"
+                              title="Pobierz oficjalny raport PDF / Drukuj dla tego zarchiwizowanego sezonu"
+                            >
+                              <FileText className="w-3.5 h-3.5 text-amber-400" />
+                              <span>Raport PDF</span>
+                            </a>
+
                             <a
                               href={`/api/admin/seasons/${s.id}`}
                               download={`${s.name.replace(/\s+/g, '_')}_archive.json`}

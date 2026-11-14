@@ -498,7 +498,7 @@
         },
         {
           "userId": "usr_trener",
-          "userName": "Hubert Obara",
+          "userName": "Hubert Rutkowski",
           "status": "BEDE"
         },
         {
@@ -564,6 +564,11 @@
         {
           "userId": "usr_augustynek",
           "userName": "Bartosz Augustynek",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_obara",
+          "userName": "Hubert Obara",
           "status": "BEDE"
         }
       ]
@@ -584,7 +589,7 @@
         },
         {
           "userId": "usr_trener",
-          "userName": "Hubert Obara",
+          "userName": "Hubert Rutkowski",
           "status": "BEDE"
         },
         {
@@ -650,6 +655,11 @@
         {
           "userId": "usr_augustynek",
           "userName": "Bartosz Augustynek",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_obara",
+          "userName": "Hubert Obara",
           "status": "BEDE"
         }
       ]
@@ -670,7 +680,7 @@
         },
         {
           "userId": "usr_trener",
-          "userName": "Hubert Obara",
+          "userName": "Hubert Rutkowski",
           "status": "BEDE"
         },
         {
@@ -737,6 +747,11 @@
           "userId": "usr_augustynek",
           "userName": "Bartosz Augustynek",
           "status": "BEDE"
+        },
+        {
+          "userId": "usr_obara",
+          "userName": "Hubert Obara",
+          "status": "BEDE"
         }
       ]
     },
@@ -750,7 +765,13 @@
       "description": "Oficjalny mecz ligowy LALS (Runda 11). Gramy jako gospodarz.",
       "costPerPerson": 0,
       "status": "ANKIETA",
-      "attendees": [],
+      "attendees": [
+        {
+          "userId": "usr_obara",
+          "userName": "Hubert Obara",
+          "status": "BEDE"
+        }
+      ],
       "createdById": "usr_hubert",
       "createdByName": "Hubert Obara",
       "createdAt": "2026-11-12T22:50:07.092Z"
@@ -765,7 +786,13 @@
       "description": "Oficjalny mecz ligowy LALS (Runda 13). Gramy na wyjeździe.",
       "costPerPerson": 0,
       "status": "ANKIETA",
-      "attendees": [],
+      "attendees": [
+        {
+          "userId": "usr_obara",
+          "userName": "Hubert Obara",
+          "status": "BEDE"
+        }
+      ],
       "createdById": "usr_hubert",
       "createdByName": "Hubert Obara",
       "createdAt": "2026-11-12T22:50:07.093Z"
@@ -780,7 +807,13 @@
       "description": "Oficjalny mecz ligowy LALS (Runda 16). Hit kolejki - walka o awans do Top 3.",
       "costPerPerson": 0,
       "status": "ANKIETA",
-      "attendees": [],
+      "attendees": [
+        {
+          "userId": "usr_obara",
+          "userName": "Hubert Obara",
+          "status": "BEDE"
+        }
+      ],
       "createdById": "usr_hubert",
       "createdByName": "Hubert Obara",
       "createdAt": "2026-11-12T22:50:07.093Z"
@@ -849,6 +882,11 @@
           "userId": "usr_pujanek",
           "userName": "Kamil Pujanek",
           "status": "BEDE"
+        },
+        {
+          "userId": "usr_obara",
+          "userName": "Hubert Obara",
+          "status": "BEDE"
         }
       ],
       "createdById": "usr_trener",
@@ -880,6 +918,11 @@
           "userId": "usr_pujanek",
           "userName": "Kamil Pujanek",
           "status": "BEDE"
+        },
+        {
+          "userId": "usr_obara",
+          "userName": "Hubert Obara",
+          "status": "BEDE"
         }
       ],
       "createdById": "usr_trener",
@@ -894,7 +937,13 @@
       "date": "2026-11-22T21:33",
       "location": "Hala Sportowa OSiR, ul. Sportowa 5",
       "description": "",
-      "attendees": [],
+      "attendees": [
+        {
+          "userId": "usr_obara",
+          "userName": "Hubert Obara",
+          "status": "BEDE"
+        }
+      ],
       "actualAttendees": [],
       "createdById": "usr_pujanek",
       "createdByName": "Kamil Pujanek",

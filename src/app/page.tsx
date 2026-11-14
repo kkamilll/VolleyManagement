@@ -38,7 +38,8 @@ import {
   ImageIcon,
   Pin,
   X,
-  Download
+  Download,
+  FileText
 } from 'lucide-react';
 import { 
   MatchResult, 
@@ -243,6 +244,16 @@ function DashboardContent() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <Link
+            href="/admin/raport-sezonu?id=current"
+            target="_blank"
+            className="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-xs font-black text-amber-900 transition flex items-center gap-1.5 shadow-2xs uppercase tracking-wide"
+            title="Pobierz oficjalny raport podsumowujący sezon (PDF / Drukuj)"
+          >
+            <FileText className="w-3.5 h-3.5 text-amber-600" />
+            <span>Raport Sezonu (PDF)</span>
+          </Link>
+
           {seasonArchives.length > 0 && (
             <Link
               href="/admin"
