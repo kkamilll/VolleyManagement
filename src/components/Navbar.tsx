@@ -334,21 +334,21 @@ export default function Navbar() {
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-sky-700 hover:bg-sky-50 transition"
                   >
                     <Compass className="w-4 h-4 text-sky-500" />
-                    <span>🎨 Tablica & Brudnopis</span>
+                    <span>Tablica Taktyczna (Boisko)</span>
                   </a>
                   <a
                     href="/taktyka?tab=matches"
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-sky-700 hover:bg-sky-50 transition"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-amber-700 hover:bg-amber-50 transition"
                   >
                     <Trophy className="w-4 h-4 text-amber-500" />
-                    <span>🏆 Mecze, Sparingi & Turnieje</span>
+                    <span>Rozpiski & Mecze LALS</span>
                   </a>
                   <a
                     href="/taktyka?tab=trainings"
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 transition"
                   >
                     <Volleyball className="w-4 h-4 text-emerald-500" />
-                    <span>🏐 Treningi & Ćwiczenia</span>
+                    <span>Konspekty Treningowe</span>
                   </a>
                 </div>
               </div>
@@ -827,21 +827,21 @@ export default function Navbar() {
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition"
             >
               <Compass className="w-4 h-4 text-sky-600" />
-              <span>🎨 Tablica & Brudnopis</span>
+              <span>Tablica Taktyczna (Boisko)</span>
             </a>
             <a
               href="/taktyka?tab=matches"
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-700 transition"
             >
               <Trophy className="w-4 h-4 text-amber-600" />
-              <span>🏆 Mecze, Sparingi & Turnieje</span>
+              <span>Rozpiski & Mecze LALS</span>
             </a>
             <a
               href="/taktyka?tab=trainings"
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition"
             >
               <Volleyball className="w-4 h-4 text-emerald-600" />
-              <span>🏐 Treningi & Ćwiczenia</span>
+              <span>Konspekty Treningowe</span>
             </a>
           </div>
 

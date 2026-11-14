@@ -1801,8 +1801,8 @@ function TacticsContent() {
                 : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-50'
             }`}
           >
-            <Compass className="w-4 h-4 text-amber-300" />
-            <span>🎯 Tablica Taktyczna (Boisko)</span>
+            <Compass className={`w-4 h-4 ${tacticsSection === 'board' ? 'text-amber-300' : 'text-sky-600'}`} />
+            <span>Tablica Taktyczna (Boisko)</span>
           </button>
 
           <button
@@ -1814,8 +1814,8 @@ function TacticsContent() {
                 : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-50'
             }`}
           >
-            <Trophy className="w-4 h-4 text-amber-300" />
-            <span>🏆 Rozpiski & Mecze LALS</span>
+            <Trophy className={`w-4 h-4 ${tacticsSection === 'matches' ? 'text-amber-300' : 'text-amber-500'}`} />
+            <span>Rozpiski & Mecze LALS</span>
           </button>
 
           <button
@@ -1827,8 +1827,8 @@ function TacticsContent() {
                 : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-50'
             }`}
           >
-            <Volleyball className="w-4 h-4 text-emerald-400" />
-            <span>🏐 Konspekty Treningowe</span>
+            <Volleyball className={`w-4 h-4 ${tacticsSection === 'trainings' ? 'text-amber-300' : 'text-emerald-500'}`} />
+            <span>Konspekty Treningowe</span>
           </button>
         </div>
 

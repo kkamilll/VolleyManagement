@@ -1086,8 +1086,8 @@ export function TrainingPlannerContent({
                         title="Otwórz tablicę taktyczną i rozrysuj ustawienie na to spotkanie"
                       >
                         <Compass className="w-3.5 h-3.5 text-sky-600" />
-                        <span className="hidden sm:inline">🎨 Rozrysuj na tablicy</span>
-                        <span className="sm:hidden">🎨 Tablica</span>
+                        <span className="hidden sm:inline">Rozrysuj na tablicy</span>
+                        <span className="sm:hidden">Tablica</span>
                       </Link>
                     )}
                     {canManage && (
