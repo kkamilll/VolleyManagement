@@ -66,7 +66,7 @@ import {
 } from '@/lib/types';
 
 // Default initial positions for 5-1 rotations on Full Court (Siatka w połowie: y=50%, Angels ZTP: y=52-95%)
-// Oficjalny system 5-1 PZPS/FIVB dla Angels ZTP:
+// Domyślne pozycje wyjściowe dla Angels ZTP:
 // - Środkowi (Ś1: Maciek Noak #47 i Ś2: Kamil Pujanek #4 / Libero: Bartosz Augustynek #97)
 // - Przyjmujący (P1: Tomasz Krupa #1 i P2: Michał Śmigiel #8)
 // - Rozgrywający (R: Karol Ordon #28 / Hubert Obara #12) i Atakujący (A: Łukasz Kremer #17)
@@ -389,7 +389,6 @@ function TacticsContent() {
   const [submittingPost, setSubmittingPost] = useState(false);
   const [editingPostModal, setEditingPostModal] = useState<TacticalPost | null>(null);
   const [editCoachFeedback, setEditCoachFeedback] = useState('');
-  const [showDiagonalsHint, setShowDiagonalsHint] = useState(false);
 
   // Player Read-Only & Sandbox State
   const [isSandboxMode, setIsSandboxMode] = useState(false);
@@ -484,9 +483,9 @@ function TacticsContent() {
       setLinkedMatchId('');
       setTacticScope('OGOLNA');
       setUnitDirectives([
-        'Podstawowe pozycje wyjściowe w systemie 5-1 PZPS/FIVB',
-        'Przekątne: Ś1 ↔ Ś2/L, P1 ↔ P2, R ↔ A',
-        'Przestrzeganie linii pionowych i poziomych w fazie przyjęcia'
+        'Podstawowe pozycje wyjściowe zespołu',
+        'Asekuracja i organizacja rozegrania',
+        'Zgranie i komunikacja na boisku'
       ]);
     }
   }, [activeTargetEvent, activeTargetMatch]);
@@ -1553,7 +1552,7 @@ function TacticsContent() {
     return {
       type: 'OGOLNA' as const,
       category: 'OGOLNA' as const,
-      label: 'Baza Ogólna 5-1 Zespołu',
+      label: 'Baza Ogólna Zespołu',
       opponent: null,
       date: null,
       badgeColor: 'slate',
@@ -1566,7 +1565,7 @@ function TacticsContent() {
   const availableMatchOptions = useMemo(() => {
     const list: { key: string; label: string; date?: string; type: 'MECZ' | 'SPARING' | 'OGOLNA' }[] = [
       { key: 'WSZYSCY', label: 'Wszystkie mecze i rywale', type: 'OGOLNA' },
-      { key: 'OGOLNA', label: '📘 Tylko Baza Ogólna 5-1 Zespołu', type: 'OGOLNA' }
+      { key: 'OGOLNA', label: '📘 Tylko Baza Ogólna Zespołu', type: 'OGOLNA' }
     ];
 
     matches.forEach(m => {
@@ -1681,7 +1680,7 @@ function TacticsContent() {
               Taktyka & Treningi
             </h1>
             <span className="hidden sm:inline-block text-[11px] text-slate-500 font-medium">
-              Centrum Taktyczne • Rozpiski Treningowe • Tablica 5-1 • Wnioski i Odprawa
+              Centrum Taktyczne • Rozpiski Treningowe • Tablica Taktyczna • Wnioski i Odprawa
             </span>
           </div>
         </div>
@@ -1692,7 +1691,7 @@ function TacticsContent() {
               <button
                 onClick={handleResetPositions}
                 className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
-                title="Przywróć domyślne pozycje 5-1 dla tej rotacji i fazy"
+                title="Przywróć domyślne pozycje dla tej rotacji i fazy"
               >
                 <RotateCcw className="w-3.5 h-3.5 text-amber-600" />
                 <span className="hidden sm:inline">Reset</span>
@@ -1792,7 +1791,7 @@ function TacticsContent() {
             }`}
           >
             <Compass className="w-3.5 h-3.5 text-sky-600 shrink-0" />
-            <span>Tablica & Brudnopis (5-1)</span>
+            <span>Tablica & Brudnopis</span>
           </button>
 
           <button
@@ -1923,7 +1922,7 @@ function TacticsContent() {
                     Nowy Szkic (Niezapisany)
                   </span>
                   <span className="text-xs font-bold text-amber-400">
-                    Domyślne pozycje FIVB 5-1: {rotation} • {phase}
+                    Ustawienie wyjściowe: {rotation} • {phase}
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 mt-0.5">
@@ -1998,7 +1997,7 @@ function TacticsContent() {
                     ? activeTargetEvent.title
                     : activeTargetMatch
                     ? `Mecz Ligowy LALS vs ${activeTargetMatch.opponent}`
-                    : 'Ogólna Baza Taktyczna Zespołu (FIVB 5-1)'}
+                    : 'Ogólna Baza Taktyczna Zespołu'}
                 </span>
               </h2>
             </div>
@@ -2522,44 +2521,10 @@ function TacticsContent() {
                       <Volleyball className="w-3 h-3" />
                       <span className="hidden sm:inline">Piłka</span>
                     </button>
-
-                    {/* 5-1 diagonals info button */}
-                    <button
-                      onClick={() => setShowDiagonalsHint(!showDiagonalsHint)}
-                      className={`px-2 py-1 rounded-lg border text-[11px] font-bold transition flex items-center gap-1 ${
-                        showDiagonalsHint
-                          ? 'bg-sky-100 text-sky-800 border-sky-300'
-                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
-                      }`}
-                      title="Pokaż przekątne systemu 5-1"
-                    >
-                      <span>ℹ️ 5-1</span>
-                    </button>
                   </div>
                 </>
               )}
             </div>
-
-            {/* Collapsible 5-1 Diagonals Banner */}
-            {showDiagonalsHint && (
-              <div className="flex flex-wrap items-center justify-between text-[11px] pt-1.5 border-t border-slate-200 gap-1.5 animate-fadeIn">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-amber-400 font-black uppercase text-[10px]">Przekątne 5-1:</span>
-                  <span className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-200 text-slate-300 font-medium">
-                    Środkowi: <strong className="text-amber-300">Ś1 ↔ Ś2/Libero</strong>
-                  </span>
-                  <span className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-200 text-slate-300 font-medium">
-                    Przyjmujący: <strong className="text-sky-300">P1 ↔ P2</strong>
-                  </span>
-                  <span className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-200 text-slate-300 font-medium">
-                    Skrzydło: <strong className="text-emerald-300">R ↔ A</strong>
-                  </span>
-                </div>
-                <span className="text-[10px] text-slate-500 font-mono">
-                  {rotation === 'P1' || rotation === 'P6' || rotation === 'P5' ? 'Rozgrywający w II linii' : 'Rozgrywający w I linii'}
-                </span>
-              </div>
-            )}
           </div>
 
           {/* Full Volleyball Court Canvas Area */}
@@ -2716,83 +2681,6 @@ function TacticsContent() {
                 </div>
               );
             })}
-
-            {/* SVG Visual Diagonals Overlay (Przekątne 5-1: Środkowi naprzeciwko siebie) */}
-            {showDiagonalsHint && (() => {
-              const middle1 = positions.find(p => p.roleCode === 'Ś1' || p.roleCode === 'Ś2');
-              const middle2 = positions.find(p => p !== middle1 && (p.roleCode === 'Ś1' || p.roleCode === 'Ś2' || p.roleCode === 'L'));
-              const setter = positions.find(p => p.roleCode === 'R');
-              const opposite = positions.find(p => p.roleCode === 'A');
-              const p1 = positions.find(p => p.roleCode === 'P1');
-              const p2 = positions.find(p => p.roleCode === 'P2');
-
-              return (
-                <svg className="absolute inset-0 w-full h-full pointer-events-none z-18">
-                  {/* Środkowi naprzeciwko siebie (Ś1 ↔ Ś2/L) */}
-                  {middle1 && middle2 && (
-                    <g>
-                      <line
-                        x1={`${middle1.x}%`}
-                        y1={`${middle1.y}%`}
-                        x2={`${middle2.x}%`}
-                        y2={`${middle2.y}%`}
-                        stroke="#f59e0b"
-                        strokeWidth="2.5"
-                        strokeDasharray="6,4"
-                        opacity="0.95"
-                      />
-                      <circle
-                        cx={`${(middle1.x + middle2.x) / 2}%`}
-                        cy={`${(middle1.y + middle2.y) / 2}%`}
-                        r="16"
-                        fill="#0b1222"
-                        stroke="#f59e0b"
-                        strokeWidth="2"
-                      />
-                      <text
-                        x={`${(middle1.x + middle2.x) / 2}%`}
-                        y={`${(middle1.y + middle2.y) / 2}%`}
-                        fill="#fcd34d"
-                        fontSize="8.5"
-                        fontWeight="900"
-                        textAnchor="middle"
-                        dominantBaseline="central"
-                      >
-                        Ś1 ↔ Ś2
-                      </text>
-                    </g>
-                  )}
-
-                  {/* Rozgrywający ↔ Atakujący (R ↔ A) */}
-                  {setter && opposite && (
-                    <line
-                      x1={`${setter.x}%`}
-                      y1={`${setter.y}%`}
-                      x2={`${opposite.x}%`}
-                      y2={`${opposite.y}%`}
-                      stroke="#10b981"
-                      strokeWidth="1.5"
-                      strokeDasharray="4,4"
-                      opacity="0.75"
-                    />
-                  )}
-
-                  {/* Przyjmujący ↔ Przyjmujący (P1 ↔ P2) */}
-                  {p1 && p2 && (
-                    <line
-                      x1={`${p1.x}%`}
-                      y1={`${p1.y}%`}
-                      x2={`${p2.x}%`}
-                      y2={`${p2.y}%`}
-                      stroke="#38bdf8"
-                      strokeWidth="1.5"
-                      strokeDasharray="4,4"
-                      opacity="0.75"
-                    />
-                  )}
-                </svg>
-              );
-            })()}
 
             {/* Angels ZTP Draggable Player Markers */}
             {positions.map(player => {
@@ -3008,7 +2896,7 @@ function TacticsContent() {
                 </span>
               </h3>
               <p className="text-xs text-slate-400">
-                Wszystkie zapisane warianty gry, rozrysowane pod konkretne mecze ligowe LALS, sparingi i bazę ogólną 5-1.
+                Wszystkie zapisane warianty gry, rozrysowane pod konkretne mecze ligowe LALS, sparingi i bazę ogólną.
               </p>
             </div>
           </div>
@@ -3031,7 +2919,7 @@ function TacticsContent() {
             { id: 'WSZYSTKIE', label: 'Wszystkie', count: categoryCounts.all, icon: '🌟' },
             { id: 'MECZE_LALS', label: 'Mecze Ligowe LALS', count: categoryCounts.lals, icon: '🏆' },
             { id: 'SPARINGI', label: 'Sparingi i Turnieje', count: categoryCounts.sparing, icon: '⚔️' },
-            { id: 'OGOLNA', label: 'Baza Ogólna 5-1', count: categoryCounts.ogolna, icon: '📘' },
+            { id: 'OGOLNA', label: 'Baza Ogólna', count: categoryCounts.ogolna, icon: '📘' },
             { id: 'TRENING', label: 'Treningi', count: categoryCounts.trening, icon: '🏐' }
           ].map(cat => {
             const isActive = playbookCategory === cat.id;
@@ -3160,7 +3048,7 @@ function TacticsContent() {
                             ? 'Sparing / Turniej'
                             : target.category === 'TRENING'
                             ? 'Trening Zespołu'
-                            : 'Baza Ogólna 5-1'}
+                            : 'Baza Ogólna'}
                         </div>
                         <div className="text-xs font-black text-white truncate">
                           {target.opponent ? `vs ${target.opponent}` : target.label}
@@ -3940,7 +3828,7 @@ function TacticsContent() {
                     { id: 'MECZ_LIGOWY', label: '🏆 Mecz LALS' },
                     { id: 'SPARING', label: '⚔️ Sparing' },
                     { id: 'TRENING', label: '🏐 Trening' },
-                    { id: 'OGOLNA', label: '📘 Baza 5-1' }
+                    { id: 'OGOLNA', label: '📘 Baza Ogólna' }
                   ].map(s => (
                     <button
                       key={s.id}
@@ -4058,7 +3946,7 @@ function TacticsContent() {
 
                 {tacticScope === 'OGOLNA' && (
                   <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-200 text-xs text-slate-400">
-                    📘 Schemat zostanie zapisany w <strong>Ogólnej Bazie 5-1</strong> i będzie dostępny jako podręcznikowy wariant dla całego zespołu.
+                    📘 Schemat zostanie zapisany w <strong>Ogólnej Bazie Taktycznej</strong> i będzie dostępny jako podręcznikowy wariant dla całego zespołu.
                   </div>
                 )}
               </div>
