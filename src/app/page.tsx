@@ -16,7 +16,6 @@ import {
   Sparkles, 
   Flame, 
   Target, 
-  Crown, 
   CheckCircle2, 
   AlertCircle, 
   HelpCircle, 
@@ -190,28 +189,15 @@ function DashboardContent() {
 
   return (
     <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 pt-6 sm:pt-8 pb-20 md:pb-16 space-y-6 sm:space-y-8">
-      {/* 1. Header & Welcome Bar */}
+      {/* 1. Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center font-mono font-black text-xl text-sky-700 shrink-0 shadow-sm">
-            {user?.number ? `#${user.number}` : '🏐'}
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase">
-                Witaj, {user ? user.name.split(' ')[0] : 'Zawodniku'}!
-              </h1>
-              {user?.isCaptain && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-black uppercase bg-amber-50 text-amber-800 border border-amber-300 shadow-sm">
-                  <Crown className="w-3.5 h-3.5 text-amber-600" />
-                  Kapitan & Kierownik
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Angels ZTP • {user?.position || 'Siatkówka'} • {user?.isCaptain ? 'Kapitan & Kierownik (Zarząd drużyny)' : user?.role === 'KIEROWNIK' ? 'Kierownik Klubu' : user?.role === 'TRENER' ? 'Trener' : 'Zawodnik'}
-            </p>
-          </div>
+        <div>
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase">
+            Pulpit Drużyny
+          </h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Angels ZTP • Bieżące mecze, frekwencja, taktyka i finanse
+          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
