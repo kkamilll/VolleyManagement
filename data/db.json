@@ -1192,7 +1192,34 @@
   "fees": [],
   "payments": [],
   "treasuryExpenses": [],
-  "announcements": [],
+  "announcements": [
+    {
+      "id": "ann_mecz_coco_jumbo",
+      "title": "🎯 Zbiórka na mecz z Coco Jumbo (Niedziela 15.11)",
+      "content": "Wszyscy spotykamy się w niedzielę o godz. 17:45 w hali OSiR Luboń (45 min przed gwizdkiem). Gramy w białych strojach meczowych. Prosimy o zgłoszenie obecności na pulpicie!",
+      "priority": "PILNY",
+      "category": "MECZ",
+      "isPinned": true,
+      "createdById": "usr_trener",
+      "createdByName": "Hubert Rutkowski",
+      "createdByRole": "TRENER",
+      "createdAt": "2026-11-13T12:00:00.000Z",
+      "readBy": []
+    },
+    {
+      "id": "ann_skladki_listopad",
+      "title": "💰 Składki klubowe za listopad 2026",
+      "content": "Przypomnienie o uregulowaniu składki klubowej. Środki przeznaczamy na opłatę sędziowską LALS i rezerwację hali treningowej. Płatność szybkim BLIKiem w zakładce Składki.",
+      "priority": "NORMALNY",
+      "category": "FINANSE",
+      "isPinned": false,
+      "createdById": "usr_kierownik",
+      "createdByName": "Łukasz Kremer",
+      "createdByRole": "KIEROWNIK",
+      "createdAt": "2026-11-10T10:00:00.000Z",
+      "readBy": []
+    }
+  ],
   "polls": [],
   "tactics": [],
   "scoutingReports": [],

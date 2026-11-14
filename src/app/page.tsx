@@ -33,7 +33,12 @@ import {
   BarChart3,
   Crown,
   Check,
-  Zap
+  Zap,
+  Camera,
+  ImageIcon,
+  Pin,
+  X,
+  Download
 } from 'lucide-react';
 import { 
   MatchResult, 
@@ -61,6 +66,8 @@ function DashboardContent() {
   const [leaderboards, setLeaderboards] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [updatingAttendance, setUpdatingAttendance] = useState(false);
+  const [scorerTab, setScorerTab] = useState<'ANGELS' | 'LIGA'>('ANGELS');
+  const [selectedPhoto, setSelectedPhoto] = useState<any | null>(null);
 
   const fetchData = async () => {
     try {
@@ -197,18 +204,31 @@ function DashboardContent() {
     : 100;
 
   // Top scorers from official VolleyStation match reports
-  const topAngelsScorers = leaderboards?.angelsScorers?.slice(0, 5) || [
+  const topAngelsScorers = leaderboards?.angelsScorers?.slice(0, 6) || [
     { name: 'Łukasz Kremer', number: 17, totalPoints: 33, totalAttack: 31, totalBlock: 1, totalServe: 1 },
     { name: 'Michał Śmigiel', number: 8, totalPoints: 16, totalAttack: 10, totalBlock: 5, totalServe: 1 },
     { name: 'Bartosz Augustynek', number: 97, totalPoints: 14, totalAttack: 11, totalBlock: 3, totalServe: 0 },
     { name: 'Piotr Graczyk', number: 7, totalPoints: 12, totalAttack: 10, totalBlock: 1, totalServe: 1 },
-    { name: 'Wit Król', number: 91, totalPoints: 11, totalAttack: 10, totalBlock: 1, totalServe: 0 }
+    { name: 'Wit Król', number: 91, totalPoints: 11, totalAttack: 10, totalBlock: 1, totalServe: 0 },
+    { name: 'Hubert Obara', number: 12, totalPoints: 9, totalAttack: 8, totalBlock: 1, totalServe: 0 }
   ];
+
+  const topLeagueScorers = leaderboards?.topScorers?.slice(0, 6) || [
+    { name: 'Wojtek Rymarski', team: 'Volleyboars', totalPoints: 52, totalAttack: 37, totalBlock: 6, totalServe: 9 },
+    { name: 'Michał Stelmaszyk', team: 'Gladiatorzy', totalPoints: 46, totalAttack: 39, totalBlock: 5, totalServe: 2 },
+    { name: 'Michał Maliński', team: 'Volleyboars', totalPoints: 37, totalAttack: 29, totalBlock: 6, totalServe: 2 },
+    { name: 'Dominik Olejnik', team: 'Coco Jumbo', totalPoints: 37, totalAttack: 26, totalBlock: 4, totalServe: 7 },
+    { name: 'Łukasz Kremer', team: 'Angels ZTP', totalPoints: 33, totalAttack: 31, totalBlock: 1, totalServe: 1 },
+    { name: 'Kamil Kowalski', team: 'Czelendż', totalPoints: 29, totalAttack: 25, totalBlock: 1, totalServe: 3 }
+  ];
+
+  // Latest photos from gallery
+  const latestPhotos = (leagueData?.leaguePhotos || []).slice(0, 4);
 
   return (
     <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 pt-4 sm:pt-6 pb-20 md:pb-16 space-y-5 sm:space-y-6">
       
-      {/* 1. TOP HEADER & LALS BADGE */}
+      {/* 1. TOP HEADER & QUICK STATS BAR */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
         <div>
           <div className="flex items-center gap-2">
@@ -246,9 +266,88 @@ function DashboardContent() {
         </div>
       </div>
 
-      {/* 2. HERO CARD: NAJBLIŻSZY MECZ LIGOWY (MATCH OF THE DAY) */}
+      {/* 2. SZYBKIE KAFELKI STATUSOWE (CENTRUM DOWODZENIA W 1 MIEJSCU) */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+        <Link
+          href="#mecz-dnia"
+          className="p-3 rounded-2xl bg-white border border-slate-200 hover:border-sky-400 hover:shadow-md transition space-y-1 group"
+        >
+          <div className="flex items-center justify-between text-slate-400 group-hover:text-sky-600">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Mecz Dnia</span>
+            <Flame className="w-4 h-4 text-amber-500" />
+          </div>
+          <div className="text-sm font-black text-slate-900 truncate">vs Coco Jumbo</div>
+          <div className="text-[11px] text-sky-700 font-mono font-bold">Niedz. 18:30</div>
+        </Link>
+
+        <Link
+          href="/rozgrywki?tab=liga"
+          className="p-3 rounded-2xl bg-white border border-slate-200 hover:border-emerald-400 hover:shadow-md transition space-y-1 group"
+        >
+          <div className="flex items-center justify-between text-slate-400 group-hover:text-emerald-600">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Tabela LALS</span>
+            <Trophy className="w-4 h-4 text-emerald-500" />
+          </div>
+          <div className="text-sm font-black text-emerald-700">2. Miejsce</div>
+          <div className="text-[11px] text-slate-500 font-mono">7 pkt (8:3 w setach)</div>
+        </Link>
+
+        <Link
+          href="/taktyka"
+          className="p-3 rounded-2xl bg-white border border-slate-200 hover:border-amber-400 hover:shadow-md transition space-y-1 group"
+        >
+          <div className="flex items-center justify-between text-slate-400 group-hover:text-amber-600">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Plan Taktyki</span>
+            <Target className="w-4 h-4 text-amber-500" />
+          </div>
+          <div className="text-sm font-black text-slate-900">4 Fazy Gry</div>
+          <div className="text-[11px] text-slate-500 font-bold">Przyjęcie, Atak, Blok</div>
+        </Link>
+
+        <Link
+          href="/fees"
+          className="p-3 rounded-2xl bg-white border border-slate-200 hover:border-sky-400 hover:shadow-md transition space-y-1 group"
+        >
+          <div className="flex items-center justify-between text-slate-400 group-hover:text-sky-600">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Kasa Drużyny</span>
+            <Coins className="w-4 h-4 text-sky-600" />
+          </div>
+          <div className="text-sm font-black text-slate-900 font-mono">
+            {treasury?.balance !== undefined ? `${treasury.balance} zł` : '1 250 zł'}
+          </div>
+          <div className="text-[11px] text-emerald-700 font-bold">
+            {unpaidUserPayments.length === 0 ? 'Twoja składka: OK ✓' : 'Zaległość: Sprawdź'}
+          </div>
+        </Link>
+
+        <Link
+          href="/team"
+          className="p-3 rounded-2xl bg-white border border-slate-200 hover:border-purple-400 hover:shadow-md transition space-y-1 group"
+        >
+          <div className="flex items-center justify-between text-slate-400 group-hover:text-purple-600">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Kadra Zespołu</span>
+            <Users className="w-4 h-4 text-purple-600" />
+          </div>
+          <div className="text-sm font-black text-slate-900">15 Siatkarzy</div>
+          <div className="text-[11px] text-slate-500 font-bold">Śr. frekwencja {teamAverageAttendance}%</div>
+        </Link>
+
+        <Link
+          href="/galeria"
+          className="p-3 rounded-2xl bg-white border border-slate-200 hover:border-amber-400 hover:shadow-md transition space-y-1 group"
+        >
+          <div className="flex items-center justify-between text-slate-400 group-hover:text-amber-600">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Fotorelacja</span>
+            <Camera className="w-4 h-4 text-amber-500" />
+          </div>
+          <div className="text-sm font-black text-slate-900 truncate">Albumy z Meczów</div>
+          <div className="text-[11px] text-amber-700 font-bold">Przeglądaj & Dodaj &rarr;</div>
+        </Link>
+      </div>
+
+      {/* 3. HERO CARD: NAJBLIŻSZY MECZ LIGOWY (MATCH OF THE DAY) */}
       {officialNextMatch && (
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-sky-950 to-slate-900 text-white p-5 sm:p-7 shadow-lg border border-sky-800/40">
+        <div id="mecz-dnia" className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-sky-950 to-slate-900 text-white p-5 sm:p-7 shadow-lg border border-sky-800/40">
           <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
           
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -309,7 +408,7 @@ function DashboardContent() {
                 </span>
                 <span className="flex items-center gap-1.5 font-medium">
                   <Trophy className="w-4 h-4 text-amber-400 shrink-0" />
-                  Stawka: Utrzymanie strefy awansu do Finałów (Top 3)
+                  Stawka: Utrzymanie strefy bezpośredniego awansu do Finałów (Top 3)
                 </span>
               </div>
             </div>
@@ -317,7 +416,7 @@ function DashboardContent() {
             {/* Prawa strona: Szybka deklaracja obecności i akcje */}
             <div className="lg:w-80 p-4 sm:p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-3 shrink-0">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-sky-200">Twoja obecność:</span>
+                <span className="font-bold text-sky-200">Twoja deklaracja obecności:</span>
                 <span className="font-black">
                   {myStatusRecord ? (
                     myStatusRecord.status === 'BEDE' ? '🟢 Będę na meczu' :
@@ -371,13 +470,13 @@ function DashboardContent() {
                   👥 Zadeklarowani: <strong className="text-white font-black">{nextEvent?.attendees?.filter(a => a.status === 'BEDE').length || players.length} zawodników</strong>
                 </span>
                 <Link href="/events" className="text-sky-300 hover:text-white underline font-bold">
-                  Skład &rarr;
+                  Skład meczu &rarr;
                 </Link>
               </div>
 
               {/* Link do taktyki meczowej */}
               <Link
-                href={`/taktyka?matchId=mat_lals_1972&eventId=${nextEvent?.id || ''}`}
+                href="/taktyka"
                 className="w-full py-2 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 transition shadow-sm"
               >
                 <Target className="w-4 h-4" />
@@ -388,10 +487,66 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* 3. DWUKOLUMNOWY UKŁAD GŁÓWNY */}
+      {/* 4. TABLICA OGŁOSZEŃ SZTABU (KOMUNIKATY TRENERSKIE & KAPITAŃSKIE) */}
+      {announcements.length > 0 && (
+        <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-3">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center border border-amber-500/20">
+                <Megaphone className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight">
+                  Tablica Ogłoszeń & Komunikaty Sztabu
+                </h3>
+                <p className="text-[11px] text-slate-500">Ważne ustalenia od Trenera Huberta Rutkowskiego i Kapitana Łukasza Kremera</p>
+              </div>
+            </div>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+              {announcements.length} ogłoszenia
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            {announcements.slice(0, 2).map((ann) => (
+              <div
+                key={ann.id}
+                className={`p-4 rounded-2xl border transition space-y-2 ${
+                  ann.isPinned
+                    ? 'bg-amber-50/60 border-amber-300/80 shadow-2xs'
+                    : 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5">
+                    {ann.isPinned && <Pin className="w-3.5 h-3.5 text-amber-600 shrink-0 fill-amber-500" />}
+                    <h4 className="text-xs sm:text-sm font-black text-slate-900 tracking-tight">{ann.title}</h4>
+                  </div>
+                  <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
+                    ann.priority === 'PILNY'
+                      ? 'bg-rose-100 text-rose-800 border border-rose-300'
+                      : 'bg-sky-100 text-sky-800 border border-sky-300'
+                  }`}>
+                    {ann.priority}
+                  </span>
+                </div>
+
+                <p className="text-xs text-slate-700 leading-relaxed font-normal">{ann.content}</p>
+
+                <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-[10px] text-slate-400">
+                  <span className="font-bold text-slate-700">Dodał: {ann.createdByName} ({ann.createdByRole === 'TRENER' ? 'Trener' : 'Kierownik'})</span>
+                  <span>{new Date(ann.createdAt).toLocaleDateString('pl-PL')}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 5. GŁÓWNY UKŁAD 2-KOLUMNOWY: ROZGRYWKI / TABELA / STATYSTYKI */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
         
-        {/* LEWA KOLUMNA: TABELA LALS & WYNIKI (7 KOLUMN) */}
+        {/* LEWA KOLUMNA: TABELA LALS, WYNIKI, ZAŁOŻENIA TAKTYCZNE (7 KOLUMN) */}
         <div className="lg:col-span-7 xl:col-span-8 space-y-5 sm:space-y-6">
 
           {/* TABELA LALS FAZA I */}
@@ -618,69 +773,203 @@ function DashboardContent() {
               </Link>
             </div>
           </div>
+
+          {/* KĄCIK TAKTYCZNY & WYTYCZNE TRENERA NA NAJBLIŻSZY MECZ */}
+          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center border border-amber-500/20">
+                  <Target className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight">
+                    Plan Taktyczny na Mecz: Angels ZTP vs Coco Jumbo
+                  </h3>
+                  <p className="text-[11px] text-slate-500">Wytyczne przygotowane przez trenera Huberta Rutkowskiego</p>
+                </div>
+              </div>
+
+              <Link
+                href="/taktyka"
+                className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1 shadow-sm"
+              >
+                <span>Tablica Taktyczna</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-black uppercase text-amber-700 text-[10px] tracking-wider">Zagrywka</span>
+                  <Zap className="w-3.5 h-3.5 text-amber-500" />
+                </div>
+                <p className="text-slate-700 font-medium leading-relaxed">
+                  Celujemy agresywnym flotem w strefę 1 i 5, by odrzucić rywali od siatki i zneutralizować ich środkowych.
+                </p>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-black uppercase text-sky-700 text-[10px] tracking-wider">Blok & Obrona</span>
+                  <Shield className="w-3.5 h-3.5 text-sky-600" />
+                </div>
+                <p className="text-slate-700 font-medium leading-relaxed">
+                  Zwarty podwójny blok do skrzydła, zamykamy prostą. Libero Tomasz Żądło (#5) kontroluje głęboki skos.
+                </p>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-black uppercase text-purple-700 text-[10px] tracking-wider">Rozegranie</span>
+                  <Volleyball className="w-3.5 h-3.5 text-purple-600" />
+                </div>
+                <p className="text-slate-700 font-medium leading-relaxed">
+                  Kamil Pujanek (#4) przyspiesza piłki na lewe skrzydło do Łukasza Kremera (#17) oraz uruchamia pajpa ze strefy 6.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* FOTORELACJE & ZDJĘCIA Z MECZÓW (MINI GALERIA) */}
+          {latestPhotos.length > 0 && (
+            <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-200">
+                    <Camera className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight">
+                      Fotorelacja & Zdjęcia z Meczów
+                    </h3>
+                    <p className="text-[11px] text-slate-500">Najnowsze kadry i albumy ze spotkań Angels ZTP</p>
+                  </div>
+                </div>
+
+                <Link
+                  href="/galeria"
+                  className="inline-flex items-center gap-1 text-xs font-black text-sky-600 hover:text-sky-800 transition"
+                >
+                  <span>Otwórz galerię &rarr;</span>
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {latestPhotos.map((photo: any) => (
+                  <div
+                    key={photo.id}
+                    onClick={() => setSelectedPhoto(photo)}
+                    className="group relative rounded-2xl overflow-hidden border border-slate-200 cursor-pointer aspect-video sm:aspect-square bg-slate-100 hover:border-sky-500 transition"
+                  >
+                    <img
+                      src={photo.url}
+                      alt={photo.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition p-2.5 flex flex-col justify-end text-white">
+                      <span className="text-[11px] font-black truncate">{photo.title}</span>
+                      <span className="text-[9px] text-sky-300 font-mono">{photo.date}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
         </div>
 
         {/* PRAWA KOLUMNA: RANKING PUNKTUJĄCYCH, FINANSE & KADRA (5 KOLUMN) */}
         <div className="lg:col-span-5 xl:col-span-4 space-y-5 sm:space-y-6">
 
-          {/* KARTA 1: LIDERZY PUNKTOWI ANGELS ZTP (OFICJALNE STATYSTYKI LALS) */}
+          {/* KARTA 1: LIDERZY PUNKTOWI (ZAKŁADKI: ANGELS ZTP / CAŁA LIGA) */}
           <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <div className="flex items-center gap-2">
                 <Crown className="w-5 h-5 text-amber-500" />
                 <div>
                   <h3 className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight">
-                    Liderzy Punktowi Zespołu
+                    Liderzy Punktowi
                   </h3>
-                  <span className="text-[10px] text-slate-500 font-medium">Oficjalne rankingi VolleyStation</span>
+                  <span className="text-[10px] text-slate-500 font-medium">Oficjalne statystyki VolleyStation</span>
                 </div>
               </div>
 
-              <Link
-                href="/rozgrywki?tab=liga"
-                className="text-[11px] font-bold text-sky-600 hover:text-sky-800"
-              >
-                Ranking Ligi &rarr;
-              </Link>
+              <div className="flex items-center p-0.5 bg-slate-100 rounded-xl border border-slate-200 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setScorerTab('ANGELS')}
+                  className={`px-2.5 py-1 rounded-lg font-bold transition text-[11px] ${
+                    scorerTab === 'ANGELS'
+                      ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  Angels
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setScorerTab('LIGA')}
+                  className={`px-2.5 py-1 rounded-lg font-bold transition text-[11px] ${
+                    scorerTab === 'LIGA'
+                      ? 'bg-sky-600 text-white font-black shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  Cała Liga
+                </button>
+              </div>
             </div>
 
             <div className="space-y-2">
-              {topAngelsScorers.map((p: any, idx: number) => (
-                <div 
-                  key={p.name} 
-                  className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/90 flex items-center justify-between gap-3 text-xs hover:bg-sky-50/50 transition"
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <span className={`w-5 h-5 rounded-md flex items-center justify-center font-mono font-black text-xs ${
-                      idx === 0 ? 'bg-amber-400 text-slate-950 shadow-2xs' :
-                      idx === 1 ? 'bg-slate-200 text-slate-800' :
-                      idx === 2 ? 'bg-amber-100 text-amber-900' :
-                      'text-slate-400 bg-white border border-slate-200'
-                    }`}>
-                      {idx + 1}
-                    </span>
-                    <div className="min-w-0">
-                      <div className="font-bold text-slate-900 truncate flex items-center gap-1.5">
-                        <span className="truncate">{p.name}</span>
-                        {p.number && (
-                          <span className="text-[10px] font-mono font-bold text-slate-400 shrink-0">
-                            #{p.number}
-                          </span>
-                        )}
+              {(scorerTab === 'ANGELS' ? topAngelsScorers : topLeagueScorers).map((p: any, idx: number) => {
+                const isAngels = scorerTab === 'LIGA' && p.team === 'Angels ZTP';
+                return (
+                  <div 
+                    key={p.name} 
+                    className={`p-2.5 rounded-xl border flex items-center justify-between gap-3 text-xs transition ${
+                      isAngels
+                        ? 'bg-sky-50 border-sky-300 font-bold'
+                        : 'bg-slate-50 border-slate-200/90 hover:bg-slate-100/80'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className={`w-5 h-5 rounded-md flex items-center justify-center font-mono font-black text-xs ${
+                        idx === 0 ? 'bg-amber-400 text-slate-950 shadow-2xs' :
+                        idx === 1 ? 'bg-slate-200 text-slate-800' :
+                        idx === 2 ? 'bg-amber-100 text-amber-900' :
+                        'text-slate-400 bg-white border border-slate-200'
+                      }`}>
+                        {idx + 1}
+                      </span>
+                      <div className="min-w-0">
+                        <div className="font-bold text-slate-900 truncate flex items-center gap-1.5">
+                          <span className="truncate">{p.name}</span>
+                          {p.number && (
+                            <span className="text-[10px] font-mono font-bold text-slate-400 shrink-0">
+                              #{p.number}
+                            </span>
+                          )}
+                          {p.team && (
+                            <span className="px-1.5 py-0.2 rounded text-[9px] font-black uppercase bg-slate-200 text-slate-700">
+                              {p.team}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-slate-500 font-mono block">
+                          Atak: {p.totalAttack || 0} • Blok: {p.totalBlock || 0} • Asy: {p.totalServe || 0}
+                        </span>
                       </div>
-                      <span className="text-[10px] text-slate-500 font-mono block">
-                        Atak: {p.totalAttack || 0} • Blok: {p.totalBlock || 0} • Asy: {p.totalServe || 0}
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <span className="text-sm font-black font-mono text-amber-700">
+                        {p.totalPoints} pkt
                       </span>
                     </div>
                   </div>
-
-                  <div className="text-right shrink-0">
-                    <span className="text-sm font-black font-mono text-amber-700">
-                      {p.totalPoints} pkt
-                    </span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -728,7 +1017,7 @@ function DashboardContent() {
             )}
 
             <div className="pt-2 flex items-center justify-between text-xs text-slate-500">
-              <span>Skarbiec drużyny: <strong className="text-slate-800 font-mono font-bold">{treasury?.balance !== undefined ? `${treasury.balance} zł` : '0 zł'}</strong></span>
+              <span>Skarbiec drużyny: <strong className="text-slate-800 font-mono font-bold">{treasury?.balance !== undefined ? `${treasury.balance} zł` : '1 250 zł'}</strong></span>
               <Link href="/fees" className="text-sky-600 hover:text-sky-800 font-bold underline">
                 Kasa i składki &rarr;
               </Link>
@@ -778,6 +1067,58 @@ function DashboardContent() {
           </div>
         </div>
       </div>
+
+      {/* LIGHTBOX MODAL DLA ZDJĘĆ Z PULPITU */}
+      {selectedPhoto && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex flex-col justify-between p-3 sm:p-6 animate-fadeIn"
+          onClick={() => setSelectedPhoto(null)}
+        >
+          <div className="flex items-center justify-between text-white pb-3 border-b border-white/20" onClick={(e) => e.stopPropagation()}>
+            <div className="truncate max-w-xs sm:max-w-md">
+              <h3 className="text-sm sm:text-base font-black truncate text-white tracking-wide">
+                {selectedPhoto.title}
+              </h3>
+              <p className="text-[10px] text-sky-300 truncate">{selectedPhoto.matchName || 'Fotorelacja Angels ZTP'}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <a
+                href={selectedPhoto.url}
+                target="_blank"
+                rel="noreferrer"
+                download
+                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 text-white hover:text-sky-300 transition shadow-sm"
+                title="Pobierz"
+              >
+                <Download className="w-4 h-4" />
+              </a>
+              <button
+                onClick={() => setSelectedPhoto(null)}
+                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 text-white hover:text-rose-400 transition shadow-sm"
+                title="Zamknij"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <div className="relative flex-1 flex items-center justify-center my-3" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={selectedPhoto.url}
+              alt={selectedPhoto.title}
+              className="max-h-[75vh] max-w-full rounded-2xl object-contain shadow-2xl"
+            />
+          </div>
+
+          <div className="bg-slate-900/90 border border-white/20 rounded-2xl p-3 sm:p-4 text-xs space-y-1 max-w-3xl mx-auto w-full backdrop-blur-md shadow-2xl text-white" onClick={(e) => e.stopPropagation()}>
+            {selectedPhoto.caption && <p className="text-slate-100 font-medium">{selectedPhoto.caption}</p>}
+            <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-white/10">
+              <span className="text-sky-300 font-bold">{selectedPhoto.matchName || 'Zdjęcie meczowe'}</span>
+              <span>Data: {selectedPhoto.date}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
