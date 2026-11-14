@@ -49,7 +49,15 @@ import {
   TacticalMaterial
 } from '@/lib/types';
 
-export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?: 'EXERCISES' | 'CONCLUSIONS' | 'COMMENTS'; hideHeader?: boolean } = {}) {
+export function TrainingPlannerContent({ 
+  defaultTab, 
+  hideHeader,
+  mode = 'ALL'
+}: { 
+  defaultTab?: 'EXERCISES' | 'CONCLUSIONS' | 'COMMENTS' | 'MATERIALS'; 
+  hideHeader?: boolean;
+  mode?: 'ALL' | 'MATCHES' | 'TRAININGS';
+} = {}) {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const queryPlanId = searchParams.get('id');
@@ -676,13 +684,24 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
   // Filtered list of events from Terminarz (Treningi, Sparingi, Mecze)
   const filteredEvents: EventItem[] = useMemo(() => {
     return events.filter(e => {
+      if (mode === 'TRAININGS') {
+        return e.type === 'TRENING';
+      }
+      if (mode === 'MATCHES') {
+        const isMatch = e.type === 'SPARING' || e.type === 'MECZ' || e.type === 'TURNIEJ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals'));
+        if (!isMatch) return false;
+        if (eventTypeFilter === 'ALL' || eventTypeFilter === 'TRENING') return true;
+        if (eventTypeFilter === 'SPARING') return e.type === 'SPARING';
+        if (eventTypeFilter === 'MECZ') return e.type === 'MECZ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals'));
+        return true;
+      }
       if (eventTypeFilter === 'ALL') return true;
       if (eventTypeFilter === 'TRENING') return e.type === 'TRENING';
       if (eventTypeFilter === 'SPARING') return e.type === 'SPARING';
       if (eventTypeFilter === 'MECZ') return e.type === 'MECZ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals'));
       return true;
     });
-  }, [events, eventTypeFilter]);
+  }, [events, eventTypeFilter, mode]);
 
   const trainingsCount = useMemo(() => events.filter(e => e.type === 'TRENING').length, [events]);
   const sparringsCount = useMemo(() => events.filter(e => e.type === 'SPARING').length, [events]);
@@ -766,53 +785,99 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
               </Link>
             </div>
 
-            {/* Filter Pills: Wszystkie, Treningi, Sparingi, Mecze */}
-            <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto scrollbar-none">
-              <button
-                type="button"
-                onClick={() => setEventTypeFilter('ALL')}
-                className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                  eventTypeFilter === 'ALL'
-                    ? 'bg-sky-600 text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                }`}
-              >
-                Wszystkie ({events.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => setEventTypeFilter('TRENING')}
-                className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                  eventTypeFilter === 'TRENING'
-                    ? 'bg-sky-600 text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                }`}
-              >
-                🏋️ Treningi ({trainingsCount})
-              </button>
-              <button
-                type="button"
-                onClick={() => setEventTypeFilter('SPARING')}
-                className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                  eventTypeFilter === 'SPARING'
-                    ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                }`}
-              >
-                ⚔️ Sparingi ({sparringsCount})
-              </button>
-              <button
-                type="button"
-                onClick={() => setEventTypeFilter('MECZ')}
-                className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                  eventTypeFilter === 'MECZ'
-                    ? 'bg-indigo-600 text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                }`}
-              >
-                🏐 Mecze ({matchesCount})
-              </button>
-            </div>
+            {/* Filter Pills based on Mode */}
+            {mode === 'MATCHES' ? (
+              <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto scrollbar-none">
+                <button
+                  type="button"
+                  onClick={() => setEventTypeFilter('ALL')}
+                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                    eventTypeFilter === 'ALL' || eventTypeFilter === 'TRENING'
+                      ? 'bg-slate-900 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                  }`}
+                >
+                  Wszystkie ({sparringsCount + matchesCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEventTypeFilter('MECZ')}
+                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                    eventTypeFilter === 'MECZ'
+                      ? 'bg-sky-600 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                  }`}
+                >
+                  🏐 Mecze LALS ({matchesCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEventTypeFilter('SPARING')}
+                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                    eventTypeFilter === 'SPARING'
+                      ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                  }`}
+                >
+                  ⚔️ Sparingi ({sparringsCount})
+                </button>
+              </div>
+            ) : mode === 'TRAININGS' ? (
+              <div className="px-3 py-1.5 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <Volleyball className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Treningi z Terminarza</span>
+                </span>
+                <span className="font-mono bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded-full text-[11px] font-black">{trainingsCount}</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto scrollbar-none">
+                <button
+                  type="button"
+                  onClick={() => setEventTypeFilter('ALL')}
+                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                    eventTypeFilter === 'ALL'
+                      ? 'bg-sky-600 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                  }`}
+                >
+                  Wszystkie ({events.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEventTypeFilter('TRENING')}
+                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                    eventTypeFilter === 'TRENING'
+                      ? 'bg-sky-600 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                  }`}
+                >
+                  🏋️ Treningi ({trainingsCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEventTypeFilter('SPARING')}
+                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                    eventTypeFilter === 'SPARING'
+                      ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                  }`}
+                >
+                  ⚔️ Sparingi ({sparringsCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEventTypeFilter('MECZ')}
+                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                    eventTypeFilter === 'MECZ'
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                  }`}
+                >
+                  🏐 Mecze ({matchesCount})
+                </button>
+              </div>
+            )}
 
             {filteredEvents.length === 0 ? (
               <div className="text-center py-8 px-3 bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-2">
@@ -1001,6 +1066,17 @@ export function TrainingPlannerContent({ defaultTab, hideHeader }: { defaultTab?
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
+                    {activeEvent && (
+                      <Link
+                        href={`/taktyka?tab=board&eventId=${activeEvent.id}`}
+                        className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold text-xs transition flex items-center gap-1.5 shadow-sm"
+                        title="Otwórz tablicę taktyczną i rozrysuj ustawienie na to spotkanie"
+                      >
+                        <Compass className="w-3.5 h-3.5 text-amber-400" />
+                        <span className="hidden sm:inline">🎨 Rozrysuj na tablicy</span>
+                        <span className="sm:hidden">🎨 Tablica</span>
+                      </Link>
+                    )}
                     {canManage && (
                       <button
                         onClick={() => handleOpenExerciseModal()}

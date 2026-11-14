@@ -328,34 +328,27 @@ export default function Navbar() {
 
               {/* Submenu Dropdown */}
               <div className="absolute left-0 top-full pt-1.5 hidden group-hover:block z-50">
-                <div className="w-60 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 space-y-0.5">
+                <div className="w-64 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 space-y-0.5">
                   <a
                     href="/taktyka?tab=board"
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-sky-700 hover:bg-sky-50 transition"
                   >
                     <Compass className="w-4 h-4 text-sky-500" />
-                    <span>Tablica Taktyczna (5-1)</span>
+                    <span>🎨 Tablica & Brudnopis</span>
                   </a>
                   <a
-                    href="/taktyka?tab=playbook"
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-amber-700 hover:bg-amber-50 transition"
+                    href="/taktyka?tab=matches"
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-sky-700 hover:bg-sky-50 transition"
                   >
-                    <Target className="w-4 h-4 text-amber-500" />
-                    <span>Baza Wariantów (Playbook)</span>
+                    <Trophy className="w-4 h-4 text-amber-500" />
+                    <span>🏆 Mecze, Sparingi & Turnieje</span>
                   </a>
                   <a
-                    href="/taktyka?tab=training"
+                    href="/taktyka?tab=trainings"
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 transition"
                   >
                     <Volleyball className="w-4 h-4 text-emerald-500" />
-                    <span>Plany Treningowe & Warsztat</span>
-                  </a>
-                  <a
-                    href="/taktyka?tab=debrief"
-                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-purple-700 hover:bg-purple-50 transition"
-                  >
-                    <FileText className="w-4 h-4 text-purple-500" />
-                    <span>Odprawa & Wnioski Trenera</span>
+                    <span>🏐 Treningi & Ćwiczenia</span>
                   </a>
                 </div>
               </div>
@@ -827,25 +820,30 @@ export default function Navbar() {
             <span>Kadra Drużyny</span>
           </a>
 
-          <a
-            href="/taktyka"
-            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
-              pathname === '/taktyka' || pathname.startsWith('/coach') ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'text-slate-700 hover:bg-slate-100'
-            }`}
-          >
-            <Target className="w-4 h-4 text-sky-600" />
-            <span>Tablica Taktyczna</span>
-          </a>
-
-          <a
-            href="/trening"
-            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
-              pathname === '/trening' ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'text-slate-700 hover:bg-slate-100'
-            }`}
-          >
-            <Volleyball className="w-4 h-4 text-emerald-600" />
-            <span>Warsztat & Treningi</span>
-          </a>
+          <div className="pt-2 pb-1 border-t border-slate-100 space-y-1">
+            <div className="px-3 text-[10px] font-black uppercase tracking-wider text-slate-400">Taktyka & Trening</div>
+            <a
+              href="/taktyka?tab=board"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition"
+            >
+              <Compass className="w-4 h-4 text-sky-600" />
+              <span>🎨 Tablica & Brudnopis</span>
+            </a>
+            <a
+              href="/taktyka?tab=matches"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-700 transition"
+            >
+              <Trophy className="w-4 h-4 text-amber-600" />
+              <span>🏆 Mecze, Sparingi & Turnieje</span>
+            </a>
+            <a
+              href="/taktyka?tab=trainings"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition"
+            >
+              <Volleyball className="w-4 h-4 text-emerald-600" />
+              <span>🏐 Treningi & Ćwiczenia</span>
+            </a>
+          </div>
 
           <a
             href="/galeria"
