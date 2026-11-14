@@ -51,7 +51,9 @@ import {
   FolderArchive,
   Lock,
   Unlock,
-  FlaskConical
+  FlaskConical,
+  Smartphone,
+  Maximize2
 } from 'lucide-react';
 import {
   TacticalPlay,
@@ -394,6 +396,25 @@ function TacticsContent() {
   const [requestEditText, setRequestEditText] = useState('');
   const [submittingRequest, setSubmittingRequest] = useState(false);
 
+  // Board Orientation: 'vertical' (pionowo) vs 'horizontal' (poziomo)
+  const [boardOrientation, setBoardOrientation] = useState<'vertical' | 'horizontal'>('vertical');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('volley_board_orientation');
+      if (saved === 'vertical' || saved === 'horizontal') {
+        setBoardOrientation(saved);
+      }
+    }
+  }, []);
+
+  const handleToggleOrientation = (orient: 'vertical' | 'horizontal') => {
+    setBoardOrientation(orient);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('volley_board_orientation', orient);
+    }
+  };
+
   // Can the user effectively drag/draw right now?
   const isEffectiveEditor = !isArchiveMode && Boolean(canEdit || isSandboxMode);
 
@@ -574,8 +595,21 @@ function TacticsContent() {
       const container = courtContainerRef.current;
       if (!container) return;
       const rect = container.getBoundingClientRect();
-      const rawX = ((clientX - rect.left) / rect.width) * 100;
-      const rawY = ((clientY - rect.top) / rect.height) * 100;
+      const mousePercentX = ((clientX - rect.left) / rect.width) * 100;
+      const mousePercentY = ((clientY - rect.top) / rect.height) * 100;
+
+      let rawX: number;
+      let rawY: number;
+
+      if (boardOrientation === 'horizontal') {
+        // Horizontal mapping: screenX is y (opponents on left, Angels on right), screenY is 100 - x
+        rawY = mousePercentX;
+        rawX = 100 - mousePercentY;
+      } else {
+        rawX = mousePercentX;
+        rawY = mousePercentY;
+      }
+
       const clampedX = Math.round(Math.max(4, Math.min(96, rawX)));
       const clampedY = Math.round(Math.max(4, Math.min(96, rawY)));
 
@@ -620,7 +654,7 @@ function TacticsContent() {
       window.removeEventListener('touchend', onPointerUp);
       window.removeEventListener('touchcancel', onPointerUp);
     };
-  }, [draggingId]);
+  }, [draggingId, boardOrientation]);
 
   // Canvas setup & resize observer
   useEffect(() => {
@@ -649,9 +683,13 @@ function TacticsContent() {
     };
 
     resizeCanvas();
+    const timer = setTimeout(resizeCanvas, 150);
     window.addEventListener('resize', resizeCanvas);
-    return () => window.removeEventListener('resize', resizeCanvas);
-  }, []);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', resizeCanvas);
+    };
+  }, [boardOrientation]);
 
   // Save canvas state to history for undo
   const saveCanvasState = () => {
@@ -2101,6 +2139,41 @@ function TacticsContent() {
                   ))}
                 </div>
               </div>
+
+              {/* Orientation Selector: Pionowo / Poziomo */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider hidden xs:inline">
+                  Widok:
+                </span>
+                <div className="inline-flex items-center p-0.5 bg-slate-100 rounded-xl border border-slate-300">
+                  <button
+                    type="button"
+                    onClick={() => handleToggleOrientation('vertical')}
+                    className={`h-8 px-2 sm:px-2.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                      boardOrientation === 'vertical'
+                        ? 'bg-sky-600 text-white shadow-2xs font-black'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                    }`}
+                    title="Widok pionowy (od linii końcowej)"
+                  >
+                    <Smartphone className="w-3.5 h-3.5" />
+                    <span>Pionowo</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleToggleOrientation('horizontal')}
+                    className={`h-8 px-2 sm:px-2.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                      boardOrientation === 'horizontal'
+                        ? 'bg-sky-600 text-white shadow-2xs font-black'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                    }`}
+                    title="Widok poziomy (od linii bocznej)"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                    <span>Poziomo</span>
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Row 2: Drawing Tools & Palettes OR Player Read-Only Toolbar */}
@@ -2319,7 +2392,11 @@ function TacticsContent() {
           <div
             id="tactical-court-container"
             ref={courtContainerRef}
-            className={`relative bg-[#0f172a] rounded-3xl border-2 border-slate-300 shadow-md overflow-hidden aspect-[9/13] sm:aspect-[9/12] max-w-3xl mx-auto select-none ${
+            className={`relative bg-[#0f172a] rounded-3xl border-2 border-slate-300 shadow-md overflow-hidden mx-auto select-none transition-all duration-300 ${
+              boardOrientation === 'horizontal'
+                ? 'aspect-[16/10] sm:aspect-[18/11] max-w-5xl'
+                : 'aspect-[9/13] sm:aspect-[9/12] max-w-3xl'
+            } ${
               activeTool === 'move' ? 'cursor-default' : 'cursor-crosshair'
             }`}
             onClick={handleCourtClick}
@@ -2327,64 +2404,121 @@ function TacticsContent() {
             {/* Outer Playing Boundary Line (White 2px) */}
             <div className="absolute inset-3 sm:inset-5 border-2 border-white rounded-sm pointer-events-none z-1 shadow-xs" />
 
-            {/* Top Half: Połowa Rywali (0% - 50%) */}
-            <div className="absolute top-3 sm:top-5 left-3 sm:left-5 right-3 sm:right-5 bottom-1/2 bg-gradient-to-b from-[#1e3a8a] to-[#1e40af] pointer-events-none" />
+            {boardOrientation === 'vertical' ? (
+              <>
+                {/* Top Half: Połowa Rywali (0% - 50%) */}
+                <div className="absolute top-3 sm:top-5 left-3 sm:left-5 right-3 sm:right-5 bottom-1/2 bg-gradient-to-b from-[#1e3a8a] to-[#1e40af] pointer-events-none" />
 
-            {/* Opponent 3m Attack Line (at 33.3%) */}
-            <div className="absolute top-[33.3%] left-3 sm:left-5 right-3 sm:right-5 border-b-2 border-dashed border-rose-300/70 pointer-events-none z-5" />
+                {/* Opponent 3m Attack Line (at 33.3%) */}
+                <div className="absolute top-[33.3%] left-3 sm:left-5 right-3 sm:right-5 border-b-2 border-dashed border-rose-300/70 pointer-events-none z-5" />
 
-            {/* Subtle Opponent Zone Watermarks */}
-            <div className="absolute top-7 left-6 text-xs font-black text-white/20 select-none pointer-events-none">V</div>
-            <div className="absolute top-7 left-1/2 -translate-x-1/2 text-xs font-black text-white/20 select-none pointer-events-none">VI</div>
-            <div className="absolute top-7 right-6 text-xs font-black text-white/20 select-none pointer-events-none">I</div>
-            <div className="absolute top-[42%] left-6 text-xs font-black text-white/20 select-none pointer-events-none">IV</div>
-            <div className="absolute top-[42%] left-1/2 -translate-x-1/2 text-xs font-black text-white/20 select-none pointer-events-none">III</div>
-            <div className="absolute top-[42%] right-6 text-xs font-black text-white/20 select-none pointer-events-none">II</div>
+                {/* Subtle Opponent Zone Watermarks */}
+                <div className="absolute top-7 left-6 text-xs font-black text-white/20 select-none pointer-events-none">V</div>
+                <div className="absolute top-7 left-1/2 -translate-x-1/2 text-xs font-black text-white/20 select-none pointer-events-none">VI</div>
+                <div className="absolute top-7 right-6 text-xs font-black text-white/20 select-none pointer-events-none">I</div>
+                <div className="absolute top-[42%] left-6 text-xs font-black text-white/20 select-none pointer-events-none">IV</div>
+                <div className="absolute top-[42%] left-1/2 -translate-x-1/2 text-xs font-black text-white/20 select-none pointer-events-none">III</div>
+                <div className="absolute top-[42%] right-6 text-xs font-black text-white/20 select-none pointer-events-none">II</div>
 
-            {/* Center Net System: Czysta, profesjonalna siatka bez zbędnych napisów */}
-            <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 z-20 pointer-events-none flex items-center justify-between">
-              {/* Left Post */}
-              <div className="w-3.5 h-8 bg-slate-400 rounded-r border border-slate-600 shadow-md -translate-x-0.5" />
+                {/* Center Net System: Czysta, profesjonalna siatka bez zbędnych napisów */}
+                <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 z-20 pointer-events-none flex items-center justify-between">
+                  {/* Left Post */}
+                  <div className="w-3.5 h-8 bg-slate-400 rounded-r border border-slate-600 shadow-md -translate-x-0.5" />
 
-              {/* Net: Sleek white volleyball net tape & grid mesh (bez tekstu/badge'y) */}
-              <div className="flex-1 h-2.5 bg-white border-y border-slate-300 shadow-sm relative overflow-hidden">
-                <div className="absolute inset-0 opacity-25 bg-[radial-gradient(#0f172a_1px,transparent_1px)] [background-size:4px_4px]" />
-              </div>
+                  {/* Net: Sleek white volleyball net tape & grid mesh (bez tekstu/badge'y) */}
+                  <div className="flex-1 h-2.5 bg-white border-y border-slate-300 shadow-sm relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-25 bg-[radial-gradient(#0f172a_1px,transparent_1px)] [background-size:4px_4px]" />
+                  </div>
 
-              {/* Right Post */}
-              <div className="w-3.5 h-8 bg-slate-400 rounded-l border border-slate-600 shadow-md translate-x-0.5" />
-            </div>
+                  {/* Right Post */}
+                  <div className="w-3.5 h-8 bg-slate-400 rounded-l border border-slate-600 shadow-md translate-x-0.5" />
+                </div>
 
-            {/* Center Line Under Net */}
-            <div className="absolute top-1/2 left-3 sm:left-5 right-3 sm:right-5 h-[2px] bg-white pointer-events-none z-10" />
+                {/* Center Line Under Net */}
+                <div className="absolute top-1/2 left-3 sm:left-5 right-3 sm:right-5 h-[2px] bg-white pointer-events-none z-10" />
 
-            {/* Antennas (Czerwono-białe antenki na liniach bocznych) */}
-            <div
-              className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 -translate-x-1/2 h-12 w-1.5 bg-[repeating-linear-gradient(to_bottom,#ef4444,#ef4444_6px,#ffffff_6px,#ffffff_12px)] rounded-full shadow-lg z-25 pointer-events-none border border-slate-900"
-              title="Antenka siatkarska lewa"
-            />
-            <div
-              className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 translate-x-1/2 h-12 w-1.5 bg-[repeating-linear-gradient(to_bottom,#ef4444,#ef4444_6px,#ffffff_6px,#ffffff_12px)] rounded-full shadow-lg z-25 pointer-events-none border border-slate-900"
-              title="Antenka siatkarska prawa"
-            />
+                {/* Antennas (Czerwono-białe antenki na liniach bocznych) */}
+                <div
+                  className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 -translate-x-1/2 h-12 w-1.5 bg-[repeating-linear-gradient(to_bottom,#ef4444,#ef4444_6px,#ffffff_6px,#ffffff_12px)] rounded-full shadow-lg z-25 pointer-events-none border border-slate-900"
+                  title="Antenka siatkarska lewa"
+                />
+                <div
+                  className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 translate-x-1/2 h-12 w-1.5 bg-[repeating-linear-gradient(to_bottom,#ef4444,#ef4444_6px,#ffffff_6px,#ffffff_12px)] rounded-full shadow-lg z-25 pointer-events-none border border-slate-900"
+                  title="Antenka siatkarska prawa"
+                />
 
-            {/* Bottom Half: Połowa Angels ZTP (50% - 100%) */}
-            <div className="absolute top-1/2 left-3 sm:left-5 right-3 sm:right-5 bottom-3 sm:bottom-5 bg-gradient-to-b from-[#1e40af] to-[#1d4ed8] pointer-events-none" />
+                {/* Bottom Half: Połowa Angels ZTP (50% - 100%) */}
+                <div className="absolute top-1/2 left-3 sm:left-5 right-3 sm:right-5 bottom-3 sm:bottom-5 bg-gradient-to-b from-[#1e40af] to-[#1d4ed8] pointer-events-none" />
 
-            {/* Angels ZTP 3m Attack Line (at 66.7%) */}
-            <div className="absolute top-[66.7%] left-3 sm:left-5 right-3 sm:right-5 border-b-2 border-dashed border-sky-200/80 pointer-events-none z-5" />
+                {/* Angels ZTP 3m Attack Line (at 66.7%) */}
+                <div className="absolute top-[66.7%] left-3 sm:left-5 right-3 sm:right-5 border-b-2 border-dashed border-sky-200/80 pointer-events-none z-5" />
 
-            {/* Subtle Angels ZTP Zone Watermarks */}
-            <div className="absolute top-[55%] left-6 text-xs font-black text-white/20 select-none pointer-events-none">IV</div>
-            <div className="absolute top-[55%] left-1/2 -translate-x-1/2 text-xs font-black text-white/20 select-none pointer-events-none">III</div>
-            <div className="absolute top-[55%] right-6 text-xs font-black text-white/20 select-none pointer-events-none">II</div>
-            <div className="absolute bottom-6 left-6 text-xs font-black text-white/20 select-none pointer-events-none">V</div>
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs font-black text-white/20 select-none pointer-events-none">VI</div>
-            <div className="absolute bottom-6 right-6 text-xs font-black text-white/20 select-none pointer-events-none">I</div>
-            <div className="absolute top-[55%] right-6 text-xs font-black text-sky-400/10 select-none pointer-events-none">II</div>
-            <div className="absolute bottom-6 left-6 text-xs font-black text-sky-400/10 select-none pointer-events-none">V</div>
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs font-black text-sky-400/10 select-none pointer-events-none">VI</div>
-            <div className="absolute bottom-6 right-6 text-xs font-black text-sky-400/10 select-none pointer-events-none">I</div>
+                {/* Subtle Angels ZTP Zone Watermarks */}
+                <div className="absolute top-[55%] left-6 text-xs font-black text-white/20 select-none pointer-events-none">IV</div>
+                <div className="absolute top-[55%] left-1/2 -translate-x-1/2 text-xs font-black text-white/20 select-none pointer-events-none">III</div>
+                <div className="absolute top-[55%] right-6 text-xs font-black text-white/20 select-none pointer-events-none">II</div>
+                <div className="absolute bottom-6 left-6 text-xs font-black text-white/20 select-none pointer-events-none">V</div>
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs font-black text-white/20 select-none pointer-events-none">VI</div>
+                <div className="absolute bottom-6 right-6 text-xs font-black text-white/20 select-none pointer-events-none">I</div>
+              </>
+            ) : (
+              <>
+                {/* Left Half: Połowa Rywali (0% - 50%) */}
+                <div className="absolute top-3 sm:top-5 left-3 sm:left-5 right-1/2 bottom-3 sm:bottom-5 bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] pointer-events-none" />
+
+                {/* Opponent 3m Attack Line (at 33.3%) */}
+                <div className="absolute left-[33.3%] top-3 sm:top-5 bottom-3 sm:bottom-5 border-r-2 border-dashed border-rose-300/70 pointer-events-none z-5" />
+
+                {/* Opponent Zone Watermarks (Horizontal) */}
+                <div className="absolute top-6 left-7 text-xs font-black text-white/20 select-none pointer-events-none">V</div>
+                <div className="absolute top-1/2 -translate-y-1/2 left-7 text-xs font-black text-white/20 select-none pointer-events-none">VI</div>
+                <div className="absolute bottom-6 left-7 text-xs font-black text-white/20 select-none pointer-events-none">I</div>
+                <div className="absolute top-6 left-[41%] text-xs font-black text-white/20 select-none pointer-events-none">IV</div>
+                <div className="absolute top-1/2 -translate-y-1/2 left-[41%] text-xs font-black text-white/20 select-none pointer-events-none">III</div>
+                <div className="absolute bottom-6 left-[41%] text-xs font-black text-white/20 select-none pointer-events-none">II</div>
+
+                {/* Center Net System: Czysta, profesjonalna siatka w pionie */}
+                <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 z-20 pointer-events-none flex flex-col items-center justify-between">
+                  {/* Top Post */}
+                  <div className="h-3.5 w-8 bg-slate-400 rounded-b border border-slate-600 shadow-md -translate-y-0.5" />
+
+                  {/* Net: Sleek white volleyball net tape & grid mesh */}
+                  <div className="flex-1 w-2.5 bg-white border-x border-slate-300 shadow-sm relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-25 bg-[radial-gradient(#0f172a_1px,transparent_1px)] [background-size:4px_4px]" />
+                  </div>
+
+                  {/* Bottom Post */}
+                  <div className="h-3.5 w-8 bg-slate-400 rounded-t border border-slate-600 shadow-md translate-y-0.5" />
+                </div>
+
+                {/* Center Line Under Net */}
+                <div className="absolute left-1/2 top-3 sm:top-5 bottom-3 sm:bottom-5 w-[2px] bg-white pointer-events-none z-10 -translate-x-1/2" />
+
+                {/* Antennas (Czerwono-białe antenki na liniach bocznych - góra i dół) */}
+                <div
+                  className="absolute top-3 sm:top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-1.5 bg-[repeating-linear-gradient(to_right,#ef4444,#ef4444_6px,#ffffff_6px,#ffffff_12px)] rounded-full shadow-lg z-25 pointer-events-none border border-slate-900"
+                  title="Antenka siatkarska górna"
+                />
+                <div
+                  className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 translate-y-1/2 w-12 h-1.5 bg-[repeating-linear-gradient(to_right,#ef4444,#ef4444_6px,#ffffff_6px,#ffffff_12px)] rounded-full shadow-lg z-25 pointer-events-none border border-slate-900"
+                  title="Antenka siatkarska dolna"
+                />
+
+                {/* Right Half: Połowa Angels ZTP (50% - 100%) */}
+                <div className="absolute top-3 sm:top-5 left-1/2 right-3 sm:right-5 bottom-3 sm:bottom-5 bg-gradient-to-r from-[#1e40af] to-[#1d4ed8] pointer-events-none" />
+
+                {/* Angels ZTP 3m Attack Line (at 66.7%) */}
+                <div className="absolute left-[66.7%] top-3 sm:top-5 bottom-3 sm:bottom-5 border-r-2 border-dashed border-sky-200/80 pointer-events-none z-5" />
+
+                {/* Angels ZTP Zone Watermarks (Horizontal) */}
+                <div className="absolute top-6 left-[56%] text-xs font-black text-white/20 select-none pointer-events-none">II</div>
+                <div className="absolute top-1/2 -translate-y-1/2 left-[56%] text-xs font-black text-white/20 select-none pointer-events-none">III</div>
+                <div className="absolute bottom-6 left-[56%] text-xs font-black text-white/20 select-none pointer-events-none">IV</div>
+                <div className="absolute top-6 right-7 text-xs font-black text-white/20 select-none pointer-events-none">I</div>
+                <div className="absolute top-1/2 -translate-y-1/2 right-7 text-xs font-black text-white/20 select-none pointer-events-none">VI</div>
+                <div className="absolute bottom-6 right-7 text-xs font-black text-white/20 select-none pointer-events-none">V</div>
+              </>
+            )}
 
             {/* Draggable Volleyball Ball 🏐 */}
             {showBall && (
@@ -2408,8 +2542,8 @@ function TacticsContent() {
                   setSelectedPlayerId('ball');
                 }}
                 style={{
-                  left: `${ballPos.x}%`,
-                  top: `${ballPos.y}%`,
+                  left: boardOrientation === 'horizontal' ? `${ballPos.y}%` : `${ballPos.x}%`,
+                  top: boardOrientation === 'horizontal' ? `${100 - ballPos.x}%` : `${ballPos.y}%`,
                   transform: 'translate(-50%, -50%)'
                 }}
                 className={`absolute z-25 flex flex-col items-center select-none transition-transform ${
@@ -2450,8 +2584,8 @@ function TacticsContent() {
                     setSelectedPlayerId(isSelected ? null : opp.id);
                   }}
                   style={{
-                    left: `${opp.x}%`,
-                    top: `${opp.y}%`,
+                    left: boardOrientation === 'horizontal' ? `${opp.y}%` : `${opp.x}%`,
+                    top: boardOrientation === 'horizontal' ? `${100 - opp.x}%` : `${opp.y}%`,
                     transform: 'translate(-50%, -50%)'
                   }}
                   className={`absolute z-20 flex flex-col items-center select-none transition-transform ${
@@ -2502,8 +2636,8 @@ function TacticsContent() {
                     setSelectedPlayerId(isSelected ? null : player.id);
                   }}
                   style={{
-                    left: `${player.x}%`,
-                    top: `${player.y}%`,
+                    left: boardOrientation === 'horizontal' ? `${player.y}%` : `${player.x}%`,
+                    top: boardOrientation === 'horizontal' ? `${100 - player.x}%` : `${player.y}%`,
                     transform: 'translate(-50%, -50%)'
                   }}
                   className={`absolute z-20 flex flex-col items-center select-none transition-transform ${
