@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
       }
       if (!tactic.posts) tactic.posts = [];
 
-      const isStaff = user.role === 'TRENER' || user.role === 'KIEROWNIK' || user.isCaptain;
+      const isStaff = hasPermission(user, 'canManageTactics');
       const newPost = {
         id: `post_${Date.now()}`,
         tacticId,
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
         authorNumber: user.number,
         content: content.trim(),
         status: isStaff ? ('ZAAKCEPTOWANY' as const) : ('OCZEKUJE' as const),
-        coachComment: isStaff ? 'Wpis sztabu trenerskiego' : undefined,
+        coachComment: isStaff ? `Wpis sztabu: ${user.name}` : undefined,
         createdAt: new Date().toISOString()
       };
 
@@ -87,9 +87,9 @@ export async function POST(req: NextRequest) {
 
     // 2. Coach/Captain accepts, rejects or edits a player suggestion
     if (body.type === 'UPDATE_POST_STATUS') {
-      const canManage = user.role === 'KIEROWNIK' || user.role === 'TRENER' || user.isCaptain || hasPermission(user, 'canManageTactics');
+      const canManage = hasPermission(user, 'canManageTactics');
       if (!canManage) {
-        return NextResponse.json({ error: 'Tylko Trener lub Kapitan może zatwierdzać sugestie taktyczne' }, { status: 403 });
+        return NextResponse.json({ error: 'Tylko Trener lub Zarząd może zarządzać sugestiami taktycznymi' }, { status: 403 });
       }
 
       const { tacticId, postId, status, coachComment, editedContent } = body;
@@ -116,9 +116,45 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 2b. Coach updates existing tactic directly (overwrites positions / drawing / title)
+    // 2b. Coach or Captain grants tactical editing permission to a requesting player
+    if (body.type === 'GRANT_PLAYER_TACTIC_EDIT') {
+      const canManage = hasPermission(user, 'canManageTactics');
+      if (!canManage) {
+        return NextResponse.json({ error: 'Tylko Trener lub Zarząd może nadawać uprawnienia edycji' }, { status: 403 });
+      }
+
+      const { targetUserId, postId, tacticId, comment } = body;
+      const targetUser = (db.users || []).find(u => u.id === targetUserId);
+      if (!targetUser) {
+        return NextResponse.json({ error: 'Zawodnik nie został znaleziony' }, { status: 404 });
+      }
+
+      if (!targetUser.permissions) {
+        targetUser.permissions = {};
+      }
+      targetUser.permissions.canManageTactics = true;
+
+      // Update post status if associated
+      if (tacticId && postId) {
+        const tactic = (db.tactics || []).find(t => t.id === tacticId);
+        const post = tactic?.posts?.find(p => p.id === postId);
+        if (post) {
+          post.status = 'ZAAKCEPTOWANY';
+          post.coachComment = comment || `🔑 Trener ${user.name} zaakceptował Twoją prośbę i odblokował Ci uprawnienia edycji tablicy taktycznej!`;
+        }
+      }
+
+      writeDatabase(db);
+
+      return NextResponse.json({
+        success: true,
+        message: `Uprawnienia edycji taktyki zostały pomyślnie nadane dla: ${targetUser.name}!`
+      });
+    }
+
+    // 2c. Coach updates existing tactic directly (overwrites positions / drawing / title)
     if (body.type === 'UPDATE_TACTIC') {
-      const canManage = user.role === 'KIEROWNIK' || user.role === 'TRENER' || user.isCaptain || hasPermission(user, 'canManageTactics');
+      const canManage = hasPermission(user, 'canManageTactics');
       if (!canManage) {
         return NextResponse.json({ error: 'Brak uprawnień trenera/kapitana do edycji taktyki' }, { status: 403 });
       }
@@ -173,9 +209,9 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Create or Save Tactic (Requires staff permission)
-    const canManage = user.role === 'KIEROWNIK' || user.role === 'TRENER' || user.isCaptain || hasPermission(user, 'canManageTactics');
+    const canManage = hasPermission(user, 'canManageTactics');
     if (!canManage) {
-      return NextResponse.json({ error: 'Brak uprawnień trenera/kapitana do zarządzania taktyką' }, { status: 403 });
+      return NextResponse.json({ error: 'Brak uprawnień do edycji taktyki (skontaktuj się z Trenerem lub Zarządem)' }, { status: 403 });
     }
 
     if (body.type === 'TACTIC') {
@@ -261,7 +297,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (body.type === 'ADD_MATERIAL') {
-      const canManage = user.role === 'KIEROWNIK' || user.role === 'TRENER' || user.isCaptain || hasPermission(user, 'canManageTactics');
+      const canManage = hasPermission(user, 'canManageTactics');
       if (!canManage) {
         return NextResponse.json({ error: 'Tylko Trener lub Sztab może dodawać materiały taktyczne' }, { status: 403 });
       }

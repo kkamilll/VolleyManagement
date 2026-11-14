@@ -149,12 +149,12 @@ Aplikacja uruchomi się pod adresem: **http://localhost:3000**
 
 Domyślne hasło dla kont zawodników: `haslo123`
 
-| Rola / Zawodnik | Adres E-mail | Uprawnienia |
+| Rola / Zawodnik | Adres E-mail | Zakres Uprawnień |
 |---|---|---|
-| **Łukasz Kremer (#17)** | `lukasz.kremer@angelsztp.pl` / `kierownik@volley.pl` | Kapitan & Kierownik (Pełne uprawnienia) |
-| **Hubert Obara (#12)** | `trener@volley.pl` | Trener (Taktyka, mecze, obecności) |
-| **Kamil Pujanek (#4)** | `kamil.pujanek@volley.pl` | Zawodnik (Obecności, składki BLIK, profil) |
-| **Dowolny zawodnik z kadry** | Dostępny w zakładce Kadra | Profil zawodnika, obecności, składki |
+| **Łukasz Kremer (#17)** | `lukasz.kremer@angelsztp.pl` / `kierownik@volley.pl` | **Kapitan & Kierownik (Pełne uprawnienia):** mecze ligowe, tabele LALS, sparingi, finanse/BLIK, taktyka, zarządzanie kadrą, admin |
+| **Kamil Pujanek (#4)** | `kamil.pujanek@angelsztp.pl` / `kamil.pujanek@volley.pl` | **Administrator & Rozgrywający (Pełne uprawnienia):** identyczne najwyższe uprawnienia jak Kierownik (zarządzanie ligą, finansami, kadrą i panelem admina) |
+| **Hubert Obara (#12)** | `hubert.obara@angelsztp.pl` / `trener@volley.pl` | **Trener (Sztab szkoleniowy):** tworzenie taktyki (P1-P6), rozpiski treningów i sparingów, akceptacja wniosków graczy i nadawanie im uprawnień edycji. *Brak dostępu do dodawania/edycji oficjalnych meczów ligowych i kasy drużyny.* |
+| **Zawodnicy kadry (np. Tomasz Krupa #1, Piotr Graczyk #7...)** | Zgodnie z profilem w `/team` | **Zawodnik (Najmniejsze uprawnienia):** podgląd założeń taktycznych (tylko odczyt / brudnopis), wysyłanie wniosków i próśb o edycję do trenera, deklaracje obecności, opłacanie składek BLIK. |
 
 ---
 

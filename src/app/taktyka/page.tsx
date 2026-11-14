@@ -289,7 +289,18 @@ function TacticsContent() {
 
   const { user } = useAuth();
   const { isArchiveMode } = useSeasonArchive();
-  const canEdit = !isArchiveMode && Boolean(user && (user.role === 'TRENER' || user.role === 'KIEROWNIK' || user.isCaptain));
+  const canEdit = !isArchiveMode && Boolean(
+    user && (
+      user.role === 'TRENER' ||
+      user.role === 'KIEROWNIK' ||
+      user.isCaptain ||
+      user.id === 'usr_pujanek' ||
+      user.id === 'usr_kierownik' ||
+      (user.email && (user.email.toLowerCase().includes('pujanek') || user.email.toLowerCase().includes('kremer'))) ||
+      user.permissions?.canManageTactics ||
+      user.permissions?.isAdmin
+    )
+  );
 
   // Section switcher: 1. Tablica (Brudnopis), 2. Mecze, Sparingi & Turnieje, 3. Treningi
   const [tacticsSection, setTacticsSection] = useState<'board' | 'matches' | 'trainings'>('board');
@@ -388,6 +399,7 @@ function TacticsContent() {
   const [submittingPost, setSubmittingPost] = useState(false);
   const [editingPostModal, setEditingPostModal] = useState<TacticalPost | null>(null);
   const [editCoachFeedback, setEditCoachFeedback] = useState('');
+  const [postFilter, setPostFilter] = useState<'ALL' | 'PENDING' | 'ACCEPTED'>('ALL');
 
   // Player Read-Only & Sandbox State
   const [isSandboxMode, setIsSandboxMode] = useState(false);
@@ -1358,6 +1370,44 @@ function TacticsContent() {
       }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  // Grant editing permission to a player upon request
+  const handleGrantTacticEdit = async (targetUserId: string, postId: string) => {
+    if (!selectedTactic) return;
+    const confirmGrant = window.confirm('Czy na pewno chcesz odblokować temu zawodnikowi pełne uprawnienia do edycji tablicy taktycznej?');
+    if (!confirmGrant) return;
+
+    try {
+      const res = await fetch('/api/tactics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'GRANT_PLAYER_TACTIC_EDIT',
+          targetUserId,
+          postId,
+          tacticId: selectedTactic.id
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message || 'Uprawnienia zostały pomyślnie nadane!');
+        await fetchData();
+        if (selectedTactic.posts) {
+          const updated = selectedTactic.posts.map(p =>
+            p.id === postId
+              ? { ...p, status: 'ZAAKCEPTOWANY' as const, coachComment: `🔑 Trener ${user?.name || 'Hubert'} zaakceptował prośbę i odblokował uprawnienia do edycji taktyki!` }
+              : p
+          );
+          setSelectedTactic({ ...selectedTactic, posts: updated });
+        }
+      } else {
+        alert(data.error || 'Błąd przyznawania uprawnień');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Wystąpił błąd podczas nadawania uprawnień');
     }
   };
 
@@ -2801,6 +2851,199 @@ function TacticsContent() {
             );
           })}
         </div>
+
+        {/* SEKCJA: SUGESTIE I WNIOSKI ZAWODNIKÓW & DYSKUSJA TAKTYCZNA */}
+        {selectedTactic && (
+          <div className="p-5 sm:p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 shrink-0">
+                  <MessageSquare className="w-5 h-5 stroke-[2.5]" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-sm sm:text-base font-black uppercase text-slate-900 tracking-tight font-athletic">
+                      Sugestie & Prośby o Edycję Zawodników
+                    </h4>
+                    {((selectedTactic.posts || []).filter(p => p.status === 'OCZEKUJE').length > 0) && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300 animate-pulse">
+                        {(selectedTactic.posts || []).filter(p => p.status === 'OCZEKUJE').length} oczekujące
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-500">
+                    Wnioski taktyczne od zespołu, uwagi do ustawień oraz prośby o dostęp do edycji tablicy.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* Filter buttons */}
+                <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200 text-[11px] font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setPostFilter('ALL')}
+                    className={`px-2.5 py-1 rounded-lg transition ${postFilter === 'ALL' ? 'bg-white text-slate-900 shadow-2xs font-black' : 'text-slate-500 hover:text-slate-900'}`}
+                  >
+                    Wszystkie ({(selectedTactic.posts || []).length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPostFilter('PENDING')}
+                    className={`px-2.5 py-1 rounded-lg transition ${postFilter === 'PENDING' ? 'bg-white text-amber-800 shadow-2xs font-black' : 'text-slate-500 hover:text-slate-900'}`}
+                  >
+                    Oczekujące ({(selectedTactic.posts || []).filter(p => p.status === 'OCZEKUJE').length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPostFilter('ACCEPTED')}
+                    className={`px-2.5 py-1 rounded-lg transition ${postFilter === 'ACCEPTED' ? 'bg-white text-emerald-800 shadow-2xs font-black' : 'text-slate-500 hover:text-slate-900'}`}
+                  >
+                    Zaakceptowane ({(selectedTactic.posts || []).filter(p => p.status === 'ZAAKCEPTOWANY').length})
+                  </button>
+                </div>
+
+                {/* Add button for players */}
+                <button
+                  type="button"
+                  onClick={() => setShowRequestEditModal(true)}
+                  className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-2xs"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>+ Zgłoś uwagę / Prośbę</span>
+                </button>
+              </div>
+            </div>
+
+            {/* List of posts / suggestions */}
+            {(!selectedTactic.posts || selectedTactic.posts.length === 0) ? (
+              <div className="py-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-1.5">
+                <MessageSquare className="w-8 h-8 text-slate-400 mx-auto" />
+                <p className="text-xs font-bold text-slate-700">Brak zgłoszeń dla tej taktyki</p>
+                <p className="text-[11px] text-slate-400 max-w-sm mx-auto">
+                  Zawodnicy mogą przesyłać swoje propozycje rotacji, asekuracji kiwek lub prosić trenera o uprawnienia edycji.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {selectedTactic.posts
+                  .filter(p => {
+                    if (postFilter === 'PENDING') return p.status === 'OCZEKUJE';
+                    if (postFilter === 'ACCEPTED') return p.status === 'ZAAKCEPTOWANY';
+                    return true;
+                  })
+                  .map(post => {
+                    const isPending = post.status === 'OCZEKUJE';
+                    const isAccepted = post.status === 'ZAAKCEPTOWANY';
+                    const isEditRequest = post.content.includes('PROŚBA O UPRAWNIENIA EDYCJI');
+
+                    return (
+                      <div
+                        key={post.id}
+                        className={`p-4 rounded-2xl border transition-all ${
+                          isPending
+                            ? 'bg-amber-50/60 border-amber-200 shadow-2xs'
+                            : isAccepted
+                            ? 'bg-emerald-50/30 border-emerald-200'
+                            : 'bg-slate-50 border-slate-200'
+                        }`}
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-200/60">
+                          <div className="flex items-center gap-2">
+                            <span className="w-7 h-7 rounded-lg bg-sky-100 text-sky-800 font-mono font-black text-xs flex items-center justify-center border border-sky-200 shrink-0">
+                              #{post.authorNumber || '•'}
+                            </span>
+                            <div>
+                              <span className="text-xs font-black text-slate-900">{post.authorName}</span>
+                              <span className="text-[10px] text-slate-400 ml-2">
+                                {new Date(post.createdAt).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider border ${
+                              isPending
+                                ? 'bg-amber-100 text-amber-900 border-amber-300'
+                                : isAccepted
+                                ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                                : 'bg-rose-100 text-rose-900 border-rose-300'
+                            }`}>
+                              {isPending ? '🟡 Oczekuje na decyzję trenera' : isAccepted ? '🟢 Zaakceptowana' : '🔴 Odrzucona'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Content text */}
+                        <div className="py-2 text-xs text-slate-800 font-medium whitespace-pre-wrap leading-relaxed">
+                          {post.content}
+                        </div>
+
+                        {/* Coach reply feedback if present */}
+                        {post.coachComment && (
+                          <div className="mt-2 p-2.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-700 flex items-start gap-2 shadow-2xs">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                            <div>
+                              <span className="font-bold text-slate-900 block text-[11px]">Odpowiedź Trenera / Sztabu:</span>
+                              <span className="text-[11.5px] italic text-slate-600">{post.coachComment}</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Actions for Coach / Manager */}
+                        {canEdit && (
+                          <div className="mt-3 pt-2.5 border-t border-slate-200/60 flex flex-wrap items-center justify-end gap-2">
+                            {isEditRequest && post.authorId && (
+                              <button
+                                type="button"
+                                onClick={() => handleGrantTacticEdit(post.authorId, post.id)}
+                                className="px-3 py-1 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
+                                title="Nadaj temu zawodnikowi uprawnienia edycji tablicy taktycznej"
+                              >
+                                <Crown className="w-3.5 h-3.5" />
+                                <span>🔑 Odblokuj edycję dla gracza</span>
+                              </button>
+                            )}
+
+                            {isPending && (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const comment = prompt('Dodaj komentarz trenera do akceptacji (opcjonalnie):', 'Świetna uwaga, wdrożone do założeń!');
+                                    if (comment !== null) {
+                                      handleUpdatePostStatus(post.id, 'ZAAKCEPTOWANY', comment);
+                                    }
+                                  }}
+                                  className="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1 shadow-2xs"
+                                >
+                                  <CheckCircle2 className="w-3.5 h-3.5" />
+                                  <span>Zaakceptuj</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const comment = prompt('Podaj powód odrzucenia (opcjonalnie):', 'Zostajemy przy obecnym wariancie.');
+                                    if (comment !== null) {
+                                      handleUpdatePostStatus(post.id, 'ODRZUCONY', comment);
+                                    }
+                                  }}
+                                  className="px-3 py-1 rounded-xl bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-300 font-bold text-xs transition flex items-center gap-1"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                  <span>Odrzuć</span>
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
+          </div>
+        )}
       </div>
       </>
       )}

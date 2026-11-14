@@ -332,9 +332,9 @@ export async function PATCH(request: Request) {
     }
 
     const user = await getServerUser();
-    const canManage = user && (user.role === 'TRENER' || user.role === 'KIEROWNIK' || user.isCaptain || hasPermission(user, 'canManageMatches'));
+    const canManage = hasPermission(user, 'canManageMatches');
     if (!canManage) {
-      return NextResponse.json({ error: 'Brak uprawnień do edycji raportu' }, { status: 403 });
+      return NextResponse.json({ error: 'Brak uprawnień do edycji raportu meczowego' }, { status: 403 });
     }
 
     const body = await request.json();
@@ -388,9 +388,9 @@ export async function DELETE(request: Request) {
     }
 
     const user = await getServerUser();
-    const canManage = user && (user.role === 'TRENER' || user.role === 'KIEROWNIK' || user.isCaptain || hasPermission(user, 'canManageMatches'));
+    const canManage = hasPermission(user, 'canManageMatches');
     if (!canManage) {
-      return NextResponse.json({ error: 'Brak uprawnień do usuwania' }, { status: 403 });
+      return NextResponse.json({ error: 'Brak uprawnień do usuwania raportu meczowego' }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);

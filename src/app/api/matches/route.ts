@@ -78,9 +78,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Musisz być zalogowany' }, { status: 401 });
     }
 
-    const canManage = user.role === 'TRENER' || user.role === 'KIEROWNIK' || user.isCaptain || hasPermission(user, 'canManageMatches');
+    const canManage = hasPermission(user, 'canManageMatches');
     if (!canManage) {
-      return NextResponse.json({ error: 'Tylko Trener, Kapitan lub Kierownik może dodawać mecze' }, { status: 403 });
+      return NextResponse.json({ error: 'Tylko Zarząd (Kamil Pujanek / Łukasz Kremer) może dodawać i zarządzać meczami ligowymi' }, { status: 403 });
     }
 
     const body = await request.json();
@@ -325,9 +325,9 @@ export async function PUT(request: Request) {
     }
 
     const user = await getServerUser();
-    const canManage = user && (user.role === 'TRENER' || user.role === 'KIEROWNIK' || user.isCaptain || hasPermission(user, 'canManageMatches'));
+    const canManage = hasPermission(user, 'canManageMatches');
     if (!canManage) {
-      return NextResponse.json({ error: 'Brak uprawnień do edycji meczu' }, { status: 403 });
+      return NextResponse.json({ error: 'Brak uprawnień do edycji meczu (wymagane uprawnienia Zarządu)' }, { status: 403 });
     }
 
     const body = await request.json();
@@ -392,9 +392,9 @@ export async function DELETE(request: Request) {
     }
 
     const user = await getServerUser();
-    const canManage = user && (user.role === 'TRENER' || user.role === 'KIEROWNIK' || user.isCaptain || hasPermission(user, 'canManageMatches'));
+    const canManage = hasPermission(user, 'canManageMatches');
     if (!canManage) {
-      return NextResponse.json({ error: 'Brak uprawnień do usuwania' }, { status: 403 });
+      return NextResponse.json({ error: 'Brak uprawnień do usuwania meczu ligowego' }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);

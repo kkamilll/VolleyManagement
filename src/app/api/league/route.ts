@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { readDatabase, writeDatabase, getEffectiveDatabase, getActiveSeasonIdFromRequest } from '@/lib/db';
-import { getServerUser } from '@/lib/auth';
+import { getServerUser, hasPermission } from '@/lib/auth';
 import { LeagueTableTeam, LeaguePhoto, LeaguePhase, VolleyStationScheduleMatch } from '@/lib/types';
 
 const DEFAULT_LALS_SCHEDULE: VolleyStationScheduleMatch[] = [
@@ -500,7 +500,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Musisz być zalogowany' }, { status: 401 });
     }
 
-    const canManage = user.role === 'KIEROWNIK' || user.role === 'TRENER' || user.isCaptain;
+    const canManageLeague = hasPermission(user, 'canManageMatches');
+    const canManagePhotos = hasPermission(user, 'canManageEvents') || hasPermission(user, 'canManageMatches');
     const body = await request.json();
     const db = readDatabase();
 
@@ -575,7 +576,7 @@ export async function POST(request: Request) {
     }
 
     if (body.action === 'DELETE_SERIES') {
-      if (!canManage) {
+      if (!canManagePhotos) {
         return NextResponse.json({ error: 'Brak uprawnień do usuwania serii zdjęć' }, { status: 403 });
       }
       const { seriesId } = body;
@@ -587,7 +588,7 @@ export async function POST(request: Request) {
     }
 
     if (body.action === 'DELETE_PHOTO') {
-      if (!canManage) {
+      if (!canManagePhotos) {
         return NextResponse.json({ error: 'Brak uprawnień do usuwania zdjęć' }, { status: 403 });
       }
       const { photoId } = body;
@@ -612,8 +613,8 @@ export async function POST(request: Request) {
     }
 
     if (body.action === 'UPDATE_PHASE') {
-      if (!canManage) {
-        return NextResponse.json({ error: 'Brak uprawnień do edycji fazy' }, { status: 403 });
+      if (!canManageLeague) {
+        return NextResponse.json({ error: 'Tylko Zarząd (Kamil Pujanek / Łukasz Kremer) może edytować fazy ligowe' }, { status: 403 });
       }
       const { phase } = body;
       if (!phase || !phase.id) {
@@ -633,8 +634,8 @@ export async function POST(request: Request) {
     }
 
     if (body.action === 'CREATE_PHASE') {
-      if (!canManage) {
-        return NextResponse.json({ error: 'Brak uprawnień do tworzenia fazy' }, { status: 403 });
+      if (!canManageLeague) {
+        return NextResponse.json({ error: 'Tylko Zarząd (Kamil Pujanek / Łukasz Kremer) może tworzyć nową fazę ligową' }, { status: 403 });
       }
       const { name, shortName, advancementSpots, advancementTargetName, teamsCount, table } = body;
       if (!name) {
@@ -660,8 +661,8 @@ export async function POST(request: Request) {
     }
 
     if (body.action === 'DELETE_PHASE') {
-      if (!canManage) {
-        return NextResponse.json({ error: 'Brak uprawnień do usuwania fazy' }, { status: 403 });
+      if (!canManageLeague) {
+        return NextResponse.json({ error: 'Tylko Zarząd (Kamil Pujanek / Łukasz Kremer) może usuwać fazę ligową' }, { status: 403 });
       }
       const { phaseId } = body;
       if (!phaseId) return NextResponse.json({ error: 'Brak ID fazy' }, { status: 400 });
@@ -680,8 +681,8 @@ export async function POST(request: Request) {
     }
 
     if (body.action === 'SPLIT_PHASE') {
-      if (!canManage) {
-        return NextResponse.json({ error: 'Brak uprawnień do podziału fazy' }, { status: 403 });
+      if (!canManageLeague) {
+        return NextResponse.json({ error: 'Tylko Zarząd (Kamil Pujanek / Łukasz Kremer) może dzielić fazy ligowe' }, { status: 403 });
       }
       const { sourcePhaseId, newPhaseName, newPhaseShortName, startRank, endRank, advancementSpots, advancementTargetName, carryOverStats } = body;
       if (!sourcePhaseId || !newPhaseName) {
@@ -734,8 +735,8 @@ export async function POST(request: Request) {
     }
 
     if (body.action === 'UPDATE_TABLE') {
-      if (!canManage) {
-        return NextResponse.json({ error: 'Tylko Trener lub Kapitan może aktualizować tabelę ligową' }, { status: 403 });
+      if (!canManageLeague) {
+        return NextResponse.json({ error: 'Tylko Zarząd (Kamil Pujanek / Łukasz Kremer) może aktualizować oficjalną tabelę ligową' }, { status: 403 });
       }
       const { table, phaseId } = body;
       if (Array.isArray(table)) {

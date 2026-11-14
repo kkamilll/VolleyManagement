@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { readDatabase, writeDatabase, getActiveSeasonIdFromRequest } from '@/lib/db';
-import { getServerUser } from '@/lib/auth';
+import { getServerUser, hasPermission } from '@/lib/auth';
 import { PaymentMethod } from '@/lib/types';
 
 export async function POST(request: Request) {
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
 
     // Check permissions: either own payment or Manager/Captain
     const isOwner = payment.userId === user.id;
-    const canManage = user.role === 'KIEROWNIK' || user.isCaptain || user.role === 'TRENER';
+    const canManage = hasPermission(user, 'canManageFees');
     if (!isOwner && !canManage) {
       return NextResponse.json({ error: 'Nie masz uprawnień do opłacenia tej składki' }, { status: 403 });
     }

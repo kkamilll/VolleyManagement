@@ -815,9 +815,9 @@ const angelsSquad = [
     passwordHash: '$2a$08$ZQ0QeuDOvE/CoIgY3QZ30.VpGzRnF0wvq5r.4fC4xYezQE7mFNUwy',
     createdAt: '2026-09-01T10:00:00Z',
     permissions: {
-      canManageMatches: true,
+      canManageMatches: false,
       canManageEvents: true,
-      canManageStats: true,
+      canManageStats: false,
       canManageTactics: true,
       canManageFees: false,
       canPostAnnouncements: true,
@@ -828,9 +828,9 @@ const angelsSquad = [
   },
   {
     id: 'usr_pujanek',
-    email: 'kamil.pujanek@volley.pl',
+    email: 'kamil.pujanek@angelsztp.pl',
     name: 'Kamil Pujanek',
-    role: 'ZAWODNIK',
+    role: 'KIEROWNIK',
     number: 4,
     position: 'Rozgrywający',
     height: 197,
@@ -838,7 +838,7 @@ const angelsSquad = [
     status: 'Aktywny',
     passwordHash: '$2a$08$ZQ0QeuDOvE/CoIgY3QZ30.VpGzRnF0wvq5r.4fC4xYezQE7mFNUwy',
     createdAt: '2026-09-05T12:00:00Z',
-    isCaptain: false,
+    isCaptain: true,
     permissions: {
       canManageMatches: true,
       canManageEvents: true,

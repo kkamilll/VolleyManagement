@@ -104,9 +104,9 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     if (body.action === 'ADD_TRANSACTION' || body.action === 'ADD_EXPENSE') {
-      const canManage = user.role === 'KIEROWNIK' || user.isCaptain || user.role === 'TRENER' || hasPermission(user, 'canManageFees');
+      const canManage = hasPermission(user, 'canManageFees');
       if (!canManage) {
-        return NextResponse.json({ error: 'Brak uprawnień do rejestracji wydatków i przychodów' }, { status: 403 });
+        return NextResponse.json({ error: 'Brak uprawnień do zarządzania finansami (wymagane uprawnienia Zarządu)' }, { status: 403 });
       }
       const { title, amount, category, description, type, date } = body;
       if (!title || !amount) {
@@ -195,7 +195,7 @@ export async function DELETE(request: Request) {
     }
 
     const user = await getServerUser();
-    const canManage = user && (user.role === 'KIEROWNIK' || user.isCaptain || user.role === 'TRENER' || hasPermission(user, 'canManageFees'));
+    const canManage = hasPermission(user, 'canManageFees');
     if (!canManage) {
       return NextResponse.json({ error: 'Brak uprawnień do usuwania operacji finansowych' }, { status: 403 });
     }

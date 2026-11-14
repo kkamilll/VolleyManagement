@@ -488,7 +488,7 @@ function AdminCenterContent() {
 
               <button
                 type="button"
-                onClick={() => quickSwitch('usr_zawodnik_2')}
+                onClick={() => quickSwitch('usr_pujanek')}
                 className="p-3 rounded-2xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-bold transition flex items-center justify-between group shadow-sm"
               >
                 <div className="flex items-center gap-2.5">

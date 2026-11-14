@@ -8,17 +8,44 @@ export const AUTH_COOKIE_NAME = 'volley_auth_session';
 
 export function hasPermission(user: User | null, perm: keyof UserPermissions): boolean {
   if (!user) return false;
-  // Kierownik and Kapitan (Łukasz Kremer) have full managerial authority
-  if (user.role === 'KIEROWNIK' || user.isCaptain) return true;
+  
+  // Kierownik, Kapitan (Łukasz Kremer) oraz Kamil Pujanek (Konto Główne / Admin) mają pełne, nadrzędne uprawnienia
+  const isSuperAdmin =
+    user.role === 'KIEROWNIK' ||
+    Boolean(user.isCaptain) ||
+    user.id === 'usr_pujanek' ||
+    user.id === 'usr_kierownik' ||
+    (user.email && (
+      user.email.toLowerCase().includes('kremer') ||
+      user.email.toLowerCase().includes('pujanek') ||
+      user.email.toLowerCase() === 'kierownik@volley.pl'
+    )) ||
+    Boolean(user.permissions?.isAdmin);
+
+  if (isSuperAdmin) return true;
+
+  // Indywidualne uprawnienia nadane użytkownikowi
   if (user.permissions && user.permissions[perm] !== undefined) {
     return Boolean(user.permissions[perm]);
   }
-  // Role defaults
+
+  // Domyślne uprawnienia dla ról:
+  // TRENER: może układać taktyki, prowadzić treningi/sparingi, dodawać ogłoszenia i ankiety.
+  // ALE NIE MOŻE dodawać/edytować oficjalnych meczów ligowych (canManageMatches: false),
+  // ani zarządzać kasą/składkami (canManageFees: false), ani administrować kontami (isAdmin: false).
   if (user.role === 'TRENER') {
     if (perm === 'isAdmin') return false;
     if (perm === 'canManageFees') return false;
-    return true;
+    if (perm === 'canManageMatches') return false;
+    if (perm === 'canManageStats') return false;
+    if (perm === 'canManageTactics') return true;
+    if (perm === 'canManageEvents') return true;
+    if (perm === 'canPostAnnouncements') return true;
+    if (perm === 'canCreatePolls') return true;
+    return false;
   }
+
+  // ZAWODNICY: najniższe uprawnienia (tylko odczyt taktyki, zgłaszanie obecności, płatność składek, wysyłanie próśb)
   return false;
 }
 

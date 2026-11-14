@@ -491,7 +491,28 @@ function RozgrywkiContent() {
   const [copiedSocialText, setCopiedSocialText] = useState(false);
 
   const { isArchiveMode } = useSeasonArchive();
-  const canManage = !isArchiveMode && Boolean(user && (user.role === 'TRENER' || user.role === 'KIEROWNIK' || user.isCaptain));
+  const canManageMatches = !isArchiveMode && Boolean(
+    user && (
+      user.role === 'KIEROWNIK' ||
+      user.isCaptain ||
+      user.id === 'usr_pujanek' ||
+      user.id === 'usr_kierownik' ||
+      (user.email && (user.email.toLowerCase().includes('pujanek') || user.email.toLowerCase().includes('kremer'))) ||
+      user.permissions?.canManageMatches ||
+      user.permissions?.isAdmin
+    )
+  );
+  const canManage = !isArchiveMode && Boolean(
+    user && (
+      user.role === 'KIEROWNIK' ||
+      user.role === 'TRENER' ||
+      user.isCaptain ||
+      user.id === 'usr_pujanek' ||
+      user.id === 'usr_kierownik' ||
+      user.permissions?.canManageEvents ||
+      user.permissions?.isAdmin
+    )
+  );
 
   const fetchData = async () => {
     try {
@@ -3232,7 +3253,7 @@ function RozgrywkiContent() {
             <div className="flex items-center gap-2 overflow-x-auto scrollbar-none shrink-0 self-start sm:self-auto py-0.5 flex-nowrap">
               {ligaSubTab === 'tabela' && (
                 <>
-                  {canManage && (
+                  {canManageMatches && (
                     <>
                       <button
                         type="button"
@@ -3274,7 +3295,7 @@ function RozgrywkiContent() {
               )}
               {ligaSubTab === 'wyniki' && (
                 <>
-                  {canManage && (
+                  {canManageMatches && (
                     <>
                       <button
                         type="button"
@@ -3307,7 +3328,7 @@ function RozgrywkiContent() {
               )}
               {ligaSubTab === 'statystyki' && (
                 <>
-                  {canManage && (
+                  {canManageMatches && (
                     <button
                       type="button"
                       onClick={() => setShowVolleyStationImportModal(true)}
@@ -3381,7 +3402,7 @@ function RozgrywkiContent() {
                         >
                           {phase.shortName || phase.name}
                         </button>
-                        {canManage && leaguePhases.length > 1 && (
+                        {canManageMatches && leaguePhases.length > 1 && (
                           <button
                             type="button"
                             onClick={() => handleDeletePhase(phase.id)}
@@ -3394,7 +3415,7 @@ function RozgrywkiContent() {
                       </div>
                     );
                   })}
-                  {canManage && (
+                  {canManageMatches && (
                     <button
                       type="button"
                       onClick={handleOpenCreatePhase}
@@ -3981,7 +4002,7 @@ function RozgrywkiContent() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2.5">
-                  {canManage && (
+                  {canManageMatches && (
                     <button
                       type="button"
                       onClick={() => setShowVolleyStationImportModal(true)}
@@ -4202,7 +4223,7 @@ function RozgrywkiContent() {
                     <p className="text-xs text-slate-500 max-w-md mx-auto">
                       Użyj przycisku &quot;Importuj z VolleyStation&quot; powyżej, aby wkleić statystyki lub terminarz skopiowany bezpośrednio ze strony ligi.
                     </p>
-                    {canManage && (
+                    {canManageMatches && (
                       <button
                         type="button"
                         onClick={() => setShowVolleyStationImportModal(true)}
@@ -4305,7 +4326,7 @@ function RozgrywkiContent() {
                               </a>
                             )}
 
-                            {canManage && (
+                            {canManageMatches && (
                               <button
                                 type="button"
                                 onClick={e => {

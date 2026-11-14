@@ -124,6 +124,17 @@ export default function LoginPage() {
             </button>
             <button
               type="button"
+              onClick={() => handleQuickLogin('usr_pujanek')}
+              className="py-1.5 px-3 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-bold transition flex items-center justify-between text-left"
+            >
+              <span className="flex items-center gap-2">
+                <Crown className="w-3.5 h-3.5 text-purple-400" />
+                <span>Kamil Pujanek #4 (Admin & Rozgrywający)</span>
+              </span>
+              <span className="text-[10px] font-mono text-purple-300/80">Pełny dostęp</span>
+            </button>
+            <button
+              type="button"
               onClick={() => handleQuickLogin('usr_trener')}
               className="py-1.5 px-3 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-300 text-xs font-bold transition flex items-center justify-between text-left"
             >
@@ -131,18 +142,18 @@ export default function LoginPage() {
                 <ClipboardList className="w-3.5 h-3.5 text-sky-400" />
                 <span>Hubert Obara #12 (Trener)</span>
               </span>
-              <span className="text-[10px] font-mono text-sky-300/80">Taktyka & Skład</span>
+              <span className="text-[10px] font-mono text-sky-300/80">Taktyka & Treningi</span>
             </button>
             <button
               type="button"
-              onClick={() => handleQuickLogin('usr_zawodnik_2')}
+              onClick={() => handleQuickLogin('usr_krupa')}
               className="py-1.5 px-3 rounded-xl bg-steel-800/40 hover:bg-steel-800/80 border border-steel-700 text-steel-300 text-xs font-bold transition flex items-center justify-between text-left"
             >
               <span className="flex items-center gap-2">
-                <Volleyball className="w-3.5 h-3.5 text-purple-400" />
-                <span>Kamil Pujanek #4 (Zawodnik)</span>
+                <Volleyball className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Tomasz Krupa #1 (Zawodnik)</span>
               </span>
-              <span className="text-[10px] font-mono text-steel-400">Składki & Mecze</span>
+              <span className="text-[10px] font-mono text-steel-400">Widok Zawodnika</span>
             </button>
           </div>
         </details>
