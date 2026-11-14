@@ -529,3 +529,4 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
 
   return createPortal(modalContent, document.body);
 }
+

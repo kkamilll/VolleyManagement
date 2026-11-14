@@ -651,7 +651,7 @@ function EventsAttendanceContent() {
   return (
     <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 pt-6 sm:pt-8 pb-20 md:pb-16 space-y-6 sm:space-y-8">
       {/* 1. Header Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 shrink-0 shadow-sm">
@@ -672,7 +672,7 @@ function EventsAttendanceContent() {
           </div>
 
           {/* Quick Shortcuts to Sparingi, Liga and Taktyka */}
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5">
+          <div className="flex items-center gap-1.5 flex-nowrap overflow-x-auto scrollbar-none py-0.5">
             <Link
               href="/rozgrywki?tab=sparingi"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-xs uppercase tracking-wider shadow-2xs hover:shadow-xs transition shrink-0 whitespace-nowrap"
@@ -701,9 +701,9 @@ function EventsAttendanceContent() {
         </div>
 
         {/* Right Controls: View Switcher + Primary Action Button */}
-        <div className="flex items-center gap-2.5 shrink-0 self-start md:self-auto flex-wrap sm:flex-nowrap">
+        <div className="flex items-center gap-2.5 shrink-0 self-start xl:self-auto flex-nowrap">
           {/* Przełącznik widoku: Lista vs Kalendarz */}
-          <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-1 shadow-2xs">
+          <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-1 shadow-2xs shrink-0">
             <button
               type="button"
               onClick={() => setViewMode('list')}

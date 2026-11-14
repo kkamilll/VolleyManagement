@@ -2447,127 +2447,150 @@ function RozgrywkiContent() {
                 );
                 const hasTactic = sparingTactics.length > 0;
 
+                // Wyznaczenie gospodarza i gościa w meczu sparingowym
+                let homeTeam = 'Angels ZTP';
+                let awayTeam = cleanOpponent || '';
+
+                if (cleanOpponent) {
+                  awayTeam = cleanOpponent;
+                  const vsParts = event.title.split(/\s+vs\.?\s+|\s+-\s+/i);
+                  if (vsParts.length === 2) {
+                    const p1 = vsParts[0].trim();
+                    if (!p1.toLowerCase().includes('sparing') && p1.length > 2 && p1.toLowerCase() !== 'angels ztp') {
+                      homeTeam = p1;
+                    }
+                  }
+                } else {
+                  const vsParts = event.title.split(/\s+vs\.?\s+|\s+-\s+/i);
+                  if (vsParts.length === 2) {
+                    const p1 = vsParts[0].trim();
+                    const p2 = vsParts[1].trim();
+                    if (p1.toLowerCase().includes('angels')) {
+                      homeTeam = 'Angels ZTP';
+                      awayTeam = p2;
+                    } else if (p2.toLowerCase().includes('angels')) {
+                      homeTeam = p1;
+                      awayTeam = 'Angels ZTP';
+                    } else if (p1.length > 2) {
+                      homeTeam = p1;
+                      awayTeam = p2;
+                    } else {
+                      homeTeam = 'Angels ZTP';
+                      awayTeam = p2;
+                    }
+                  } else {
+                    const t = event.title.replace(/^sparing\s*(kontrolny)?\s*(z|vs)?\s*/i, '').trim();
+                    awayTeam = t || 'Rywal Sparingowy';
+                    homeTeam = 'Angels ZTP';
+                  }
+                }
+
+                const isHomeAngels = homeTeam.toLowerCase().includes('angels') || (!homeTeam.toLowerCase().includes('vs') && !awayTeam.toLowerCase().includes('angels'));
+                const isAwayAngels = awayTeam.toLowerCase().includes('angels');
+
                 return (
                   <div
                     key={event.id}
                     className={`bg-white border ${
-                      isExpanded ? 'border-amber-400 shadow-md' : 'border-slate-200 hover:border-amber-300 shadow-sm'
-                    } border-l-[6px] border-l-amber-500 rounded-2xl overflow-hidden transition-all duration-200`}
+                      isExpanded ? 'border-amber-400 shadow-md ring-2 ring-amber-100/70' : 'border-slate-200 hover:border-amber-300 shadow-xs hover:shadow-sm'
+                    } border-l-[6px] border-l-amber-500 rounded-3xl overflow-hidden transition-all duration-200`}
                   >
                     {/* Zwijany Nagłówek Karty Sparingowej */}
                     <div
                       onClick={() => toggleSparring(event.id)}
-                      className="p-4 sm:p-5 cursor-pointer flex flex-col gap-3.5 select-none hover:bg-amber-50/10 transition group"
+                      className="p-4 sm:p-5 cursor-pointer flex flex-col gap-4 select-none hover:bg-amber-50/15 transition group"
                     >
-                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 flex-1 min-w-0">
-                        {/* Lewa strona: Data Box + Tytuł + Szczegóły */}
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                          {/* Compact Date Box */}
-                          <div className="w-fit sm:w-28 shrink-0 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 flex items-center sm:flex-col sm:justify-center text-left sm:text-center gap-2 sm:gap-0.5 transition shadow-2xs">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-amber-700">
-                              {new Date(event.date).toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' })}
-                            </span>
-                            <span className="text-xs font-mono font-bold flex items-center gap-1 sm:justify-center text-amber-950">
-                              <Clock className="w-3 h-3 text-amber-600" />
-                              {new Date(event.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
-                            </span>
+                      {/* 1. Górna belka metadanych i szybkich akcji */}
+                      <div className="flex flex-wrap items-center justify-between gap-2.5 pb-3 border-b border-slate-100">
+                        {/* Lewa strona: Data/Godzina + Badges + Lokalizacja */}
+                        <div className="flex flex-wrap items-center gap-2 min-w-0">
+                          {/* Data i Godzina - wyrazisty dark badge w stylu sportowym */}
+                          <div className="px-3 py-1 rounded-xl bg-slate-900 text-white font-mono font-bold text-xs flex items-center gap-1.5 shadow-2xs shrink-0">
+                            <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                            <span className="uppercase">{new Date(event.date).toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
+                            <span className="text-slate-500">•</span>
+                            <span className="text-amber-300">{new Date(event.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}</span>
                           </div>
 
-                          {/* Title and details */}
-                          <div className="space-y-1.5 min-w-0 flex-1">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs">
-                                ⚔️ SPARING
-                              </span>
-                              {isFinished ? (
-                                <span className="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1 shadow-2xs">
-                                  <CheckCircle2 className="w-3 h-3 text-emerald-700" /> Zakończony
-                                </span>
-                              ) : (
-                                <span className="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-50 text-amber-800 border border-amber-200">
-                                  Zgłoszenia w toku
-                                </span>
-                              )}
-                              {event.liveScore?.isLive && (
-                                <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-rose-50 text-rose-700 border border-rose-300 flex items-center gap-1.5 animate-pulse shadow-2xs">
-                                  <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping" />
-                                  🔴 NA ŻYWO: Set {event.liveScore.currentSet} ({event.liveScore.teamCurrentScore}:{event.liveScore.opponentCurrentScore})
-                                </span>
-                              )}
-                            </div>
+                          {/* Typ: Sparing */}
+                          <span className="px-2.5 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs shrink-0">
+                            ⚔️ SPARING
+                          </span>
 
-                            <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-amber-700 transition tracking-tight truncate">
-                              {event.title} {cleanOpponent && !event.title.toLowerCase().includes(cleanOpponent.toLowerCase()) ? `vs ${cleanOpponent}` : ''}
-                            </h3>
-
-                            <div className="flex items-center gap-3 text-xs text-slate-500 truncate">
-                              <span className="flex items-center gap-1 truncate">
-                                <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                                <span className="truncate">{event.location}</span>
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Prawa strona nagłówka: Wynik, Taktyka, Terminarz, Obecność, Chevron */}
-                        <div 
-                          onClick={e => e.stopPropagation()} 
-                          className="flex flex-wrap items-center justify-between lg:justify-end gap-2.5 shrink-0 pt-2 lg:pt-0 border-t border-slate-100 lg:border-t-0"
-                        >
-                          {isFinished && event.result && (
-                            <div className="text-right px-3.5 py-1 rounded-xl bg-slate-900 text-white shadow-xs">
-                              <span className="text-lg font-mono font-black text-white block leading-tight">
-                                {event.result.teamSetsWon} : {event.result.opponentSetsWon}
-                              </span>
-                              <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest block">
-                                Wynik
-                              </span>
-                            </div>
+                          {/* Status */}
+                          {isFinished ? (
+                            <span className="px-2.5 py-1 rounded-xl text-[11px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1 shadow-2xs shrink-0">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" /> Rozegrany
+                            </span>
+                          ) : event.liveScore?.isLive ? (
+                            <span className="px-2.5 py-1 rounded-xl text-[11px] font-black uppercase bg-rose-50 text-rose-700 border border-rose-300 flex items-center gap-1.5 animate-pulse shadow-2xs shrink-0">
+                              <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping" />
+                              🔴 NA ŻYWO: Set {event.liveScore.currentSet} ({event.liveScore.teamCurrentScore}:{event.liveScore.opponentCurrentScore})
+                            </span>
+                          ) : (
+                            <span className="px-2.5 py-1 rounded-xl text-[11px] font-bold uppercase bg-amber-50 text-amber-800 border border-amber-200 shrink-0">
+                              ⏳ Zgłoszenia w toku
+                            </span>
                           )}
 
+                          {/* Lokalizacja na desktopie */}
+                          {event.location && (
+                            <span className="hidden md:flex items-center gap-1 text-xs text-slate-500 font-medium ml-1 truncate max-w-[280px]">
+                              <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                              <span className="truncate">{event.location}</span>
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Prawa strona: Taktyka, Frekwencja, Chevron */}
+                        <div 
+                          onClick={e => e.stopPropagation()} 
+                          className="flex items-center gap-2 shrink-0 ml-auto"
+                        >
                           {/* Przycisk Taktyki – podświetlony gdy jest taktyka, wyszarzony gdy jej brak */}
                           {hasTactic ? (
                             <Link
                               href={`/taktyka?eventId=${event.id}&type=SPARING`}
-                              className="px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition"
+                              className="px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-2xs hover:shadow-xs transition"
                               title={`Założenia taktyczne sparingu (${sparingTactics.length})`}
                             >
-                              <Target className="w-4 h-4 text-sky-600" />
+                              <Target className="w-3.5 h-3.5 text-sky-600" />
                               <span>Taktyka 🎯</span>
                             </Link>
                           ) : canManage ? (
                             <Link
                               href={`/taktyka?eventId=${event.id}&type=SPARING`}
-                              className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-600 border border-slate-200 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition opacity-60 hover:opacity-100"
+                              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 border border-slate-200 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition opacity-60 hover:opacity-100"
                               title="Brak taktyki – kliknij, aby utworzyć założenia dla tego sparingu"
                             >
-                              <Target className="w-4 h-4 text-slate-400" />
+                              <Target className="w-3.5 h-3.5 text-slate-400" />
                               <span>Taktyka</span>
                             </Link>
                           ) : (
                             <div
-                              className="px-3.5 py-2 rounded-xl bg-slate-100 text-slate-400 border border-slate-200 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 opacity-40 cursor-not-allowed select-none"
+                              className="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-400 border border-slate-200 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 opacity-40 cursor-not-allowed select-none"
                               title="Brak taktyki dla tego sparingu"
                             >
-                              <Target className="w-4 h-4 text-slate-400" />
+                              <Target className="w-3.5 h-3.5 text-slate-400" />
                               <span>Taktyka</span>
                             </div>
                           )}
 
-                          {/* Badge obecności */}
-                          <span className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center gap-1.5 shadow-2xs">
+                          {/* Licznik obecności */}
+                          <span className="px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center gap-1.5 shadow-2xs">
                             <Users className="w-3.5 h-3.5 text-amber-600" />
-                            <span>{yesCount} obecnych</span>
+                            <span>{yesCount}</span>
+                            <span className="hidden sm:inline">obecnych</span>
                           </span>
 
-                          {/* Chevron Toggle */}
+                          {/* Przycisk rozwijania (Chevron) */}
                           <button
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleSparring(event.id);
                             }}
-                            className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-all duration-200 ${
+                            className={`w-8 h-8 rounded-xl border flex items-center justify-center transition-all duration-200 ${
                               isExpanded ? 'rotate-180 bg-amber-100 text-amber-900 border-amber-300' : 'bg-slate-50 border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300'
                             }`}
                             title={isExpanded ? 'Zwiń szczegóły' : 'Rozwiń szczegóły'}
@@ -2576,6 +2599,93 @@ function RozgrywkiContent() {
                           </button>
                         </div>
                       </div>
+
+                      {/* 2. Główna Arena Pojedynku: Gospodarz vs Gość z centralną tablicą wyników */}
+                      <div className="py-2 flex items-center justify-between gap-3 sm:gap-6 min-w-0">
+                        {/* Gospodarz / Drużyna A (Wyrównanie do prawej na desktopie) */}
+                        <div className="flex items-center justify-end gap-2.5 sm:gap-3.5 flex-1 min-w-0 text-right">
+                          <div className="min-w-0">
+                            <span className="text-[10px] font-black uppercase text-sky-600 tracking-wider block">
+                              Gospodarz
+                            </span>
+                            <h4 className={`text-base sm:text-xl font-black ${isHomeAngels ? 'text-sky-950 font-athletic' : 'text-slate-900'} group-hover:text-amber-700 transition tracking-tight truncate`}>
+                              {homeTeam}
+                            </h4>
+                          </div>
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl overflow-hidden border-2 border-sky-400 shadow-sm shrink-0 bg-slate-900 flex items-center justify-center ring-2 ring-sky-100">
+                            {isHomeAngels ? (
+                              <img src="/logo.jpg" alt={homeTeam} className="w-full h-full object-cover" />
+                            ) : (
+                              <span className="text-white font-black text-base uppercase">{(homeTeam[0] || '?').toUpperCase()}</span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Środkowa tablica: Wynik meczu / VS */}
+                        <div className="shrink-0 flex flex-col items-center justify-center min-w-[90px] sm:min-w-[140px] px-2 text-center">
+                          {isFinished && event.result ? (
+                            <>
+                              <div className="px-4 sm:px-6 py-1 sm:py-1.5 rounded-2xl bg-slate-950 text-white font-mono font-black text-xl sm:text-2xl tracking-widest text-center shadow-md border border-slate-800">
+                                {event.result.teamSetsWon} : {event.result.opponentSetsWon}
+                              </div>
+                              {event.result.sets && event.result.sets.length > 0 ? (
+                                <span className="text-[10px] sm:text-[11px] font-mono font-bold text-slate-500 mt-1 tracking-tight truncate max-w-[160px]">
+                                  ({event.result.sets.map(s => `${s.teamScore}:${s.opponentScore}`).join(', ')})
+                                </span>
+                              ) : (
+                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                                  Wynik końcowy
+                                </span>
+                              )}
+                            </>
+                          ) : event.liveScore?.isLive ? (
+                            <>
+                              <div className="px-4 py-1.5 rounded-2xl bg-rose-600 text-white font-mono font-black text-lg sm:text-xl tracking-wider text-center shadow-md animate-pulse">
+                                {event.liveScore.teamSetsWon || 0} : {event.liveScore.opponentSetsWon || 0}
+                              </div>
+                              <span className="text-[10px] font-black text-rose-600 uppercase tracking-wider mt-1">
+                                Set {event.liveScore.currentSet} ({event.liveScore.teamCurrentScore}:{event.liveScore.opponentCurrentScore})
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-amber-500 text-slate-950 font-black text-sm flex items-center justify-center border-2 border-amber-300 shadow-sm font-athletic tracking-wider">
+                                VS
+                              </div>
+                              <span className="text-xs font-mono font-bold text-slate-600 mt-1">
+                                {new Date(event.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </>
+                          )}
+                        </div>
+
+                        {/* Gość / Drużyna B (Wyrównanie do lewej na desktopie) */}
+                        <div className="flex items-center justify-start gap-2.5 sm:gap-3.5 flex-1 min-w-0 text-left">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl overflow-hidden border-2 border-slate-700 shadow-sm shrink-0 bg-gradient-to-br from-slate-800 to-slate-950 flex items-center justify-center text-white font-black text-base uppercase ring-2 ring-slate-100">
+                            {isAwayAngels ? (
+                              <img src="/logo.jpg" alt={awayTeam} className="w-full h-full object-cover" />
+                            ) : (
+                              (awayTeam[0] || '?').toUpperCase()
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <span className="text-[10px] font-black uppercase text-amber-600 tracking-wider block">
+                              Gość
+                            </span>
+                            <h4 className={`text-base sm:text-xl font-black ${isAwayAngels ? 'text-sky-950 font-athletic' : 'text-slate-900'} group-hover:text-amber-700 transition tracking-tight truncate`}>
+                              {awayTeam}
+                            </h4>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Mobilny wiersz lokalizacji */}
+                      {event.location && (
+                        <div className="flex md:hidden items-center gap-1.5 text-xs text-slate-500 pt-2 border-t border-slate-100">
+                          <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                          <span className="truncate">{event.location}</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Rozwijana Zawartość Karty Sparingowej */}
