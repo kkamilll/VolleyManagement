@@ -2131,33 +2131,20 @@ function TacticsContent() {
           
           {/* UNIFIED COMPACT TACTICAL CONSOLE */}
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-2.5 sm:p-3 shadow-sm space-y-2">
-            {/* Row 1: Phase Selector, Orientation & Quick Reset */}
+            {/* Row 1: Custom Plan Name & Orientation */}
             <div className="flex flex-wrap items-center justify-between gap-2.5">
-              {/* Phase Selector - 4 distinct phases */}
-              <div className="flex items-center gap-1.5 flex-1 min-w-[280px]">
-                <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider hidden xs:inline shrink-0">
-                  Faza gry:
+              {/* Custom tactic title input - freely named by user */}
+              <div className="flex items-center gap-2 flex-1 min-w-[260px]">
+                <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider hidden sm:inline shrink-0">
+                  Nazwa taktyki:
                 </span>
-                <div className="grid grid-cols-4 gap-1.5 w-full sm:w-auto flex-1 max-w-lg">
-                  {[
-                    { id: 'PRZYJECIE', label: 'Przyjęcie' },
-                    { id: 'OBRONA', label: 'Obrona' },
-                    { id: 'ATAK', label: 'Atak' },
-                    { id: 'ZAGRYWKA', label: 'Zagrywka' }
-                  ].map(p => (
-                    <button
-                      key={p.id}
-                      onClick={() => applyPreset(rotation, p.id as TacticalPhase)}
-                      className={`h-8 px-2 rounded-xl text-xs font-black transition border flex items-center justify-center whitespace-nowrap shadow-xs ${
-                        phase === p.id
-                          ? 'bg-amber-500 text-slate-950 border-amber-400 font-black shadow-sm'
-                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 hover:text-slate-900'
-                      }`}
-                    >
-                      {p.label}
-                    </button>
-                  ))}
-                </div>
+                <input
+                  type="text"
+                  value={tacticTitle}
+                  onChange={(e) => setTacticTitle(e.target.value)}
+                  placeholder="Wpisz własną nazwę planu / taktyki (np. Kontra ze skrzydła, Zagrywka na strefę 1)..."
+                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-xs text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-amber-500 shadow-2xs"
+                />
               </div>
 
               {/* Orientation Selector: Pionowo / Poziomo */}
@@ -2702,7 +2689,7 @@ function TacticsContent() {
         </div>
       </div>
 
-      {/* SEKCJA 2: ZADANIA I USTAWIENIE POZYCJI W DANEJ FAZIE */}
+      {/* SEKCJA 2: ZADANIA I USTAWIENIE POZYCJI */}
       <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
           <div className="flex items-center gap-2.5">
@@ -2711,13 +2698,13 @@ function TacticsContent() {
             </div>
             <div>
               <h3 className="text-base font-black uppercase text-slate-900 tracking-wide flex items-center gap-2">
-                Zadania i Ustawienie Pozycji: {phase === 'PRZYJECIE' ? 'Przyjęcie' : phase === 'OBRONA' ? 'Obrona' : phase === 'ATAK' ? 'Atak' : 'Zagrywka'}
+                Zadania i Pozycje Zawodników {tacticTitle ? `• ${tacticTitle}` : ''}
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200">
                   {positions.length} graczy
                 </span>
               </h3>
               <p className="text-xs text-slate-500">
-                Szczegółowe zadania taktyczne dla każdego zawodnika w tej fazie akcji.
+                Szczegółowe zadania taktyczne i dyspozycje dla każdego zawodnika na boisku.
               </p>
             </div>
           </div>
