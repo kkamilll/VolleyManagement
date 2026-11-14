@@ -1107,6 +1107,17 @@
       "createdById": "usr_kierownik",
       "createdByName": "Łukasz",
       "createdAt": "2026-11-02T10:00:00Z"
+    },
+    {
+      "id": "fee_1794659143227",
+      "title": "sqw",
+      "amount": 120,
+      "dueDate": "2026-11-28",
+      "type": "MIESIECZNA",
+      "description": "",
+      "createdById": "usr_kierownik",
+      "createdByName": "Łukasz Kremer",
+      "createdAt": "2026-11-14T12:25:43.227Z"
     }
   ],
   "payments": [
@@ -1154,8 +1165,13 @@
       "userId": "usr_zawodnik_3",
       "userName": "Jan Kowalski",
       "amount": 120,
-      "status": "OCZEKUJE",
-      "paymentMethod": "BLIK"
+      "status": "OPLACONE",
+      "paymentMethod": "GOTÓWKA",
+      "baseAmount": 120,
+      "paidAt": "2026-11-14T12:25:55.936Z",
+      "transactionId": "GOT-9736",
+      "verifiedByManager": true,
+      "note": "Opłacone gotówką do rąk kierownika/trenera"
     },
     {
       "id": "pay_5",
@@ -1168,6 +1184,87 @@
       "paymentMethod": "BLIK",
       "transactionId": "TXN-884214",
       "verifiedByManager": true
+    },
+    {
+      "id": "pay_1794659143227_exn6nz",
+      "feeId": "fee_1794659143227",
+      "userId": "usr_zawodnik_1",
+      "userName": "Tomasz Krupa",
+      "amount": 120,
+      "status": "OCZEKUJE",
+      "note": "Składka: sqw"
+    },
+    {
+      "id": "pay_1794659143227_juji5y",
+      "feeId": "fee_1794659143227",
+      "userId": "usr_zawodnik_2",
+      "userName": "Kamil Pujanek",
+      "amount": 120,
+      "status": "OCZEKUJE",
+      "note": "Składka: sqw"
+    },
+    {
+      "id": "pay_1794659143227_s41pkb",
+      "feeId": "fee_1794659143227",
+      "userId": "usr_zawodnik_3",
+      "userName": "Jan Kowalski",
+      "amount": 120,
+      "status": "OCZEKUJE",
+      "note": "Składka: sqw"
+    },
+    {
+      "id": "pay_1794659143227_wnkyb4",
+      "feeId": "fee_1794659143227",
+      "userId": "usr_zawodnik_4",
+      "userName": "Michał Śmigiel",
+      "amount": 120,
+      "status": "OCZEKUJE",
+      "note": "Składka: sqw"
+    },
+    {
+      "id": "pay_1794659143227_7uyxuf",
+      "feeId": "fee_1794659143227",
+      "userId": "usr_zawodnik_5",
+      "userName": "Piotr Wiśniewski",
+      "amount": 120,
+      "status": "OCZEKUJE",
+      "note": "Składka: sqw"
+    },
+    {
+      "id": "pay_1794659143227_4ycyie",
+      "feeId": "fee_1794659143227",
+      "userId": "usr_zawodnik_7",
+      "userName": "Karol Ordon",
+      "amount": 120,
+      "status": "OCZEKUJE",
+      "note": "Składka: sqw"
+    },
+    {
+      "id": "pay_1794659143227_bkvqmf",
+      "feeId": "fee_1794659143227",
+      "userId": "usr_zawodnik_8",
+      "userName": "Maciej Noak",
+      "amount": 120,
+      "status": "OCZEKUJE",
+      "note": "Składka: sqw"
+    },
+    {
+      "id": "pay_1794659143227_s3zcl2",
+      "feeId": "fee_1794659143227",
+      "userId": "usr_zawodnik_9",
+      "userName": "Bartosz Augustynek",
+      "amount": 120,
+      "status": "OCZEKUJE",
+      "note": "Składka: sqw"
+    },
+    {
+      "id": "pay_1794659143227_vnbt2u",
+      "feeId": "fee_1794659143227",
+      "userId": "usr_zawodnik_10",
+      "userName": "Damian Lis",
+      "amount": 120,
+      "status": "OCZEKUJE",
+      "note": "Składka: sqw"
     }
   ],
   "treasuryExpenses": [
@@ -3370,14 +3467,14 @@
       "uploadedBy": "Sztab Klubu"
     }
   ],
-  "activeLeaguePhaseId": "faza_1",
+  "activeLeaguePhaseId": "faza_1794658922199",
   "leaguePhases": [
     {
       "id": "faza_1",
       "name": "Faza I: Grupa Eliminacyjna (Top 3 awans)",
       "shortName": "Faza I",
       "groupName": "Grupa Angels ZTP (7 zespołów)",
-      "isActive": true,
+      "isActive": false,
       "advancementSpots": 3,
       "advancementTargetName": "Awans do Grupy Finałowej (Top 3)",
       "teamsCount": 7,
@@ -3575,6 +3672,17 @@
           ]
         }
       ]
+    },
+    {
+      "id": "faza_1794658922199",
+      "name": "Faza 2",
+      "shortName": "Grupa B",
+      "isActive": true,
+      "advancementSpots": 1,
+      "advancementTargetName": "Mistrz Ligi LALS",
+      "teamsCount": 0,
+      "table": [],
+      "createdAt": "2026-11-14T12:22:02.199Z"
     }
   ],
   "trainingPlans": [
