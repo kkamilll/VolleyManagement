@@ -78,6 +78,12 @@ function AdminCenterContent() {
   const [loadingArchiveDetail, setLoadingArchiveDetail] = useState(false);
   const [archiveDetailTab, setArchiveDetailTab] = useState<'roster' | 'matches' | 'events' | 'fees' | 'tactics' | 'photos' | 'announcements'>('roster');
 
+  // Backups state
+  const [backupsList, setBackupsList] = useState<any[]>([]);
+  const [loadingBackups, setLoadingBackups] = useState(false);
+  const [creatingBackup, setCreatingBackup] = useState(false);
+  const [restoringBackup, setRestoringBackup] = useState(false);
+
   const [usersPage, setUsersPage] = useState(1);
   const USERS_PER_PAGE = 6;
 
@@ -157,10 +163,111 @@ function AdminCenterContent() {
     }
   };
 
+  const fetchBackups = async () => {
+    try {
+      setLoadingBackups(true);
+      const res = await fetch('/api/admin/backup');
+      if (res.ok) {
+        const data = await res.json();
+        setBackupsList(data.backups || []);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingBackups(false);
+    }
+  };
+
+  const handleCreateBackup = async () => {
+    const label = prompt('Podaj krótki opis tego punktu przywracania (np. przed_importem_rundy_11):', 'kopia_bezpieczenstwa');
+    if (label === null) return;
+    setCreatingBackup(true);
+    try {
+      const res = await fetch('/api/admin/backup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'CREATE', label })
+      });
+      const d = await res.json();
+      if (res.ok) {
+        alert(d.message || 'Kopia zapasowa została pomyślnie utworzona!');
+        await fetchBackups();
+      } else {
+        alert(d.error || 'Błąd tworzenia kopii');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Wystąpił błąd podczas tworzenia kopii');
+    } finally {
+      setCreatingBackup(false);
+    }
+  };
+
+  const handleRestoreBackup = async (filename: string) => {
+    if (!confirm(`UWAGA: Czy na pewno chcesz przywrócić bazę danych z pliku "${filename}"? Aktualny stan bazy zostanie automatycznie zabezpieczony w osobnym pliku.`)) {
+      return;
+    }
+    setRestoringBackup(true);
+    try {
+      const res = await fetch('/api/admin/backup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'RESTORE', filename })
+      });
+      const d = await res.json();
+      if (res.ok) {
+        alert(d.message || 'Baza została pomyślnie przywrócona!');
+        window.location.reload();
+      } else {
+        alert(d.error || 'Błąd przywracania kopii');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Błąd podczas przywracania bazy');
+    } finally {
+      setRestoringBackup(false);
+    }
+  };
+
+  const handleUploadFileBackup = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const text = event.target?.result as string;
+        const parsed = JSON.parse(text);
+        if (!confirm(`Czy na pewno chcesz wgrać i nadpisać obecną bazę danych danymi z pliku "${file.name}"? Przed nadpisaniem system utworzy automatyczną kopię bezpieczeństwa.`)) {
+          return;
+        }
+        setRestoringBackup(true);
+        const res = await fetch('/api/admin/backup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'UPLOAD_RESTORE', databasePayload: parsed })
+        });
+        const d = await res.json();
+        if (res.ok) {
+          alert(d.message || 'Baza danych została pomyślnie przywrócona z pliku!');
+          window.location.reload();
+        } else {
+          alert(d.error || 'Błąd wgrywania pliku');
+        }
+      } catch (err) {
+        alert('Nieprawidłowy plik JSON lub błąd odczytu');
+      } finally {
+        setRestoringBackup(false);
+      }
+    };
+    reader.readAsText(file);
+  };
+
   useEffect(() => {
     fetchUsers();
     fetchSeasons();
     fetchMongoStatus();
+    fetchBackups();
   }, [currentUser]);
 
   const handleArchiveSeason = async () => {
@@ -1531,6 +1638,154 @@ function AdminCenterContent() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* CENTRUM KOPII ZAPASOWYCH & OCHRONA DANYCH (BACKUP & RESTORE) */}
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 shrink-0">
+                  <Database className="w-5 h-5 stroke-[2.5]" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 uppercase tracking-tight font-athletic">
+                    Kopie Zapasowe & Ochrona Przed Utratą Danych
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Pobieraj pełny zrzut bazy w pliku JSON, twórz ręczne punkty przywracania oraz przywracaj stan drużyny 1-kliknięciem.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                <a
+                  href="/api/admin/backup?download=true"
+                  className="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm"
+                  title="Pobierz plik bazy danych na swój dysk komputera"
+                >
+                  <Download className="w-4 h-4 stroke-[2.5]" />
+                  <span>Pobierz Backup (JSON)</span>
+                </a>
+
+                <button
+                  type="button"
+                  disabled={creatingBackup}
+                  onClick={handleCreateBackup}
+                  className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-4 h-4 ${creatingBackup ? 'animate-spin' : ''}`} />
+                  <span>{creatingBackup ? 'Tworzenie...' : 'Utwórz Punkt Przywracania'}</span>
+                </button>
+
+                <label className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold text-xs flex items-center gap-1.5 transition shadow-2xs cursor-pointer">
+                  <Upload className="w-4 h-4 text-slate-600" />
+                  <span>Przywróć z pliku</span>
+                  <input
+                    type="file"
+                    accept=".json"
+                    className="hidden"
+                    onChange={handleUploadFileBackup}
+                    disabled={restoringBackup}
+                  />
+                </label>
+              </div>
+            </div>
+
+            {/* Bezpieczeństwo i gwarancja braku utraty danych */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 space-y-1">
+                <span className="font-bold flex items-center gap-1.5 text-emerald-800">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  Kopia w locie przed zapisem
+                </span>
+                <p className="text-[11px] text-emerald-700 leading-relaxed">
+                  Każda modyfikacja najpierw zabezpiecza poprzedni stan w pliku <code>db.backup.json</code>.
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-sky-900 space-y-1">
+                <span className="font-bold flex items-center gap-1.5 text-sky-800">
+                  <History className="w-4 h-4 text-sky-600" />
+                  Automatyczne migawki co 30 min
+                </span>
+                <p className="text-[11px] text-sky-700 leading-relaxed">
+                  System tworzy cykliczne punkty w <code>data/backups/</code> trzymając do 20 ostatnich wersji.
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 space-y-1">
+                <span className="font-bold flex items-center gap-1.5 text-amber-800">
+                  <ShieldAlert className="w-4 h-4 text-amber-600" />
+                  Autoodzyskiwanie przy awarii
+                </span>
+                <p className="text-[11px] text-amber-700 leading-relaxed">
+                  W razie błędu pliku system samoczynnie odzyskuje dane z najświeższego dostępnego backupu.
+                </p>
+              </div>
+            </div>
+
+            {/* Wykaz istniejących punktów przywracania */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-black uppercase text-slate-700 tracking-wider">
+                  Zapisane Punkty Przywracania na Serwerze ({backupsList.length})
+                </h4>
+                <button
+                  type="button"
+                  onClick={fetchBackups}
+                  className="text-xs text-sky-600 hover:text-sky-800 font-bold flex items-center gap-1"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                  <span>Odśwież listę</span>
+                </button>
+              </div>
+
+              {loadingBackups ? (
+                <div className="py-6 text-center text-xs text-slate-400">Ładowanie kopii zapasowych...</div>
+              ) : backupsList.length === 0 ? (
+                <div className="py-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-xs text-slate-500">
+                  Brak zapisanych punktów przywracania. Kliknij przycisk powyżej, aby utworzyć pierwszą kopię!
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-100 border border-slate-200 rounded-2xl overflow-hidden bg-slate-50/50">
+                  {backupsList.map(b => (
+                    <div
+                      key={b.filename}
+                      className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white hover:bg-slate-50 transition"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="w-8 h-8 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 flex items-center justify-center shrink-0">
+                          <Archive className="w-4 h-4" />
+                        </span>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-xs font-bold text-slate-900">{b.filename}</span>
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                              {b.label}
+                            </span>
+                          </div>
+                          <span className="text-[11px] text-slate-400 block mt-0.5">
+                            {new Date(b.createdAt).toLocaleString('pl-PL')} • {(b.size / 1024).toFixed(1)} KB
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          disabled={restoringBackup}
+                          onClick={() => handleRestoreBackup(b.filename)}
+                          className="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 font-bold text-xs transition flex items-center gap-1 shadow-2xs disabled:opacity-50"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5" />
+                          <span>Przywróć ten punkt</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -45,6 +45,25 @@ Oto proste i konkretne wyjaśnienie:
 
 ---
 
+## 🛡️ Kopie Zapasowe & Bezpieczeństwo Danych (Gwarancja braku utraty)
+
+W aplikacji wdrożono wielopoziomowy system ochrony danych, dzięki któremu **nie ma ryzyka przypadkowej utraty meczów, punktów, taktyki czy rozliczeń**:
+
+1. **Automatyczna kopia przed każdym zapisem (`data/db.backup.json`)**:
+   * Zanim jakakolwiek operacja (dodanie wyniku, modyfikacja taktyki, wpłata składki) nadpisze plik `db.json`, system automatycznie zabezpiecza dotychczasowy stan w pliku lustrzanym `db.backup.json`.
+2. **Cykliczne migawki na dysku (`data/backups/`)**:
+   * Co 30 minut aktywnego korzystania tworzony jest datowany plik (np. `backup_2026-11-14_14-15_auto.json`). System przechowuje historię ostatnich 20 punktów przywracania.
+3. **Autoodzyskiwanie przy awarii**:
+   * Jeśli plik `db.json` kiedykolwiek zostałby uszkodzony lub pusty, serwer automatycznie wykrywa błąd i samoczynnie odzyskuje bazę z najświeższej kopii zapasowej.
+4. **Pobieranie kopii zapasowej 1-kliknięciem (`/admin` -> Baza Danych)**:
+   * W panelu administratora znajdziesz przycisk **`📥 Pobierz Backup (JSON)`**, który w każdej chwili zapisuje pełny plik bazy bezpośrednio na dysk Twojego komputera.
+5. **Przywracanie stanu z pliku lub listy punktów**:
+   * W każdej chwili możesz cofnąć stan bazy klikając **`Przywróć ten punkt`** na liście w `/admin` lub wgrywając pobrany wcześniej plik JSON przyciskiem **`📤 Przywróć z pliku`**.
+6. **Lokalna historia w systemie Git**:
+   * Wszystkie oficjalne dane są dodatkowo zabezpieczone w lokalnym repozytorium kodu.
+
+---
+
 ## ⚡ Stos Technologiczny
 
 - **Framework**: [Next.js 14](https://nextjs.org/) (App Router, Server & Client Components)

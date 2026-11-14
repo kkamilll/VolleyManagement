@@ -7,10 +7,18 @@ import { getMongoDb, isMongoConfigured } from './mongodb';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
+const BACKUP_FILE = path.join(DATA_DIR, 'db.backup.json');
+const BACKUPS_DIR = path.join(DATA_DIR, 'backups');
+
+let lastAutoBackupTime = 0;
+const AUTO_BACKUP_INTERVAL_MS = 30 * 60 * 1000; // Auto-backup co 30 minut aktywności
 
 function ensureDataDir() {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+  if (!fs.existsSync(BACKUPS_DIR)) {
+    fs.mkdirSync(BACKUPS_DIR, { recursive: true });
   }
 }
 
@@ -791,6 +799,9 @@ export function readDatabase(): AppDatabase {
   }
   try {
     const raw = fs.readFileSync(DB_FILE, 'utf-8');
+    if (!raw.trim() || raw.length < 50) {
+      throw new Error('db.json jest pusty lub uszkodzony');
+    }
     const db = JSON.parse(raw) as AppDatabase;
 
     if (!db.users) db.users = [];
@@ -809,7 +820,40 @@ export function readDatabase(): AppDatabase {
     inMemoryCache = db;
     return db;
   } catch (err) {
-    console.error('Error reading db.json, returning empty db:', err);
+    console.warn('Ostrzeżenie przy odczycie db.json, próba odzyskania z kopii zapasowej:', err);
+
+    // 1. Próba odzyskania z db.backup.json
+    if (fs.existsSync(BACKUP_FILE)) {
+      try {
+        const backupRaw = fs.readFileSync(BACKUP_FILE, 'utf-8');
+        if (backupRaw.trim() && backupRaw.length >= 50) {
+          const restored = JSON.parse(backupRaw) as AppDatabase;
+          console.log('[Autoodzyskiwanie] Pomyślnie przywrócono bazę z db.backup.json!');
+          fs.writeFileSync(DB_FILE, backupRaw, 'utf-8');
+          inMemoryCache = restored;
+          return restored;
+        }
+      } catch (e) {
+        console.error('Błąd odczytu db.backup.json:', e);
+      }
+    }
+
+    // 2. Próba odzyskania z najnowszej migawki w data/backups/
+    try {
+      const backups = listDatabaseBackups();
+      if (backups.length > 0) {
+        const latestPath = path.join(BACKUPS_DIR, backups[0].filename);
+        const bRaw = fs.readFileSync(latestPath, 'utf-8');
+        const restored = JSON.parse(bRaw) as AppDatabase;
+        console.log(`[Autoodzyskiwanie] Pomyślnie przywrócono bazę z ${backups[0].filename}!`);
+        fs.writeFileSync(DB_FILE, bRaw, 'utf-8');
+        inMemoryCache = restored;
+        return restored;
+      }
+    } catch (e) {
+      console.error('Błąd odzyskiwania z migawek backups/:', e);
+    }
+
     return {
       users: [],
       matches: [],
@@ -831,11 +875,105 @@ export function writeDatabase(data: AppDatabase): void {
   inMemoryCache = data;
   lastCacheFetchTime = Date.now();
   ensureDataDir();
+
   try {
-    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
-  } catch {}
+    const jsonStr = JSON.stringify(data, null, 2);
+
+    // 1. Zapisz kopię zapasową .backup.json przed nadpisaniem
+    if (fs.existsSync(DB_FILE)) {
+      try {
+        fs.copyFileSync(DB_FILE, BACKUP_FILE);
+      } catch {}
+    }
+
+    // 2. Bezpieczny zapis do pliku głównego db.json
+    fs.writeFileSync(DB_FILE, jsonStr, 'utf-8');
+
+    // 3. Automatyczna cykliczna migawka w data/backups/ co 30 minut
+    const now = Date.now();
+    if (now - lastAutoBackupTime > AUTO_BACKUP_INTERVAL_MS) {
+      lastAutoBackupTime = now;
+      saveBackupSnapshot(jsonStr, 'auto');
+    }
+  } catch (err) {
+    console.error('Błąd zapisu bazy danych db.json:', err);
+  }
+
   if (isMongoConfigured()) {
     writeDatabaseAsync(data).catch(e => console.error('[MongoDB Atlas] Sync error on writeDatabase:', e));
+  }
+}
+
+export function saveBackupSnapshot(jsonContent?: string, label: string = 'manual'): string {
+  ensureDataDir();
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const dateStr = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
+  const filename = `backup_${dateStr}_${label}.json`;
+  const targetPath = path.join(BACKUPS_DIR, filename);
+
+  const content = jsonContent || (fs.existsSync(DB_FILE) ? fs.readFileSync(DB_FILE, 'utf-8') : JSON.stringify(readDatabase(), null, 2));
+  fs.writeFileSync(targetPath, content, 'utf-8');
+
+  cleanOldBackups(20);
+  return filename;
+}
+
+export function cleanOldBackups(maxKeep: number = 20): void {
+  try {
+    ensureDataDir();
+    const files = fs.readdirSync(BACKUPS_DIR)
+      .filter(f => f.startsWith('backup_') && f.endsWith('.json'))
+      .map(f => ({
+        name: f,
+        time: fs.statSync(path.join(BACKUPS_DIR, f)).mtimeMs
+      }))
+      .sort((a, b) => b.time - a.time);
+
+    if (files.length > maxKeep) {
+      files.slice(maxKeep).forEach(f => {
+        try {
+          fs.unlinkSync(path.join(BACKUPS_DIR, f.name));
+        } catch {}
+      });
+    }
+  } catch {}
+}
+
+export function listDatabaseBackups(): Array<{ filename: string; size: number; createdAt: string; label: string }> {
+  ensureDataDir();
+  try {
+    return fs.readdirSync(BACKUPS_DIR)
+      .filter(f => f.startsWith('backup_') && f.endsWith('.json'))
+      .map(filename => {
+        const filePath = path.join(BACKUPS_DIR, filename);
+        const stats = fs.statSync(filePath);
+        return {
+          filename,
+          size: stats.size,
+          createdAt: stats.mtime.toISOString(),
+          label: filename.includes('_auto') ? 'Automatyczny' : filename.includes('_manual') ? 'Ręczny punkt przywracania' : 'Kopia bezpieczeństwa'
+        };
+      })
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  } catch {
+    return [];
+  }
+}
+
+export function restoreBackupFile(filename: string): boolean {
+  ensureDataDir();
+  const filePath = path.join(BACKUPS_DIR, filename);
+  if (!fs.existsSync(filePath)) return false;
+
+  try {
+    const raw = fs.readFileSync(filePath, 'utf-8');
+    const parsed = JSON.parse(raw) as AppDatabase;
+    writeDatabase(parsed);
+    return true;
+  } catch (e) {
+    console.error('Nie udało się przywrócić kopii zapasowej:', e);
+    return false;
   }
 }
 
