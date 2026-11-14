@@ -286,3 +286,4 @@ if (db.tactics && Array.isArray(db.tactics)) {
 
 fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf8');
 console.log(`Successfully updated Angels ZTP squad to ${officialSquad.length} official players!`);
+

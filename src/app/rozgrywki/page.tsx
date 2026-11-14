@@ -443,6 +443,10 @@ function RozgrywkiContent() {
   const [photoFilterCategory, setPhotoFilterCategory] = useState<string>('ALL');
   const [submittingPhoto, setSubmittingPhoto] = useState(false);
   const [selectedPhotoPreview, setSelectedPhotoPreview] = useState<LeaguePhoto | null>(null);
+  const [isDraggingPhotos, setIsDraggingPhotos] = useState(false);
+  const [isGalleryDragging, setIsGalleryDragging] = useState(false);
+  const [processingPhotos, setProcessingPhotos] = useState(false);
+  const [processingCount, setProcessingCount] = useState(0);
 
   // League match manual entry modal
   const [showAddMatchModal, setShowAddMatchModal] = useState(false);
@@ -1051,33 +1055,89 @@ function RozgrywkiContent() {
     setTimeout(() => setCopiedSocialText(false), 3000);
   };
 
-  // 5. Direct File Upload for League Photos & Series
-  const handleMultiplePhotosUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    const fileList = Array.from(files);
-    let loaded = 0;
-    const newItems: Array<{ url: string; title?: string }> = [];
-
-    fileList.forEach(file => {
+  // 5. Direct File Upload for League Photos & Series (Batch Drag & Drop + Auto Compression)
+  const compressPhotoFile = (file: File): Promise<{ url: string; title: string }> => {
+    return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = ev => {
-        const base64Url = ev.target?.result as string;
-        newItems.push({
-          url: base64Url,
-          title: file.name.replace(/\.[^/.]+$/, "")
-        });
-        loaded++;
-        if (loaded === fileList.length) {
-          setPhotoSeriesList(prev => [...prev, ...newItems]);
-          if (!photoSeriesTitle) {
-            setPhotoSeriesTitle(photoMatch ? `Fotorelacja: ${photoMatch}` : `Seria zdjęć (${new Date().toLocaleDateString('pl-PL')})`);
+        const rawDataUrl = ev.target?.result as string;
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            const MAX_DIM = 1600;
+            if (width > MAX_DIM || height > MAX_DIM) {
+              if (width > height) {
+                height = Math.round((height * MAX_DIM) / width);
+                width = MAX_DIM;
+              } else {
+                width = Math.round((width * MAX_DIM) / height);
+                height = MAX_DIM;
+              }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.drawImage(img, 0, 0, width, height);
+              const compressed = canvas.toDataURL('image/jpeg', 0.82);
+              resolve({
+                url: compressed,
+                title: file.name.replace(/\.[^/.]+$/, "")
+              });
+              return;
+            }
+          } catch (err) {
+            console.warn('Canvas compression fallback to raw:', err);
           }
-        }
+          resolve({
+            url: rawDataUrl,
+            title: file.name.replace(/\.[^/.]+$/, "")
+          });
+        };
+        img.onerror = () => {
+          resolve({
+            url: rawDataUrl,
+            title: file.name.replace(/\.[^/.]+$/, "")
+          });
+        };
+        img.src = rawDataUrl;
       };
       reader.readAsDataURL(file);
     });
+  };
+
+  const processPhotoFiles = async (files: FileList | File[]) => {
+    const fileList = Array.from(files).filter(f => f.type.startsWith('image/'));
+    if (fileList.length === 0) {
+      alert('Wybierz lub przeciągnij pliki graficzne (JPG, PNG, WebP)!');
+      return;
+    }
+
+    setProcessingPhotos(true);
+    setProcessingCount(fileList.length);
+
+    try {
+      const processedItems = await Promise.all(fileList.map(compressPhotoFile));
+      setPhotoSeriesList(prev => [...prev, ...processedItems]);
+      if (!photoSeriesTitle) {
+        setPhotoSeriesTitle(photoMatch ? `Fotorelacja: ${photoMatch}` : `Seria zdjęć (${new Date().toLocaleDateString('pl-PL')})`);
+      }
+    } catch (err) {
+      console.error('Error processing photos:', err);
+      alert('Wystąpił błąd podczas wczytywania zdjęć');
+    } finally {
+      setProcessingPhotos(false);
+      setProcessingCount(0);
+    }
+  };
+
+  const handleMultiplePhotosUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      processPhotoFiles(e.target.files);
+    }
   };
 
   const handlePhotoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -2223,7 +2283,42 @@ function RozgrywkiContent() {
     const iconColor = isSky ? 'text-sky-400' : isAmber ? 'text-amber-400' : 'text-purple-400';
 
     return (
-      <div className="space-y-6">
+      <div 
+        onDragOver={e => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (canManage) setIsGalleryDragging(true);
+        }}
+        onDragEnter={e => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (canManage) setIsGalleryDragging(true);
+        }}
+        onDragLeave={e => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsGalleryDragging(false);
+        }}
+        onDrop={e => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsGalleryDragging(false);
+          if (canManage && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            onAddClick();
+            processPhotoFiles(e.dataTransfer.files);
+          }
+        }}
+        className={`space-y-6 relative rounded-3xl transition ${
+          isGalleryDragging ? 'ring-4 ring-amber-400 bg-amber-50/20' : ''
+        }`}
+      >
+        {isGalleryDragging && (
+          <div className="absolute inset-0 bg-amber-50/95 backdrop-blur-xs border-3 border-dashed border-amber-500 rounded-3xl z-30 flex flex-col items-center justify-center p-8 text-amber-950 pointer-events-none space-y-2">
+            <Upload className="w-12 h-12 text-amber-600 animate-bounce" />
+            <h3 className="text-lg font-black uppercase font-athletic">Upuść serię zdjęć tutaj!</h3>
+            <p className="text-xs font-bold text-amber-800">Automatycznie otworzymy formularz i zoptymalizujemy wszystkie upuszczone zdjęcia.</p>
+          </div>
+        )}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
@@ -5555,62 +5650,122 @@ function RozgrywkiContent() {
                 </select>
               </div>
 
-              {/* Wybór wielu zdjęć (seria) */}
+              {/* Wybór wielu zdjęć (seria) & Drag and Drop */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-slate-600">
-                    Wybierz zdjęcia (możesz zaznaczyć całą serię na raz) *
+                  <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                    <Camera className="w-4 h-4 text-amber-500" />
+                    <span>Wybierz lub przeciągnij zdjęcia (Drag & Drop) *</span>
                   </label>
                   {photoSeriesList.length > 0 && (
-                    <span className="text-[11px] font-mono font-bold text-amber-400">
-                      Wczytano: {photoSeriesList.length} {photoSeriesList.length === 1 ? 'zdjęcie' : photoSeriesList.length < 5 ? 'zdjęcia' : 'zdjęć'}
+                    <span className="text-[11px] font-mono font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                      Gotowe do wgrania: {photoSeriesList.length} {photoSeriesList.length === 1 ? 'zdjęcie' : photoSeriesList.length < 5 ? 'zdjęcia' : 'zdjęć'}
                     </span>
                   )}
                 </div>
                 
-                <label className="flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-dashed border-slate-300 hover:border-amber-400 bg-slate-50 cursor-pointer transition group mb-2 text-center">
-                  <Upload className="w-7 h-7 text-slate-500 group-hover:text-amber-400 transition mb-1" />
-                  <span className="text-xs font-bold text-slate-600 group-hover:text-slate-900">
-                    {photoSeriesList.length > 0
-                      ? '✓ Dodaj kolejne zdjęcia do serii z galerii'
-                      : 'Wybierz serię zdjęć z telefonu / komputera'}
-                  </span>
-                  <span className="text-[10px] text-slate-500 mt-0.5">Wybierz kilka plików naraz (JPG, PNG, WebP)</span>
+                <div
+                  onDragOver={e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsDraggingPhotos(true);
+                  }}
+                  onDragEnter={e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsDraggingPhotos(true);
+                  }}
+                  onDragLeave={e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsDraggingPhotos(false);
+                  }}
+                  onDrop={e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsDraggingPhotos(false);
+                    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                      processPhotoFiles(e.dataTransfer.files);
+                    }
+                  }}
+                  className={`relative flex flex-col items-center justify-center p-6 rounded-3xl border-2 border-dashed transition duration-200 cursor-pointer text-center mb-2.5 ${
+                    isDraggingPhotos
+                      ? 'border-amber-500 bg-amber-50/90 text-amber-950 scale-[1.01] shadow-md ring-4 ring-amber-200'
+                      : 'border-slate-300 hover:border-amber-500 bg-slate-50/70 hover:bg-slate-50 text-slate-700'
+                  }`}
+                >
                   <input
                     type="file"
                     multiple
                     accept="image/*"
+                    id="modal-photos-multi-upload"
                     className="hidden"
                     onChange={handleMultiplePhotosUpload}
                   />
-                </label>
+                  <label htmlFor="modal-photos-multi-upload" className="cursor-pointer w-full flex flex-col items-center">
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-2 transition ${
+                      isDraggingPhotos ? 'bg-amber-500 text-slate-950 scale-110 shadow-md' : 'bg-white border border-slate-200 text-amber-600 shadow-2xs'
+                    }`}>
+                      <Upload className="w-6 h-6 stroke-[2.5]" />
+                    </div>
+
+                    <span className="text-sm font-black text-slate-900 block">
+                      {isDraggingPhotos 
+                        ? '👉 Upuść zdjęcia tutaj teraz!' 
+                        : 'Przeciągnij tutaj kilkanaście zdjęć naraz (Drag & Drop)'}
+                    </span>
+                    <span className="text-xs text-slate-500 mt-1 block">
+                      lub kliknij, aby zaznaczyć serię plików z telefonu / komputera (JPG, PNG, WebP)
+                    </span>
+                    <div className="flex items-center gap-1.5 mt-2 flex-wrap justify-center">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                        ⚡ Obsługa wielu zdjęć naraz
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-900 border border-sky-300">
+                        🔍 Automatyczna optymalizacja wagi
+                      </span>
+                    </div>
+                  </label>
+
+                  {processingPhotos && (
+                    <div className="absolute inset-0 bg-white/95 backdrop-blur-xs rounded-3xl flex flex-col items-center justify-center z-10 space-y-2 p-4 shadow-inner">
+                      <div className="w-8 h-8 border-3 border-amber-500 border-t-transparent rounded-full animate-spin" />
+                      <span className="text-xs font-black text-slate-900 font-mono">
+                        Wczytywanie i optymalizacja {processingCount} zdjęć...
+                      </span>
+                      <span className="text-[10px] text-slate-500">Kompresujemy zdjęcia w locie, aby nie obciążały telefonu</span>
+                    </div>
+                  )}
+                </div>
 
                 {/* Podgląd miniatur wczytanej serii */}
                 {photoSeriesList.length > 0 && (
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 mb-2">
-                    <div className="flex items-center justify-between text-[11px] text-slate-500">
-                      <span>Miniatury serii do wgrania:</span>
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 mb-2.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-slate-700">
+                        Miniatury wczytanej serii ({photoSeriesList.length} szt.):
+                      </span>
                       <button
                         type="button"
                         onClick={() => setPhotoSeriesList([])}
-                        className="text-rose-400 hover:text-rose-300 font-bold"
+                        className="text-xs font-bold text-rose-600 hover:text-rose-700 transition underline underline-offset-2"
                       >
                         Wyczyść wszystkie
                       </button>
                     </div>
-                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-40 overflow-y-auto p-1">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 max-h-48 overflow-y-auto p-1 scrollbar-thin">
                       {photoSeriesList.map((item, idx) => (
-                        <div key={idx} className="relative group rounded-xl overflow-hidden aspect-square border border-slate-300 bg-slate-50">
+                        <div key={idx} className="relative group rounded-xl overflow-hidden aspect-square border border-slate-300 bg-white shadow-2xs">
                           <img src={item.url} alt={`Podgląd ${idx + 1}`} className="w-full h-full object-cover" />
                           <button
                             type="button"
                             onClick={() => handleRemoveFromSeries(idx)}
-                            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-rose-600/90 text-slate-900 text-[10px] font-bold flex items-center justify-center opacity-90 hover:opacity-100 transition shadow"
+                            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-rose-600 text-white text-[10px] font-bold flex items-center justify-center opacity-85 hover:opacity-100 transition shadow"
                             title="Usuń to zdjęcie z serii"
                           >
                             ✕
                           </button>
-                          <span className="absolute bottom-0.5 left-1 text-[9px] font-mono text-slate-900/80 bg-black/60 px-1 rounded">
+                          <span className="absolute bottom-1 left-1 text-[9px] font-mono font-bold text-white bg-slate-950/70 px-1 py-0.2 rounded">
                             #{idx + 1}
                           </span>
                         </div>

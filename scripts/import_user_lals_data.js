@@ -1054,3 +1054,4 @@ db.officialRanking = [
 
 fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf8');
 console.log('Database successfully populated with official VolleyStation LALS data!');
+
