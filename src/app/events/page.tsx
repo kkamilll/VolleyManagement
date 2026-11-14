@@ -1101,7 +1101,7 @@ function EventsAttendanceContent() {
                                   title="Przejdź do oficjalnego meczu i tabeli LALS"
                                 >
                                   <img src="/lals_logo.png" alt="LALS" className="w-3.5 h-3.5 rounded-full bg-white p-0.5 object-contain" />
-                                  <span>Mecz LALS</span>
+                                  <span>Liga LALS</span>
                                 </Link>
                               ) : event.type === 'SPARING' ? (
                                 <Link
@@ -1378,7 +1378,12 @@ function EventsAttendanceContent() {
                 // Avoid duplicating opponent if title already contains opponent name
                 const cleanOpponent = event.opponent?.trim();
                 const hasOpponentInTitle = Boolean(cleanOpponent && event.title.toLowerCase().includes(cleanOpponent.toLowerCase()));
-                const displayTitle = cleanOpponent && !hasOpponentInTitle ? `${event.title} vs ${cleanOpponent}` : event.title;
+                const rawTitle = cleanOpponent && !hasOpponentInTitle ? `${event.title} vs ${cleanOpponent}` : event.title;
+                const displayTitle = isLeagueMatch
+                  ? rawTitle
+                      .replace(/^(?:oficjalne\s+spotkanie\s+(?:ligowe\s+)?lals|mecz\s+ligowy\s+lals|mecz\s+lals)\s*(\([^\)]+\))?:\s*/i, (_m, round) => round ? `${round} ` : '')
+                      .trim()
+                  : rawTitle;
 
                 // Sprawdzenie czy do tej jednostki przypisano jakąkolwiek taktykę
                 const eventTactics = tactics.filter(
@@ -1483,7 +1488,7 @@ function EventsAttendanceContent() {
                             title="Przejdź do oficjalnego meczu i tabeli LALS"
                           >
                             <img src="/lals_logo.png" alt="LALS" className="w-4 h-4 rounded-full bg-white p-0.5 object-contain" />
-                            <span>Mecz LALS ↗</span>
+                            <span>Liga LALS ↗</span>
                           </Link>
                         ) : event.type === 'SPARING' ? (
                           <Link
@@ -1549,6 +1554,44 @@ function EventsAttendanceContent() {
                           </div>
                         )}
 
+                        {/* Status deklaracji obecności gracza */}
+                        {myAttendance ? (
+                          <span
+                            className={`px-3 py-2 rounded-xl text-[11px] font-bold border ${
+                              myAttendance.status === 'BEDE'
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-300 shadow-2xs'
+                                : myAttendance.status === 'NIEPEWNE'
+                                ? 'bg-amber-50 text-amber-800 border-amber-300'
+                                : 'bg-rose-50 text-rose-800 border-rose-300'
+                            }`}
+                          >
+                            {myAttendance.status === 'BEDE' ? '✓ Będę' : myAttendance.status === 'NIEPEWNE' ? '? Niepewny' : '✗ Nieobecny'}
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setExpandedEventId(isExpanded ? null : event.id)}
+                            className="px-3 py-2 rounded-xl text-[11px] font-bold bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 flex items-center gap-1 transition shadow-2xs"
+                            title="Kliknij, aby oddać głos w ankiecie obecności"
+                          >
+                            <Lock className="w-3.5 h-3.5 text-amber-600" />
+                            <span>Oddaj głos</span>
+                          </button>
+                        )}
+
+                        {/* Quick Edit Button dla sztabu */}
+                        {canManage && (
+                          <button
+                            type="button"
+                            onClick={() => openEditModal(event)}
+                            className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-800 border border-slate-200 transition shadow-2xs"
+                            title="Edytuj jednostkę"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+                        )}
+
+                        {/* Pojedynczy przycisk Chevron */}
                         <div
                           className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-all duration-200 ml-1 ${
                             isExpanded ? 'rotate-180 bg-slate-200 border-slate-300 text-slate-900' : 'bg-slate-100 border-slate-200 text-slate-500 group-hover:text-slate-900'
@@ -1558,81 +1601,7 @@ function EventsAttendanceContent() {
                         </div>
                       </div>
                     </div>
-
-                      {/* Dolny pasek pod kreską */}
-                      <div className="flex flex-wrap items-center justify-between gap-2.5 shrink-0 pt-2.5 border-t border-slate-200">
-                        {/* Lewa strona pod kreską: Czyste podsumowanie / odznaka typu bez powielania przycisków */}
-                        <div className="flex items-center gap-2 text-xs text-slate-500">
-                          {isLeagueMatch ? (
-                            <span className="inline-flex items-center gap-1.5 font-bold text-sky-800">
-                              <img src="/lals_logo.png" alt="LALS" className="w-4 h-4 rounded-full bg-white p-0.5 object-contain" />
-                              <span>Oficjalne spotkanie ligowe LALS</span>
-                            </span>
-                          ) : event.type === 'SPARING' ? (
-                            <span className="inline-flex items-center gap-1.5 font-bold text-amber-800">
-                              <Swords className="w-3.5 h-3.5 text-amber-600" />
-                              <span>Mecz kontrolny Angels ZTP</span>
-                            </span>
-                          ) : event.type === 'TRENING' ? (
-                            <span className="inline-flex items-center gap-1.5 font-bold text-emerald-800">
-                              <Volleyball className="w-3.5 h-3.5 text-emerald-600" />
-                              <span>Oficjalna jednostka treningowa</span>
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1.5 font-bold text-purple-800">
-                              <Trophy className="w-3.5 h-3.5 text-purple-600" />
-                              <span>Turniej pucharowy / sparingowy</span>
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Prawa strona pod kreską: status głosu, edycja i chevron */}
-                        <div className="flex items-center gap-2 text-xs">
-                          {myAttendance ? (
-                            <span
-                              className={`px-2.5 py-1 rounded-xl text-[11px] font-bold border ${
-                                myAttendance.status === 'BEDE'
-                                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300 shadow-sm'
-                                  : myAttendance.status === 'NIEPEWNE'
-                                  ? 'bg-amber-50 text-amber-800 border-amber-300'
-                                  : 'bg-rose-50 text-rose-800 border-rose-300'
-                              }`}
-                            >
-                              {myAttendance.status === 'BEDE' ? '✓ Będę' : myAttendance.status === 'NIEPEWNE' ? '? Niepewny' : '✗ Nieobecny'}
-                            </span>
-                          ) : (
-                            <span className="px-2.5 py-1 rounded-xl text-[11px] font-bold bg-amber-50 border border-amber-200 text-amber-800 flex items-center gap-1">
-                              <Lock className="w-3 h-3 text-amber-600" />
-                              <span>Oddaj głos</span>
-                            </span>
-                          )}
-
-                          {/* Quick Edit Button on row for managers */}
-                          {canManage && (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openEditModal(event);
-                              }}
-                              className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-800 border border-slate-200 transition shadow-sm"
-                              title="Edytuj jednostkę"
-                            >
-                              <Edit3 className="w-4 h-4" />
-                            </button>
-                          )}
-
-                          {/* Expand / Collapse Chevron */}
-                          <div
-                            className={`w-8 h-8 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 transition-all duration-200 ${
-                              isExpanded ? 'rotate-180 bg-sky-50 text-sky-700 border-sky-300' : 'group-hover:text-slate-800 group-hover:bg-slate-100'
-                            }`}
-                          >
-                            <ChevronDown className="w-4 h-4" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                  </div>
 
                     {/* EXPANDED CONTENT (Szczegóły jednostki po rozwinięciu) */}
                     {isExpanded && (
