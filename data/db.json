@@ -885,6 +885,20 @@
       "createdById": "usr_trener",
       "createdByName": "Hubert Rutkowski",
       "createdAt": "2026-11-14T11:00:00.000Z"
+    },
+    {
+      "id": "evt_1794677593622",
+      "title": "ef",
+      "type": "TURNIEJ",
+      "status": "ANKIETA",
+      "date": "2026-11-22T21:33",
+      "location": "Hala Sportowa OSiR, ul. Sportowa 5",
+      "description": "",
+      "attendees": [],
+      "actualAttendees": [],
+      "createdById": "usr_pujanek",
+      "createdByName": "Kamil Pujanek",
+      "createdAt": "2026-11-14T17:33:13.622Z"
     }
   ],
   "leagueReports": [
@@ -1294,6 +1308,26 @@
   "payments": [],
   "treasuryExpenses": [],
   "announcements": [
+    {
+      "id": "ann_evt_evt_1794677593622_1794677593671",
+      "title": "📅 Nowe wydarzenie: ef",
+      "content": "Turniej zaplanowany na niedziela, 22 listopada 21:33 (Hala Sportowa OSiR, ul. Sportowa 5). Zadeklaruj swoją obecność w ankiecie!",
+      "priority": "WAZNY",
+      "category": "MECZ",
+      "isPinned": false,
+      "link": "/events?eventId=evt_1794677593622",
+      "createdById": "usr_pujanek",
+      "createdByName": "Kamil Pujanek",
+      "createdByRole": "KIEROWNIK",
+      "createdAt": "2026-11-14T17:33:13.671Z",
+      "readBy": [
+        {
+          "userId": "usr_pujanek",
+          "userName": "Kamil Pujanek",
+          "readAt": "2026-11-14T17:33:13.671Z"
+        }
+      ]
+    },
     {
       "id": "ann_mecz_coco_jumbo",
       "title": "🎯 Zbiórka na mecz z Coco Jumbo (Niedziela 15.11)",

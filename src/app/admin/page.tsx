@@ -1593,53 +1593,7 @@ function AdminCenterContent() {
             )}
           </div>
 
-          {/* Poradnik integracji */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-4 shadow-sm">
-            <div className="flex items-center gap-2.5 pb-3 border-b border-slate-200">
-              <Cloud className="w-5 h-5 text-sky-400" />
-              <h3 className="text-base font-black text-slate-900 uppercase tracking-wider">
-                Jak podpiąć MongoDB Atlas (Darmowy Cluster M0)
-              </h3>
-            </div>
 
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Dzięki temu cała drużyna ma dostęp do aktualnych meczów, składek i obecności w sieci, a dane nigdy nie znikną przy restartach serwera:
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                <div className="flex items-center gap-2 font-bold text-sky-400">
-                  <span className="w-5 h-5 rounded-full bg-sky-500/20 flex items-center justify-center text-[11px]">1</span>
-                  <span>Kroki w MongoDB Atlas:</span>
-                </div>
-                <ol className="list-decimal list-inside space-y-1.5 text-slate-600 pl-1 leading-relaxed">
-                  <li>Zaloguj się na <strong className="text-slate-900">mongodb.com/atlas</strong> i wybierz darmowy klaster <em>M0 (Free)</em>.</li>
-                  <li>W zakładce <strong className="text-slate-900">Database Access</strong> stwórz użytkownika (np. <code className="bg-slate-900 px-1 py-0.5 rounded text-amber-300">angels_admin</code>) i ustaw hasło.</li>
-                  <li>W zakładce <strong className="text-slate-900">Network Access</strong> kliknij <em>Add IP Address</em> &rarr; wybierz <em>Allow Access from Anywhere</em> (<code className="bg-slate-900 px-1 py-0.5 rounded text-amber-300">0.0.0.0/0</code>).</li>
-                  <li>Kliknij <strong className="text-slate-900">Connect &rarr; Drivers (Node.js)</strong> i skopiuj link połączenia (np. <code className="bg-slate-900 px-1 py-0.5 rounded text-emerald-300 break-all">mongodb+srv://...</code>).</li>
-                </ol>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                <div className="flex items-center gap-2 font-bold text-emerald-400">
-                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center text-[11px]">2</span>
-                  <span>Podpięcie do aplikacji:</span>
-                </div>
-                <div className="space-y-2 text-slate-600 leading-relaxed">
-                  <p>
-                    W pliku <strong className="text-slate-900">.env</strong> (lub w panelu Vercel w <em>Settings &rarr; Environment Variables</em>) wklej skopiowany link jako zmienną:
-                  </p>
-                  <pre className="p-3 rounded-xl bg-black border border-slate-200 text-[11px] font-mono text-emerald-300 overflow-x-auto select-all">
-                    MONGODB_URI=mongodb+srv://user:haslo@cluster0.xxx.mongodb.net/angels_ztp?retryWrites=true&w=majority
-                  </pre>
-                  <div className="p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-200 text-[11px] text-emerald-300 flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
-                    <span>Gotowe! Przy pierwszym uruchomieniu system sam automatycznie wyśle wszystkich 11 zawodników, fazy LALS i mecze z pliku do klastra Atlas.</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* CENTRUM KOPII ZAPASOWYCH & OCHRONA DANYCH (BACKUP & RESTORE) */}
           <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
