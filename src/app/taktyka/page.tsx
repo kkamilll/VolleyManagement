@@ -1797,29 +1797,29 @@ function TacticsContent() {
         (() => {
           const target = getTacticTargetInfo(selectedTactic);
           return (
-            <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-sky-950/80 via-[#0c1424] to-slate-900 border-2 border-sky-400/50 shadow-2xl shadow-sky-950/50 space-y-3">
+            <div className="p-4 sm:p-5 rounded-3xl bg-sky-50 border-2 border-sky-300 shadow-sm space-y-3">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div className="flex items-start gap-3.5 min-w-0">
-                  <div className="w-11 h-11 rounded-2xl bg-sky-500/20 text-sky-400 border border-sky-400/40 flex items-center justify-center text-2xl shrink-0 shadow-lg shadow-sky-500/20">
+                  <div className="w-11 h-11 rounded-2xl bg-sky-100 text-sky-700 border border-sky-300 flex items-center justify-center text-2xl shrink-0 shadow-sm">
                     🎯
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-sky-500 text-slate-950 shadow-sm">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-sky-600 text-white shadow-xs">
                         Wczytana Taktyka
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-800/90 text-sky-300 border border-sky-500/30">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white text-sky-800 border border-sky-200 shadow-2xs">
                         {target.icon} {target.label} {target.date ? `(${new Date(target.date).toLocaleDateString('pl-PL')})` : ''}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-800 text-amber-300 border border-slate-700">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white text-amber-800 border border-amber-300 shadow-2xs">
                         {selectedTactic.rotation} • {selectedTactic.phase}
                       </span>
                     </div>
-                    <h2 className="text-base sm:text-lg font-black text-white mt-1 truncate">
+                    <h2 className="text-base sm:text-lg font-black text-slate-900 mt-1 truncate">
                       {selectedTactic.title}
                     </h2>
                     {selectedTactic.description && (
-                      <p className="text-xs text-slate-300 line-clamp-1 mt-0.5">
+                      <p className="text-xs text-slate-600 line-clamp-1 mt-0.5">
                         {selectedTactic.description}
                       </p>
                     )}
@@ -1832,7 +1832,7 @@ function TacticsContent() {
                       <button
                         onClick={handleQuickUpdateCurrentTactic}
                         disabled={saving}
-                        className="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-sky-500/25"
+                        className="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs transition flex items-center gap-1.5 shadow-sm"
                         title="Nadpisz zmiany (pozycje graczy i rysunki pisakiem) w tej taktyce"
                       >
                         <Save className="w-3.5 h-3.5" />
@@ -1841,10 +1841,10 @@ function TacticsContent() {
 
                       <button
                         onClick={handleOpenSaveModal}
-                        className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition flex items-center gap-1.5"
+                        className="px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs"
                         title="Zapisz ten schemat jako nową kopię dla innego meczu"
                       >
-                        <Camera className="w-3.5 h-3.5 text-amber-400" />
+                        <Camera className="w-3.5 h-3.5 text-amber-600" />
                         <span>Klonuj / Nowa</span>
                       </button>
                     </>
@@ -1852,10 +1852,10 @@ function TacticsContent() {
 
                   <button
                     onClick={handleStartNewDraft}
-                    className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-200 text-xs font-bold transition flex items-center gap-1.5"
+                    className="px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs"
                     title="Odłącz tablicę i zacznij czysty, niezapisany szkic"
                   >
-                    <Plus className="w-3.5 h-3.5 text-emerald-400" />
+                    <Plus className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Nowy czysty szkic</span>
                   </button>
                 </div>
@@ -1864,23 +1864,23 @@ function TacticsContent() {
           );
         })()
       ) : (
-        <div className="p-3.5 sm:p-4 rounded-3xl bg-slate-900/60 border border-slate-200 shadow-md">
+        <div className="p-3.5 sm:p-4 rounded-3xl bg-white border border-slate-200 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-slate-800 text-slate-300 border border-slate-700 flex items-center justify-center text-lg shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 flex items-center justify-center text-lg shrink-0 shadow-2xs">
                 📋
               </div>
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-800 text-slate-400 border border-slate-700">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
                     Nowy Szkic (Niezapisany)
                   </span>
-                  <span className="text-xs font-bold text-amber-400">
+                  <span className="text-xs font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
                     Ustawienie wyjściowe: {rotation} • {phase}
                   </span>
                 </div>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Możesz swobodnie przestawiać zawodników i rysować pisakiem. Aby zachować ten wariant, kliknij "Zapisz do Playbooka".
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Możesz swobodnie przestawiać zawodników i rysować pisakiem. Aby zachować ten wariant, kliknij "Zapisz do Meczu / Treningu".
                 </p>
               </div>
             </div>
@@ -1889,10 +1889,10 @@ function TacticsContent() {
               {canEdit && (
                 <button
                   onClick={handleOpenSaveModal}
-                  className="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-sky-500/20"
+                  className="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs transition flex items-center gap-1.5 shadow-sm"
                 >
                   <Save className="w-3.5 h-3.5" />
-                  <span>Zapisz do Playbooka / Meczu</span>
+                  <span>Zapisz do Meczu / Treningu</span>
                 </button>
               )}
             </div>
@@ -1981,16 +1981,16 @@ function TacticsContent() {
 
                 <Link
                   href="/events"
-                  className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-200 text-xs font-bold transition flex items-center gap-1.5"
+                  className="px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs"
                   title="Wróć do terminarza"
                 >
-                  <Calendar className="w-3.5 h-3.5 text-sky-400" />
+                  <Calendar className="w-3.5 h-3.5 text-sky-600" />
                   <span>Terminarz</span>
                 </Link>
 
                 <Link
                   href="/taktyka"
-                  className="px-2.5 py-2 rounded-xl bg-slate-900/60 hover:bg-slate-800 text-slate-400 hover:text-amber-300 border border-slate-200 text-[11px] font-medium transition flex items-center gap-1"
+                  className="px-2.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-amber-700 border border-slate-200 text-[11px] font-medium transition flex items-center gap-1 shadow-2xs"
                   title="Odblokuj ogólną bazę taktyczną drużyny"
                 >
                   <Unlock className="w-3 h-3 text-slate-400" />
@@ -2002,7 +2002,7 @@ function TacticsContent() {
                 <select
                   value={selectedContextKey}
                   onChange={e => setSelectedContextKey(e.target.value)}
-                  className="bg-white border border-slate-300 text-slate-800 hover:border-slate-600 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-amber-400 max-w-full sm:max-w-xs"
+                  className="bg-white border border-slate-300 text-slate-900 hover:border-slate-400 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-sky-500 max-w-full sm:max-w-xs shadow-2xs"
                 >
                   <option value="GENERAL">🌐 Ogólna Tablica Drużyny (Uniwersalna)</option>
 
@@ -2061,7 +2061,7 @@ function TacticsContent() {
                   <button
                     onClick={handleQuickSaveForUnit}
                     disabled={saving}
-                    className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-amber-500/20"
+                    className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-sm"
                     title="Zapisz aktualne rozrysowanie i wytyczne bezpośrednio do tej jednostki"
                   >
                     <Save className="w-3.5 h-3.5" />
@@ -2072,7 +2072,7 @@ function TacticsContent() {
                 {selectedContextKey !== 'GENERAL' && (
                   <button
                     onClick={() => setSelectedContextKey('GENERAL')}
-                    className="px-2.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-200 text-xs font-bold transition"
+                    className="px-2.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 text-xs font-bold transition shadow-2xs"
                     title="Powrót do ogólnej tablicy"
                   >
                     Resetuj kontekst
@@ -2087,16 +2087,16 @@ function TacticsContent() {
         {(activeTargetEvent || activeTargetMatch) && (
           <div className={`p-3.5 sm:p-4 rounded-2xl border text-xs space-y-3 animate-fadeIn ${
             activeTargetEvent?.type === 'TRENING'
-              ? 'bg-emerald-950/30 border-emerald-500/40'
+              ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
               : activeTargetEvent?.type === 'SPARING'
-              ? 'bg-amber-950/30 border-amber-500/40'
+              ? 'bg-amber-50/70 border-amber-200 text-amber-950'
               : activeTargetEvent?.type === 'TURNIEJ'
-              ? 'bg-purple-950/30 border-purple-500/40'
-              : 'bg-sky-950/40 border-sky-500/40'
+              ? 'bg-purple-50/70 border-purple-200 text-purple-950'
+              : 'bg-sky-50/70 border-sky-200 text-sky-950'
           }`}>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-200">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-bold text-white text-xs">
+                <span className="font-bold text-slate-900 text-xs">
                   {activeTargetEvent?.type === 'TRENING'
                     ? 'Plan Treningowy & Zestawienie Pozycji'
                     : activeTargetEvent?.type === 'SPARING'
@@ -2107,7 +2107,7 @@ function TacticsContent() {
                 </span>
 
                 {activeTargetEvent && (
-                  <span className="text-[11px] font-mono text-slate-400">
+                  <span className="text-[11px] font-mono text-slate-500">
                     • {new Date(activeTargetEvent.date).toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' })} • {activeTargetEvent.location}
                   </span>
                 )}
@@ -2116,17 +2116,17 @@ function TacticsContent() {
               {/* Roster & Auto-populate action */}
               {activeTargetEvent && (
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[11px] font-mono font-bold text-slate-300 px-2 py-0.5 rounded bg-slate-900 border border-slate-200">
+                  <span className="text-[11px] font-mono font-bold text-slate-700 px-2 py-0.5 rounded bg-white border border-slate-200 shadow-2xs">
                     ✓ {(activeTargetEvent.attendees || []).filter(a => a.status === 'BEDE').length} obecnych z ankiety
                   </span>
 
                   {canEdit && (
                     <button
                       onClick={handlePopulateConfirmedPlayers}
-                      className="px-2.5 py-1 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 text-[11px] font-black transition flex items-center gap-1 shadow-sm"
+                      className="px-2.5 py-1 rounded-xl bg-white hover:bg-sky-50 text-sky-700 border border-sky-200 text-[11px] font-bold transition flex items-center gap-1 shadow-2xs"
                       title="Automatycznie przypisz potwierdzonych graczy z ankiety do ich nominalnych pozycji (R, P1, P2, Ś1, Ś2, A, L)"
                     >
-                      <UserCheck className="w-3.5 h-3.5" />
+                      <UserCheck className="w-3.5 h-3.5 text-sky-600" />
                       <span>Wstaw obecnych na boisko</span>
                     </button>
                   )}
@@ -2137,13 +2137,13 @@ function TacticsContent() {
             {/* Tactical Directives / Action Points */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase tracking-wider text-amber-400">
+                <span className="text-[10px] font-black uppercase tracking-wider text-amber-800">
                   Wytyczne Taktyczne & Zadania dla Drużyny:
                 </span>
                 {canEdit && (
                   <button
                     onClick={() => setShowDirectiveEditor(!showDirectiveEditor)}
-                    className="text-[10px] text-slate-400 hover:text-white underline font-bold"
+                    className="text-[10px] text-sky-700 hover:text-sky-900 underline font-bold"
                   >
                     {showDirectiveEditor ? 'Zwiń edytor' : '+ Edytuj wytyczne'}
                   </button>
@@ -2154,13 +2154,13 @@ function TacticsContent() {
                 {unitDirectives.map((dir, idx) => (
                   <span
                     key={idx}
-                    className="px-2.5 py-1 rounded-xl bg-slate-900/90 border border-slate-200 text-[11px] text-slate-200 font-medium flex items-center gap-1.5 shadow-sm"
+                    className="px-2.5 py-1 rounded-xl bg-white border border-slate-200 text-[11px] text-slate-800 font-medium flex items-center gap-1.5 shadow-2xs"
                   >
                     <span>{dir}</span>
                     {canEdit && showDirectiveEditor && (
                       <button
                         onClick={() => setUnitDirectives(unitDirectives.filter((_, i) => i !== idx))}
-                        className="text-slate-500 hover:text-rose-400 ml-1 font-bold"
+                        className="text-slate-400 hover:text-rose-600 ml-1 font-bold"
                         title="Usuń wytyczną"
                       >
                         ×
@@ -2177,7 +2177,7 @@ function TacticsContent() {
                     value={newDirectiveInput}
                     onChange={e => setNewDirectiveInput(e.target.value)}
                     placeholder="Wpisz nowe zadanie lub wytyczną..."
-                    className="flex-1 bg-white border border-slate-300 text-slate-800 rounded-xl px-2.5 py-1 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                    className="flex-1 bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl px-2.5 py-1 text-xs focus:outline-none focus:border-amber-500 shadow-2xs"
                     onKeyDown={e => {
                       if (e.key === 'Enter' && newDirectiveInput.trim()) {
                         e.preventDefault();
@@ -2485,44 +2485,44 @@ function TacticsContent() {
           <div
             id="tactical-court-container"
             ref={courtContainerRef}
-            className={`relative bg-[#0b1222] rounded-3xl border-2 border-slate-300 shadow-md overflow-hidden aspect-[9/13] sm:aspect-[9/12] max-w-3xl mx-auto select-none ${
+            className={`relative bg-[#0f172a] rounded-3xl border-2 border-slate-300 shadow-md overflow-hidden aspect-[9/13] sm:aspect-[9/12] max-w-3xl mx-auto select-none ${
               activeTool === 'move' ? 'cursor-default' : 'cursor-crosshair'
             }`}
             onClick={handleCourtClick}
           >
             {/* Outer Playing Boundary Line (White 2px) */}
-            <div className="absolute inset-3 sm:inset-5 border-2 border-white/85 rounded-sm pointer-events-none z-1" />
+            <div className="absolute inset-3 sm:inset-5 border-2 border-white rounded-sm pointer-events-none z-1 shadow-xs" />
 
             {/* Top Half: Połowa Rywali (0% - 50%) */}
-            <div className="absolute top-3 sm:top-5 left-3 sm:left-5 right-3 sm:right-5 bottom-1/2 bg-gradient-to-b from-[#0f1b34] to-[#132345] pointer-events-none" />
+            <div className="absolute top-3 sm:top-5 left-3 sm:left-5 right-3 sm:right-5 bottom-1/2 bg-gradient-to-b from-[#1e3a8a] to-[#1e40af] pointer-events-none" />
 
             {/* Opponent 3m Attack Line (at 33.3%) */}
-            <div className="absolute top-[33.3%] left-3 sm:left-5 right-3 sm:right-5 border-b-2 border-dashed border-rose-400/35 pointer-events-none z-5" />
+            <div className="absolute top-[33.3%] left-3 sm:left-5 right-3 sm:right-5 border-b-2 border-dashed border-rose-300/70 pointer-events-none z-5" />
 
             {/* Subtle Opponent Zone Watermarks */}
-            <div className="absolute top-7 left-6 text-xs font-black text-rose-400/10 select-none pointer-events-none">V</div>
-            <div className="absolute top-7 left-1/2 -translate-x-1/2 text-xs font-black text-rose-400/10 select-none pointer-events-none">VI</div>
-            <div className="absolute top-7 right-6 text-xs font-black text-rose-400/10 select-none pointer-events-none">I</div>
-            <div className="absolute top-[42%] left-6 text-xs font-black text-rose-400/10 select-none pointer-events-none">IV</div>
-            <div className="absolute top-[42%] left-1/2 -translate-x-1/2 text-xs font-black text-rose-400/10 select-none pointer-events-none">III</div>
-            <div className="absolute top-[42%] right-6 text-xs font-black text-rose-400/10 select-none pointer-events-none">II</div>
+            <div className="absolute top-7 left-6 text-xs font-black text-white/20 select-none pointer-events-none">V</div>
+            <div className="absolute top-7 left-1/2 -translate-x-1/2 text-xs font-black text-white/20 select-none pointer-events-none">VI</div>
+            <div className="absolute top-7 right-6 text-xs font-black text-white/20 select-none pointer-events-none">I</div>
+            <div className="absolute top-[42%] left-6 text-xs font-black text-white/20 select-none pointer-events-none">IV</div>
+            <div className="absolute top-[42%] left-1/2 -translate-x-1/2 text-xs font-black text-white/20 select-none pointer-events-none">III</div>
+            <div className="absolute top-[42%] right-6 text-xs font-black text-white/20 select-none pointer-events-none">II</div>
 
             {/* Center Net System: Czysta, profesjonalna siatka bez zbędnych napisów */}
             <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 z-20 pointer-events-none flex items-center justify-between">
               {/* Left Post */}
-              <div className="w-3.5 h-8 bg-slate-500 rounded-r border border-slate-700 shadow-xl -translate-x-0.5" />
+              <div className="w-3.5 h-8 bg-slate-400 rounded-r border border-slate-600 shadow-md -translate-x-0.5" />
 
               {/* Net: Sleek white volleyball net tape & grid mesh (bez tekstu/badge'y) */}
-              <div className="flex-1 h-2.5 bg-slate-100 border-y border-slate-400 shadow-md relative overflow-hidden">
-                <div className="absolute inset-0 opacity-30 bg-[radial-gradient(#0f172a_1px,transparent_1px)] [background-size:4px_4px]" />
+              <div className="flex-1 h-2.5 bg-white border-y border-slate-300 shadow-sm relative overflow-hidden">
+                <div className="absolute inset-0 opacity-25 bg-[radial-gradient(#0f172a_1px,transparent_1px)] [background-size:4px_4px]" />
               </div>
 
               {/* Right Post */}
-              <div className="w-3.5 h-8 bg-slate-500 rounded-l border border-slate-700 shadow-xl translate-x-0.5" />
+              <div className="w-3.5 h-8 bg-slate-400 rounded-l border border-slate-600 shadow-md translate-x-0.5" />
             </div>
 
             {/* Center Line Under Net */}
-            <div className="absolute top-1/2 left-3 sm:left-5 right-3 sm:right-5 h-[2px] bg-white/70 pointer-events-none z-10" />
+            <div className="absolute top-1/2 left-3 sm:left-5 right-3 sm:right-5 h-[2px] bg-white pointer-events-none z-10" />
 
             {/* Antennas (Czerwono-białe antenki na liniach bocznych) */}
             <div
@@ -2535,14 +2535,18 @@ function TacticsContent() {
             />
 
             {/* Bottom Half: Połowa Angels ZTP (50% - 100%) */}
-            <div className="absolute top-1/2 left-3 sm:left-5 right-3 sm:right-5 bottom-3 sm:bottom-5 bg-gradient-to-b from-[#132345] to-[#0f1b34] pointer-events-none" />
+            <div className="absolute top-1/2 left-3 sm:left-5 right-3 sm:right-5 bottom-3 sm:bottom-5 bg-gradient-to-b from-[#1e40af] to-[#1d4ed8] pointer-events-none" />
 
             {/* Angels ZTP 3m Attack Line (at 66.7%) */}
-            <div className="absolute top-[66.7%] left-3 sm:left-5 right-3 sm:right-5 border-b-2 border-dashed border-sky-400/40 pointer-events-none z-5" />
+            <div className="absolute top-[66.7%] left-3 sm:left-5 right-3 sm:right-5 border-b-2 border-dashed border-sky-200/80 pointer-events-none z-5" />
 
             {/* Subtle Angels ZTP Zone Watermarks */}
-            <div className="absolute top-[55%] left-6 text-xs font-black text-sky-400/10 select-none pointer-events-none">IV</div>
-            <div className="absolute top-[55%] left-1/2 -translate-x-1/2 text-xs font-black text-sky-400/10 select-none pointer-events-none">III</div>
+            <div className="absolute top-[55%] left-6 text-xs font-black text-white/20 select-none pointer-events-none">IV</div>
+            <div className="absolute top-[55%] left-1/2 -translate-x-1/2 text-xs font-black text-white/20 select-none pointer-events-none">III</div>
+            <div className="absolute top-[55%] right-6 text-xs font-black text-white/20 select-none pointer-events-none">II</div>
+            <div className="absolute bottom-6 left-6 text-xs font-black text-white/20 select-none pointer-events-none">V</div>
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs font-black text-white/20 select-none pointer-events-none">VI</div>
+            <div className="absolute bottom-6 right-6 text-xs font-black text-white/20 select-none pointer-events-none">I</div>
             <div className="absolute top-[55%] right-6 text-xs font-black text-sky-400/10 select-none pointer-events-none">II</div>
             <div className="absolute bottom-6 left-6 text-xs font-black text-sky-400/10 select-none pointer-events-none">V</div>
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs font-black text-sky-400/10 select-none pointer-events-none">VI</div>
@@ -2624,7 +2628,7 @@ function TacticsContent() {
                     className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-black text-[10px] shadow-lg border-2 transition ${
                       isSelected
                         ? 'bg-rose-500 text-white border-white animate-pulse ring-2 ring-rose-400'
-                        : 'bg-rose-950 text-rose-200 border-rose-500'
+                        : 'bg-rose-600 text-white border-white shadow-md'
                     }`}
                   >
                     {opp.roleCode}
@@ -2678,7 +2682,7 @@ function TacticsContent() {
                         ? 'bg-amber-500 text-slate-950 border-white'
                         : isSelected
                         ? 'bg-sky-400 text-slate-950 border-white animate-pulse ring-2 ring-sky-300'
-                        : 'bg-slate-900 text-white border-sky-400'
+                        : 'bg-sky-600 text-white border-white shadow-md'
                     }`}
                   >
                     {player.roleCode}
@@ -2714,17 +2718,17 @@ function TacticsContent() {
       <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center border border-sky-500/30">
+            <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center border border-sky-200">
               <Users className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-base font-black uppercase text-slate-900 tracking-wide flex items-center gap-2">
                 Zadania i Ustawienie Pozycji: Rotacja {rotation} ({phase})
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200">
                   {positions.length} graczy
                 </span>
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500">
                 Szczegółowe zadania taktyczne dla każdego zawodnika w tej fazie akcji.
               </p>
             </div>
@@ -2747,18 +2751,18 @@ function TacticsContent() {
           const sel = positions.find(p => p.id === selectedPlayerId);
           if (!sel) return null;
           return (
-            <div className="p-4 rounded-2xl bg-sky-500/10 border-2 border-sky-500/40 space-y-2.5 animate-fadeIn">
+            <div className="p-4 rounded-2xl bg-sky-50 border-2 border-sky-300 space-y-2.5 animate-fadeIn">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded-lg bg-sky-500 text-slate-950 font-black text-xs">
+                  <span className="px-2 py-0.5 rounded-lg bg-sky-600 text-white font-black text-xs">
                     {sel.roleCode}
                   </span>
                   <span className="text-sm font-bold text-slate-900">{sel.name}</span>
-                  <span className="text-xs text-sky-300 font-medium">• Strefa nominalna: {sel.zone}</span>
+                  <span className="text-xs text-sky-700 font-medium">• Strefa nominalna: {sel.zone}</span>
                 </div>
                 <button
                   onClick={() => setSelectedPlayerId(null)}
-                  className="text-xs text-slate-400 hover:text-white px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-200"
+                  className="text-xs text-slate-600 hover:text-slate-900 px-2 py-0.5 rounded-lg bg-white border border-slate-300 shadow-2xs"
                 >
                   Zamknij edycję
                 </button>
@@ -2769,7 +2773,7 @@ function TacticsContent() {
                   value={sel.task || ''}
                   onChange={e => handleUpdatePlayerTask(sel.id, e.target.value)}
                   placeholder="Wpisz zadanie zawodnika w tej rotacji (np. 'Asekuracja prostej, szybkie przejście do kontry...')"
-                  className="flex-1 bg-white border border-slate-300 text-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400"
+                  className="flex-1 bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-sky-500 shadow-2xs"
                 />
               </div>
             </div>
@@ -2807,21 +2811,21 @@ function TacticsContent() {
                     }`}>
                       {p.roleCode}
                     </span>
-                    <span className="font-bold text-white text-xs truncate max-w-[130px]">
+                    <span className="font-bold text-slate-900 text-xs truncate max-w-[130px]">
                       {p.name.replace(/\s*\([^)]*\)/, '')}
                     </span>
                   </div>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-300 border border-slate-700 shrink-0">
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200 shrink-0">
                     Strefa {p.zone}
                   </span>
                 </div>
 
                 <div className="pt-2">
-                  <p className="text-[11.5px] text-slate-300 leading-snug line-clamp-3">
+                  <p className="text-[11.5px] text-slate-600 leading-snug line-clamp-3">
                     {p.task ? (
                       p.task
                     ) : (
-                      <span className="text-slate-500 italic">Podstawowa pozycja nominalna (kliknij, by dodać zadanie)</span>
+                      <span className="text-slate-400 italic">Podstawowa pozycja nominalna (kliknij, by dodać zadanie)</span>
                     )}
                   </p>
                 </div>
@@ -2849,7 +2853,7 @@ function TacticsContent() {
 
       {/* Modal: Wczytaj zapisany schemat na tablicę */}
       {showLoadTacticModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-xl shadow-xl space-y-4 max-h-[88vh] overflow-y-auto text-slate-800">
             <div className="flex justify-between items-center pb-3 border-b border-slate-200">
               <div className="flex items-center gap-2">
@@ -2909,27 +2913,32 @@ function TacticsContent() {
 
       {/* Modal: Dodaj Materiał Taktyczny (PDF / Grafika) */}
       {showAddMaterialModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-lg shadow-xl space-y-4 max-h-[92vh] overflow-y-auto text-slate-800">
             <div className="flex justify-between items-center pb-3 border-b border-slate-200">
               <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-rose-400" />
+                <FileText className="w-5 h-5 text-rose-500" />
                 <h3 className="text-base font-black uppercase text-slate-900">
                   Dodaj Materiał Taktyczny
                 </h3>
               </div>
-              <button onClick={() => setShowAddMaterialModal(false)} className="text-slate-400 hover:text-white">✕</button>
+              <button
+                onClick={() => setShowAddMaterialModal(false)}
+                className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition"
+              >
+                ✕
+              </button>
             </div>
 
             <form onSubmit={handleSaveMaterial} className="space-y-4">
               {/* Wybór pliku */}
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
                   Wybierz plik z komputera / telefonu (PDF lub Grafika) *
                 </label>
-                <label className="flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-dashed border-slate-700 hover:border-rose-400 bg-slate-900/60 cursor-pointer transition group mb-2 text-center">
-                  <Upload className="w-7 h-7 text-slate-400 group-hover:text-rose-400 transition mb-1" />
-                  <span className="text-xs font-bold text-slate-300 group-hover:text-white">
+                <label className="flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-dashed border-slate-300 hover:border-rose-400 bg-slate-50 cursor-pointer transition group mb-2 text-center">
+                  <Upload className="w-7 h-7 text-slate-400 group-hover:text-rose-500 transition mb-1" />
+                  <span className="text-xs font-bold text-slate-700 group-hover:text-slate-900">
                     {materialFileName
                       ? `✓ ${materialFileName} (${materialType})`
                       : 'Wybierz plik PDF, PNG, JPG lub WEBP'}
@@ -2957,31 +2966,31 @@ function TacticsContent() {
                       }
                     }
                   }}
-                  className="w-full bg-white border border-slate-300 text-slate-800 rounded-xl p-2.5 text-xs text-white"
+                  className="w-full bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl p-2.5 text-xs focus:outline-none focus:border-rose-400 shadow-2xs"
                 />
               </div>
 
               {/* Tytuł materiału */}
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Tytuł materiału *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Tytuł materiału *</label>
                 <input
                   type="text"
                   required
                   placeholder="np. Raport wideo: Analiza zagrywki KS Metro Poznań"
                   value={materialTitle}
                   onChange={e => setMaterialTitle(e.target.value)}
-                  className="w-full bg-white border border-slate-300 text-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-rose-400"
+                  className="w-full bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl p-2.5 text-xs focus:outline-none focus:border-rose-400 shadow-2xs"
                 />
               </div>
 
               {/* Kategoria & Jednostka */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Kategoria</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Kategoria</label>
                   <select
                     value={materialScope}
                     onChange={e => setMaterialScope(e.target.value as any)}
-                    className="w-full bg-white border border-slate-300 text-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-rose-400"
+                    className="w-full bg-white border border-slate-300 text-slate-900 rounded-xl p-2.5 text-xs focus:outline-none focus:border-rose-400 shadow-2xs"
                   >
                     <option value="OGOLNE">Ogólne (baza taktyczna)</option>
                     <option value="MECZ_LIGOWY">Mecz Ligowy LALS</option>
@@ -2992,11 +3001,11 @@ function TacticsContent() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1">Przypisz do wydarzenia</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Przypisz do wydarzenia</label>
                   <select
                     value={materialEventId}
                     onChange={e => setMaterialEventId(e.target.value)}
-                    className="w-full bg-white border border-slate-300 text-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-rose-400"
+                    className="w-full bg-white border border-slate-300 text-slate-900 rounded-xl p-2.5 text-xs focus:outline-none focus:border-rose-400 shadow-2xs"
                   >
                     <option value="">(Brak - ogólny materiał)</option>
                     {events.map(ev => (
@@ -3010,13 +3019,13 @@ function TacticsContent() {
 
               {/* Opis / Wskazówki */}
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">Wskazówki trenera & opis</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Wskazówki trenera & opis</label>
                 <textarea
                   rows={3}
                   placeholder="Krótki opis, na co zawodnicy mają zwrócić uwagę w tym dokumencie..."
                   value={materialDescription}
                   onChange={e => setMaterialDescription(e.target.value)}
-                  className="w-full bg-white border border-slate-300 text-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-rose-400"
+                  className="w-full bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl p-2.5 text-xs focus:outline-none focus:border-rose-400 shadow-2xs"
                 />
               </div>
 
@@ -3024,14 +3033,14 @@ function TacticsContent() {
                 <button
                   type="button"
                   onClick={() => setShowAddMaterialModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-800"
                 >
                   Anuluj
                 </button>
                 <button
                   type="submit"
                   disabled={uploadingMaterial}
-                  className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-rose-500 hover:bg-rose-400 text-white transition shadow-lg shadow-rose-500/20"
+                  className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-rose-500 hover:bg-rose-400 text-white transition shadow-sm"
                 >
                   {uploadingMaterial ? 'Zapisywanie...' : 'Zapisz Materiał'}
                 </button>
@@ -3045,7 +3054,7 @@ function TacticsContent() {
       {selectedPdfViewer && (
         <div
           onClick={() => setSelectedPdfViewer(null)}
-          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
+          className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
         >
           <div
             onClick={e => e.stopPropagation()}
@@ -3053,10 +3062,10 @@ function TacticsContent() {
           >
             <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
               <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-rose-400" />
+                <FileText className="w-5 h-5 text-rose-500" />
                 <div>
-                  <h3 className="text-sm font-black text-white">{selectedPdfViewer.title}</h3>
-                  <span className="text-[10px] text-slate-400">{selectedPdfViewer.fileName || 'Dokument PDF'}</span>
+                  <h3 className="text-sm font-black text-slate-900">{selectedPdfViewer.title}</h3>
+                  <span className="text-[10px] text-slate-500">{selectedPdfViewer.fileName || 'Dokument PDF'}</span>
                 </div>
               </div>
 
@@ -3064,21 +3073,21 @@ function TacticsContent() {
                 <a
                   href={selectedPdfViewer.fileUrl}
                   download={selectedPdfViewer.fileName || `${selectedPdfViewer.title}.pdf`}
-                  className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 text-xs font-bold transition flex items-center gap-1.5"
+                  className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs"
                 >
-                  <Download className="w-3.5 h-3.5 text-rose-400" />
+                  <Download className="w-3.5 h-3.5 text-rose-500" />
                   <span>Pobierz PDF</span>
                 </a>
                 <button
                   onClick={() => setSelectedPdfViewer(null)}
-                  className="w-8 h-8 rounded-full bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center border border-slate-700 text-xs"
+                  className="w-8 h-8 rounded-full bg-white hover:bg-slate-100 text-slate-500 flex items-center justify-center border border-slate-200 text-xs shadow-2xs"
                 >
                   ✕
                 </button>
               </div>
             </div>
 
-            <div className="flex-1 bg-slate-900 relative">
+            <div className="flex-1 bg-slate-100 relative">
               <iframe
                 src={selectedPdfViewer.fileUrl}
                 title={selectedPdfViewer.title}
@@ -3093,16 +3102,16 @@ function TacticsContent() {
       {selectedImagePreview && (
         <div
           onClick={() => setSelectedImagePreview(null)}
-          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer"
+          className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer"
         >
           <div className="max-w-4xl max-h-[92vh] flex flex-col items-center relative" onClick={e => e.stopPropagation()}>
             <button
               onClick={() => setSelectedImagePreview(null)}
-              className="absolute top-2 right-2 sm:-top-10 sm:right-0 w-8 h-8 rounded-full bg-slate-900 hover:bg-slate-800 text-white flex items-center justify-center border border-slate-700 text-xs"
+              className="absolute top-2 right-2 sm:-top-10 sm:right-0 w-8 h-8 rounded-full bg-white hover:bg-slate-100 text-slate-700 flex items-center justify-center border border-slate-200 text-xs shadow-md"
             >
               ✕
             </button>
-            <div className="rounded-3xl overflow-hidden border border-slate-200 bg-black max-h-[75vh]">
+            <div className="rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-xl max-h-[75vh]">
               <img
                 src={selectedImagePreview.fileUrl}
                 alt={selectedImagePreview.title}
@@ -3110,17 +3119,17 @@ function TacticsContent() {
               />
             </div>
             <div className="mt-3 text-center text-white space-y-1">
-              <h3 className="text-base font-black">{selectedImagePreview.title}</h3>
+              <h3 className="text-base font-black text-white">{selectedImagePreview.title}</h3>
               {selectedImagePreview.description && (
-                <p className="text-xs text-slate-400">{selectedImagePreview.description}</p>
+                <p className="text-xs text-slate-200">{selectedImagePreview.description}</p>
               )}
               <div className="pt-1 flex items-center justify-center gap-2">
                 <a
                   href={selectedImagePreview.fileUrl}
                   download={selectedImagePreview.fileName || `${selectedImagePreview.title}.png`}
-                  className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-bold text-white transition flex items-center gap-1.5"
+                  className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-xs font-bold text-slate-800 transition flex items-center gap-1.5 shadow-sm"
                 >
-                  <Download className="w-3.5 h-3.5 text-amber-400" />
+                  <Download className="w-3.5 h-3.5 text-amber-500" />
                   <span>Pobierz grafikę</span>
                 </a>
               </div>
@@ -3131,19 +3140,19 @@ function TacticsContent() {
 
       {/* Save Tactic / Snapshot Modal */}
       {showSaveModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-lg shadow-xl relative text-slate-800">
             <h3 className="text-lg font-black uppercase text-slate-900 tracking-wider flex items-center gap-2">
-              <Camera className="w-5 h-5 text-sky-400" />
+              <Camera className="w-5 h-5 text-sky-600" />
               Zapisz Zrzut Taktyczny do Meczu
             </h3>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-slate-500 mt-1">
               Aktualne rozrysowanie pisakiem oraz pozycje graczy zostaną zapisane i <strong>automatycznie pojawią się w terminarzu tego meczu</strong>.
             </p>
 
             <form onSubmit={handleSaveTactic} className="mt-5 space-y-4">
               <div>
-                <label className="block text-xs font-black uppercase text-slate-300 mb-1">
+                <label className="block text-xs font-black uppercase text-slate-700 mb-1">
                   Tytuł zrzutu taktycznego *
                 </label>
                 <input
@@ -3152,12 +3161,12 @@ function TacticsContent() {
                   value={tacticTitle}
                   onChange={e => setTacticTitle(e.target.value)}
                   placeholder="np. Plan na mecz: Ustawienie obrony przeciwko Trefl II"
-                  className="w-full bg-white border border-slate-300 text-slate-800 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-400"
+                  className="w-full bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-sky-500 shadow-2xs"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-black uppercase text-slate-300 mb-1.5">
+                <label className="block text-xs font-black uppercase text-slate-700 mb-1.5">
                   1. Gdzie przypisać ten wariant taktyczny? *
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2.5">
@@ -3191,8 +3200,8 @@ function TacticsContent() {
                       }}
                       className={`py-2 px-2 rounded-xl text-xs font-bold transition border text-center ${
                         tacticScope === s.id
-                          ? 'bg-sky-500 text-slate-950 border-sky-400 font-black shadow-md shadow-sky-500/20'
-                          : 'bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800'
+                          ? 'bg-sky-600 text-white border-sky-600 font-black shadow-sm'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
                       {s.label}
@@ -3202,7 +3211,7 @@ function TacticsContent() {
 
                 {tacticScope === 'MECZ_LIGOWY' && (
                   <div className="space-y-1">
-                    <label className="block text-[11px] font-bold text-slate-400">
+                    <label className="block text-[11px] font-bold text-slate-600">
                       Wybierz konkretny mecz ligowy LALS:
                     </label>
                     <select
@@ -3215,7 +3224,7 @@ function TacticsContent() {
                           setTacticTitle(`Plan vs ${m.opponent} • R${rotation} (${phase})`);
                         }
                       }}
-                      className="w-full bg-white border border-slate-300 text-slate-800 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-400 font-bold"
+                      className="w-full bg-white border border-slate-300 text-slate-900 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-sky-500 font-bold shadow-2xs"
                     >
                       <option value="">Wybierz mecz ligowy z listy...</option>
                       {matches.map(m => (
@@ -3229,7 +3238,7 @@ function TacticsContent() {
 
                 {tacticScope === 'SPARING' && (
                   <div className="space-y-1">
-                    <label className="block text-[11px] font-bold text-slate-400">
+                    <label className="block text-[11px] font-bold text-slate-600">
                       Wybierz sparing z terminarza:
                     </label>
                     <select
@@ -3242,7 +3251,7 @@ function TacticsContent() {
                           setTacticTitle(`Sparing: ${ev.opponent || ev.title} • R${rotation} (${phase})`);
                         }
                       }}
-                      className="w-full bg-white border border-slate-300 text-slate-800 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-400 font-bold"
+                      className="w-full bg-white border border-slate-300 text-slate-900 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-sky-500 font-bold shadow-2xs"
                     >
                       <option value="">Wybierz sparing z listy...</option>
                       {events.filter(e => e.type === 'SPARING' || e.type === 'TURNIEJ').map(e => (
@@ -3256,7 +3265,7 @@ function TacticsContent() {
 
                 {tacticScope === 'TRENING' && (
                   <div className="space-y-1">
-                    <label className="block text-[11px] font-bold text-slate-400">
+                    <label className="block text-[11px] font-bold text-slate-600">
                       Wybierz trening z terminarza:
                     </label>
                     <select
@@ -3269,7 +3278,7 @@ function TacticsContent() {
                           setTacticTitle(`Trening: ${ev.title} • R${rotation} (${phase})`);
                         }
                       }}
-                      className="w-full bg-white border border-slate-300 text-slate-800 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-400 font-bold"
+                      className="w-full bg-white border border-slate-300 text-slate-900 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-sky-500 font-bold shadow-2xs"
                     >
                       <option value="">Wybierz trening z listy...</option>
                       {events.filter(e => e.type === 'TRENING').map(e => (
@@ -3282,14 +3291,14 @@ function TacticsContent() {
                 )}
 
                 {tacticScope === 'OGOLNA' && (
-                  <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-200 text-xs text-slate-400">
+                  <div className="p-2.5 rounded-xl bg-sky-50 border border-sky-200 text-xs text-sky-900 shadow-2xs">
                     📘 Schemat zostanie zapisany w <strong>Ogólnej Bazie Taktycznej</strong> i będzie dostępny jako podręcznikowy wariant dla całego zespołu.
                   </div>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs font-black uppercase text-slate-300 mb-1">
+                <label className="block text-xs font-black uppercase text-slate-700 mb-1">
                   2. Tytuł wariantu taktycznego *
                 </label>
                 <input
@@ -3298,12 +3307,12 @@ function TacticsContent() {
                   value={tacticTitle}
                   onChange={e => setTacticTitle(e.target.value)}
                   placeholder="np. Plan vs Gladiatorzy: Obrona skrzydła i kontra P1"
-                  className="w-full bg-white border border-slate-300 text-slate-800 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-sky-400 font-bold"
+                  className="w-full bg-white border border-slate-300 text-slate-900 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-sky-500 font-bold shadow-2xs"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-black uppercase text-slate-300 mb-1">
+                <label className="block text-xs font-black uppercase text-slate-700 mb-1">
                   3. Wytyczne i komentarz przedmeczowy (opcjonalnie)
                 </label>
                 <textarea
@@ -3311,7 +3320,7 @@ function TacticsContent() {
                   value={tacticComment}
                   onChange={e => setTacticComment(e.target.value)}
                   placeholder="np. Skrzydłowi zamykają prostą, libero asekuruje na 6. metrze..."
-                  className="w-full bg-white border border-slate-300 text-slate-800 rounded-xl p-3 text-white text-xs focus:outline-none focus:border-sky-400"
+                  className="w-full bg-white border border-slate-300 text-slate-900 rounded-xl p-3 text-xs focus:outline-none focus:border-sky-500 shadow-2xs"
                 />
               </div>
 
@@ -3319,14 +3328,14 @@ function TacticsContent() {
                 <button
                   type="button"
                   onClick={() => setShowSaveModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-800"
                 >
                   Anuluj
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-sky-500 hover:bg-sky-400 text-slate-950 transition shadow-lg shadow-sky-500/20"
+                  className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm"
                 >
                   {saving ? 'Zapisywanie...' : 'Zapisz Zrzut do Meczu'}
                 </button>
@@ -3338,18 +3347,18 @@ function TacticsContent() {
 
       {/* Modal: Player Request Edit / Tactical Feedback to Coach */}
       {showRequestEditModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-200 rounded-2xl w-full max-w-lg p-5 sm:p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg p-5 sm:p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200 text-slate-800">
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div className="flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                <div className="p-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
                   <MessageSquare className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-white uppercase tracking-tight font-athletic">
+                  <h3 className="text-base font-black text-slate-900 uppercase tracking-tight font-athletic">
                     Zgłoś Uwagę / Poproś o Edycję
                   </h3>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-slate-500">
                     Wyślij informację bezpośrednio do trenera prowadzącego taktykę.
                   </p>
                 </div>
@@ -3357,15 +3366,15 @@ function TacticsContent() {
               <button
                 type="button"
                 onClick={() => setShowRequestEditModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             <form onSubmit={handleSendEditRequest} className="space-y-4">
               <div>
-                <label className="block text-xs font-black uppercase text-slate-300 mb-2">
+                <label className="block text-xs font-black uppercase text-slate-700 mb-2">
                   Czego dotyczy Twoja wiadomość?
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -3381,8 +3390,8 @@ function TacticsContent() {
                       onClick={() => setRequestEditType(cat.id as any)}
                       className={`p-2.5 rounded-xl text-xs font-bold border text-left transition ${
                         requestEditType === cat.id
-                          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
-                          : 'bg-slate-100 text-slate-600 border-slate-200 hover:text-white'
+                          ? 'bg-amber-50 text-amber-900 border-amber-300 shadow-2xs font-black'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
                       {cat.label}
@@ -3392,7 +3401,7 @@ function TacticsContent() {
               </div>
 
               <div>
-                <label className="block text-xs font-black uppercase text-slate-300 mb-1">
+                <label className="block text-xs font-black uppercase text-slate-700 mb-1">
                   Treść uwagi lub prośby
                 </label>
                 <textarea
@@ -3407,7 +3416,7 @@ function TacticsContent() {
                       ? 'np. W ustawieniu P3 przy rotacji z mocną zagrywką przeciwnika lepiej, gdybym schodził głębiej do linii 7. metra...'
                       : 'Wpisz treść swojej uwagi lub propozycji...'
                   }
-                  className="w-full bg-white border border-slate-300 text-slate-800 rounded-xl p-3 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                  className="w-full bg-white border border-slate-300 text-slate-900 rounded-xl p-3 text-xs placeholder:text-slate-400 focus:outline-none focus:border-amber-500 shadow-2xs"
                 />
                 <p className="text-[10px] text-slate-500 mt-1">
                   💡 Wiadomość zostanie dodana do oficjalnego panelu dyskusji taktycznej tego spotkania.
@@ -3418,14 +3427,14 @@ function TacticsContent() {
                 <button
                   type="button"
                   onClick={() => setShowRequestEditModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-800"
                 >
                   Anuluj
                 </button>
                 <button
                   type="submit"
                   disabled={submittingRequest || !requestEditText.trim()}
-                  className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 transition shadow-lg shadow-amber-500/20 disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm disabled:opacity-50"
                 >
                   {submittingRequest ? 'Wysyłanie...' : 'Wyślij do Trenera'}
                 </button>

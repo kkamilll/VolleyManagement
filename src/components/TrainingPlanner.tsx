@@ -793,7 +793,7 @@ export function TrainingPlannerContent({
                   onClick={() => setEventTypeFilter('ALL')}
                   className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
                     eventTypeFilter === 'ALL' || eventTypeFilter === 'TRENING'
-                      ? 'bg-slate-900 text-white shadow-xs'
+                      ? 'bg-sky-600 text-white shadow-xs'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                   }`}
                 >
@@ -1069,10 +1069,10 @@ export function TrainingPlannerContent({
                     {activeEvent && (
                       <Link
                         href={`/taktyka?tab=board&eventId=${activeEvent.id}`}
-                        className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-300 font-bold text-xs transition flex items-center gap-1.5 shadow-sm"
+                        className="px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold text-xs transition flex items-center gap-1.5 shadow-xs"
                         title="Otwórz tablicę taktyczną i rozrysuj ustawienie na to spotkanie"
                       >
-                        <Compass className="w-3.5 h-3.5 text-amber-400" />
+                        <Compass className="w-3.5 h-3.5 text-sky-600" />
                         <span className="hidden sm:inline">🎨 Rozrysuj na tablicy</span>
                         <span className="sm:hidden">🎨 Tablica</span>
                       </Link>
@@ -1518,9 +1518,9 @@ export function TrainingPlannerContent({
                         <div
                           key={concl.id}
                           className={`p-4 rounded-2xl border space-y-2 ${
-                            concl.type === 'PLUS' ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-200' :
-                            concl.type === 'MINUS' ? 'bg-rose-950/20 border-rose-500/30 text-rose-200' :
-                            concl.type === 'INDYWIDUALNA' ? 'bg-sky-950/30 border-sky-500/40 text-sky-200' :
+                            concl.type === 'PLUS' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' :
+                            concl.type === 'MINUS' ? 'bg-rose-50 border-rose-200 text-rose-800' :
+                            concl.type === 'INDYWIDUALNA' ? 'bg-sky-50 border-sky-200 text-sky-800' :
                             'bg-slate-50 border-slate-200 text-slate-700'
                           }`}
                         >
