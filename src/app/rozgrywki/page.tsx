@@ -411,6 +411,23 @@ function RozgrywkiContent() {
     }
   };
 
+  const handleDeleteEvent = async (event: EventItem) => {
+    const typeLabel = event.type === 'TURNIEJ' ? 'turniej' : event.type === 'SPARING' ? 'sparing' : 'wydarzenie';
+    if (!confirm(`Czy na pewno chcesz bezpowrotnie usunąć ${typeLabel}: "${event.title}"?`)) return;
+    try {
+      const res = await fetch(`/api/events?id=${event.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setEvents(prev => prev.filter(ev => ev.id !== event.id));
+      } else {
+        const data = await res.json().catch(() => null);
+        alert(data?.error || `Błąd podczas usuwania ${typeLabel}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert(`Wystąpił błąd podczas usuwania ${typeLabel}`);
+    }
+  };
+
   const handleQuickSetTournamentRank = async (event: EventItem, rank: string) => {
     try {
       const updatedResult = {
@@ -2867,6 +2884,15 @@ function RozgrywkiContent() {
                                 <Trophy className="w-3.5 h-3.5" />
                                 {isFinished ? 'Edytuj wynik' : 'Wpisz wynik po sparingu'}
                               </button>
+
+                              <button
+                                onClick={() => handleDeleteEvent(event)}
+                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition flex items-center gap-1.5 shadow-xs"
+                                title="Usuń sparing"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span>Usuń Sparing</span>
+                              </button>
                             </div>
                           </div>
                         )}
@@ -4917,6 +4943,14 @@ function RozgrywkiContent() {
                                 className="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition"
                               >
                                 Pełny Protokół Wyniku
+                              </button>
+                              <button
+                                onClick={() => handleDeleteEvent(event)}
+                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition flex items-center gap-1.5 shadow-xs"
+                                title="Usuń ten turniej"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span>Usuń Turniej</span>
                               </button>
                             </div>
                           </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useSeasonArchive } from '@/lib/season-archive-context';
@@ -581,13 +582,13 @@ export default function Navbar() {
                     )}
                   </div>
 
-                  <a
-                    href="/#komunikaty"
+                  <Link
+                    href="/events"
                     onClick={() => setShowNotifications(false)}
                     className="block text-center mt-3 pt-2 text-xs font-bold text-sky-600 hover:text-sky-800 border-t border-slate-200"
                   >
                     Wszystkie ogłoszenia i ankiety ➔
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>

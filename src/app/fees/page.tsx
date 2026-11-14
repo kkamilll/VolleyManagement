@@ -50,6 +50,7 @@ function FeesContent() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const actionParam = searchParams.get('action');
+  const tabParam = searchParams.get('tab');
 
   const [fees, setFees] = useState<Fee[]>([]);
   const [payments, setPayments] = useState<FeePayment[]>([]);
@@ -344,7 +345,15 @@ function FeesContent() {
   const isPlayer = !isArchiveMode && Boolean(user?.role === 'ZAWODNIK' || (user?.role === 'KIEROWNIK' && user?.number));
   const canManageTreasury = !isArchiveMode && (isManager || user?.role === 'TRENER' || user?.isCaptain);
 
-  const [feesTab, setFeesTab] = useState<'fees_table' | 'expenses_revenues' | 'my_fees'>('fees_table');
+  const [feesTab, setFeesTab] = useState<'fees_table' | 'expenses_revenues' | 'my_fees'>(
+    tabParam === 'my_fees' || tabParam === 'expenses_revenues' ? tabParam : 'fees_table'
+  );
+
+  useEffect(() => {
+    if (tabParam === 'my_fees' || tabParam === 'expenses_revenues' || tabParam === 'fees_table') {
+      setFeesTab(tabParam);
+    }
+  }, [tabParam]);
 
   const filteredPayments = useMemo(() => {
     return payments.filter(p => {

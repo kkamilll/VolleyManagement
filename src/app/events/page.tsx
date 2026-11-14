@@ -273,6 +273,25 @@ function EventsAttendanceContent() {
     fetchData();
   }, []);
 
+  // Auto-expand and scroll to event if eventId query param is present
+  useEffect(() => {
+    if (queryEventId && events.length > 0) {
+      const target = events.find(e => e.id === queryEventId);
+      if (target) {
+        setFilterType('ALL');
+        setFilterTime('ALL');
+        setSearchQuery('');
+        setExpandedEventId(queryEventId);
+        setTimeout(() => {
+          const el = document.getElementById(`event_${queryEventId}`);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 400);
+      }
+    }
+  }, [queryEventId, events]);
+
   // Filter players only for attendance calculations
   const players = useMemo(() => {
     return users.filter(u => u.role === 'ZAWODNIK' || (u.role === 'KIEROWNIK' && Boolean(u.number)));
@@ -1369,6 +1388,7 @@ function EventsAttendanceContent() {
                 return (
                   <div
                     key={event.id}
+                    id={`event_${event.id}`}
                     className={`rounded-2xl border ${theme.cardBorder} ${theme.cardBg} ${theme.leftAccent} ${theme.glow} transition-all duration-300 overflow-hidden`}
                   >
                     {/* Collapsible Header Row (Rozwijany wiersz jednostki) */}
@@ -2818,21 +2838,38 @@ function EventsAttendanceContent() {
               </div>
 
               {/* Actions */}
-              <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
+              <div className="flex items-center justify-between gap-3 pt-3 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => setEditingEvent(null)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 border border-slate-200 font-bold text-slate-700 hover:bg-slate-200"
+                  onClick={() => {
+                    if (editingEvent) {
+                      const id = editingEvent.id;
+                      const title = editingEvent.title;
+                      setEditingEvent(null);
+                      handleDeleteEvent(id, title);
+                    }
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs flex items-center gap-1.5 transition"
                 >
-                  Anuluj
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Usuń to wydarzenie</span>
                 </button>
-                <button
-                  type="submit"
-                  disabled={savingEdit}
-                  className="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black shadow-sm"
-                >
-                  {savingEdit ? 'Zapisywanie...' : 'Zapisz zmiany'}
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingEvent(null)}
+                    className="px-4 py-2 rounded-xl bg-slate-100 border border-slate-200 font-bold text-slate-700 hover:bg-slate-200 text-xs"
+                  >
+                    Anuluj
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={savingEdit}
+                    className="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs shadow-sm"
+                  >
+                    {savingEdit ? 'Zapisywanie...' : 'Zapisz zmiany'}
+                  </button>
+                </div>
               </div>
             </form>
           </div>

@@ -258,10 +258,18 @@ export async function DELETE(request: Request) {
     }
 
     const db = readDatabase();
+    const eventToDelete = db.events.find(e => e.id === id);
+    if (eventToDelete?.linkedFeeId) {
+      db.fees = db.fees.filter(f => f.id !== eventToDelete.linkedFeeId);
+      db.payments = db.payments.filter(p => p.feeId !== eventToDelete.linkedFeeId);
+    }
+    if (db.announcements) {
+      db.announcements = db.announcements.filter(a => !a.id.includes(id) && (!a.link || !a.link.includes(id)));
+    }
     db.events = db.events.filter(e => e.id !== id);
     writeDatabase(db);
 
-    return NextResponse.json({ success: true, message: 'Wydarzenie zostało usunięte' });
+    return NextResponse.json({ success: true, message: 'Wydarzenie zostało pomyślnie usunięte' });
   } catch (error) {
     return NextResponse.json({ error: 'Błąd podczas usuwania wydarzenia' }, { status: 500 });
   }

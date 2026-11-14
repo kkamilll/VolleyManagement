@@ -5,48 +5,29 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useSeasonArchive } from '@/lib/season-archive-context';
 import { 
-  Volleyball, 
   Calendar, 
-  CreditCard, 
-  Users, 
-  Trophy, 
-  Clock, 
   MapPin, 
   ChevronRight, 
-  Sparkles, 
   Flame, 
   Target, 
   CheckCircle2, 
   AlertCircle, 
   HelpCircle, 
-  Megaphone, 
-  ArrowRight,
-  TrendingUp,
-  Coins,
-  Shield,
-  ClipboardList,
-  FolderArchive,
-  Award,
-  Swords,
-  ExternalLink,
-  UserCheck,
-  BarChart3,
-  Crown,
-  Check,
-  Zap,
-  Camera,
-  ImageIcon,
+  CreditCard,
   Pin,
-  X,
-  Download,
-  FileText
+  Clock,
+  ArrowRight,
+  Volleyball,
+  Shield,
+  Users,
+  Check
 } from 'lucide-react';
 import { 
   MatchResult, 
   EventItem, 
   Fee, 
   FeePayment, 
-  Announcement, 
+  Announcement,
   AttendanceStatus,
   User 
 } from '@/lib/types';
@@ -54,39 +35,25 @@ import {
 function DashboardContent() {
   const { user } = useAuth();
   const { isArchiveMode } = useSeasonArchive();
-  const [matches, setMatches] = useState<MatchResult[]>([]);
   const [events, setEvents] = useState<EventItem[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
   const [fees, setFees] = useState<Fee[]>([]);
   const [userPayments, setUserPayments] = useState<FeePayment[]>([]);
   const [treasury, setTreasury] = useState<any>(null);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [seasonArchives, setSeasonArchives] = useState<any[]>([]);
   const [leagueData, setLeagueData] = useState<any>(null);
-  const [leagueReports, setLeagueReports] = useState<any[]>([]);
-  const [leaderboards, setLeaderboards] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [updatingAttendance, setUpdatingAttendance] = useState(false);
-  const [scorerTab, setScorerTab] = useState<'ANGELS' | 'LIGA'>('ANGELS');
-  const [selectedPhoto, setSelectedPhoto] = useState<any | null>(null);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [matchesRes, eventsRes, feesRes, annRes, usersRes, seasonsRes, leagueRes, reportsRes] = await Promise.allSettled([
-        fetch('/api/matches').then(r => r.ok ? r.json() : null).catch(() => null),
+      const [eventsRes, feesRes, annRes, leagueRes] = await Promise.allSettled([
         fetch('/api/events').then(r => r.ok ? r.json() : null).catch(() => null),
         fetch('/api/fees').then(r => r.ok ? r.json() : null).catch(() => null),
         fetch('/api/announcements').then(r => r.ok ? r.json() : null).catch(() => null),
-        fetch('/api/users').then(r => r.ok ? r.json() : null).catch(() => null),
-        fetch('/api/admin/seasons').then(r => r.ok ? r.json() : null).catch(() => null),
-        fetch('/api/league').then(r => r.ok ? r.json() : null).catch(() => null),
-        fetch('/api/league-reports').then(r => r.ok ? r.json() : null).catch(() => null)
+        fetch('/api/league').then(r => r.ok ? r.json() : null).catch(() => null)
       ]);
 
-      if (matchesRes.status === 'fulfilled' && matchesRes.value) {
-        setMatches(matchesRes.value.matches || []);
-      }
       if (eventsRes.status === 'fulfilled' && eventsRes.value) {
         setEvents(eventsRes.value.events || []);
       }
@@ -98,18 +65,8 @@ function DashboardContent() {
       if (annRes.status === 'fulfilled' && annRes.value) {
         setAnnouncements(annRes.value.announcements || []);
       }
-      if (usersRes.status === 'fulfilled' && usersRes.value) {
-        setUsers(usersRes.value.users || []);
-      }
-      if (seasonsRes.status === 'fulfilled' && seasonsRes.value) {
-        setSeasonArchives(seasonsRes.value.seasons || []);
-      }
       if (leagueRes.status === 'fulfilled' && leagueRes.value) {
         setLeagueData(leagueRes.value);
-      }
-      if (reportsRes.status === 'fulfilled' && reportsRes.value) {
-        setLeagueReports(reportsRes.value.reports || []);
-        setLeaderboards(reportsRes.value.leaderboards || null);
       }
     } catch (e) {
       console.error('Error fetching dashboard data:', e);
@@ -122,10 +79,10 @@ function DashboardContent() {
     fetchData();
   }, [user]);
 
-  // Quick 1-click attendance vote right from the dashboard
+  // Quick 1-click attendance vote
   const handleQuickAttendance = async (eventId: string, status: AttendanceStatus) => {
     if (isArchiveMode) {
-      alert('W trybie archiwum głosowanie jest zablokowane.');
+      alert('W trybie archiwum deklarowanie obecności jest zablokowane.');
       return;
     }
     if (!user) {
@@ -149,844 +106,309 @@ function DashboardContent() {
     }
   };
 
-  // Find next upcoming event (match or training)
+  // Nadchodzące wydarzenia (mecze, treningi, sparingi)
+  const now = Date.now() - 3600000 * 12;
   const upcomingEvents = events
-    .filter(e => new Date(e.date).getTime() >= Date.now() - 3600000 * 24)
+    .filter(e => new Date(e.date).getTime() >= now && !e.isCompleted && e.status !== 'ZAKONCZONY')
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  const nextEvent = upcomingEvents[0];
 
-  // Official LALS Schedule matches for Angels ZTP
+  const nextEvent = upcomingEvents[0];
+  const followingEvents = upcomingEvents.slice(1, 4);
+
+  // Terminarz ligowy LALS dla Angels ZTP
   const angelsScheduleMatches = (leagueData?.leagueSchedule || []).filter(
     (m: any) => m.homeTeam === 'Angels ZTP' || m.awayTeam === 'Angels ZTP'
   );
-
-  const officialFinishedMatch = [...angelsScheduleMatches]
-    .reverse()
-    .find((m: any) => m.isFinished);
-
   const officialNextMatch = angelsScheduleMatches.find((m: any) => !m.isFinished);
-  const upcomingAngelsMatches = angelsScheduleMatches.filter((m: any) => !m.isFinished).slice(0, 3);
 
-  // Angels standing in LALS Table
-  const leagueTable: any[] = leagueData?.leagueTable || [];
-  const angelsStanding = leagueTable.find((t: any) => t.teamName?.includes('Angels')) || null;
+  // Status obecności użytkownika na najbliższym wydarzeniu
+  const myStatusRecord = nextEvent?.attendees?.find(a => a.userId === user?.id);
+  const attendingAttendees = nextEvent?.attendees?.filter(a => a.status === 'BEDE') || [];
+  const attendingCount = attendingAttendees.length;
 
-  // Find user's latest fee payment and unpaid totals
+  // Status składki klubowej użytkownika
   const currentPayment = userPayments.length > 0 ? userPayments[0] : null;
   const currentFee = currentPayment ? fees.find(f => f.id === currentPayment.feeId) : null;
   const unpaidUserPayments = userPayments.filter(p => p.status === 'OCZEKUJE' || p.status === 'ZALEGLE');
 
-  // Next event user status
-  const myStatusRecord = nextEvent?.attendees?.find(a => a.userId === user?.id);
-
-  // Squad and attendance
-  const players = users.filter(u => u.role === 'ZAWODNIK' || (u.role === 'KIEROWNIK' && Boolean(u.number)));
-  const completedEvents = events.filter(e => 
-    e.isCompleted || 
-    e.status === 'ZAKONCZONY' || 
-    new Date(e.date).getTime() < Date.now()
-  );
-
-  // Player attendance calculations
-  const playerStats = (players.length > 0 ? players : users).map(p => {
-    let attended = 0;
-    completedEvents.forEach(ev => {
-      const isDecl = ev.attendees?.some(a => a.userId === p.id && a.status === 'BEDE');
-      if (isDecl) {
-        attended++;
-      }
-    });
-    const percent = completedEvents.length > 0 ? Math.round((attended / completedEvents.length) * 100) : 100;
-    return { player: p, attended, total: completedEvents.length, percent };
-  }).sort((a, b) => b.percent - a.percent);
-
-  const teamAverageAttendance = playerStats.length > 0
-    ? Math.round(playerStats.reduce((acc, curr) => acc + curr.percent, 0) / playerStats.length)
-    : 100;
-
-  // Top scorers from official VolleyStation match reports
-  const topAngelsScorers = leaderboards?.angelsScorers?.slice(0, 6) || [
-    { name: 'Łukasz Kremer', number: 17, totalPoints: 33, totalAttack: 31, totalBlock: 1, totalServe: 1 },
-    { name: 'Michał Śmigiel', number: 8, totalPoints: 16, totalAttack: 10, totalBlock: 5, totalServe: 1 },
-    { name: 'Bartosz Augustynek', number: 97, totalPoints: 14, totalAttack: 11, totalBlock: 3, totalServe: 0 },
-    { name: 'Piotr Graczyk', number: 7, totalPoints: 12, totalAttack: 10, totalBlock: 1, totalServe: 1 },
-    { name: 'Wit Król', number: 91, totalPoints: 11, totalAttack: 10, totalBlock: 1, totalServe: 0 },
-    { name: 'Hubert Obara', number: 12, totalPoints: 9, totalAttack: 8, totalBlock: 1, totalServe: 0 }
-  ];
-
-  const topLeagueScorers = leaderboards?.topScorers?.slice(0, 6) || [
-    { name: 'Wojtek Rymarski', team: 'Volleyboars', totalPoints: 52, totalAttack: 37, totalBlock: 6, totalServe: 9 },
-    { name: 'Michał Stelmaszyk', team: 'Gladiatorzy', totalPoints: 46, totalAttack: 39, totalBlock: 5, totalServe: 2 },
-    { name: 'Michał Maliński', team: 'Volleyboars', totalPoints: 37, totalAttack: 29, totalBlock: 6, totalServe: 2 },
-    { name: 'Dominik Olejnik', team: 'Coco Jumbo', totalPoints: 37, totalAttack: 26, totalBlock: 4, totalServe: 7 },
-    { name: 'Łukasz Kremer', team: 'Angels ZTP', totalPoints: 33, totalAttack: 31, totalBlock: 1, totalServe: 1 },
-    { name: 'Kamil Kowalski', team: 'Czelendż', totalPoints: 29, totalAttack: 25, totalBlock: 1, totalServe: 3 }
-  ];
-
-  // Latest photos from gallery
-  const latestPhotos = (leagueData?.leaguePhotos || []).slice(0, 4);
+  // Najważniejsze / pilne ogłoszenie sztabu
+  const urgentAnnouncement = announcements.find(a => a.isPinned || a.priority === 'PILNY' || a.priority === 'WAZNY');
 
   return (
-    <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 pt-4 sm:pt-6 pb-20 md:pb-16 space-y-5 sm:space-y-6">
+    <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7 space-y-6">
       
-      {/* 1. TOP HEADER & QUICK STATS BAR */}
+      {/* 1. NAGŁÓWEK: TYLKO NAJBLIŻSZE SPRAWY */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 font-mono">
-              Lubońska Amatorska Liga Siatkówki (LALS) • Sezon 2026/2027
+              Centrum Drużyny • Angels ZTP
             </span>
           </div>
-          <h1 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight uppercase font-athletic mt-0.5">
-            Pulpit Drużyny Angels ZTP
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight uppercase font-athletic mt-0.5">
+            Najbliższe Sprawy
           </h1>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+        <div className="flex items-center gap-2">
           <Link
-            href="/admin/raport-sezonu?id=current"
-            target="_blank"
-            className="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-xs font-black text-amber-900 transition flex items-center gap-1.5 shadow-2xs uppercase tracking-wide"
-            title="Pobierz oficjalny raport podsumowujący sezon (PDF / Drukuj)"
-          >
-            <FileText className="w-3.5 h-3.5 text-amber-600" />
-            <span>Raport Sezonu (PDF)</span>
-          </Link>
-
-          {seasonArchives.length > 0 && (
-            <Link
-              href="/admin"
-              className="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-xs font-bold text-purple-800 transition flex items-center gap-1.5 shadow-2xs"
-              title="Przejdź do archiwum poprzednich sezonów"
-            >
-              <FolderArchive className="w-3.5 h-3.5 text-purple-600" />
-              <span>Archiwum ({seasonArchives.length})</span>
-            </Link>
-          )}
-
-          <Link
-            href="/rozgrywki?tab=liga"
+            href="/events"
             className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-sky-300 flex items-center gap-2 text-xs font-bold text-slate-800 shadow-2xs transition"
           >
-            <img src="/lals_logo.png" alt="LALS" className="w-5 h-5 rounded-full object-contain" />
-            <span>
-              LALS Faza I: <strong className="text-emerald-700 font-black">{angelsStanding ? `${angelsStanding.position}. Miejsce` : '2. Miejsce'}</strong> ({angelsStanding?.points || 7} pkt • sety {angelsStanding?.setsWon || 8}:{angelsStanding?.setsLost || 3})
-            </span>
+            <Calendar className="w-4 h-4 text-sky-600" />
+            <span>Pełny Terminarz &rarr;</span>
           </Link>
         </div>
       </div>
 
-      {/* 2. SZYBKIE KAFELKI STATUSOWE (CENTRUM DOWODZENIA W 1 MIEJSCU) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
-        <Link
-          href="#mecz-dnia"
-          className="p-3 rounded-2xl bg-white border border-slate-200 hover:border-sky-400 hover:shadow-md transition space-y-1 group"
-        >
-          <div className="flex items-center justify-between text-slate-400 group-hover:text-sky-600">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Mecz Dnia</span>
-            <Flame className="w-4 h-4 text-amber-500" />
-          </div>
-          <div className="text-sm font-black text-slate-900 truncate">vs Coco Jumbo</div>
-          <div className="text-[11px] text-sky-700 font-mono font-bold">Niedz. 18:30</div>
-        </Link>
-
-        <Link
-          href="/rozgrywki?tab=liga"
-          className="p-3 rounded-2xl bg-white border border-slate-200 hover:border-emerald-400 hover:shadow-md transition space-y-1 group"
-        >
-          <div className="flex items-center justify-between text-slate-400 group-hover:text-emerald-600">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Tabela LALS</span>
-            <Trophy className="w-4 h-4 text-emerald-500" />
-          </div>
-          <div className="text-sm font-black text-emerald-700">2. Miejsce</div>
-          <div className="text-[11px] text-slate-500 font-mono">7 pkt (8:3 w setach)</div>
-        </Link>
-
-        <Link
-          href="/taktyka"
-          className="p-3 rounded-2xl bg-white border border-slate-200 hover:border-amber-400 hover:shadow-md transition space-y-1 group"
-        >
-          <div className="flex items-center justify-between text-slate-400 group-hover:text-amber-600">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Plan Taktyki</span>
-            <Target className="w-4 h-4 text-amber-500" />
-          </div>
-          <div className="text-sm font-black text-slate-900">4 Fazy Gry</div>
-          <div className="text-[11px] text-slate-500 font-bold">Przyjęcie, Atak, Blok</div>
-        </Link>
-
-        <Link
-          href="/fees"
-          className="p-3 rounded-2xl bg-white border border-slate-200 hover:border-sky-400 hover:shadow-md transition space-y-1 group"
-        >
-          <div className="flex items-center justify-between text-slate-400 group-hover:text-sky-600">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Kasa Drużyny</span>
-            <Coins className="w-4 h-4 text-sky-600" />
-          </div>
-          <div className="text-sm font-black text-slate-900 font-mono">
-            {treasury?.balance !== undefined ? `${treasury.balance} zł` : '1 250 zł'}
-          </div>
-          <div className="text-[11px] text-emerald-700 font-bold">
-            {unpaidUserPayments.length === 0 ? 'Twoja składka: OK ✓' : 'Zaległość: Sprawdź'}
-          </div>
-        </Link>
-
-        <Link
-          href="/team"
-          className="p-3 rounded-2xl bg-white border border-slate-200 hover:border-purple-400 hover:shadow-md transition space-y-1 group"
-        >
-          <div className="flex items-center justify-between text-slate-400 group-hover:text-purple-600">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Kadra Zespołu</span>
-            <Users className="w-4 h-4 text-purple-600" />
-          </div>
-          <div className="text-sm font-black text-slate-900">15 Siatkarzy</div>
-          <div className="text-[11px] text-slate-500 font-bold">Śr. frekwencja {teamAverageAttendance}%</div>
-        </Link>
-
-        <Link
-          href="/galeria"
-          className="p-3 rounded-2xl bg-white border border-slate-200 hover:border-amber-400 hover:shadow-md transition space-y-1 group"
-        >
-          <div className="flex items-center justify-between text-slate-400 group-hover:text-amber-600">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Fotorelacja</span>
-            <Camera className="w-4 h-4 text-amber-500" />
-          </div>
-          <div className="text-sm font-black text-slate-900 truncate">Albumy z Meczów</div>
-          <div className="text-[11px] text-amber-700 font-bold">Przeglądaj & Dodaj &rarr;</div>
-        </Link>
-      </div>
-
-      {/* 3. HERO CARD: NAJBLIŻSZY MECZ LIGOWY (MATCH OF THE DAY) */}
-      {officialNextMatch && (
-        <div id="mecz-dnia" className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-sky-950 to-slate-900 text-white p-5 sm:p-7 shadow-lg border border-sky-800/40">
+      {/* 2. ELEGANCKA, PROFESJONALNA KARTA MECZU NA SZCZYCIE (HERO MATCH CARD) */}
+      {(nextEvent || officialNextMatch) ? (
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-sky-950 text-white p-5 sm:p-7 shadow-xl border border-sky-800/40 space-y-6">
           <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-          
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            {/* Lewa strona: Informacja o meczu i drużyny */}
-            <div className="space-y-4 flex-1">
-              <div className="flex flex-wrap items-center gap-2.5">
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-amber-400 text-slate-950 flex items-center gap-1 shadow-sm font-sans">
-                  <Flame className="w-3.5 h-3.5 fill-slate-950" />
-                  Mecz na Szczycie LALS (Runda {officialNextMatch.round})
-                </span>
-                <span className="text-xs font-mono text-sky-200 font-bold">
-                  {officialNextMatch.dateStr} • godz. {officialNextMatch.timeStr}
-                </span>
-                <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-white/10 text-white border border-white/15">
-                  Nr {officialNextMatch.matchNumber}
-                </span>
-              </div>
 
-              {/* Starcie rywali */}
-              <div className="flex items-center gap-3 sm:gap-6 flex-wrap sm:flex-nowrap">
-                {/* Drużyna 1: Gospodarz */}
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-xl sm:text-2xl font-black shadow-inner">
-                    👼
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-sky-300 block">Gospodarz (2. Miejsce)</span>
-                    <h2 className="text-xl sm:text-2xl font-black tracking-tight uppercase font-athletic text-white">
-                      {officialNextMatch.homeTeam}
-                    </h2>
-                  </div>
-                </div>
+          {/* GÓRNY PASEK: KATEGORIA, RUNDA, DATA I GODZINA */}
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-white/10 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-amber-400 text-slate-950 flex items-center gap-1.5 shadow-sm font-sans">
+                <Flame className="w-3.5 h-3.5 fill-slate-950" />
+                Najbliższy Mecz Ligowy
+              </span>
+              {officialNextMatch && (
+                <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-white/10 text-slate-200 border border-white/15">
+                  LALS Runda {officialNextMatch.round} • Nr {officialNextMatch.matchNumber}
+                </span>
+              )}
+            </div>
 
-                {/* VS Divider */}
-                <div className="px-3 py-1 rounded-xl bg-white/10 border border-white/20 text-xs font-black uppercase text-amber-300 tracking-wider font-mono">
-                  VS
-                </div>
+            <div className="flex items-center gap-2 text-sky-200 font-mono font-bold">
+              <Clock className="w-3.5 h-3.5 text-sky-400" />
+              <span>
+                {officialNextMatch?.dateStr || (nextEvent ? new Date(nextEvent.date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' }) : '')} • godz. {officialNextMatch?.timeStr || (nextEvent ? new Date(nextEvent.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) : '')}
+              </span>
+            </div>
+          </div>
 
-                {/* Drużyna 2: Gość */}
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-xl sm:text-2xl font-black shadow-inner">
-                    🥥
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-sky-300 block">Rywal (4. Miejsce)</span>
-                    <h2 className="text-xl sm:text-2xl font-black tracking-tight uppercase font-athletic text-white">
-                      {officialNextMatch.awayTeam}
-                    </h2>
-                  </div>
+          {/* ŚRODKOWY SCOREBOARD: POJEDYNEK DRUŻYN */}
+          <div className="relative z-10 grid grid-cols-1 md:grid-cols-7 items-center gap-6 py-2">
+            
+            {/* GOSPODARZ (ANGELS ZTP) */}
+            <div className="md:col-span-3 flex items-center gap-4">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-600 p-0.5 shadow-lg shadow-sky-500/25 shrink-0 flex items-center justify-center">
+                <div className="w-full h-full rounded-2xl bg-slate-900/60 backdrop-blur-xs flex items-center justify-center text-white">
+                  <Volleyball className="w-8 h-8 sm:w-10 sm:h-10 text-sky-300" />
                 </div>
               </div>
-
-              {/* Lokalizacja i szczegóły */}
-              <div className="flex flex-wrap items-center gap-4 text-xs text-sky-200/90 pt-1">
-                <span className="flex items-center gap-1.5 font-medium">
-                  <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
-                  Hala Sportowa OSiR, Luboń
+              <div className="space-y-0.5 min-w-0">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-sky-400 block font-mono">
+                  Gospodarz • 2. Miejsce
                 </span>
-                <span className="flex items-center gap-1.5 font-medium">
-                  <Trophy className="w-4 h-4 text-amber-400 shrink-0" />
-                  Stawka: Utrzymanie strefy bezpośredniego awansu do Finałów (Top 3)
+                <h2 className="text-xl sm:text-2xl font-black tracking-tight uppercase font-athletic text-white truncate">
+                  {officialNextMatch?.homeTeam || 'Angels ZTP'}
+                </h2>
+                <span className="text-xs text-slate-300 font-medium block">
+                  Luboń, Poznań
                 </span>
               </div>
             </div>
 
-            {/* Prawa strona: Szybka deklaracja obecności i akcje */}
-            <div className="lg:w-80 p-4 sm:p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-3 shrink-0">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-sky-200">Twoja deklaracja obecności:</span>
-                <span className="font-black">
-                  {myStatusRecord ? (
-                    myStatusRecord.status === 'BEDE' ? '🟢 Będę na meczu' :
-                    myStatusRecord.status === 'NIEPEWNE' ? '🟡 Niepewne' : '🔴 Nieobecny'
-                  ) : '⚪ Brak deklaracji'}
+            {/* ŚRODEK (VS & LOKALIZACJA) */}
+            <div className="md:col-span-1 flex flex-col items-center justify-center text-center space-y-1 py-2 md:py-0 border-y md:border-y-0 md:border-x border-white/10">
+              <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-xs font-black uppercase text-amber-300 tracking-wider font-mono shadow-inner">
+                VS
+              </div>
+              <div className="text-[11px] text-sky-200/90 font-medium flex items-center gap-1 justify-center pt-1">
+                <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                <span className="truncate max-w-[140px]">{nextEvent?.location || 'Hala OSiR, Luboń'}</span>
+              </div>
+            </div>
+
+            {/* RYWAL (COCO JUMBO) */}
+            <div className="md:col-span-3 flex items-center md:flex-row-reverse gap-4 md:text-right">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 p-0.5 shadow-lg shadow-amber-500/25 shrink-0 flex items-center justify-center">
+                <div className="w-full h-full rounded-2xl bg-slate-900/60 backdrop-blur-xs flex items-center justify-center text-white">
+                  <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-amber-300" />
+                </div>
+              </div>
+              <div className="space-y-0.5 min-w-0">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400 block font-mono">
+                  Rywal • 4. Miejsce
+                </span>
+                <h2 className="text-xl sm:text-2xl font-black tracking-tight uppercase font-athletic text-white truncate">
+                  {officialNextMatch?.awayTeam || nextEvent?.opponent || 'Coco Jumbo'}
+                </h2>
+                <span className="text-xs text-slate-300 font-medium block">
+                  Stawka: Top 3 Ligi
                 </span>
               </div>
+            </div>
 
-              {/* 3 przyciski deklaracji */}
+          </div>
+
+          {/* ZINTEGROWANY DOLNY PASEK: DEKLARACJA OBECNOŚCI & TAKTYKA */}
+          <div className="relative z-10 pt-4 border-t border-white/10 flex flex-col lg:flex-row items-center justify-between gap-4">
+            
+            {/* Lewa strona: Twoja deklaracja obecności */}
+            <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+              <span className="text-xs font-bold text-sky-200 shrink-0">Twoja obecność:</span>
               {nextEvent && (
-                <div className="grid grid-cols-3 gap-2">
+                <div className="inline-flex items-center gap-1.5 p-1 rounded-2xl bg-white/5 border border-white/15">
                   <button
                     onClick={() => handleQuickAttendance(nextEvent.id, 'BEDE')}
                     disabled={updatingAttendance}
-                    className={`py-2 px-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1 shadow-sm ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 ${
                       myStatusRecord?.status === 'BEDE'
-                        ? 'bg-emerald-500 text-slate-950 font-black shadow-emerald-500/30'
-                        : 'bg-white/10 hover:bg-emerald-500/30 text-white border border-white/20'
+                        ? 'bg-emerald-500 text-slate-950 shadow-md'
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
                     }`}
                   >
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Będę
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Będę</span>
                   </button>
                   <button
                     onClick={() => handleQuickAttendance(nextEvent.id, 'NIEPEWNE')}
                     disabled={updatingAttendance}
-                    className={`py-2 px-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1 shadow-sm ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 ${
                       myStatusRecord?.status === 'NIEPEWNE'
-                        ? 'bg-amber-400 text-slate-950 font-black shadow-amber-400/30'
-                        : 'bg-white/10 hover:bg-amber-400/30 text-white border border-white/20'
+                        ? 'bg-amber-400 text-slate-950 shadow-md'
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
                     }`}
                   >
-                    <HelpCircle className="w-3.5 h-3.5" /> Może
+                    <HelpCircle className="w-3.5 h-3.5" />
+                    <span>Może</span>
                   </button>
                   <button
                     onClick={() => handleQuickAttendance(nextEvent.id, 'NIE_BEDE')}
                     disabled={updatingAttendance}
-                    className={`py-2 px-2 rounded-xl text-xs font-black transition flex items-center justify-center gap-1 shadow-sm ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 ${
                       myStatusRecord?.status === 'NIE_BEDE'
-                        ? 'bg-rose-500 text-white font-black shadow-rose-500/30'
-                        : 'bg-white/10 hover:bg-rose-500/30 text-white border border-white/20'
+                        ? 'bg-rose-500 text-white shadow-md'
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
                     }`}
                   >
-                    <AlertCircle className="w-3.5 h-3.5" /> Nie
+                    <AlertCircle className="w-3.5 h-3.5" />
+                    <span>Nieobecny</span>
                   </button>
                 </div>
               )}
+            </div>
 
-              {/* Licznik obecnych */}
-              <div className="text-[11px] text-sky-200/90 pt-1 flex items-center justify-between border-t border-white/10">
-                <span>
-                  👥 Zadeklarowani: <strong className="text-white font-black">{nextEvent?.attendees?.filter(a => a.status === 'BEDE').length || players.length} zawodników</strong>
-                </span>
-                <Link href="/events" className="text-sky-300 hover:text-white underline font-bold">
-                  Skład meczu &rarr;
-                </Link>
-              </div>
+            {/* Prawa strona: Zadeklarowany skład oraz Przycisk do taktyki */}
+            <div className="flex items-center justify-between lg:justify-end gap-4 w-full lg:w-auto">
+              <Link 
+                href={`/events?eventId=${nextEvent?.id || 'evt_lals_1972'}`}
+                className="text-xs text-sky-200/90 hover:text-white transition flex items-center gap-1.5 font-medium"
+              >
+                <Users className="w-4 h-4 text-sky-400" />
+                <span>Zadeklarowani: <strong className="text-white font-black">{attendingCount === 1 ? '1 obecny' : `${attendingCount} obecnych`}</strong></span>
+              </Link>
 
-              {/* Link do taktyki meczowej */}
               <Link
-                href="/taktyka"
-                className="w-full py-2 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 transition shadow-sm"
+                href={`/taktyka?eventId=${nextEvent?.id || 'evt_lals_1972'}`}
+                className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs flex items-center gap-1.5 transition shadow-sm shrink-0"
               >
                 <Target className="w-4 h-4" />
-                <span>Założenia Taktyczne vs Coco Jumbo 🎯</span>
+                <span>Założenia Taktyczne &rarr;</span>
               </Link>
             </div>
+
           </div>
+
+        </div>
+      ) : (
+        <div className="p-8 rounded-3xl bg-slate-50 border border-slate-200 text-center space-y-2">
+          <Calendar className="w-8 h-8 text-slate-400 mx-auto" />
+          <h3 className="text-base font-bold text-slate-700">Brak zaplanowanych meczów w najbliższych dniach</h3>
+          <p className="text-xs text-slate-500">Sztab szkoleniowy wkrótce doda kolejne terminy w terminarzu.</p>
         </div>
       )}
 
-      {/* 4. TABLICA OGŁOSZEŃ SZTABU (KOMUNIKATY TRENERSKIE & KAPITAŃSKIE) */}
-      {announcements.length > 0 && (
-        <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-3">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center border border-amber-500/20">
-                <Megaphone className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight">
-                  Tablica Ogłoszeń & Komunikaty Sztabu
-                </h3>
-                <p className="text-[11px] text-slate-500">Ważne ustalenia od Trenera Huberta Rutkowskiego i Kapitana Łukasza Kremera</p>
-              </div>
-            </div>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
-              {announcements.length} ogłoszenia
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-            {announcements.slice(0, 2).map((ann) => (
-              <div
-                key={ann.id}
-                className={`p-4 rounded-2xl border transition space-y-2 ${
-                  ann.isPinned
-                    ? 'bg-amber-50/60 border-amber-300/80 shadow-2xs'
-                    : 'bg-slate-50 border-slate-200 hover:border-slate-300'
-                }`}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5">
-                    {ann.isPinned && <Pin className="w-3.5 h-3.5 text-amber-600 shrink-0 fill-amber-500" />}
-                    <h4 className="text-xs sm:text-sm font-black text-slate-900 tracking-tight">{ann.title}</h4>
-                  </div>
-                  <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
-                    ann.priority === 'PILNY'
-                      ? 'bg-rose-100 text-rose-800 border border-rose-300'
-                      : 'bg-sky-100 text-sky-800 border border-sky-300'
-                  }`}>
-                    {ann.priority}
-                  </span>
-                </div>
-
-                <p className="text-xs text-slate-700 leading-relaxed font-normal">{ann.content}</p>
-
-                <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-[10px] text-slate-400">
-                  <span className="font-bold text-slate-700">Dodał: {ann.createdByName} ({ann.createdByRole === 'TRENER' ? 'Trener' : 'Kierownik'})</span>
-                  <span>{new Date(ann.createdAt).toLocaleDateString('pl-PL')}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 5. GŁÓWNY UKŁAD 2-KOLUMNOWY: ROZGRYWKI / TABELA / STATYSTYKI */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
+      {/* 3. DWIE GŁÓWNE SEKCJIE: KOLEJNE NAJBLIŻSZE TERMINY ORAZ TWOJE SPRAWY DO ZAŁATWIENIA */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        {/* LEWA KOLUMNA: TABELA LALS, WYNIKI, ZAŁOŻENIA TAKTYCZNE (7 KOLUMN) */}
-        <div className="lg:col-span-7 xl:col-span-8 space-y-5 sm:space-y-6">
-
-          {/* TABELA LALS FAZA I */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
-              <div>
-                <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-sky-600 mb-0.5">
-                  <Trophy className="w-4 h-4 text-sky-600" />
-                  Oficjalna Tabela Ligi LALS (Faza I)
-                </div>
-                <h3 className="text-lg sm:text-xl font-black text-slate-900 uppercase tracking-tight font-athletic">
-                  Grupa Eliminacyjna (7 Drużyn)
-                </h3>
-              </div>
-
-              <Link
-                href="/rozgrywki?tab=liga"
-                className="inline-flex items-center gap-1 text-xs font-black text-sky-600 hover:text-sky-800 transition"
-              >
-                <span>Pełna tabela & mecze</span>
-                <ChevronRight className="w-4 h-4" />
-              </Link>
+        {/* LEWA KOLUMNA: NAJBLIŻSZE KOLEJNE TERMINY (KALENDARZ NA DNI) */}
+        <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-sky-600" />
+              <h3 className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight">
+                Kolejne Najbliższe Terminy
+              </h3>
             </div>
-
-            {/* Informacja o awansie */}
-            <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-xs text-emerald-950 flex items-center justify-between gap-2">
-              <span className="font-bold flex items-center gap-1.5">
-                <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Top 3 uzyskuje bezpośredni awans do Grupy Finałowej!</span>
-              </span>
-              <span className="px-2 py-0.5 rounded-md bg-white border border-emerald-300 font-mono font-black text-emerald-800 text-[10px] shrink-0">
-                Angels ZTP: 2. miejsce
-              </span>
-            </div>
-
-            {/* Tabela skrócona */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-slate-200 text-slate-500 font-black uppercase text-[10px] tracking-wider bg-slate-50/50">
-                    <th className="py-2.5 px-3 text-center">#</th>
-                    <th className="py-2.5 px-3">Drużyna</th>
-                    <th className="py-2.5 px-2 text-center">M</th>
-                    <th className="py-2.5 px-2 text-center">Sety</th>
-                    <th className="py-2.5 px-2 text-center">Pkt</th>
-                    <th className="py-2.5 px-3 text-right">Bilans Małych</th>
-                    <th className="py-2.5 px-3 text-center">Forma</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 font-medium">
-                  {leagueTable.map((team, idx) => {
-                    const isAngels = team.teamName?.includes('Angels');
-                    const isNextOpponent = team.teamName?.includes('Coco');
-                    const isAdvancing = (team.position || idx + 1) <= 3;
-                    return (
-                      <tr 
-                        key={team.id || team.teamName} 
-                        className={`transition ${
-                          isAngels 
-                            ? 'bg-sky-50/80 font-black text-slate-900 border-l-4 border-l-sky-600' 
-                            : isNextOpponent
-                            ? 'bg-amber-50/50 hover:bg-amber-50'
-                            : 'hover:bg-slate-50/80 text-slate-700'
-                        }`}
-                      >
-                        <td className="py-2.5 px-3 text-center font-mono font-black">
-                          <span className={`inline-flex items-center justify-center w-5 h-5 rounded-md ${
-                            isAdvancing 
-                              ? 'bg-emerald-100 text-emerald-800' 
-                              : 'text-slate-400'
-                          }`}>
-                            {team.position || idx + 1}
-                          </span>
-                        </td>
-                        <td className="py-2.5 px-3">
-                          <div className="flex items-center gap-1.5">
-                            <span className="truncate">{team.teamName}</span>
-                            {isAngels && (
-                              <span className="px-1.5 py-0.2 rounded text-[9px] font-black uppercase bg-sky-600 text-white font-sans">
-                                MY
-                              </span>
-                            )}
-                            {isNextOpponent && (
-                              <span className="px-1.5 py-0.2 rounded text-[9px] font-black uppercase bg-amber-200 text-amber-900 font-sans">
-                                JUTRO
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="py-2.5 px-2 text-center font-mono font-bold text-slate-800">{team.matchesPlayed}</td>
-                        <td className="py-2.5 px-2 text-center font-mono font-bold text-slate-800">{team.setsWon}:{team.setsLost}</td>
-                        <td className="py-2.5 px-2 text-center font-mono font-black text-sky-800 text-sm">{team.points}</td>
-                        <td className="py-2.5 px-3 text-right font-mono text-slate-500 text-[11px]">
-                          {team.pointsWon}:{team.pointsLost} ({team.pointsWon - team.pointsLost > 0 ? `+${team.pointsWon - team.pointsLost}` : team.pointsWon - team.pointsLost})
-                        </td>
-                        <td className="py-2.5 px-3 text-center">
-                          <div className="flex items-center justify-center gap-0.5">
-                            {(team.form || []).map((f: string, i: number) => (
-                              <span
-                                key={i}
-                                className={`w-4 h-4 rounded text-[9px] font-black flex items-center justify-center font-mono ${
-                                  f === 'W'
-                                    ? 'bg-emerald-100 text-emerald-800'
-                                    : 'bg-rose-100 text-rose-800'
-                                }`}
-                              >
-                                {f}
-                              </span>
-                            ))}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <Link href="/events" className="text-xs font-bold text-sky-600 hover:text-sky-800">
+              Wszystkie ({events.length}) &rarr;
+            </Link>
           </div>
 
-          {/* OSTATNI WYNIK & KOLEJNE MECZE ANGELS ZTP */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            
-            {/* Ostatni rozegrany mecz: Volleyboars 0:3 Angels ZTP */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-3 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
-                    Ostatni Mecz • Zwycięstwo ✓
-                  </span>
-                  <span className="text-[11px] font-mono font-bold text-slate-400">
-                    8 lis 2026 (Runda 9)
-                  </span>
-                </div>
-
-                <div className="space-y-1">
-                  <div className="text-xs font-bold text-slate-600 uppercase">Volleyboars vs Angels ZTP</div>
-                  <div className="text-3xl font-black font-mono text-slate-900 flex items-center gap-2">
-                    <span className="text-slate-400">0</span>
-                    <span className="text-slate-300">:</span>
-                    <span className="text-emerald-600">3</span>
-                    <span className="text-xs font-sans font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 ml-1">
-                      Angels ZTP wygrywa
-                    </span>
-                  </div>
-                </div>
-
-                {/* Sety */}
-                <div className="flex flex-wrap gap-1.5 pt-2 text-[11px] font-mono text-slate-700">
-                  <span className="px-2 py-0.5 bg-slate-100 border border-slate-200 rounded-lg font-bold">Set 1: 21:25</span>
-                  <span className="px-2 py-0.5 bg-slate-100 border border-slate-200 rounded-lg font-bold">Set 2: 19:25</span>
-                  <span className="px-2 py-0.5 bg-slate-100 border border-slate-200 rounded-lg font-bold">Set 3: 18:25</span>
-                </div>
-
-                {/* MVP */}
-                <div className="mt-3 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 font-bold flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
-                  <span>MVP Meczu: <strong>Hubert Obara (#12)</strong></span>
-                </div>
-              </div>
-
-              <Link
-                href="/rozgrywki?tab=liga"
-                className="inline-flex items-center gap-1 text-xs font-bold text-sky-600 hover:text-sky-800 transition pt-2 border-t border-slate-100"
-              >
-                <span>Zobacz oficjalny protokół</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            {/* Terminarz kolejnych 3 meczów Angels ZTP */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-3 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-sky-700 bg-sky-50 px-2 py-0.5 rounded-lg border border-sky-200">
-                    Terminarz Spotkań LALS
-                  </span>
-                  <Calendar className="w-4 h-4 text-sky-600" />
-                </div>
-
-                <h4 className="text-xs font-black uppercase text-slate-800">Najbliższe spotkania Angels ZTP</h4>
-
-                <div className="space-y-2 pt-1">
-                  {upcomingAngelsMatches.map((m: any, idx: number) => {
-                    const isTomorrow = idx === 0;
-                    return (
-                      <div 
-                        key={m.matchNumber} 
-                        className={`p-2.5 rounded-xl border text-xs flex items-center justify-between gap-2 transition ${
-                          isTomorrow 
-                            ? 'bg-amber-50/80 border-amber-300 font-bold' 
-                            : 'bg-slate-50 border-slate-200 text-slate-700'
-                        }`}
-                      >
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-black text-slate-900">
-                              vs {m.homeTeam === 'Angels ZTP' ? m.awayTeam : m.homeTeam}
-                            </span>
-                            {isTomorrow && (
-                              <span className="px-1.5 py-0.2 rounded text-[9px] font-black uppercase bg-amber-400 text-slate-950 font-sans">
-                                JUTRO
-                              </span>
-                            )}
-                          </div>
-                          <span className="text-[10px] text-slate-500 font-mono">
-                            Runda {m.round} • {m.dateStr.split(',')[0]} • {m.timeStr}
-                          </span>
-                        </div>
-                        <span className="text-[10px] font-mono text-slate-400 font-bold shrink-0">
-                          Nr {m.matchNumber}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <Link
-                href="/events"
-                className="inline-flex items-center gap-1 text-xs font-bold text-sky-600 hover:text-sky-800 transition pt-2 border-t border-slate-100"
-              >
-                <span>Otwórz pełny terminarz ligowy</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </div>
-
-          {/* KĄCIK TAKTYCZNY & WYTYCZNE TRENERA NA NAJBLIŻSZY MECZ */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center border border-amber-500/20">
-                  <Target className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight">
-                    Plan Taktyczny na Mecz: Angels ZTP vs Coco Jumbo
-                  </h3>
-                  <p className="text-[11px] text-slate-500">Wytyczne przygotowane przez trenera Huberta Rutkowskiego</p>
-                </div>
-              </div>
-
-              <Link
-                href="/taktyka"
-                className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1 shadow-sm"
-              >
-                <span>Tablica Taktyczna</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="font-black uppercase text-amber-700 text-[10px] tracking-wider">Zagrywka</span>
-                  <Zap className="w-3.5 h-3.5 text-amber-500" />
-                </div>
-                <p className="text-slate-700 font-medium leading-relaxed">
-                  Celujemy agresywnym flotem w strefę 1 i 5, by odrzucić rywali od siatki i zneutralizować ich środkowych.
-                </p>
-              </div>
-
-              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="font-black uppercase text-sky-700 text-[10px] tracking-wider">Blok & Obrona</span>
-                  <Shield className="w-3.5 h-3.5 text-sky-600" />
-                </div>
-                <p className="text-slate-700 font-medium leading-relaxed">
-                  Zwarty podwójny blok do skrzydła, zamykamy prostą. Libero Tomasz Żądło (#5) kontroluje głęboki skos.
-                </p>
-              </div>
-
-              <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="font-black uppercase text-purple-700 text-[10px] tracking-wider">Rozegranie</span>
-                  <Volleyball className="w-3.5 h-3.5 text-purple-600" />
-                </div>
-                <p className="text-slate-700 font-medium leading-relaxed">
-                  Kamil Pujanek (#4) przyspiesza piłki na lewe skrzydło do Łukasza Kremera (#17) oraz uruchamia pajpa ze strefy 6.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* FOTORELACJE & ZDJĘCIA Z MECZÓW (MINI GALERIA) */}
-          {latestPhotos.length > 0 && (
-            <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-200">
-                    <Camera className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight">
-                      Fotorelacja & Zdjęcia z Meczów
-                    </h3>
-                    <p className="text-[11px] text-slate-500">Najnowsze kadry i albumy ze spotkań Angels ZTP</p>
-                  </div>
-                </div>
-
-                <Link
-                  href="/galeria"
-                  className="inline-flex items-center gap-1 text-xs font-black text-sky-600 hover:text-sky-800 transition"
-                >
-                  <span>Otwórz galerię &rarr;</span>
-                </Link>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {latestPhotos.map((photo: any) => (
-                  <div
-                    key={photo.id}
-                    onClick={() => setSelectedPhoto(photo)}
-                    className="group relative rounded-2xl overflow-hidden border border-slate-200 cursor-pointer aspect-video sm:aspect-square bg-slate-100 hover:border-sky-500 transition"
+          <div className="space-y-2.5">
+            {followingEvents.length > 0 ? (
+              followingEvents.map((ev) => {
+                const evDate = new Date(ev.date);
+                const isMatch = ev.type === 'MECZ';
+                const myEvStatus = ev.attendees?.find(a => a.userId === user?.id);
+                return (
+                  <Link
+                    key={ev.id}
+                    href={`/events?eventId=${ev.id}`}
+                    className="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100/80 border border-slate-200/90 transition flex items-center justify-between gap-3 text-xs group"
                   >
-                    <img
-                      src={photo.url}
-                      alt={photo.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition p-2.5 flex flex-col justify-end text-white">
-                      <span className="text-[11px] font-black truncate">{photo.title}</span>
-                      <span className="text-[9px] text-sky-300 font-mono">{photo.date}</span>
+                    <div className="space-y-0.5 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className={`px-1.5 py-0.2 rounded text-[9px] font-black uppercase ${
+                          isMatch ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-900'
+                        }`}>
+                          {ev.type}
+                        </span>
+                        <h4 className="font-bold text-slate-900 group-hover:text-sky-600 transition truncate">{ev.title}</h4>
+                      </div>
+                      <div className="text-[11px] text-slate-500 font-mono flex items-center gap-2">
+                        <span>{evDate.toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
+                        <span>•</span>
+                        <span>godz. {evDate.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}</span>
+                        {ev.location && (
+                          <>
+                            <span>•</span>
+                            <span className="truncate max-w-[150px]">{ev.location}</span>
+                          </>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
+                    <div className="shrink-0 text-right">
+                      <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black uppercase ${
+                        myEvStatus?.status === 'BEDE' ? 'bg-emerald-100 text-emerald-800' :
+                        myEvStatus?.status === 'NIEPEWNE' ? 'bg-amber-100 text-amber-800' :
+                        myEvStatus?.status === 'NIE_BEDE' ? 'bg-rose-100 text-rose-800' :
+                        'bg-slate-200 text-slate-600'
+                      }`}>
+                        {myEvStatus?.status === 'BEDE' ? 'Będziesz ✓' :
+                         myEvStatus?.status === 'NIEPEWNE' ? 'Niepewne' :
+                         myEvStatus?.status === 'NIE_BEDE' ? 'Nieobecny' : 'Brak głosu'}
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })
+            ) : (
+              <p className="text-xs text-slate-500 py-3 text-center">Brak dalszych terminów w najbliższym tygodniu.</p>
+            )}
+          </div>
+
+          <Link
+            href="/events"
+            className="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition"
+          >
+            <span>Otwórz pełny terminarz meczów i treningów</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
 
-        {/* PRAWA KOLUMNA: RANKING PUNKTUJĄCYCH, FINANSE & KADRA (5 KOLUMN) */}
-        <div className="lg:col-span-5 xl:col-span-4 space-y-5 sm:space-y-6">
+        {/* PRAWA KOLUMNA: TWOJE BIEŻĄCE SPRAWY (SKŁADKA & PILNE OGŁOSZENIE) */}
+        <div className="space-y-6">
 
-          {/* KARTA 1: LIDERZY PUNKTOWI (ZAKŁADKI: ANGELS ZTP / CAŁA LIGA) */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-              <div className="flex items-center gap-2">
-                <Crown className="w-5 h-5 text-amber-500" />
-                <div>
-                  <h3 className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-tight">
-                    Liderzy Punktowi
-                  </h3>
-                  <span className="text-[10px] text-slate-500 font-medium">Oficjalne statystyki VolleyStation</span>
-                </div>
-              </div>
-
-              <div className="flex items-center p-0.5 bg-slate-100 rounded-xl border border-slate-200 text-xs">
-                <button
-                  type="button"
-                  onClick={() => setScorerTab('ANGELS')}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition text-[11px] ${
-                    scorerTab === 'ANGELS'
-                      ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Angels
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setScorerTab('LIGA')}
-                  className={`px-2.5 py-1 rounded-lg font-bold transition text-[11px] ${
-                    scorerTab === 'LIGA'
-                      ? 'bg-sky-600 text-white font-black shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Cała Liga
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              {(scorerTab === 'ANGELS' ? topAngelsScorers : topLeagueScorers).map((p: any, idx: number) => {
-                const isAngels = scorerTab === 'LIGA' && p.team === 'Angels ZTP';
-                return (
-                  <div 
-                    key={p.name} 
-                    className={`p-2.5 rounded-xl border flex items-center justify-between gap-3 text-xs transition ${
-                      isAngels
-                        ? 'bg-sky-50 border-sky-300 font-bold'
-                        : 'bg-slate-50 border-slate-200/90 hover:bg-slate-100/80'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <span className={`w-5 h-5 rounded-md flex items-center justify-center font-mono font-black text-xs ${
-                        idx === 0 ? 'bg-amber-400 text-slate-950 shadow-2xs' :
-                        idx === 1 ? 'bg-slate-200 text-slate-800' :
-                        idx === 2 ? 'bg-amber-100 text-amber-900' :
-                        'text-slate-400 bg-white border border-slate-200'
-                      }`}>
-                        {idx + 1}
-                      </span>
-                      <div className="min-w-0">
-                        <div className="font-bold text-slate-900 truncate flex items-center gap-1.5">
-                          <span className="truncate">{p.name}</span>
-                          {p.number && (
-                            <span className="text-[10px] font-mono font-bold text-slate-400 shrink-0">
-                              #{p.number}
-                            </span>
-                          )}
-                          {p.team && (
-                            <span className="px-1.5 py-0.2 rounded text-[9px] font-black uppercase bg-slate-200 text-slate-700">
-                              {p.team}
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-[10px] text-slate-500 font-mono block">
-                          Atak: {p.totalAttack || 0} • Blok: {p.totalBlock || 0} • Asy: {p.totalServe || 0}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="text-right shrink-0">
-                      <span className="text-sm font-black font-mono text-amber-700">
-                        {p.totalPoints} pkt
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* KARTA 2: TWOJE SKŁADKI & STATUS FINANSOWY */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-3">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+          {/* TWOJE SKŁADKI KLUBOWE */}
+          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-xs space-y-3">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-sky-600" />
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">
@@ -998,7 +420,7 @@ function DashboardContent() {
                   ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                   : 'bg-amber-50 text-amber-800 border-amber-300'
               }`}>
-                {unpaidUserPayments.length === 0 ? 'Wszystko OK ✓' : `${unpaidUserPayments.length} do opłaty`}
+                {unpaidUserPayments.length === 0 ? 'Wszystko OK' : `${unpaidUserPayments.length} do opłaty`}
               </span>
             </div>
 
@@ -1027,109 +449,43 @@ function DashboardContent() {
               </div>
             )}
 
-            <div className="pt-2 flex items-center justify-between text-xs text-slate-500">
-              <span>Skarbiec drużyny: <strong className="text-slate-800 font-mono font-bold">{treasury?.balance !== undefined ? `${treasury.balance} zł` : '1 250 zł'}</strong></span>
+            <div className="pt-2 flex items-center justify-between text-xs text-slate-500 border-t border-slate-100">
+              <span>Skarbiec drużyny: <strong className="text-slate-800 font-mono font-bold">{treasury?.balance !== undefined ? `${treasury.balance} zł` : '0 zł'}</strong></span>
               <Link href="/fees" className="text-sky-600 hover:text-sky-800 font-bold underline">
                 Kasa i składki &rarr;
               </Link>
             </div>
           </div>
 
-          {/* KARTA 3: KADRA ANGELS ZTP (15 ZAWODNIKÓW) */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-3">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-purple-600" />
-                <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">
-                  Oficjalna Kadra (15 Siatkarzy)
-                </h3>
+          {/* WAŻNY KOMUNIKAT PRZEDMECZOWY (JEŚLI JEST) */}
+          {urgentAnnouncement && (
+            <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs space-y-2.5">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <Pin className="w-4 h-4 text-amber-600" />
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-800">
+                    Ważny Komunikat Sztabu
+                  </span>
+                </div>
+                <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase bg-amber-100 text-amber-900 border border-amber-200">
+                  {urgentAnnouncement.priority}
+                </span>
               </div>
-              <Link href="/team" className="text-xs font-bold text-purple-700 hover:text-purple-900">
-                Skład &rarr;
-              </Link>
-            </div>
 
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-                <span className="text-[10px] text-slate-400 font-bold uppercase block">Rozgrywający</span>
-                <span className="font-black text-slate-900">#4 Pujanek • #18 Shetty</span>
+              <div className="space-y-1">
+                <h4 className="text-xs sm:text-sm font-black text-slate-900">{urgentAnnouncement.title}</h4>
+                <p className="text-xs text-slate-600 leading-relaxed font-normal">{urgentAnnouncement.content}</p>
               </div>
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-                <span className="text-[10px] text-slate-400 font-bold uppercase block">Libero</span>
-                <span className="font-black text-slate-900">#5 Tomasz Żądło</span>
-              </div>
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-                <span className="text-[10px] text-slate-400 font-bold uppercase block">Przyjmujący</span>
-                <span className="font-black text-slate-900">#17 Kremer • #12 Obara...</span>
-              </div>
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-                <span className="text-[10px] text-slate-400 font-bold uppercase block">Atakujący</span>
-                <span className="font-black text-slate-900">#97 Augustynek • #91 Król</span>
+
+              <div className="pt-1 text-[10px] text-slate-400 flex items-center justify-between">
+                <span>Autor: {urgentAnnouncement.createdByName}</span>
+                <span>{new Date(urgentAnnouncement.createdAt).toLocaleDateString('pl-PL')}</span>
               </div>
             </div>
+          )}
 
-            <Link
-              href="/team"
-              className="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition mt-2"
-            >
-              <UserCheck className="w-3.5 h-3.5 text-purple-600" />
-              <span>Zobacz pełny skład i profile zawodników</span>
-            </Link>
-          </div>
         </div>
       </div>
-
-      {/* LIGHTBOX MODAL DLA ZDJĘĆ Z PULPITU */}
-      {selectedPhoto && (
-        <div
-          className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex flex-col justify-between p-3 sm:p-6 animate-fadeIn"
-          onClick={() => setSelectedPhoto(null)}
-        >
-          <div className="flex items-center justify-between text-white pb-3 border-b border-white/20" onClick={(e) => e.stopPropagation()}>
-            <div className="truncate max-w-xs sm:max-w-md">
-              <h3 className="text-sm sm:text-base font-black truncate text-white tracking-wide">
-                {selectedPhoto.title}
-              </h3>
-              <p className="text-[10px] text-sky-300 truncate">{selectedPhoto.matchName || 'Fotorelacja Angels ZTP'}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <a
-                href={selectedPhoto.url}
-                target="_blank"
-                rel="noreferrer"
-                download
-                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 text-white hover:text-sky-300 transition shadow-sm"
-                title="Pobierz"
-              >
-                <Download className="w-4 h-4" />
-              </a>
-              <button
-                onClick={() => setSelectedPhoto(null)}
-                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 text-white hover:text-rose-400 transition shadow-sm"
-                title="Zamknij"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          <div className="relative flex-1 flex items-center justify-center my-3" onClick={(e) => e.stopPropagation()}>
-            <img
-              src={selectedPhoto.url}
-              alt={selectedPhoto.title}
-              className="max-h-[75vh] max-w-full rounded-2xl object-contain shadow-2xl"
-            />
-          </div>
-
-          <div className="bg-slate-900/90 border border-white/20 rounded-2xl p-3 sm:p-4 text-xs space-y-1 max-w-3xl mx-auto w-full backdrop-blur-md shadow-2xl text-white" onClick={(e) => e.stopPropagation()}>
-            {selectedPhoto.caption && <p className="text-slate-100 font-medium">{selectedPhoto.caption}</p>}
-            <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-white/10">
-              <span className="text-sky-300 font-bold">{selectedPhoto.matchName || 'Zdjęcie meczowe'}</span>
-              <span>Data: {selectedPhoto.date}</span>
-            </div>
-          </div>
-        </div>
-      )}
 
     </div>
   );

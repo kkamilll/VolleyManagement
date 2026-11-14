@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { Announcement } from '@/lib/types';
 import {
@@ -326,15 +327,18 @@ export default function UnreadAnnouncementPopup() {
         {/* Optional External / Page Link */}
         {current.link && (
           <div className="pt-0.5">
-            <a
+            <Link
               href={current.link}
-              target={current.link.startsWith('http') ? '_blank' : '_self'}
+              onClick={() => {
+                handleClose();
+              }}
+              target={current.link.startsWith('http') ? '_blank' : undefined}
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 font-bold text-xs transition"
             >
               <span>Otwórz powiązany link</span>
               <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
-            </a>
+            </Link>
           </div>
         )}
 
