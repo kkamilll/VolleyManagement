@@ -2081,8 +2081,8 @@ function TacticsContent() {
           
           {/* UNIFIED COMPACT TACTICAL CONSOLE */}
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-2.5 sm:p-3 shadow-sm space-y-2">
-            {/* Row 1: Rotation Selector & Phase Selector */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            {/* Row 1: Rotation Selector, Phase Selector & Orientation */}
+            <div className="flex flex-wrap items-center justify-between gap-2.5">
               {/* Rotation P1 - P6 */}
               <div className="flex items-center gap-1.5">
                 <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider hidden xs:inline">

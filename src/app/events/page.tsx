@@ -1479,7 +1479,7 @@ function EventsAttendanceContent() {
                       </div>
 
                       {/* Prawa strona nagłówka: Duże, widoczne przyciski Akcji (Sparing / Mecz LALS / Trening) oraz Taktyka */}
-                      <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+                      <div className="flex flex-wrap items-center gap-2 shrink-0 self-start sm:self-center">
                         {isLeagueMatch ? (
                           <Link
                             href="/rozgrywki?tab=liga"

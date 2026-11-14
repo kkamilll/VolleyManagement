@@ -219,7 +219,7 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center space-x-1 lg:space-x-1.5 shrink-0">
+          <nav className="hidden xl:flex items-center space-x-1 lg:space-x-1.5 shrink-0">
             <a
               href="/"
               className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
@@ -383,7 +383,7 @@ export default function Navbar() {
 
           {/* User Section & Mobile Hamburger */}
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-            <div className="hidden md:block h-6 w-px bg-slate-200 mx-0.5" />
+            <div className="hidden xl:block h-6 w-px bg-slate-200 mx-0.5" />
 
             {/* Archive Mode Warning Badge (widoczny tylko gdy przeglądamy miniony sezon) */}
             {isArchiveMode && (
@@ -695,7 +695,7 @@ export default function Navbar() {
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 transition shadow-sm"
+              className="xl:hidden p-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 transition shadow-sm"
               aria-label="Menu"
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -706,7 +706,7 @@ export default function Navbar() {
 
       {/* Mobile Navigation Drawer */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-5 space-y-2 animate-fadeIn shadow-xl text-slate-800">
+        <div className="xl:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-5 space-y-2 animate-fadeIn shadow-xl text-slate-800">
           {user && (
             <div className="p-3 mb-2 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
