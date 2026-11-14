@@ -1682,41 +1682,9 @@ function TacticsContent() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
-          {tacticsSection === 'board' && canEdit && (
-            <>
-              {tactics.length > 0 && (
-                <button
-                  onClick={() => setShowLoadTacticModal(true)}
-                  className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
-                  title="Wczytaj zapisany schemat z bazy"
-                >
-                  <FolderArchive className="w-3.5 h-3.5 text-sky-600" />
-                  <span className="hidden sm:inline">Wczytaj ({tactics.length})</span>
-                </button>
-              )}
-
-              <button
-                onClick={handleResetPositions}
-                className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
-                title="Przywróć domyślne pozycje dla tej rotacji i fazy"
-              >
-                <RotateCcw className="w-3.5 h-3.5 text-amber-600" />
-                <span className="hidden sm:inline">Reset</span>
-              </button>
-
-              <button
-                onClick={handleOpenSaveModal}
-                className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-black uppercase tracking-wider transition shadow-sm bg-sky-600 hover:bg-sky-500 text-white"
-              >
-                <Camera className="w-3.5 h-3.5" />
-                <span>Zapisz Zrzut</span>
-              </button>
-            </>
-          )}
-
-          {!canEdit && (
-            isArchiveMode ? (
+        {!canEdit && (
+          <div className="flex items-center gap-2 shrink-0">
+            {isArchiveMode ? (
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 text-xs font-bold shadow-sm">
                 <span>🔒 Archiwum: Tylko do odczytu</span>
               </div>
@@ -1727,18 +1695,19 @@ function TacticsContent() {
               >
                 <span>✋ Poproś o edycję / Zgłoś uwagę</span>
               </button>
-            )
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* GŁÓWNY PODZIAŁ MODUŁU TAKTYKI - 3 PROSTE ZAKŁADKI */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-1.5 rounded-2xl bg-slate-100 border border-slate-200 shadow-sm">
-        <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto scrollbar-none">
+      {/* GŁÓWNY PODZIAŁ MODUŁU TAKTYKI - 3 ZAKŁADKI & KONSOLA AKCJI */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 p-1.5 rounded-2xl bg-slate-100 border border-slate-200 shadow-sm">
+        {/* 3 Zakładki */}
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none w-full lg:w-auto">
           <button
             type="button"
             onClick={() => setTacticsSection('board')}
-            className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
+            className={`flex-1 lg:flex-initial flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
               tacticsSection === 'board'
                 ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
                 : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-50'
@@ -1751,7 +1720,7 @@ function TacticsContent() {
           <button
             type="button"
             onClick={() => setTacticsSection('matches')}
-            className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
+            className={`flex-1 lg:flex-initial flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
               tacticsSection === 'matches'
                 ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
                 : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-50'
@@ -1764,363 +1733,230 @@ function TacticsContent() {
           <button
             type="button"
             onClick={() => setTacticsSection('trainings')}
-            className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
+            className={`flex-1 lg:flex-initial flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
               tacticsSection === 'trainings'
                 ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
                 : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-50'
             }`}
           >
-            <Volleyball className="w-4 h-4 text-emerald-300" />
+            <Volleyball className="w-4 h-4 text-emerald-400" />
             <span>🏐 Treningi</span>
           </button>
         </div>
 
-        {/* Pomocnicza informacja o sekcji */}
-        <div className="text-[11px] text-slate-500 font-medium px-2 hidden lg:flex items-center gap-1.5">
-          {tacticsSection === 'board' && (
-            <span>🎨 Swobodny brudnopis: przesuwaj zawodników, rywali, piłkę i rysuj pisakiem</span>
-          )}
-          {tacticsSection === 'matches' && (
-            <span>🏆 Wybierz mecz lub sparing z Terminarza, aby ustalić założenia i taktykę</span>
-          )}
-          {tacticsSection === 'trainings' && (
-            <span>🏐 Wybierz trening z Terminarza, aby przeglądać i dodawać ćwiczenia ze zrzutami boiska</span>
-          )}
-        </div>
+        {/* Prawa strona w trybie Tablicy: Kontekst i szybkie przyciski */}
+        {tacticsSection === 'board' && (
+          <div className="flex items-center gap-2 flex-wrap lg:flex-nowrap justify-between lg:justify-end w-full lg:w-auto pt-1 lg:pt-0 border-t lg:border-t-0 border-slate-200">
+            {/* Wybór kontekstu tablicy */}
+            <div className="flex items-center gap-1 flex-1 lg:flex-initial min-w-0">
+              <select
+                value={selectedContextKey}
+                onChange={e => setSelectedContextKey(e.target.value)}
+                className="w-full lg:w-auto bg-white border border-slate-300 text-slate-800 rounded-xl px-2.5 py-1.5 text-xs font-bold focus:outline-none focus:border-sky-500 shadow-2xs max-w-[240px] truncate"
+                title="Wybierz wydarzenie, którego dotyczy ta taktyka"
+              >
+                <option value="GENERAL">🌐 Ogólna Tablica Drużyny</option>
+
+                {events.some(e => e.type === 'TRENING') && (
+                  <optgroup label="🏐 Najbliższe Treningi">
+                    {events.filter(e => e.type === 'TRENING').map(e => (
+                      <option key={e.id} value={`EVENT_${e.id}`}>
+                        Trening: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} — {e.title}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+
+                {events.some(e => e.type === 'SPARING') && (
+                  <optgroup label="⚔️ Sparingi">
+                    {events.filter(e => e.type === 'SPARING').map(e => (
+                      <option key={e.id} value={`EVENT_${e.id}`}>
+                        Sparing: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} vs {e.opponent || 'Rywal'}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+
+                {(events.some(e => e.type === 'MECZ' || e.title.toLowerCase().includes('lals') || e.title.toLowerCase().includes('mecz')) || matches.length > 0) && (
+                  <optgroup label="🏆 Mecze Ligowe LALS">
+                    {events.filter(e => e.type === 'MECZ' || e.title.toLowerCase().includes('lals') || e.title.toLowerCase().includes('mecz')).map(e => (
+                      <option key={e.id} value={`EVENT_${e.id}`}>
+                        Mecz LALS: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} vs {e.opponent || 'Rywal'}
+                      </option>
+                    ))}
+                    {matches.map(m => (
+                      <option key={m.id} value={`MATCH_${m.id}`}>
+                        LALS: {new Date(m.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} vs {m.opponent}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+
+                {events.some(e => e.type === 'TURNIEJ') && (
+                  <optgroup label="🥇 Turnieje">
+                    {events.filter(e => e.type === 'TURNIEJ').map(e => (
+                      <option key={e.id} value={`EVENT_${e.id}`}>
+                        Turniej: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} — {e.title}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+              </select>
+
+              {selectedContextKey !== 'GENERAL' && (
+                <button
+                  onClick={() => setSelectedContextKey('GENERAL')}
+                  className="px-2 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 text-xs font-bold transition shadow-2xs whitespace-nowrap"
+                  title="Powrót do ogólnej tablicy"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Narzędzia tablicy */}
+            {canEdit && (
+              <div className="flex items-center gap-1.5 shrink-0">
+                {tactics.length > 0 && (
+                  <button
+                    onClick={() => setShowLoadTacticModal(true)}
+                    className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold transition flex items-center gap-1 shadow-2xs"
+                    title="Wczytaj zapisany schemat z bazy"
+                  >
+                    <FolderArchive className="w-3.5 h-3.5 text-sky-600" />
+                    <span>Wczytaj ({tactics.length})</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={handleResetPositions}
+                  className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold transition flex items-center gap-1 shadow-2xs"
+                  title="Przywróć domyślne pozycje"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-amber-600" />
+                  <span className="hidden sm:inline">Reset</span>
+                </button>
+
+                <button
+                  onClick={handleOpenSaveModal}
+                  className="px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs transition flex items-center gap-1.5 shadow-sm"
+                  title="Zapisz ten schemat"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>Zapisz</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {tacticsSection === 'board' && (
         <>
-
-      {/* ACTIVE TACTIC STATUS BANNER - Eliminates guesswork on whether this is a saved tactic or a draft */}
-      {selectedTactic ? (
-        (() => {
-          const target = getTacticTargetInfo(selectedTactic);
-          return (
-            <div className="p-4 sm:p-5 rounded-3xl bg-sky-50 border-2 border-sky-300 shadow-sm space-y-3">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <div className="flex items-start gap-3.5 min-w-0">
-                  <div className="w-11 h-11 rounded-2xl bg-sky-100 text-sky-700 border border-sky-300 flex items-center justify-center text-2xl shrink-0 shadow-sm">
+          {/* SLIM ACTIVE TACTIC STATUS PILL (Tylko gdy wczytano schemat) */}
+          {selectedTactic && (() => {
+            const target = getTacticTargetInfo(selectedTactic);
+            return (
+              <div className="p-3 sm:p-3.5 rounded-2xl bg-sky-50 border border-sky-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 h-8 rounded-xl bg-sky-600 text-white flex items-center justify-center text-sm shrink-0 font-bold shadow-xs">
                     🎯
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-sky-600 text-white shadow-xs">
-                        Wczytana Taktyka
+                      <span className="text-xs font-black text-slate-900 truncate">
+                        {selectedTactic.title}
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white text-sky-800 border border-sky-200 shadow-2xs">
-                        {target.icon} {target.label} {target.date ? `(${new Date(target.date).toLocaleDateString('pl-PL')})` : ''}
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-white text-sky-800 border border-sky-200">
+                        {target.icon} {target.label}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white text-amber-800 border border-amber-300 shadow-2xs">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-white text-amber-800 border border-amber-300">
                         {selectedTactic.rotation} • {selectedTactic.phase}
                       </span>
                     </div>
-                    <h2 className="text-base sm:text-lg font-black text-slate-900 mt-1 truncate">
-                      {selectedTactic.title}
-                    </h2>
                     {selectedTactic.description && (
-                      <p className="text-xs text-slate-600 line-clamp-1 mt-0.5">
+                      <p className="text-[11px] text-slate-600 line-clamp-1 mt-0.5">
                         {selectedTactic.description}
                       </p>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 flex-wrap shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
                   {canEdit && (
-                    <>
-                      <button
-                        onClick={handleQuickUpdateCurrentTactic}
-                        disabled={saving}
-                        className="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs transition flex items-center gap-1.5 shadow-sm"
-                        title="Nadpisz zmiany (pozycje graczy i rysunki pisakiem) w tej taktyce"
-                      >
-                        <Save className="w-3.5 h-3.5" />
-                        <span>{saving ? 'Zapisywanie...' : 'Zapisz zmiany w tej taktyce'}</span>
-                      </button>
-
-                      <button
-                        onClick={handleOpenSaveModal}
-                        className="px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs"
-                        title="Zapisz ten schemat jako nową kopię dla innego meczu"
-                      >
-                        <Camera className="w-3.5 h-3.5 text-amber-600" />
-                        <span>Klonuj / Nowa</span>
-                      </button>
-                    </>
+                    <button
+                      onClick={handleQuickUpdateCurrentTactic}
+                      disabled={saving}
+                      className="px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-xs"
+                      title="Nadpisz zmiany w tej taktyce"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>{saving ? 'Zapisywanie...' : 'Zapisz zmiany'}</span>
+                    </button>
                   )}
-
                   <button
                     onClick={handleStartNewDraft}
-                    className="px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs"
-                    title="Odłącz tablicę i zacznij czysty, niezapisany szkic"
+                    className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold transition flex items-center gap-1 shadow-2xs"
+                    title="Wróć do czystego szkicu"
                   >
-                    <Plus className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Nowy czysty szkic</span>
+                    <Plus className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Nowy szkic</span>
                   </button>
                 </div>
               </div>
-            </div>
-          );
-        })()
-      ) : (
-        <div className="p-3.5 sm:p-4 rounded-3xl bg-white border border-slate-200 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 flex items-center justify-center text-lg shrink-0 shadow-2xs">
-                📋
-              </div>
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
-                    Nowy Szkic (Niezapisany)
-                  </span>
-                  <span className="text-xs font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
-                    Ustawienie wyjściowe: {rotation} • {phase}
-                  </span>
-                </div>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Możesz swobodnie przestawiać zawodników i rysować pisakiem. Aby zachować ten wariant, kliknij "Zapisz do Meczu / Treningu".
-                </p>
-              </div>
-            </div>
+            );
+          })()}
 
-            <div className="flex items-center gap-2 shrink-0">
-              {canEdit && (
-                <button
-                  onClick={handleOpenSaveModal}
-                  className="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs transition flex items-center gap-1.5 shadow-sm"
-                >
-                  <Save className="w-3.5 h-3.5" />
-                  <span>Zapisz do Meczu / Treningu</span>
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Dedicated Tactical Context Switcher Bar */}
-      <div className="p-3.5 sm:p-4 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3 text-slate-800">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className={`w-9 h-9 rounded-2xl flex items-center justify-center shrink-0 border ${
+          {/* Specialized Unit Command Box (Tylko gdy wybrano konkretny mecz / trening) */}
+          {(activeTargetEvent || activeTargetMatch) && (
+            <div className={`p-3.5 sm:p-4 rounded-2xl border text-xs space-y-3 animate-fadeIn ${
               activeTargetEvent?.type === 'TRENING'
-                ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
+                ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
                 : activeTargetEvent?.type === 'SPARING'
-                ? 'bg-amber-50 border-amber-300 text-amber-700'
+                ? 'bg-amber-50/70 border-amber-200 text-amber-950'
                 : activeTargetEvent?.type === 'TURNIEJ'
-                ? 'bg-purple-50 border-purple-300 text-purple-700'
-                : (activeTargetEvent || activeTargetMatch)
-                ? 'bg-sky-50 border-sky-300 text-sky-700'
-                : 'bg-slate-100 border-slate-200 text-slate-700'
+                ? 'bg-purple-50/70 border-purple-200 text-purple-950'
+                : 'bg-sky-50/70 border-sky-200 text-sky-950'
             }`}>
-              {activeTargetEvent?.type === 'TRENING' ? (
-                <Target className="w-5 h-5" />
-              ) : activeTargetEvent?.type === 'SPARING' ? (
-                <Swords className="w-5 h-5" />
-              ) : activeTargetEvent?.type === 'TURNIEJ' ? (
-                <Trophy className="w-5 h-5" />
-              ) : (activeTargetEvent || activeTargetMatch) ? (
-                <img src="/lals_logo.png" alt="LALS" className="w-5 h-5 rounded-full object-contain" />
-              ) : (
-                <Compass className="w-5 h-5" />
-              )}
-            </div>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-200">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-bold text-slate-900 text-xs">
+                    {activeTargetEvent?.type === 'TRENING'
+                      ? 'Plan Treningowy & Zestawienie Pozycji'
+                      : activeTargetEvent?.type === 'SPARING'
+                      ? `Założenia Sparingowe vs ${activeTargetEvent.opponent || 'Rywal'}`
+                      : activeTargetEvent?.type === 'TURNIEJ'
+                      ? 'Taktyka Turniejowa & Zmiany Zmęczeniowe'
+                      : `Odprawa Meczowa LALS vs ${activeTargetEvent?.opponent || activeTargetMatch?.opponent || 'Rywal'}`}
+                  </span>
 
-            <div className="min-w-0">
-              <div className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                <span>Kontekst Taktyczny:</span>
-                <span className={`px-2 py-0.5 rounded text-[9px] font-mono font-black uppercase border ${
-                  activeTargetEvent?.type === 'TRENING'
-                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                    : activeTargetEvent?.type === 'SPARING'
-                    ? 'bg-amber-50 text-amber-800 border-amber-300'
-                    : activeTargetEvent?.type === 'TURNIEJ'
-                    ? 'bg-purple-50 text-purple-800 border-purple-300'
-                    : (activeTargetEvent || activeTargetMatch)
-                    ? 'bg-sky-50 text-sky-800 border-sky-300'
-                    : 'bg-slate-100 text-slate-600 border-slate-200'
-                }`}>
-                  {activeTargetEvent?.type || (activeTargetMatch ? 'MECZ LALS' : 'OGÓLNA TABLICA')}
-                </span>
-              </div>
-              <h2 className="text-sm sm:text-base font-black text-slate-900 truncate flex items-center gap-2">
-                <span>
-                  {activeTargetEvent
-                    ? activeTargetEvent.title
-                    : activeTargetMatch
-                    ? `Mecz Ligowy LALS vs ${activeTargetMatch.opponent}`
-                    : 'Ogólna Baza Taktyczna Zespołu'}
-                </span>
-              </h2>
-            </div>
-          </div>
-
-          {/* Unit selector dropdown / Locked indicator */}
-          <div className="flex flex-wrap items-center gap-2 shrink-0">
-            {isLockedToUnit ? (
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold shadow-sm">
-                  <Lock className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Zablokowano dla tego wydarzenia</span>
+                  {activeTargetEvent && (
+                    <span className="text-[11px] font-mono text-slate-500">
+                      • {new Date(activeTargetEvent.date).toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' })} • {activeTargetEvent.location}
+                    </span>
+                  )}
                 </div>
 
-                {/* Quick 1-Click Save for this Unit */}
-                {canEdit && (activeTargetEvent || activeTargetMatch) && (
-                  <button
-                    onClick={handleQuickSaveForUnit}
-                    disabled={saving}
-                    className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-md shadow-amber-500/20"
-                    title="Zapisz aktualne rozrysowanie bezpośrednio do tej jednostki"
-                  >
-                    <Save className="w-3.5 h-3.5" />
-                    <span>{saving ? 'Zapisywanie...' : 'Zapisz dla tej jednostki'}</span>
-                  </button>
-                )}
-
-                <Link
-                  href="/events"
-                  className="px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs"
-                  title="Wróć do terminarza"
-                >
-                  <Calendar className="w-3.5 h-3.5 text-sky-600" />
-                  <span>Terminarz</span>
-                </Link>
-
-                <Link
-                  href="/taktyka"
-                  className="px-2.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-amber-700 border border-slate-200 text-[11px] font-medium transition flex items-center gap-1 shadow-2xs"
-                  title="Odblokuj ogólną bazę taktyczną drużyny"
-                >
-                  <Unlock className="w-3 h-3 text-slate-400" />
-                  <span>Odblokuj bazę</span>
-                </Link>
-              </div>
-            ) : (
-              <>
-                <select
-                  value={selectedContextKey}
-                  onChange={e => setSelectedContextKey(e.target.value)}
-                  className="bg-white border border-slate-300 text-slate-900 hover:border-slate-400 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-sky-500 max-w-full sm:max-w-xs shadow-2xs"
-                >
-                  <option value="GENERAL">🌐 Ogólna Tablica Drużyny (Uniwersalna)</option>
-
-                  {/* Treningi */}
-                  {events.some(e => e.type === 'TRENING') && (
-                    <optgroup label="🏐 Najbliższe Treningi">
-                      {events.filter(e => e.type === 'TRENING').map(e => (
-                        <option key={e.id} value={`EVENT_${e.id}`}>
-                          Trening: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} — {e.title}
-                        </option>
-                      ))}
-                    </optgroup>
-                  )}
-
-                  {/* Sparingi */}
-                  {events.some(e => e.type === 'SPARING') && (
-                    <optgroup label="⚔️ Sparingi">
-                      {events.filter(e => e.type === 'SPARING').map(e => (
-                        <option key={e.id} value={`EVENT_${e.id}`}>
-                          Sparing: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} vs {e.opponent || 'Rywal'}
-                        </option>
-                      ))}
-                    </optgroup>
-                  )}
-
-                  {/* Mecze ligowe LALS */}
-                  {(events.some(e => e.type === 'MECZ' || e.title.toLowerCase().includes('lals') || e.title.toLowerCase().includes('mecz')) || matches.length > 0) && (
-                    <optgroup label="🏆 Mecze Ligowe LALS">
-                      {events.filter(e => e.type === 'MECZ' || e.title.toLowerCase().includes('lals') || e.title.toLowerCase().includes('mecz')).map(e => (
-                        <option key={e.id} value={`EVENT_${e.id}`}>
-                          Mecz LALS: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} vs {e.opponent || 'Rywal'}
-                        </option>
-                      ))}
-                      {matches.map(m => (
-                        <option key={m.id} value={`MATCH_${m.id}`}>
-                          LALS Wyniki: {new Date(m.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} vs {m.opponent}
-                        </option>
-                      ))}
-                    </optgroup>
-                  )}
-
-                  {/* Turnieje */}
-                  {events.some(e => e.type === 'TURNIEJ') && (
-                    <optgroup label="🥇 Turnieje">
-                      {events.filter(e => e.type === 'TURNIEJ').map(e => (
-                        <option key={e.id} value={`EVENT_${e.id}`}>
-                          Turniej: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} — {e.title}
-                        </option>
-                      ))}
-                    </optgroup>
-                  )}
-                </select>
-
-                {/* Quick 1-Click Save for this Unit */}
-                {canEdit && (activeTargetEvent || activeTargetMatch) && (
-                  <button
-                    onClick={handleQuickSaveForUnit}
-                    disabled={saving}
-                    className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-sm"
-                    title="Zapisz aktualne rozrysowanie i wytyczne bezpośrednio do tej jednostki"
-                  >
-                    <Save className="w-3.5 h-3.5" />
-                    <span>{saving ? 'Zapisywanie...' : 'Zapisz dla tej jednostki'}</span>
-                  </button>
-                )}
-
-                {selectedContextKey !== 'GENERAL' && (
-                  <button
-                    onClick={() => setSelectedContextKey('GENERAL')}
-                    className="px-2.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 text-xs font-bold transition shadow-2xs"
-                    title="Powrót do ogólnej tablicy"
-                  >
-                    Resetuj kontekst
-                  </button>
-                )}
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Specialized Unit Command Box */}
-        {(activeTargetEvent || activeTargetMatch) && (
-          <div className={`p-3.5 sm:p-4 rounded-2xl border text-xs space-y-3 animate-fadeIn ${
-            activeTargetEvent?.type === 'TRENING'
-              ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
-              : activeTargetEvent?.type === 'SPARING'
-              ? 'bg-amber-50/70 border-amber-200 text-amber-950'
-              : activeTargetEvent?.type === 'TURNIEJ'
-              ? 'bg-purple-50/70 border-purple-200 text-purple-950'
-              : 'bg-sky-50/70 border-sky-200 text-sky-950'
-          }`}>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-200">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="font-bold text-slate-900 text-xs">
-                  {activeTargetEvent?.type === 'TRENING'
-                    ? 'Plan Treningowy & Zestawienie Pozycji'
-                    : activeTargetEvent?.type === 'SPARING'
-                    ? `Założenia Sparingowe vs ${activeTargetEvent.opponent || 'Rywal'}`
-                    : activeTargetEvent?.type === 'TURNIEJ'
-                    ? 'Taktyka Turniejowa & Zmiany Zmęczeniowe'
-                    : `Odprawa Meczowa LALS vs ${activeTargetEvent?.opponent || activeTargetMatch?.opponent || 'Rywal'}`}
-                </span>
-
-                {activeTargetEvent && (
-                  <span className="text-[11px] font-mono text-slate-500">
-                    • {new Date(activeTargetEvent.date).toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' })} • {activeTargetEvent.location}
-                  </span>
-                )}
-              </div>
-
-              {/* Roster & Auto-populate action */}
-              {activeTargetEvent && (
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[11px] font-mono font-bold text-slate-700 px-2 py-0.5 rounded bg-white border border-slate-200 shadow-2xs">
-                    ✓ {(activeTargetEvent.attendees || []).filter(a => a.status === 'BEDE').length} obecnych z ankiety
-                  </span>
+                  {activeTargetEvent && (
+                    <span className="text-[11px] font-mono font-bold text-slate-700 px-2 py-0.5 rounded bg-white border border-slate-200 shadow-2xs">
+                      ✓ {(activeTargetEvent.attendees || []).filter(a => a.status === 'BEDE').length} obecnych z ankiety
+                    </span>
+                  )}
 
-                  {canEdit && (
+                  {canEdit && (activeTargetEvent || activeTargetMatch) && (
+                    <button
+                      onClick={handleQuickSaveForUnit}
+                      disabled={saving}
+                      className="px-2.5 py-1 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] transition flex items-center gap-1 shadow-sm"
+                      title="Zapisz aktualne rozrysowanie bezpośrednio do tej jednostki"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>{saving ? 'Zapisywanie...' : 'Zapisz dla tej jednostki'}</span>
+                    </button>
+                  )}
+
+                  {canEdit && activeTargetEvent && (
                     <button
                       onClick={handlePopulateConfirmedPlayers}
                       className="px-2.5 py-1 rounded-xl bg-white hover:bg-sky-50 text-sky-700 border border-sky-200 text-[11px] font-bold transition flex items-center gap-1 shadow-2xs"
@@ -2131,78 +1967,76 @@ function TacticsContent() {
                     </button>
                   )}
                 </div>
-              )}
-            </div>
+              </div>
 
-            {/* Tactical Directives / Action Points */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase tracking-wider text-amber-800">
-                  Wytyczne Taktyczne & Zadania dla Drużyny:
-                </span>
-                {canEdit && (
-                  <button
-                    onClick={() => setShowDirectiveEditor(!showDirectiveEditor)}
-                    className="text-[10px] text-sky-700 hover:text-sky-900 underline font-bold"
-                  >
-                    {showDirectiveEditor ? 'Zwiń edytor' : '+ Edytuj wytyczne'}
-                  </button>
+              {/* Tactical Directives / Action Points */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-800">
+                    Wytyczne Taktyczne & Zadania dla Drużyny:
+                  </span>
+                  {canEdit && (
+                    <button
+                      onClick={() => setShowDirectiveEditor(!showDirectiveEditor)}
+                      className="text-[10px] text-sky-700 hover:text-sky-900 underline font-bold"
+                    >
+                      {showDirectiveEditor ? 'Zwiń edytor' : '+ Edytuj wytyczne'}
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap gap-1.5">
+                  {unitDirectives.map((dir, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2.5 py-1 rounded-xl bg-white border border-slate-200 text-[11px] text-slate-800 font-medium flex items-center gap-1.5 shadow-2xs"
+                    >
+                      <span>{dir}</span>
+                      {canEdit && showDirectiveEditor && (
+                        <button
+                          onClick={() => setUnitDirectives(unitDirectives.filter((_, i) => i !== idx))}
+                          className="text-slate-400 hover:text-rose-600 ml-1 font-bold"
+                          title="Usuń wytyczną"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </span>
+                  ))}
+                </div>
+
+                {canEdit && showDirectiveEditor && (
+                  <div className="flex items-center gap-2 pt-1 animate-fadeIn">
+                    <input
+                      type="text"
+                      value={newDirectiveInput}
+                      onChange={e => setNewDirectiveInput(e.target.value)}
+                      placeholder="Wpisz nowe zadanie lub wytyczną..."
+                      className="flex-1 bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl px-2.5 py-1 text-xs focus:outline-none focus:border-amber-500 shadow-2xs"
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' && newDirectiveInput.trim()) {
+                          e.preventDefault();
+                          setUnitDirectives([...unitDirectives, newDirectiveInput.trim()]);
+                          setNewDirectiveInput('');
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={() => {
+                        if (newDirectiveInput.trim()) {
+                          setUnitDirectives([...unitDirectives, newDirectiveInput.trim()]);
+                          setNewDirectiveInput('');
+                        }
+                      }}
+                      className="px-3 py-1 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition"
+                    >
+                      Dodaj
+                    </button>
+                  </div>
                 )}
               </div>
-
-              <div className="flex flex-wrap gap-1.5">
-                {unitDirectives.map((dir, idx) => (
-                  <span
-                    key={idx}
-                    className="px-2.5 py-1 rounded-xl bg-white border border-slate-200 text-[11px] text-slate-800 font-medium flex items-center gap-1.5 shadow-2xs"
-                  >
-                    <span>{dir}</span>
-                    {canEdit && showDirectiveEditor && (
-                      <button
-                        onClick={() => setUnitDirectives(unitDirectives.filter((_, i) => i !== idx))}
-                        className="text-slate-400 hover:text-rose-600 ml-1 font-bold"
-                        title="Usuń wytyczną"
-                      >
-                        ×
-                      </button>
-                    )}
-                  </span>
-                ))}
-              </div>
-
-              {canEdit && showDirectiveEditor && (
-                <div className="flex items-center gap-2 pt-1 animate-fadeIn">
-                  <input
-                    type="text"
-                    value={newDirectiveInput}
-                    onChange={e => setNewDirectiveInput(e.target.value)}
-                    placeholder="Wpisz nowe zadanie lub wytyczną..."
-                    className="flex-1 bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl px-2.5 py-1 text-xs focus:outline-none focus:border-amber-500 shadow-2xs"
-                    onKeyDown={e => {
-                      if (e.key === 'Enter' && newDirectiveInput.trim()) {
-                        e.preventDefault();
-                        setUnitDirectives([...unitDirectives, newDirectiveInput.trim()]);
-                        setNewDirectiveInput('');
-                      }
-                    }}
-                  />
-                  <button
-                    onClick={() => {
-                      if (newDirectiveInput.trim()) {
-                        setUnitDirectives([...unitDirectives, newDirectiveInput.trim()]);
-                        setNewDirectiveInput('');
-                      }
-                    }}
-                    className="px-3 py-1 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition"
-                  >
-                    Dodaj
-                  </button>
-                </div>
-              )}
             </div>
-          </div>
-        )}
-      </div>
+          )}
 
       {/* SEKCJA 1: TABLICA TAKTYCZNA (BOISKO I KONSOLA ROZGRYWANIA) */}
       <div className="bg-white border border-slate-200 rounded-3xl p-3 sm:p-5 shadow-sm space-y-4">
