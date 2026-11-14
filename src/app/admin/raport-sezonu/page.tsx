@@ -586,3 +586,4 @@ export default function SeasonReportPage() {
     </Suspense>
   );
 }
+

@@ -25,7 +25,7 @@ interface SnoozeMap {
 }
 
 export default function UnreadAnnouncementPopup() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [activeUnread, setActiveUnread] = useState<Announcement[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -81,6 +81,9 @@ export default function UnreadAnnouncementPopup() {
 
   // Filter unread and non-snoozed announcements
   const evaluateActiveAnnouncements = useCallback((all: Announcement[]) => {
+    // Wait until authentication is finished to prevent flash / race condition
+    if (authLoading) return;
+
     const now = Date.now();
     const snoozeMap = getSnoozeMap();
     const guestRead = getGuestReadList();
@@ -109,10 +112,11 @@ export default function UnreadAnnouncementPopup() {
     } else {
       setIsOpen(false);
     }
-  }, [user]);
+  }, [user, authLoading]);
 
   // Fetch announcements from API
   const fetchAnnouncements = useCallback(async () => {
+    if (authLoading) return;
     try {
       const res = await fetch('/api/announcements');
       if (res.ok) {
@@ -124,10 +128,11 @@ export default function UnreadAnnouncementPopup() {
     } catch (e) {
       console.error('Failed to load announcements for popup:', e);
     }
-  }, [evaluateActiveAnnouncements]);
+  }, [evaluateActiveAnnouncements, authLoading]);
 
-  // Initial fetch and periodic snooze check
+  // Initial fetch once auth is ready, plus periodic background check
   useEffect(() => {
+    if (authLoading) return;
     fetchAnnouncements();
 
     const interval = setInterval(() => {
@@ -143,7 +148,7 @@ export default function UnreadAnnouncementPopup() {
       clearInterval(interval);
       window.removeEventListener('announcementRead', handleExternalRead);
     };
-  }, [fetchAnnouncements]);
+  }, [fetchAnnouncements, authLoading]);
 
   // Current active announcement
   const current = activeUnread[currentIndex];
@@ -207,12 +212,13 @@ export default function UnreadAnnouncementPopup() {
     }
   };
 
-  // Standard dismiss via 'X' or backdrop: snoozes for 30 minutes so user is not repeatedly blocked
-  const handleDismiss = () => {
-    handleSnooze(30);
+  // Explicit close via 'X' button
+  const handleClose = () => {
+    handleSnooze(60); // Snooze for 1 hour on explicit X click
   };
 
-  if (!isOpen || !current) return null;
+  // Do not render if auth is still loading, or if no unread announcements exist
+  if (authLoading || !isOpen || !current) return null;
 
   const isUrgent = current.priority === 'PILNY';
   const isImportant = current.priority === 'WAZNY';
@@ -220,7 +226,6 @@ export default function UnreadAnnouncementPopup() {
   return (
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150"
-      onClick={handleDismiss}
     >
       <div
         onClick={e => e.stopPropagation()}
@@ -229,9 +234,9 @@ export default function UnreadAnnouncementPopup() {
         {/* Top Close Button (X) */}
         <button
           type="button"
-          onClick={handleDismiss}
-          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition flex items-center justify-center"
-          title="Zamknij (przypomnij za 30 min)"
+          onClick={handleClose}
+          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition flex items-center justify-center cursor-pointer"
+          title="Zamknij powiadomienie (przypomnij za 1h)"
         >
           <X className="w-4 h-4" />
         </button>
@@ -271,7 +276,7 @@ export default function UnreadAnnouncementPopup() {
                 type="button"
                 onClick={() => setCurrentIndex(i => Math.max(0, i - 1))}
                 disabled={currentIndex === 0}
-                className="hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                 title="Poprzedni komunikat"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
@@ -281,7 +286,7 @@ export default function UnreadAnnouncementPopup() {
                 type="button"
                 onClick={() => setCurrentIndex(i => Math.min(activeUnread.length - 1, i + 1))}
                 disabled={currentIndex === activeUnread.length - 1}
-                className="hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                 title="Następny komunikat"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -340,7 +345,7 @@ export default function UnreadAnnouncementPopup() {
             <button
               type="button"
               onClick={() => setShowSnoozeOptions(!showSnoozeOptions)}
-              className="w-full sm:w-auto px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition border border-slate-200"
+              className="w-full sm:w-auto px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition border border-slate-200 cursor-pointer"
               title="Przypomnij mi później"
             >
               <Timer className="w-3.5 h-3.5 text-slate-500" />
@@ -363,7 +368,7 @@ export default function UnreadAnnouncementPopup() {
                     key={opt.minutes}
                     type="button"
                     onClick={() => handleSnooze(opt.minutes)}
-                    className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition"
+                    className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition cursor-pointer"
                   >
                     {opt.label}
                   </button>
@@ -377,7 +382,7 @@ export default function UnreadAnnouncementPopup() {
             type="button"
             onClick={handleConfirmRead}
             disabled={marking}
-            className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition disabled:opacity-50"
+            className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition disabled:opacity-50 cursor-pointer"
           >
             <Check className="w-3.5 h-3.5 text-emerald-400" />
             <span>{marking ? 'Zapisywanie...' : 'Potwierdzam przeczytanie'}</span>
