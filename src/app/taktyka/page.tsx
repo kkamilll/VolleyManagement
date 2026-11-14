@@ -70,73 +70,73 @@ import {
 
 // Default initial positions for 5-1 rotations on Full Court (Siatka w połowie: y=50%, Angels ZTP: y=52-95%)
 // Domyślne pozycje wyjściowe dla Angels ZTP:
-// - Środkowi (Ś1: Maciek Noak #47 i Ś2: Kamil Pujanek #4 / Libero: Bartosz Augustynek #97)
+// - Środkowi (Ś1: Maciek Noak #47 i Ś2: Dominik Kruk #10 / Libero: Tomasz Żądło #5)
 // - Przyjmujący (P1: Tomasz Krupa #1 i P2: Michał Śmigiel #8)
-// - Rozgrywający (R: Karol Ordon #28 / Hubert Obara #12) i Atakujący (A: Łukasz Kremer #17)
+// - Rozgrywający (R: Kamil Pujanek #4 / Vikhyath Shetty #18) i Atakujący (A: Łukasz Kremer #17)
 const ROTATION_DEFAULTS: Record<RotationCode, Record<TacticalPhase, CourtPlayerPosition[]>> = {
   P1: {
     PRZYJECIE: [
-      { id: 'p1_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 1, x: 82, y: 84, task: 'Chowa się za P1 (II linia) i po serwisie sprintuje pod siatkę do strefy 2/3' },
+      { id: 'p1_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 1, x: 82, y: 84, task: 'Chowa się za P1 (II linia) i po serwisie sprintuje pod siatkę do strefy 2/3' },
       { id: 'p1_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 2, x: 76, y: 68, task: 'Schodzi ze strefy 2 do linii przyjęcia po prawej stronie' },
       { id: 'p1_s1', name: 'Maciek (Ś1)', number: 47, roleCode: 'Ś1', zone: 3, x: 50, y: 56, task: 'Stoi przy siatce, atak z 1. tempa (krótka na wprost rozgrywającego)' },
       { id: 'p1_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 4, x: 18, y: 56, task: 'Skrzydłowy lewy, atak ze strefy 4 z I linii' },
       { id: 'p1_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 5, x: 24, y: 78, task: 'Przyjęcie lewego sektora boiska w II linii' },
-      { id: 'p1_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 6, x: 50, y: 82, task: 'Dowodzenie przyjęciem w środku (zmienia Ś2 w II linii)' }
+      { id: 'p1_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 6, x: 50, y: 82, task: 'Dowodzenie przyjęciem w środku (zmienia Ś2 w II linii)' }
     ],
     OBRONA: [
-      { id: 'p1_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 1, x: 80, y: 84, task: 'Obrona ataku po prostej' },
+      { id: 'p1_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 1, x: 80, y: 84, task: 'Obrona ataku po prostej' },
       { id: 'p1_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 2, x: 78, y: 56, task: 'Blok prawy (zamyka prostą)' },
       { id: 'p1_s1', name: 'Maciek (Ś1)', number: 47, roleCode: 'Ś1', zone: 3, x: 50, y: 56, task: 'Dostawienie bloku do skrzydła' },
       { id: 'p1_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 4, x: 18, y: 56, task: 'Blok lewy skrzydłowy' },
       { id: 'p1_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 5, x: 22, y: 82, task: 'Obrona ciasnego skosu' },
-      { id: 'p1_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 6, x: 50, y: 86, task: 'Obrona ataku po głębokim skosie' }
+      { id: 'p1_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 6, x: 50, y: 86, task: 'Obrona ataku po głębokim skosie' }
     ],
     ATAK: [
-      { id: 'p1_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 1, x: 65, y: 57, task: 'Wystawa z wyskoku ze strefy 2/3' },
+      { id: 'p1_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 1, x: 65, y: 57, task: 'Wystawa z wyskoku ze strefy 2/3' },
       { id: 'p1_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 2, x: 80, y: 57, task: 'Atak z prawego skrzydła' },
       { id: 'p1_s1', name: 'Maciek (Ś1)', number: 47, roleCode: 'Ś1', zone: 3, x: 50, y: 56, task: 'Szybkie tempo na środku' },
       { id: 'p1_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 4, x: 16, y: 57, task: 'Atak po skosie ze strefy 4' },
       { id: 'p1_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 5, x: 45, y: 74, task: 'Najście na pajpa z 6. metra' },
-      { id: 'p1_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 6, x: 50, y: 82, task: 'Asekuracja atakującego' }
+      { id: 'p1_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 6, x: 50, y: 82, task: 'Asekuracja atakującego' }
     ],
     ZAGRYWKA: [
-      { id: 'p1_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 1, x: 80, y: 94, task: 'Zagrywka taktyczna w strefę 1 lub 5' },
+      { id: 'p1_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 1, x: 80, y: 94, task: 'Zagrywka taktyczna w strefę 1 lub 5' },
       { id: 'p1_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 2, x: 78, y: 56, task: 'Blok prawy' },
       { id: 'p1_s1', name: 'Maciek (Ś1)', number: 47, roleCode: 'Ś1', zone: 3, x: 50, y: 56, task: 'Blok środkowy' },
       { id: 'p1_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 4, x: 18, y: 56, task: 'Blok lewy' },
       { id: 'p1_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 5, x: 24, y: 82, task: 'Obrona skosu' },
-      { id: 'p1_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 6, x: 50, y: 82, task: 'Obrona środka' }
+      { id: 'p1_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 6, x: 50, y: 82, task: 'Obrona środka' }
     ]
   },
   P2: {
     PRZYJECIE: [
-      { id: 'p2_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 1, x: 76, y: 80, task: 'Przyjmuje prawy sektor (zmienia Ś1 w II linii; naprzeciwko Ś2 w strefie 4)' },
-      { id: 'p2_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 2, x: 74, y: 56, task: 'Rozgrywający w I linii w strefie 2, wystawia bezpośrednio z siatki' },
+      { id: 'p2_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 1, x: 76, y: 80, task: 'Przyjmuje prawy sektor (zmienia Ś1 w II linii; naprzeciwko Ś2 w strefie 4)' },
+      { id: 'p2_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 2, x: 74, y: 56, task: 'Rozgrywający w I linii w strefie 2, wystawia bezpośrednio z siatki' },
       { id: 'p2_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 3, x: 32, y: 68, task: 'Schodzi ze strefy 3 do przyjęcia po lewej i przygotowuje atak' },
-      { id: 'p2_s2', name: 'Kamil (Ś2)', number: 4, roleCode: 'Ś2', zone: 4, x: 20, y: 56, task: 'Środkowy 2 w I linii przy siatce (naprzeciwko Libero w strefie 1)' },
+      { id: 'p2_s2', name: 'Dominik (Ś2)', number: 10, roleCode: 'Ś2', zone: 4, x: 20, y: 56, task: 'Środkowy 2 w I linii przy siatce (naprzeciwko Libero w strefie 1)' },
       { id: 'p2_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 5, x: 22, y: 82, task: 'Atakujący w II linii, gotowy do ataku z lewej strony lub pipe' },
       { id: 'p2_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 6, x: 50, y: 80, task: 'Przyjęcie środka boiska w II linii' }
     ],
     OBRONA: [
-      { id: 'p2_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 1, x: 80, y: 84, task: 'Obrona prostej' },
-      { id: 'p2_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 2, x: 78, y: 56, task: 'Blok prawy (zamyka prostą)' },
+      { id: 'p2_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 1, x: 80, y: 84, task: 'Obrona prostej' },
+      { id: 'p2_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 2, x: 78, y: 56, task: 'Blok prawy (zamyka prostą)' },
       { id: 'p2_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 3, x: 18, y: 56, task: 'Przejście na lewe skrzydło do bloku' },
-      { id: 'p2_s2', name: 'Kamil (Ś2)', number: 4, roleCode: 'Ś2', zone: 4, x: 50, y: 56, task: 'Przejście na środek do bloku' },
+      { id: 'p2_s2', name: 'Dominik (Ś2)', number: 10, roleCode: 'Ś2', zone: 4, x: 50, y: 56, task: 'Przejście na środek do bloku' },
       { id: 'p2_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 5, x: 22, y: 82, task: 'Obrona ciasnego skosu' },
       { id: 'p2_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 6, x: 50, y: 86, task: 'Obrona środka' }
     ],
     ATAK: [
-      { id: 'p2_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 2, x: 68, y: 57, task: 'Wystawa i opcja kiwki w 2. kontakcie' },
-      { id: 'p2_s2', name: 'Kamil (Ś2)', number: 4, roleCode: 'Ś2', zone: 4, x: 50, y: 56, task: 'Krótka z 1. tempa na środku' },
+      { id: 'p2_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 2, x: 68, y: 57, task: 'Wystawa i opcja kiwki w 2. kontakcie' },
+      { id: 'p2_s2', name: 'Dominik (Ś2)', number: 10, roleCode: 'Ś2', zone: 4, x: 50, y: 56, task: 'Krótka z 1. tempa na środku' },
       { id: 'p2_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 3, x: 16, y: 57, task: 'Atak z lewego skrzydła (strefa 4)' },
       { id: 'p2_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 5, x: 22, y: 78, task: 'Atak z lewej strony z II linii' },
       { id: 'p2_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 6, x: 50, y: 74, task: 'Wejście na pipe' },
-      { id: 'p2_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 1, x: 75, y: 82, task: 'Asekuracja' }
+      { id: 'p2_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 1, x: 75, y: 82, task: 'Asekuracja' }
     ],
     ZAGRYWKA: [
       { id: 'p2_s1', name: 'Maciek (Ś1)', number: 47, roleCode: 'Ś1', zone: 1, x: 80, y: 94, task: 'Środkowy 1 na zagrywce (po akcji zmiana na Libero)' },
-      { id: 'p2_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 2, x: 78, y: 56, task: 'Blok prawy' },
-      { id: 'p2_s2', name: 'Kamil (Ś2)', number: 4, roleCode: 'Ś2', zone: 4, x: 50, y: 56, task: 'Blok środkowy' },
+      { id: 'p2_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 2, x: 78, y: 56, task: 'Blok prawy' },
+      { id: 'p2_s2', name: 'Dominik (Ś2)', number: 10, roleCode: 'Ś2', zone: 4, x: 50, y: 56, task: 'Blok środkowy' },
       { id: 'p2_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 3, x: 18, y: 56, task: 'Blok lewy' },
       { id: 'p2_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 5, x: 24, y: 82, task: 'Obrona skosu' },
       { id: 'p2_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 6, x: 50, y: 82, task: 'Obrona środka' }
@@ -145,34 +145,34 @@ const ROTATION_DEFAULTS: Record<RotationCode, Record<TacticalPhase, CourtPlayerP
   P3: {
     PRZYJECIE: [
       { id: 'p3_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 1, x: 76, y: 80, task: 'Przyjęcie prawego sektora boiska w II linii' },
-      { id: 'p3_s2', name: 'Kamil (Ś2)', number: 4, roleCode: 'Ś2', zone: 2, x: 80, y: 56, task: 'Środkowy 2 w strefie 2 (I linia), gotowy na obejście za plecy R' },
-      { id: 'p3_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 3, x: 62, y: 56, task: 'Rozgrywający w I linii w strefie 3' },
+      { id: 'p3_s2', name: 'Dominik (Ś2)', number: 10, roleCode: 'Ś2', zone: 2, x: 80, y: 56, task: 'Środkowy 2 w strefie 2 (I linia), gotowy na obejście za plecy R' },
+      { id: 'p3_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 3, x: 62, y: 56, task: 'Rozgrywający w I linii w strefie 3' },
       { id: 'p3_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 4, x: 22, y: 68, task: 'Schodzi ze strefy 4 do przyjęcia po lewej i przygotowuje atak' },
-      { id: 'p3_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 5, x: 38, y: 80, task: 'Zmienia Ś1 w II linii (naprzeciwko Ś2 w strefie 2), przyjmuje środek' },
+      { id: 'p3_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 5, x: 38, y: 80, task: 'Zmienia Ś1 w II linii (naprzeciwko Ś2 w strefie 2), przyjmuje środek' },
       { id: 'p3_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 6, x: 58, y: 84, task: 'Chowa się za R w środku, gotowy do ataku z prawej II linii' }
     ],
     OBRONA: [
       { id: 'p3_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 1, x: 80, y: 84, task: 'Obrona po prostej' },
-      { id: 'p3_s2', name: 'Kamil (Ś2)', number: 4, roleCode: 'Ś2', zone: 2, x: 50, y: 56, task: 'Przejście na środek do bloku' },
-      { id: 'p3_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 3, x: 78, y: 56, task: 'Przejście na prawe skrzydło do bloku' },
+      { id: 'p3_s2', name: 'Dominik (Ś2)', number: 10, roleCode: 'Ś2', zone: 2, x: 50, y: 56, task: 'Przejście na środek do bloku' },
+      { id: 'p3_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 3, x: 78, y: 56, task: 'Przejście na prawe skrzydło do bloku' },
       { id: 'p3_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 4, x: 18, y: 56, task: 'Blok lewy' },
-      { id: 'p3_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 5, x: 22, y: 84, task: 'Obrona skosu' },
+      { id: 'p3_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 5, x: 22, y: 84, task: 'Obrona skosu' },
       { id: 'p3_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 6, x: 50, y: 86, task: 'Obrona środka' }
     ],
     ATAK: [
-      { id: 'p3_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 3, x: 65, y: 57, task: 'Wystawa piłki ze strefy 2/3' },
+      { id: 'p3_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 3, x: 65, y: 57, task: 'Wystawa piłki ze strefy 2/3' },
       { id: 'p3_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 4, x: 16, y: 57, task: 'Atak ze skrzydła lewego' },
-      { id: 'p3_s2', name: 'Kamil (Ś2)', number: 4, roleCode: 'Ś2', zone: 2, x: 50, y: 56, task: 'Krótka na środku lub obejście za głowę' },
+      { id: 'p3_s2', name: 'Dominik (Ś2)', number: 10, roleCode: 'Ś2', zone: 2, x: 50, y: 56, task: 'Krótka na środku lub obejście za głowę' },
       { id: 'p3_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 6, x: 82, y: 78, task: 'Atak z prawej strony II linii' },
       { id: 'p3_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 1, x: 45, y: 74, task: 'Wejście na pipe' },
-      { id: 'p3_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 5, x: 50, y: 82, task: 'Asekuracja' }
+      { id: 'p3_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 5, x: 50, y: 82, task: 'Asekuracja' }
     ],
     ZAGRYWKA: [
       { id: 'p3_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 1, x: 80, y: 94, task: 'Mocna zagrywka kierunkowa' },
-      { id: 'p3_s2', name: 'Kamil (Ś2)', number: 4, roleCode: 'Ś2', zone: 2, x: 50, y: 56, task: 'Blok środkowy' },
-      { id: 'p3_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 3, x: 78, y: 56, task: 'Blok prawy' },
+      { id: 'p3_s2', name: 'Dominik (Ś2)', number: 10, roleCode: 'Ś2', zone: 2, x: 50, y: 56, task: 'Blok środkowy' },
+      { id: 'p3_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 3, x: 78, y: 56, task: 'Blok prawy' },
       { id: 'p3_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 4, x: 18, y: 56, task: 'Blok lewy' },
-      { id: 'p3_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 5, x: 24, y: 82, task: 'Obrona skosu' },
+      { id: 'p3_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 5, x: 24, y: 82, task: 'Obrona skosu' },
       { id: 'p3_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 6, x: 50, y: 82, task: 'Obrona środka' }
     ]
   },
@@ -180,67 +180,67 @@ const ROTATION_DEFAULTS: Record<RotationCode, Record<TacticalPhase, CourtPlayerP
     PRZYJECIE: [
       { id: 'p4_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 1, x: 80, y: 84, task: 'Atakujący w II linii, gotowy do ataku z prawej strony' },
       { id: 'p4_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 2, x: 76, y: 68, task: 'Schodzi ze strefy 2 do przyjęcia po prawej stronie' },
-      { id: 'p4_s2', name: 'Kamil (Ś2)', number: 4, roleCode: 'Ś2', zone: 3, x: 50, y: 56, task: 'Środkowy 2 w strefie 3 (naprzeciwko Libero w strefie 6)' },
-      { id: 'p4_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 4, x: 24, y: 56, task: 'Rozgrywający w I linii w strefie 4, przesuwa się na pozycję rozegrania' },
+      { id: 'p4_s2', name: 'Dominik (Ś2)', number: 10, roleCode: 'Ś2', zone: 3, x: 50, y: 56, task: 'Środkowy 2 w strefie 3 (naprzeciwko Libero w strefie 6)' },
+      { id: 'p4_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 4, x: 24, y: 56, task: 'Rozgrywający w I linii w strefie 4, przesuwa się na pozycję rozegrania' },
       { id: 'p4_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 5, x: 26, y: 80, task: 'Przyjęcie lewego sektora boiska' },
-      { id: 'p4_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 6, x: 50, y: 82, task: 'Zmienia Ś1 w II linii (naprzeciwko Ś2 w strefie 3), przyjmuje środek' }
+      { id: 'p4_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 6, x: 50, y: 82, task: 'Zmienia Ś1 w II linii (naprzeciwko Ś2 w strefie 3), przyjmuje środek' }
     ],
     OBRONA: [
       { id: 'p4_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 1, x: 80, y: 84, task: 'Obrona prostej' },
       { id: 'p4_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 2, x: 18, y: 56, task: 'Przejście na lewe skrzydło do bloku' },
-      { id: 'p4_s2', name: 'Kamil (Ś2)', number: 4, roleCode: 'Ś2', zone: 3, x: 50, y: 56, task: 'Blok środkowy' },
-      { id: 'p4_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 4, x: 78, y: 56, task: 'Przejście na prawe skrzydło do bloku' },
+      { id: 'p4_s2', name: 'Dominik (Ś2)', number: 10, roleCode: 'Ś2', zone: 3, x: 50, y: 56, task: 'Blok środkowy' },
+      { id: 'p4_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 4, x: 78, y: 56, task: 'Przejście na prawe skrzydło do bloku' },
       { id: 'p4_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 5, x: 22, y: 82, task: 'Obrona skosu' },
-      { id: 'p4_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 6, x: 50, y: 86, task: 'Obrona środka' }
+      { id: 'p4_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 6, x: 50, y: 86, task: 'Obrona środka' }
     ],
     ATAK: [
-      { id: 'p4_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 4, x: 65, y: 57, task: 'Rozegranie pod siatką (opcja kiwki w 2. kontakcie)' },
-      { id: 'p4_s2', name: 'Kamil (Ś2)', number: 4, roleCode: 'Ś2', zone: 3, x: 50, y: 56, task: 'Krótka ze środka' },
+      { id: 'p4_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 4, x: 65, y: 57, task: 'Rozegranie pod siatką (opcja kiwki w 2. kontakcie)' },
+      { id: 'p4_s2', name: 'Dominik (Ś2)', number: 10, roleCode: 'Ś2', zone: 3, x: 50, y: 56, task: 'Krótka ze środka' },
       { id: 'p4_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 2, x: 16, y: 57, task: 'Atak ze strefy 4 (lewe skrzydło)' },
       { id: 'p4_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 1, x: 82, y: 78, task: 'Atak z prawej II linii' },
       { id: 'p4_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 5, x: 45, y: 74, task: 'Pipe ze środka' },
-      { id: 'p4_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 6, x: 48, y: 82, task: 'Asekuracja' }
+      { id: 'p4_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 6, x: 48, y: 82, task: 'Asekuracja' }
     ],
     ZAGRYWKA: [
       { id: 'p4_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 1, x: 80, y: 94, task: 'Mocna zagrywka po prostej' },
-      { id: 'p4_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 4, x: 78, y: 56, task: 'Blok prawy' },
-      { id: 'p4_s2', name: 'Kamil (Ś2)', number: 4, roleCode: 'Ś2', zone: 3, x: 50, y: 56, task: 'Blok środkowy' },
+      { id: 'p4_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 4, x: 78, y: 56, task: 'Blok prawy' },
+      { id: 'p4_s2', name: 'Dominik (Ś2)', number: 10, roleCode: 'Ś2', zone: 3, x: 50, y: 56, task: 'Blok środkowy' },
       { id: 'p4_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 2, x: 18, y: 56, task: 'Blok lewy' },
       { id: 'p4_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 5, x: 24, y: 82, task: 'Obrona skosu' },
-      { id: 'p4_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 6, x: 50, y: 82, task: 'Obrona środka' }
+      { id: 'p4_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 6, x: 50, y: 82, task: 'Obrona środka' }
     ]
   },
   P5: {
     PRZYJECIE: [
-      { id: 'p5_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 1, x: 78, y: 80, task: 'Zmienia Ś2 w II linii (naprzeciwko Ś1 w strefie 4), przyjmuje prawy sektor' },
+      { id: 'p5_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 1, x: 78, y: 80, task: 'Zmienia Ś2 w II linii (naprzeciwko Ś1 w strefie 4), przyjmuje prawy sektor' },
       { id: 'p5_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 2, x: 80, y: 56, task: 'Atakujący w I linii w strefie 2, gotowy do ataku ze skrzydła' },
       { id: 'p5_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 3, x: 42, y: 70, task: 'Schodzi ze strefy 3 do linii przyjęcia' },
       { id: 'p5_s1', name: 'Maciek (Ś1)', number: 47, roleCode: 'Ś1', zone: 4, x: 20, y: 56, task: 'Środkowy 1 przy siatce po lewej (naprzeciwko Libero w strefie 1)' },
-      { id: 'p5_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 5, x: 18, y: 80, task: 'Chowa się za Ś1 w lewym rogu i sprintuje pod siatkę' },
+      { id: 'p5_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 5, x: 18, y: 80, task: 'Chowa się za Ś1 w lewym rogu i sprintuje pod siatkę' },
       { id: 'p5_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 6, x: 52, y: 80, task: 'Przyjęcie lewego/środkowego sektora boiska' }
     ],
     OBRONA: [
-      { id: 'p5_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 1, x: 80, y: 84, task: 'Obrona po prostej' },
+      { id: 'p5_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 1, x: 80, y: 84, task: 'Obrona po prostej' },
       { id: 'p5_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 2, x: 78, y: 56, task: 'Blok prawy skrzydłowy' },
       { id: 'p5_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 3, x: 18, y: 56, task: 'Przejście na lewe skrzydło do bloku' },
       { id: 'p5_s1', name: 'Maciek (Ś1)', number: 47, roleCode: 'Ś1', zone: 4, x: 50, y: 56, task: 'Przejście na środek do bloku' },
-      { id: 'p5_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 5, x: 22, y: 82, task: 'Obrona ciasnego skosu' },
+      { id: 'p5_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 5, x: 22, y: 82, task: 'Obrona ciasnego skosu' },
       { id: 'p5_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 6, x: 50, y: 86, task: 'Obrona środka' }
     ],
     ATAK: [
-      { id: 'p5_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 5, x: 65, y: 57, task: 'Wystawa zbiegowa ze strefy 2/3' },
+      { id: 'p5_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 5, x: 65, y: 57, task: 'Wystawa zbiegowa ze strefy 2/3' },
       { id: 'p5_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 2, x: 80, y: 57, task: 'Atak z prawego skrzydła ze strefy 2' },
       { id: 'p5_s1', name: 'Maciek (Ś1)', number: 47, roleCode: 'Ś1', zone: 4, x: 50, y: 56, task: 'Krótka na środku' },
       { id: 'p5_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 3, x: 16, y: 57, task: 'Atak ze strefy 4 po przejściu' },
       { id: 'p5_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 6, x: 45, y: 74, task: 'Pipe ze strefy 6' },
-      { id: 'p5_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 1, x: 50, y: 82, task: 'Asekuracja' }
+      { id: 'p5_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 1, x: 50, y: 82, task: 'Asekuracja' }
     ],
     ZAGRYWKA: [
-      { id: 'p5_s2', name: 'Kamil (Ś2)', number: 4, roleCode: 'Ś2', zone: 1, x: 80, y: 94, task: 'Środkowy 2 na zagrywce' },
+      { id: 'p5_s2', name: 'Dominik (Ś2)', number: 10, roleCode: 'Ś2', zone: 1, x: 80, y: 94, task: 'Środkowy 2 na zagrywce' },
       { id: 'p5_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 2, x: 78, y: 56, task: 'Blok prawy' },
       { id: 'p5_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 3, x: 18, y: 56, task: 'Blok lewy' },
       { id: 'p5_s1', name: 'Maciek (Ś1)', number: 47, roleCode: 'Ś1', zone: 4, x: 50, y: 56, task: 'Blok środkowy' },
-      { id: 'p5_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 5, x: 24, y: 82, task: 'Obrona skosu' },
+      { id: 'p5_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 5, x: 24, y: 82, task: 'Obrona skosu' },
       { id: 'p5_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 6, x: 50, y: 82, task: 'Obrona środka' }
     ]
   },
@@ -250,32 +250,32 @@ const ROTATION_DEFAULTS: Record<RotationCode, Record<TacticalPhase, CourtPlayerP
       { id: 'p6_s1', name: 'Maciek (Ś1)', number: 47, roleCode: 'Ś1', zone: 2, x: 80, y: 56, task: 'Środkowy 1 w strefie 2 (naprzeciwko Libero w strefie 5)' },
       { id: 'p6_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 3, x: 52, y: 56, task: 'Atakujący w strefie 3, gotowy do nabiegu na prawe skrzydło' },
       { id: 'p6_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 4, x: 24, y: 68, task: 'Schodzi ze strefy 4 do linii przyjęcia' },
-      { id: 'p6_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 5, x: 36, y: 80, task: 'Zmienia Ś2 w II linii (naprzeciwko Ś1 w strefie 2), przyjmuje lewy/środek' },
-      { id: 'p6_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 6, x: 50, y: 74, task: 'Chowa się za A w środku i po zagrywce biegnie pod siatkę' }
+      { id: 'p6_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 5, x: 36, y: 80, task: 'Zmienia Ś2 w II linii (naprzeciwko Ś1 w strefie 2), przyjmuje lewy/środek' },
+      { id: 'p6_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 6, x: 50, y: 74, task: 'Chowa się za A w środku i po zagrywce biegnie pod siatkę' }
     ],
     OBRONA: [
       { id: 'p6_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 1, x: 80, y: 84, task: 'Obrona po prostej' },
       { id: 'p6_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 3, x: 78, y: 56, task: 'Przejście na prawe skrzydło do bloku' },
       { id: 'p6_s1', name: 'Maciek (Ś1)', number: 47, roleCode: 'Ś1', zone: 2, x: 50, y: 56, task: 'Przejście na środek do bloku' },
       { id: 'p6_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 4, x: 18, y: 56, task: 'Blok lewy' },
-      { id: 'p6_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 5, x: 22, y: 82, task: 'Obrona ciasnego skosu' },
-      { id: 'p6_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 6, x: 50, y: 85, task: 'Obrona środka' }
+      { id: 'p6_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 5, x: 22, y: 82, task: 'Obrona ciasnego skosu' },
+      { id: 'p6_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 6, x: 50, y: 85, task: 'Obrona środka' }
     ],
     ATAK: [
-      { id: 'p6_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 6, x: 65, y: 57, task: 'Wystawa ze strefy 2/3 po zbiegu ze środka' },
+      { id: 'p6_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 6, x: 65, y: 57, task: 'Wystawa ze strefy 2/3 po zbiegu ze środka' },
       { id: 'p6_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 3, x: 80, y: 57, task: 'Atak z prawego skrzydła ze strefy 2' },
       { id: 'p6_s1', name: 'Maciek (Ś1)', number: 47, roleCode: 'Ś1', zone: 2, x: 50, y: 56, task: 'Krótka na środku' },
       { id: 'p6_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 4, x: 18, y: 57, task: 'Atak ze strefy 4' },
       { id: 'p6_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 1, x: 75, y: 78, task: 'Wejście z II linii / asekuracja' },
-      { id: 'p6_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 5, x: 25, y: 82, task: 'Asekuracja skrzydeł' }
+      { id: 'p6_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 5, x: 25, y: 82, task: 'Asekuracja skrzydeł' }
     ],
     ZAGRYWKA: [
       { id: 'p6_p1', name: 'Tomasz (P1)', number: 1, roleCode: 'P1', zone: 1, x: 80, y: 94, task: 'Mocna zagrywka z wyskoku' },
       { id: 'p6_a', name: 'Łukasz (A)', number: 17, roleCode: 'A', zone: 3, x: 78, y: 56, task: 'Blok prawy' },
       { id: 'p6_s1', name: 'Maciek (Ś1)', number: 47, roleCode: 'Ś1', zone: 2, x: 50, y: 56, task: 'Blok środkowy' },
       { id: 'p6_p2', name: 'Michał (P2)', number: 8, roleCode: 'P2', zone: 4, x: 18, y: 56, task: 'Blok lewy' },
-      { id: 'p6_l', name: 'Bartosz (L)', number: 97, roleCode: 'L', zone: 5, x: 24, y: 82, task: 'Obrona skosu' },
-      { id: 'p6_r', name: 'Karol (R)', number: 28, roleCode: 'R', zone: 6, x: 50, y: 82, task: 'Obrona środka' }
+      { id: 'p6_l', name: 'Tomasz (L)', number: 5, roleCode: 'L', zone: 5, x: 24, y: 82, task: 'Obrona skosu' },
+      { id: 'p6_r', name: 'Kamil (R)', number: 4, roleCode: 'R', zone: 6, x: 50, y: 82, task: 'Obrona środka' }
     ]
   }
 };
