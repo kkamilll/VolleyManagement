@@ -1802,7 +1802,7 @@ function TacticsContent() {
             }`}
           >
             <Compass className="w-4 h-4 text-amber-300" />
-            <span>🎨 Tablica (Brudnopis)</span>
+            <span>🎯 Tablica Taktyczna (Boisko)</span>
           </button>
 
           <button
@@ -1815,7 +1815,7 @@ function TacticsContent() {
             }`}
           >
             <Trophy className="w-4 h-4 text-amber-300" />
-            <span>🏆 Mecze, Sparingi & Turnieje</span>
+            <span>🏆 Rozpiski & Mecze LALS</span>
           </button>
 
           <button
@@ -1828,7 +1828,7 @@ function TacticsContent() {
             }`}
           >
             <Volleyball className="w-4 h-4 text-emerald-400" />
-            <span>🏐 Treningi</span>
+            <span>🏐 Konspekty Treningowe</span>
           </button>
         </div>
 

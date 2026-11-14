@@ -3109,7 +3109,76 @@
       ]
     }
   ],
-  "trainingPlans": [],
+  "trainingPlans": [
+    {
+      "id": "plan_lals_coco_jumbo",
+      "eventId": "evt_lals_1972",
+      "title": "Plan Meczowy: Angels ZTP vs Coco Jumbo (LALS R11)",
+      "date": "2026-11-15T18:30:00.000Z",
+      "time": "18:30",
+      "location": "Hala OSiR, Luboń",
+      "durationMinutes": 90,
+      "mainGoal": "Zwycięstwo 3:0/3:1 i umocnienie pozycji w Top 3 grupy eliminacyjnej",
+      "secondaryGoals": [
+        "Agresywny serwis flot w strefy 1 i 5",
+        "Szczelny podwójny blok zamykający prostą na skrzydłach",
+        "Kontrola asekuracji kiwek przez libero Tomasza Żądło (#5)"
+      ],
+      "intensity": "MECZOWA",
+      "equipmentNeeded": "Białe stroje meczowe Angels ZTP, piłki Mikasa V200W, apteczka klubowa",
+      "exercises": [
+        {
+          "id": "ex_odprawa",
+          "title": "Odprawa przedmeczowa i omówienie Coco Jumbo",
+          "category": "TAKTYKA",
+          "durationMinutes": 15,
+          "description": "Trener Hubert Rutkowski i Kapitan Łukasz Kremer omawiają słabe punkty przyjęcia rywala i kierunki ataku ich skrzydłowych.",
+          "keyPoints": [
+            "Zbiórka 17:45 w szatni OSiR Luboń",
+            "Gra bez przestojów punktowych przy własnym przyjęciu",
+            "Kamil Pujanek (#4) prowadzi szybkie rozegranie"
+          ]
+        },
+        {
+          "id": "ex_zagrywka",
+          "title": "Taktyka zagrywki: celowany serwis w strefy 1 i 5",
+          "category": "TAKTYKA",
+          "durationMinutes": 20,
+          "description": "Serwis odrzucający rywali od siatki, uniemożliwiający rozegranie pierwszego tempa przez środek.",
+          "keyPoints": [
+            "Skrót w strefę 1 na zmianę z mocnym serwisem w strefę 5",
+            "Minimum błędów bezpośrednich po przerwach na żądanie"
+          ]
+        },
+        {
+          "id": "ex_blok_obrona",
+          "title": "System blok-obrona na skrzydłach",
+          "category": "TAKTYKA",
+          "durationMinutes": 25,
+          "description": "Środkowy Maciej Noak (#47) doskakuje do skrzydłowego zamykając prostą. Libero Tomasz Żądło (#5) zbiera po głębokim skosie.",
+          "keyPoints": [
+            "Zwarty podwójny blok, dłonie głęboko przełożone na stronę rywala",
+            "Zawodnicy II linii asekurują kiwki i plasowane piłki"
+          ]
+        }
+      ],
+      "conclusions": [
+        {
+          "id": "conc_1",
+          "authorId": "usr_trener",
+          "authorName": "Hubert Rutkowski",
+          "authorRole": "Trener",
+          "type": "UWAGA",
+          "content": "Kluczem do wygrania meczu jest wysoka skuteczność na kontrze i cierpliwość w dłuższych wymianach.",
+          "createdAt": "2026-11-14T10:00:00.000Z"
+        }
+      ],
+      "comments": [],
+      "createdById": "usr_trener",
+      "createdByName": "Hubert Rutkowski",
+      "createdAt": "2026-11-14T10:00:00.000Z"
+    }
+  ],
   "leagueSchedule": [
     {
       "round": 2,

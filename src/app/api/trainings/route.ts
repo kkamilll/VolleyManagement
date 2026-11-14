@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   const seasonId = getActiveSeasonIdFromRequest(req);
   const db = getEffectiveDatabase(seasonId);
   const plans = db.trainingPlans || [];
-  const events = (db.events || []).filter(e => e.type === 'TRENING');
+  const events = db.events || [];
   const players = (db.users || [])
     .filter(u => u.role === 'ZAWODNIK')
     .map(u => ({ id: u.id, name: u.name, number: u.number, position: u.position }));
