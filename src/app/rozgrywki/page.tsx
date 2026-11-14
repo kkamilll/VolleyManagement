@@ -168,6 +168,9 @@ function RozgrywkiContent() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [leagueReports, setLeagueReports] = useState<LeagueMatchReport[]>([]);
   const [leaderboards, setLeaderboards] = useState<any>(null);
+  const [playerRankings, setPlayerRankings] = useState<any[]>([]);
+  const [rankingSearch, setRankingSearch] = useState('');
+  const [rankingFilterTeam, setRankingFilterTeam] = useState<'ALL' | 'ANGELS'>('ALL');
   const [showVolleyStationImportModal, setShowVolleyStationImportModal] = useState(false);
   const [volleyStationRawInput, setVolleyStationRawInput] = useState('');
   const [volleyStationAutoCreate, setVolleyStationAutoCreate] = useState(true);
@@ -539,6 +542,9 @@ function RozgrywkiContent() {
         setLeagueReports(lr.reports || []);
         if (lr.leaderboards) {
           setLeaderboards(lr.leaderboards);
+        }
+        if (lr.playerRankings) {
+          setPlayerRankings(lr.playerRankings);
         }
       }
       if (usersRes.ok) {
@@ -4207,6 +4213,166 @@ function RozgrywkiContent() {
                 </div>
               )}
 
+              {/* Full VolleyStation Player Rankings Table (76 Zawodników) */}
+              {playerRankings.length > 0 && (
+                <div className="p-5 sm:p-6 bg-white border border-slate-200 rounded-3xl shadow-sm space-y-4">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <Award className="w-5 h-5 text-amber-500" />
+                        <h4 className="text-base font-black text-slate-900 uppercase tracking-tight font-athletic">
+                          Oficjalny Ranking Punktowy Zawodników LALS
+                        </h4>
+                      </div>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Statystyki indywidualne VolleyStation • Wszystkie drużyny i zawodnicy ligi ({playerRankings.length} sklasyfikowanych)
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      {/* Przełącznik Wszyscy / Angels */}
+                      <div className="flex items-center gap-1 p-1 bg-slate-100 border border-slate-200 rounded-xl text-xs">
+                        <button
+                          type="button"
+                          onClick={() => setRankingFilterTeam('ALL')}
+                          className={`px-3 py-1.5 rounded-lg font-bold transition ${
+                            rankingFilterTeam === 'ALL'
+                              ? 'bg-amber-500 text-slate-950 font-bold shadow-sm'
+                              : 'text-slate-600 hover:text-slate-900'
+                          }`}
+                        >
+                          🌐 Cała Liga ({playerRankings.length})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setRankingFilterTeam('ANGELS')}
+                          className={`px-3 py-1.5 rounded-lg font-bold transition ${
+                            rankingFilterTeam === 'ANGELS'
+                              ? 'bg-sky-600 text-white shadow-sm'
+                              : 'text-slate-600 hover:text-slate-900'
+                          }`}
+                        >
+                          👼 Angels ZTP ({playerRankings.filter((p: any) => p.isAngels).length})
+                        </button>
+                      </div>
+
+                      {/* Wyszukiwarka */}
+                      <div className="relative">
+                        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+                        <input
+                          type="text"
+                          value={rankingSearch}
+                          onChange={e => setRankingSearch(e.target.value)}
+                          placeholder="Szukaj gracza lub klubu..."
+                          className="pl-8 pr-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-sky-500 focus:bg-white transition w-44 sm:w-52"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tabela Zawodników */}
+                  <div className="overflow-x-auto rounded-2xl border border-slate-200">
+                    <table className="w-full text-left text-xs whitespace-nowrap">
+                      <thead className="bg-slate-50 text-[11px] font-black uppercase text-slate-600 border-b border-slate-200">
+                        <tr>
+                          <th className="py-2.5 px-3 text-center">#</th>
+                          <th className="py-2.5 px-3">Zawodnik</th>
+                          <th className="py-2.5 px-3">Pozycja</th>
+                          <th className="py-2.5 px-3">Drużyna</th>
+                          <th className="py-2.5 px-3 text-center font-black text-amber-700 bg-amber-50/60">Punkty (ABS)</th>
+                          <th className="py-2.5 px-3 text-center text-sky-700">Atak (Ata)</th>
+                          <th className="py-2.5 px-3 text-center text-emerald-700">Blok (Blk)</th>
+                          <th className="py-2.5 px-3 text-center text-rose-700">Zagrywka (Ser)</th>
+                          <th className="py-2.5 px-3 text-center text-slate-500">% Drużyny</th>
+                          <th className="py-2.5 px-3 text-center text-slate-500">Wygr. / Rozegr.</th>
+                          <th className="py-2.5 px-3 text-center text-slate-500">% Wygranych</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 font-sans">
+                        {playerRankings
+                          .filter((p: any) => rankingFilterTeam === 'ALL' || p.isAngels)
+                          .filter((p: any) => !rankingSearch.trim() || 
+                            p.name.toLowerCase().includes(rankingSearch.toLowerCase()) ||
+                            p.team.toLowerCase().includes(rankingSearch.toLowerCase()) ||
+                            p.teamCode.toLowerCase().includes(rankingSearch.toLowerCase()) ||
+                            p.position.toLowerCase().includes(rankingSearch.toLowerCase())
+                          )
+                          .map((p: any) => (
+                            <tr
+                              key={`${p.rank}_${p.name}`}
+                              className={`transition hover:bg-slate-50/80 ${
+                                p.isAngels ? 'bg-sky-50/50 font-medium' : ''
+                              }`}
+                            >
+                              <td className="py-2.5 px-3 text-center font-mono font-bold text-slate-500">
+                                {p.rank <= 3 ? (
+                                  <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full font-black text-[11px] ${
+                                    p.rank === 1 ? 'bg-amber-400 text-slate-950 shadow-xs' :
+                                    p.rank === 2 ? 'bg-slate-300 text-slate-900' :
+                                    'bg-amber-700/20 text-amber-900'
+                                  }`}>
+                                    {p.rank}
+                                  </span>
+                                ) : (
+                                  p.rank
+                                )}
+                              </td>
+                              <td className="py-2.5 px-3">
+                                <div className="flex items-center gap-2">
+                                  <span className={`font-bold ${p.isAngels ? 'text-sky-950 font-black' : 'text-slate-900'}`}>
+                                    {p.name}
+                                  </span>
+                                  {p.isAngels && p.number && (
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-black bg-sky-100 text-sky-800 border border-sky-300">
+                                      #{p.number}
+                                    </span>
+                                  )}
+                                  {p.isAngels && (
+                                    <span className="text-xs" title="Zawodnik Angels ZTP">👼</span>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="py-2.5 px-3 text-slate-600 capitalize">
+                                {p.position}
+                              </td>
+                              <td className="py-2.5 px-3">
+                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold ${
+                                  p.isAngels
+                                    ? 'bg-sky-100 text-sky-900 border border-sky-300 font-black'
+                                    : 'bg-slate-100 text-slate-700 border border-slate-200'
+                                }`}>
+                                  {p.team}
+                                </span>
+                              </td>
+                              <td className="py-2.5 px-3 text-center font-mono font-black text-amber-700 text-sm bg-amber-50/40">
+                                {p.totalPoints}
+                              </td>
+                              <td className="py-2.5 px-3 text-center font-mono font-bold text-sky-700">
+                                {p.totalAttack}
+                              </td>
+                              <td className="py-2.5 px-3 text-center font-mono font-bold text-emerald-700">
+                                {p.totalBlock}
+                              </td>
+                              <td className="py-2.5 px-3 text-center font-mono font-bold text-rose-700">
+                                {p.totalServe}
+                              </td>
+                              <td className="py-2.5 px-3 text-center font-mono text-slate-500">
+                                {p.teamPointsPercent}
+                              </td>
+                              <td className="py-2.5 px-3 text-center font-mono text-slate-500">
+                                {p.ralliesWon} / {p.ralliesPlayed}
+                              </td>
+                              <td className="py-2.5 px-3 text-center font-mono text-slate-600 font-bold">
+                                {p.ralliesWonPercent}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
               {/* Match Reports List (Protokoły Meczowe) */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between px-1">
@@ -6733,7 +6899,7 @@ function RozgrywkiContent() {
                 <textarea
                   value={volleyStationRawInput}
                   onChange={e => setVolleyStationRawInput(e.target.value)}
-                  placeholder="Wklej tutaj treść skopiowaną z terminarza ligowego lub ze strony raportu meczowego VolleyStation..."
+                  placeholder="Wklej tutaj treść skopiowaną z VolleyStation: oficjalny ranking punktowy zawodników ligi, terminarz lub protokół meczu..."
                   rows={9}
                   className="w-full rounded-xl bg-slate-50 border border-slate-300 p-3 text-xs font-mono text-slate-700 placeholder:text-slate-600 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition resize-y"
                   required

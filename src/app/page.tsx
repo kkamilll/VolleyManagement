@@ -198,11 +198,11 @@ function DashboardContent() {
 
   // Top scorers from official VolleyStation match reports
   const topAngelsScorers = leaderboards?.angelsScorers?.slice(0, 5) || [
-    { name: 'Łukasz Kremer', number: 17, totalPoints: 26, totalAttack: 24, totalBlock: 1, totalServe: 1 },
+    { name: 'Łukasz Kremer', number: 17, totalPoints: 33, totalAttack: 31, totalBlock: 1, totalServe: 1 },
     { name: 'Michał Śmigiel', number: 8, totalPoints: 16, totalAttack: 10, totalBlock: 5, totalServe: 1 },
-    { name: 'Bartosz Augustynek', number: 97, totalPoints: 11, totalAttack: 8, totalBlock: 3, totalServe: 0 },
-    { name: 'Piotr Graczyk', number: 7, totalPoints: 9, totalAttack: 7, totalBlock: 1, totalServe: 1 },
-    { name: 'Maciek Noak', number: 47, totalPoints: 8, totalAttack: 5, totalBlock: 2, totalServe: 1 }
+    { name: 'Bartosz Augustynek', number: 97, totalPoints: 14, totalAttack: 11, totalBlock: 3, totalServe: 0 },
+    { name: 'Piotr Graczyk', number: 7, totalPoints: 12, totalAttack: 10, totalBlock: 1, totalServe: 1 },
+    { name: 'Wit Król', number: 91, totalPoints: 11, totalAttack: 10, totalBlock: 1, totalServe: 0 }
   ];
 
   return (

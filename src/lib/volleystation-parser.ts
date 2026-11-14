@@ -535,6 +535,153 @@ export function computeLeaderboards(reports: LeagueMatchReport[]) {
 }
 
 /**
+ * Computes leaderboards from the official VolleyStation player rankings table
+ */
+export function computeLeaderboardsFromRankings(rankings: any[]) {
+  if (!rankings || rankings.length === 0) {
+    return {
+      topScorers: [],
+      topAttackers: [],
+      topBlockers: [],
+      topServers: [],
+      topMvps: [],
+      angelsScorers: [],
+      angelsAttackers: [],
+      angelsBlockers: [],
+      angelsServers: []
+    };
+  }
+
+  const allPlayers = rankings.map(r => ({
+    name: r.name,
+    number: r.number,
+    team: r.team,
+    teamCode: r.teamCode,
+    position: r.position,
+    isAngels: r.isAngels,
+    matchesPlayed: 3,
+    totalPoints: r.totalPoints || 0,
+    totalAttack: r.totalAttack || 0,
+    totalBlock: r.totalBlock || 0,
+    totalServe: r.totalServe || 0,
+    mvpCount: r.mvpCount || 0,
+    teamPointsPercent: r.teamPointsPercent,
+    ralliesWon: r.ralliesWon,
+    ralliesPlayed: r.ralliesPlayed,
+    ralliesWonPercent: r.ralliesWonPercent,
+    ralliesPlayedPercent: r.ralliesPlayedPercent
+  }));
+
+  const topScorers = [...allPlayers].sort((a, b) => b.totalPoints - a.totalPoints);
+  const topAttackers = [...allPlayers].sort((a, b) => b.totalAttack - a.totalAttack);
+  const topBlockers = [...allPlayers].sort((a, b) => b.totalBlock - a.totalBlock);
+  const topServers = [...allPlayers].sort((a, b) => b.totalServe - a.totalServe);
+  const topMvps = [...allPlayers].filter(p => (p.mvpCount || 0) > 0).sort((a, b) => (b.mvpCount || 0) - (a.mvpCount || 0));
+
+  const angelsPlayers = allPlayers.filter(p => p.isAngels);
+  const angelsScorers = [...angelsPlayers].sort((a, b) => b.totalPoints - a.totalPoints);
+  const angelsAttackers = [...angelsPlayers].sort((a, b) => b.totalAttack - a.totalAttack);
+  const angelsBlockers = [...angelsPlayers].sort((a, b) => b.totalBlock - a.totalBlock);
+  const angelsServers = [...angelsPlayers].sort((a, b) => b.totalServe - a.totalServe);
+
+  return {
+    topScorers: topScorers.slice(0, 15),
+    topAttackers: topAttackers.slice(0, 15),
+    topBlockers: topBlockers.slice(0, 15),
+    topServers: topServers.slice(0, 15),
+    topMvps: topMvps.slice(0, 10),
+    angelsScorers: angelsScorers.slice(0, 15),
+    angelsAttackers: angelsAttackers.slice(0, 15),
+    angelsBlockers: angelsBlockers.slice(0, 15),
+    angelsServers: angelsServers.slice(0, 15)
+  };
+}
+
+/**
+ * Parses official VolleyStation player rankings table copied directly from website
+ */
+export function parseVolleyStationPlayerRankings(raw: string): any[] {
+  if (!raw || !raw.trim()) return [];
+
+  const teamMap: Record<string, string> = {
+    'VOL': 'Volleyboars',
+    'GLA': 'Gladiatorzy BUD-WENT',
+    'COC': 'Coco Jumbo',
+    'ANG': 'Angels ZTP',
+    'CZE': 'Czelendż',
+    'KOT': 'Koty Broniszewice',
+    'AFE': 'Afera Volley'
+  };
+
+  const angelsNumberMap: Record<string, number> = {
+    'Tomasz Krupa': 1,
+    'Kamil Pujanek': 4,
+    'Tomasz Żądło': 5,
+    'Piotr Graczyk': 7,
+    'Michał Śmigiel': 8,
+    'Dominik Kruk': 10,
+    'Paweł Kulupa': 11,
+    'Hubert Obara': 12,
+    'Łukasz Kremer': 17,
+    'Vikhyath Shetty': 18,
+    'Karol Ordon': 28,
+    'Maciej Noak': 47,
+    'Maciek Noak': 47,
+    'Stanisław Suwalski': 55,
+    'Wit Król': 91,
+    'Bartosz Augustynek': 97
+  };
+
+  const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const parsed: any[] = [];
+
+  for (const line of lines) {
+    const parts = line.split(/\t|\s{2,}/).map(p => p.trim());
+    if (parts.length < 5) continue;
+    const rank = parseInt(parts[0], 10);
+    if (isNaN(rank)) continue;
+
+    const name = parts[1];
+    const position = parts[2];
+    const teamCode = parts[3];
+    const totalPoints = parseInt(parts[4], 10) || 0;
+    const attack = parseInt(parts[5], 10) || 0;
+    const block = parseInt(parts[6], 10) || 0;
+    const serve = parseInt(parts[7], 10) || 0;
+    const teamPointsPercent = parts[8] || '0%';
+    const ralliesWon = parseInt(parts[9], 10) || 0;
+    const ralliesPlayed = parseInt(parts[10], 10) || 0;
+    const ralliesWonPercent = parts[11] || '-';
+    const ralliesPlayedPercent = parts[12] || '-';
+
+    const fullTeamName = teamMap[teamCode] || teamCode;
+    const isAngels = teamCode === 'ANG' || fullTeamName.toLowerCase().includes('angel');
+    const number = isAngels ? angelsNumberMap[name] : undefined;
+
+    parsed.push({
+      rank,
+      name,
+      number,
+      position,
+      teamCode,
+      team: fullTeamName,
+      isAngels,
+      totalPoints,
+      totalAttack: attack,
+      totalBlock: block,
+      totalServe: serve,
+      teamPointsPercent,
+      ralliesWon,
+      ralliesPlayed,
+      ralliesWonPercent,
+      ralliesPlayedPercent
+    });
+  }
+
+  return parsed;
+}
+
+/**
  * Parses full VolleyStation standings/table copied from the website.
  * Supports:
  * - Multi-line cell-by-cell copy-paste (rank -> [Team](url) -> 16 numbers)

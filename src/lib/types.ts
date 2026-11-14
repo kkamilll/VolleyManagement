@@ -617,6 +617,7 @@ export interface AppDatabase {
   activeLeaguePhaseId?: string;
   leagueSchedule?: VolleyStationScheduleMatch[];
   leaguePhotos?: LeaguePhoto[];
+  leaguePlayerRankings?: any[];
   tacticalMaterials?: TacticalMaterial[];
   treasuryExpenses?: TreasuryExpense[];
   seasonsArchive?: SeasonArchive[];

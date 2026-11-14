@@ -4,7 +4,9 @@ import { getServerUser, hasPermission } from '@/lib/auth';
 import {
   parseVolleyStationMultiReport,
   parseVolleyStationSchedule,
-  computeLeaderboards
+  parseVolleyStationPlayerRankings,
+  computeLeaderboards,
+  computeLeaderboardsFromRankings
 } from '@/lib/volleystation-parser';
 import { LeagueMatchReport, MatchResult, Announcement } from '@/lib/types';
 
@@ -17,7 +19,9 @@ export async function GET(request: Request) {
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
-  const leaderboards = computeLeaderboards(sortedReports);
+  const leaderboards = (db.leaguePlayerRankings && db.leaguePlayerRankings.length > 0)
+    ? computeLeaderboardsFromRankings(db.leaguePlayerRankings)
+    : computeLeaderboards(sortedReports);
 
   // Enrich reports with linked match info
   const matchesMap = new Map<string, MatchResult>();
@@ -46,7 +50,8 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     reports: enrichedReports,
-    leaderboards
+    leaderboards,
+    playerRankings: db.leaguePlayerRankings || []
   });
 }
 
@@ -72,6 +77,47 @@ export async function POST(request: Request) {
     const db = readDatabase();
     if (!db.leagueReports) db.leagueReports = [];
     if (!db.matches) db.matches = [];
+
+    // Check if user is importing a PLAYER RANKING / INDIVIDUAL STATS table
+    if (rawText.includes('Pozycja') && (rawText.includes('Akcje') || rawText.includes('Punkty') || rawText.includes('ABS') || rawText.includes('%Druż'))) {
+      const parsedRankings = parseVolleyStationPlayerRankings(rawText);
+      if (parsedRankings.length > 0) {
+        db.leaguePlayerRankings = parsedRankings;
+
+        // Sync Angels ZTP players stats into db.users
+        const angelsRankings = parsedRankings.filter((p: any) => p.isAngels);
+        if (db.users) {
+          db.users = db.users.map((u: any) => {
+            const matching = angelsRankings.find((p: any) => 
+              p.name.toLowerCase() === u.name.toLowerCase() ||
+              (u.name.includes('Noak') && p.name.includes('Noak')) ||
+              (u.number && p.number === u.number)
+            );
+            if (matching) {
+              u.stats = {
+                ...(u.stats || {}),
+                totalPoints: matching.totalPoints,
+                attackPoints: matching.totalAttack,
+                blockPoints: matching.totalBlock,
+                servePoints: matching.totalServe,
+                acePoints: matching.totalServe,
+                matchesPlayed: u.stats?.matchesPlayed || 3
+              };
+            }
+            return u;
+          });
+        }
+
+        writeDatabase(db);
+        return NextResponse.json({
+          success: true,
+          type: 'RANKINGS',
+          rankingsCount: parsedRankings.length,
+          angelsCount: angelsRankings.length,
+          message: `Pomyślnie zaimportowano oficjalny ranking zawodników VolleyStation! Zaktualizowano statystyki dla ${parsedRankings.length} graczy (w tym ${angelsRankings.length} zawodników Angels ZTP).`
+        });
+      }
+    }
 
     // Check if user is importing a SCHEDULE / TERMINARZ
     const scheduleMatches = parseVolleyStationSchedule(rawText);
