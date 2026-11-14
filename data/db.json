@@ -372,7 +372,6 @@
       ],
       "teamSetsWon": 3,
       "opponentSetsWon": 0,
-      "mvp": "Kamil Wolski",
       "notes": "Runda 5 LALS: Inauguracyjne pewne zwycięstwo Angels 3:0 przed własną publicznością.",
       "leaguePhaseId": "faza_1",
       "leaguePhaseName": "Faza I (Eliminacje)",
@@ -383,337 +382,262 @@
   ],
   "events": [
     {
-      "id": "evt_turniej_1",
-      "title": "Ogólnopolski Turniej Niepodległości",
-      "type": "TURNIEJ",
-      "date": "2026-11-21T09:00:00",
-      "endDate": "2026-11-21T19:00:00",
-      "location": "Arena Ursynów, ul. Pileckiego 122, Warszawa",
-      "opponent": "8 zaproszonych drużyn (m.in. KPS Radom, AZS Politechnika, Volley Kraków)",
-      "description": "Turniej jednodniowy z pucharami. Faza grupowa (2 grupy po 4 zespoły) + faza pucharowa (1/4, 1/2 i Finał).",
-      "costPerPerson": 50,
+      "id": "evt_lals_1887",
+      "title": "Mecz LALS (R5): Angels ZTP vs Koty Broniszewice",
+      "type": "MECZ",
+      "date": "2026-10-18T15:00:00.000Z",
+      "location": "Hala Luboń",
+      "opponent": "Koty Broniszewice",
+      "description": "Oficjalny mecz ligowy LALS - Runda 5 (Wynik: 3:0 dla Angels ZTP)",
       "attendees": [
+        {
+          "userId": "usr_kierownik",
+          "userName": "Łukasz Kremer",
+          "status": "BEDE"
+        },
         {
           "userId": "usr_trener",
           "userName": "Hubert Obara",
-          "userRole": "TRENER",
-          "userNumber": 12,
-          "position": "Sztab trenerski",
-          "status": "BEDE",
-          "updatedAt": "2026-11-12T10:00:00Z"
-        }
-      ],
-      "result": {
-        "teamSetsWon": 10,
-        "opponentSetsWon": 3,
-        "sets": [],
-        "tournamentRank": "🥇 1. Miejsce / Złoty Puchar",
-        "notes": "Fantastyczna postawa całego zespołu! Wygrana faza grupowa, pewny ćwierćfinał i dramatyczny finał w tie-breaku."
-      },
-      "tournamentMatches": [
-        {
-          "id": "tm_1",
-          "phase": "FAZA_GRUPOWA",
-          "round": "Grupa A - Mecz 1",
-          "teamA": "Angels ZTP",
-          "teamB": "KPS Radom",
-          "scoreA": 2,
-          "scoreB": 0,
-          "setScores": "21:16, 21:18",
-          "time": "09:30 · Boisko A",
-          "isFinished": true,
-          "notes": "Pewne otwarcie turnieju, mocna zagrywka."
-        },
-        {
-          "id": "tm_2",
-          "phase": "FAZA_GRUPOWA",
-          "round": "Grupa A - Mecz 2",
-          "teamA": "Angels ZTP",
-          "teamB": "Volley Kraków",
-          "scoreA": 2,
-          "scoreB": 1,
-          "setScores": "21:19, 18:21, 15:12",
-          "time": "11:15 · Boisko B",
-          "isFinished": true,
-          "notes": "Zwycięski tie-break w końcówce."
-        },
-        {
-          "id": "tm_3",
-          "phase": "FAZA_GRUPOWA",
-          "round": "Grupa A - Mecz 3",
-          "teamA": "Angels ZTP",
-          "teamB": "Siatkarz Wieluń",
-          "scoreA": 2,
-          "scoreB": 0,
-          "setScores": "21:14, 21:15",
-          "time": "13:00 · Boisko A",
-          "isFinished": true,
-          "notes": "Komplet 3 zwycięstw i 1. miejsce w Grupie A!"
-        },
-        {
-          "id": "tm_4",
-          "phase": "1_4_FINALU",
-          "round": "Ćwierćfinał (1/4)",
-          "teamA": "Angels ZTP",
-          "teamB": "Sparta Warszawa",
-          "scoreA": 2,
-          "scoreB": 0,
-          "setScores": "25:21, 25:19",
-          "time": "14:45 · Boisko Główne",
-          "isFinished": true,
-          "notes": "Awans do półfinału (strefa medalowa)."
-        },
-        {
-          "id": "tm_5",
-          "phase": "1_2_FINALU",
-          "round": "Półfinał (1/2)",
-          "teamA": "Angels ZTP",
-          "teamB": "AZS Politechnika",
-          "scoreA": 2,
-          "scoreB": 1,
-          "setScores": "23:25, 25:22, 15:13",
-          "time": "16:30 · Boisko Główne",
-          "isFinished": true,
-          "notes": "Mecz turnieju! Obrona piłki meczowej i wejście do FINAŁU!"
-        },
-        {
-          "id": "tm_6",
-          "phase": "FINAL",
-          "round": "Wielki Finał Turnieju",
-          "teamA": "Angels ZTP",
-          "teamB": "Trefl II",
-          "scoreA": 2,
-          "scoreB": 1,
-          "setScores": "25:23, 22:25, 15:12",
-          "time": "18:15 · Boisko Główne",
-          "isFinished": true,
-          "notes": "🏆 Zwycięstwo w turnieju i Złoty Puchar!"
-        }
-      ],
-      "createdById": "usr_trener",
-      "createdByName": "Hubert Obara",
-      "createdAt": "2026-11-04T12:00:00Z"
-    },
-    {
-      "id": "evt_next_1",
-      "title": "Trening techniczno-taktyczny LALS",
-      "type": "TRENING",
-      "status": "ZAKONCZONY",
-      "date": "2026-11-08T19:00:00.000Z",
-      "location": "Hala OSiR Luboń, ul. Kołłątaja 2",
-      "description": "Przygotowanie do meczu na szczycie. Doskonalenie systemu 5-1 i obrony w strefach 5 i 1.",
-      "attendees": [
-        {
-          "userId": "usr_kierownik",
-          "userName": "Łukasz",
-          "userRole": "KIEROWNIK",
-          "position": "Zarząd",
-          "status": "NIE_BEDE",
-          "updatedAt": "2026-11-06T15:20:56.648Z"
-        },
-        {
-          "userId": "usr_zawodnik_1",
-          "userName": "Tomasz Krupa",
-          "userRole": "ZAWODNIK",
           "status": "BEDE"
         },
         {
-          "userId": "usr_zawodnik_2",
+          "userId": "usr_pujanek",
           "userName": "Kamil Pujanek",
-          "userRole": "ZAWODNIK",
           "status": "BEDE"
         },
         {
-          "userId": "usr_zawodnik_3",
-          "userName": "Jan Kowalski",
-          "userRole": "ZAWODNIK",
-          "status": "BEDE"
-        },
-        {
-          "userId": "usr_zawodnik_4",
-          "userName": "Michał Śmigiel",
-          "userRole": "ZAWODNIK",
-          "status": "BEDE"
-        },
-        {
-          "userId": "usr_kierownik",
-          "userName": "Łukasz Kremer",
-          "userRole": "ZAWODNIK",
-          "status": "BEDE"
-        },
-        {
-          "userId": "usr_zawodnik_10",
-          "userName": "Damian Lis",
-          "userRole": "ZAWODNIK",
-          "status": "BEDE"
-        }
-      ],
-      "actualAttendees": [],
-      "createdById": "usr_trener",
-      "createdByName": "Hubert",
-      "createdAt": "2026-11-04T12:00:00Z",
-      "costPerPerson": 0,
-      "result": {
-        "teamSetsWon": 3,
-        "opponentSetsWon": 1,
-        "sets": [
-          {
-            "setNumber": 1,
-            "teamScore": 25,
-            "opponentScore": 21
-          },
-          {
-            "setNumber": 2,
-            "teamScore": 25,
-            "opponentScore": 19
-          },
-          {
-            "setNumber": 3,
-            "teamScore": 22,
-            "opponentScore": 25
-          },
-          {
-            "setNumber": 4,
-            "teamScore": 25,
-            "opponentScore": 18
-          }
-        ]
-      }
-    },
-    {
-      "id": "evt_past_1",
-      "title": "Trening: Przyjęcie & Blok sytuacyjny",
-      "type": "TRENING",
-      "status": "ZAKONCZONY",
-      "date": "2026-11-04T20:00",
-      "location": "Hala OSiR Luboń",
-      "description": "Zrealizowany trening z analizą wideo.",
-      "isCompleted": true,
-      "attendees": [
-        {
-          "userId": "usr_zawodnik_1",
+          "userId": "usr_krupa",
           "userName": "Tomasz Krupa",
-          "userRole": "ZAWODNIK",
           "status": "BEDE"
         },
         {
-          "userId": "usr_zawodnik_2",
-          "userName": "Kamil Pujanek",
-          "userRole": "ZAWODNIK",
+          "userId": "usr_zadlo",
+          "userName": "Tomasz Żądło",
           "status": "BEDE"
         },
         {
-          "userId": "usr_zawodnik_3",
-          "userName": "Jan Kowalski",
-          "userRole": "ZAWODNIK",
+          "userId": "usr_graczyk",
+          "userName": "Piotr Graczyk",
           "status": "BEDE"
         },
         {
-          "userId": "usr_zawodnik_4",
+          "userId": "usr_smigiel",
           "userName": "Michał Śmigiel",
-          "userRole": "ZAWODNIK",
           "status": "BEDE"
         },
         {
-          "userId": "usr_kierownik",
-          "userName": "Łukasz Kremer",
-          "userRole": "ZAWODNIK",
+          "userId": "usr_kruk",
+          "userName": "Dominik Kruk",
           "status": "BEDE"
         },
         {
-          "userId": "usr_zawodnik_7",
+          "userId": "usr_kulupa",
+          "userName": "Paweł Kulupa",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_shetty",
+          "userName": "Vikhyath Shetty",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_ordon",
           "userName": "Karol Ordon",
-          "userRole": "ZAWODNIK",
           "status": "BEDE"
         },
         {
-          "userId": "usr_zawodnik_8",
+          "userId": "usr_noak",
           "userName": "Maciej Noak",
-          "userRole": "ZAWODNIK",
           "status": "BEDE"
         },
         {
-          "userId": "usr_zawodnik_9",
+          "userId": "usr_suwalski",
+          "userName": "Stanisław Suwalski",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_krol",
+          "userName": "Wit Król",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_augustynek",
           "userName": "Bartosz Augustynek",
-          "userRole": "ZAWODNIK",
-          "status": "BEDE"
-        },
-        {
-          "userId": "usr_zawodnik_10",
-          "userName": "Damian Lis",
-          "userRole": "ZAWODNIK",
           "status": "BEDE"
         }
-      ],
-      "actualAttendees": [
-        "usr_zawodnik_1",
-        "usr_zawodnik_2",
-        "usr_zawodnik_3",
-        "usr_zawodnik_4",
-        "usr_kierownik",
-        "usr_zawodnik_7",
-        "usr_zawodnik_8",
-        "usr_zawodnik_9",
-        "usr_zawodnik_10"
-      ],
-      "createdById": "usr_trener",
-      "createdByName": "Hubert",
-      "createdAt": "2026-11-02T10:00:00Z"
+      ]
     },
     {
-      "id": "evt_1793959274090",
-      "title": "d",
-      "type": "SPARING",
-      "status": "ZAKONCZONY",
-      "date": "2026-11-14T11:01",
-      "location": "Hala Sportowa OSiR, ul. Sportowa 5",
-      "opponent": "ffdsf",
-      "description": "",
-      "attendees": [],
-      "actualAttendees": [],
-      "createdById": "usr_trener",
-      "createdByName": "Hubert",
-      "createdAt": "2026-11-06T10:01:14.090Z",
-      "result": {
-        "teamSetsWon": 3,
-        "opponentSetsWon": 1,
-        "sets": [
-          {
-            "setNumber": 1,
-            "teamScore": 25,
-            "opponentScore": 21
-          },
-          {
-            "setNumber": 2,
-            "teamScore": 25,
-            "opponentScore": 19
-          },
-          {
-            "setNumber": 3,
-            "teamScore": 22,
-            "opponentScore": 25
-          },
-          {
-            "setNumber": 4,
-            "teamScore": 25,
-            "opponentScore": 18
-          }
-        ]
-      }
+      "id": "evt_lals_1926",
+      "title": "Mecz LALS (R7): Gladiatorzy BUD-WENT vs Angels ZTP",
+      "type": "MECZ",
+      "date": "2026-10-31T15:00:00.000Z",
+      "location": "Hala Luboń",
+      "opponent": "Gladiatorzy BUD-WENT",
+      "description": "Oficjalny mecz ligowy LALS - Runda 7 (Wynik: 3:2 dla Gladiatorzy)",
+      "attendees": [
+        {
+          "userId": "usr_kierownik",
+          "userName": "Łukasz Kremer",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_trener",
+          "userName": "Hubert Obara",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_pujanek",
+          "userName": "Kamil Pujanek",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_krupa",
+          "userName": "Tomasz Krupa",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_zadlo",
+          "userName": "Tomasz Żądło",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_graczyk",
+          "userName": "Piotr Graczyk",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_smigiel",
+          "userName": "Michał Śmigiel",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_kruk",
+          "userName": "Dominik Kruk",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_kulupa",
+          "userName": "Paweł Kulupa",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_shetty",
+          "userName": "Vikhyath Shetty",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_ordon",
+          "userName": "Karol Ordon",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_noak",
+          "userName": "Maciej Noak",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_suwalski",
+          "userName": "Stanisław Suwalski",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_krol",
+          "userName": "Wit Król",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_augustynek",
+          "userName": "Bartosz Augustynek",
+          "status": "BEDE"
+        }
+      ]
     },
     {
-      "id": "evt_1793983444232",
-      "title": "asddas",
-      "type": "TRENING",
-      "status": "ANKIETA",
-      "date": "2026-11-08T17:44",
-      "location": "Hala Sportowa OSiR, ul. Sportowa 5",
-      "description": "",
-      "attendees": [],
-      "actualAttendees": [],
-      "createdById": "usr_trener",
-      "createdByName": "Hubert",
-      "createdAt": "2026-11-06T16:44:04.232Z"
+      "id": "evt_lals_1948",
+      "title": "Mecz LALS (R9): Volleyboars vs Angels ZTP",
+      "type": "MECZ",
+      "date": "2026-11-08T17:00:00.000Z",
+      "location": "Hala Luboń",
+      "opponent": "Volleyboars",
+      "description": "Oficjalny mecz ligowy LALS - Runda 9 (Wynik: 0:3 dla Angels ZTP, MVP: Hubert Obara)",
+      "attendees": [
+        {
+          "userId": "usr_kierownik",
+          "userName": "Łukasz Kremer",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_trener",
+          "userName": "Hubert Obara",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_pujanek",
+          "userName": "Kamil Pujanek",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_krupa",
+          "userName": "Tomasz Krupa",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_zadlo",
+          "userName": "Tomasz Żądło",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_graczyk",
+          "userName": "Piotr Graczyk",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_smigiel",
+          "userName": "Michał Śmigiel",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_kruk",
+          "userName": "Dominik Kruk",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_kulupa",
+          "userName": "Paweł Kulupa",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_shetty",
+          "userName": "Vikhyath Shetty",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_ordon",
+          "userName": "Karol Ordon",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_noak",
+          "userName": "Maciej Noak",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_suwalski",
+          "userName": "Stanisław Suwalski",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_krol",
+          "userName": "Wit Król",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_augustynek",
+          "userName": "Bartosz Augustynek",
+          "status": "BEDE"
+        }
+      ]
     },
     {
       "id": "evt_lals_1972",
@@ -1164,708 +1088,12 @@
       "matchId": "mat_lals_1887"
     }
   ],
-  "fees": [
-    {
-      "id": "fee_1",
-      "title": "Składka członkowska - Listopad 2026",
-      "amount": 120,
-      "dueDate": "2026-11-15",
-      "type": "MIESIECZNA",
-      "description": "Miesięczna składka na halę w Luboniu, sprzęt i trenera.",
-      "createdById": "usr_kierownik",
-      "createdByName": "Łukasz",
-      "createdAt": "2026-11-01T08:00:00Z"
-    },
-    {
-      "id": "fee_2",
-      "title": "Wpisowe do Turnieju LALS",
-      "amount": 50,
-      "dueDate": "2026-11-20",
-      "type": "TURNIEJ",
-      "description": "Udział w turnieju pucharowym Lubonia.",
-      "createdById": "usr_kierownik",
-      "createdByName": "Łukasz",
-      "createdAt": "2026-11-02T10:00:00Z"
-    },
-    {
-      "id": "fee_1794659143227",
-      "title": "sqw",
-      "amount": 120,
-      "dueDate": "2026-11-28",
-      "type": "MIESIECZNA",
-      "description": "",
-      "createdById": "usr_kierownik",
-      "createdByName": "Łukasz Kremer",
-      "createdAt": "2026-11-14T12:25:43.227Z"
-    }
-  ],
-  "payments": [
-    {
-      "id": "pay_1",
-      "feeId": "fee_1",
-      "userId": "usr_kierownik",
-      "userName": "Łukasz",
-      "amount": 120,
-      "status": "OPLACONE",
-      "paidAt": "2026-11-02T12:00:00Z",
-      "paymentMethod": "BLIK",
-      "transactionId": "TXN-884210",
-      "verifiedByManager": true,
-      "overpayment": 20
-    },
-    {
-      "id": "pay_2",
-      "feeId": "fee_1",
-      "userId": "usr_zawodnik_1",
-      "userName": "Tomasz Krupa",
-      "amount": 120,
-      "status": "OPLACONE",
-      "paidAt": "2026-11-03T14:10:00Z",
-      "paymentMethod": "BLIK",
-      "transactionId": "TXN-884211",
-      "verifiedByManager": true
-    },
-    {
-      "id": "pay_3",
-      "feeId": "fee_1",
-      "userId": "usr_zawodnik_2",
-      "userName": "Kamil Pujanek",
-      "amount": 120,
-      "status": "OPLACONE",
-      "paidAt": "2026-11-03T16:20:00Z",
-      "paymentMethod": "PRZELEW",
-      "transactionId": "TXN-884212",
-      "verifiedByManager": true,
-      "overpayment": 30
-    },
-    {
-      "id": "pay_4",
-      "feeId": "fee_1",
-      "userId": "usr_zawodnik_3",
-      "userName": "Jan Kowalski",
-      "amount": 120,
-      "status": "OPLACONE",
-      "paymentMethod": "GOTÓWKA",
-      "baseAmount": 120,
-      "paidAt": "2026-11-14T12:25:55.936Z",
-      "transactionId": "GOT-9736",
-      "verifiedByManager": true,
-      "note": "Opłacone gotówką do rąk kierownika/trenera"
-    },
-    {
-      "id": "pay_5",
-      "feeId": "fee_1",
-      "userId": "usr_zawodnik_4",
-      "userName": "Michał Śmigiel",
-      "amount": 120,
-      "status": "OPLACONE",
-      "paidAt": "2026-11-04T18:00:00Z",
-      "paymentMethod": "BLIK",
-      "transactionId": "TXN-884214",
-      "verifiedByManager": true
-    },
-    {
-      "id": "pay_1794659143227_exn6nz",
-      "feeId": "fee_1794659143227",
-      "userId": "usr_zawodnik_1",
-      "userName": "Tomasz Krupa",
-      "amount": 120,
-      "status": "OCZEKUJE",
-      "note": "Składka: sqw"
-    },
-    {
-      "id": "pay_1794659143227_juji5y",
-      "feeId": "fee_1794659143227",
-      "userId": "usr_zawodnik_2",
-      "userName": "Kamil Pujanek",
-      "amount": 120,
-      "status": "OCZEKUJE",
-      "note": "Składka: sqw"
-    },
-    {
-      "id": "pay_1794659143227_s41pkb",
-      "feeId": "fee_1794659143227",
-      "userId": "usr_zawodnik_3",
-      "userName": "Jan Kowalski",
-      "amount": 120,
-      "status": "OCZEKUJE",
-      "note": "Składka: sqw"
-    },
-    {
-      "id": "pay_1794659143227_wnkyb4",
-      "feeId": "fee_1794659143227",
-      "userId": "usr_zawodnik_4",
-      "userName": "Michał Śmigiel",
-      "amount": 120,
-      "status": "OCZEKUJE",
-      "note": "Składka: sqw"
-    },
-    {
-      "id": "pay_1794659143227_7uyxuf",
-      "feeId": "fee_1794659143227",
-      "userId": "usr_zawodnik_5",
-      "userName": "Piotr Wiśniewski",
-      "amount": 120,
-      "status": "OCZEKUJE",
-      "note": "Składka: sqw"
-    },
-    {
-      "id": "pay_1794659143227_4ycyie",
-      "feeId": "fee_1794659143227",
-      "userId": "usr_zawodnik_7",
-      "userName": "Karol Ordon",
-      "amount": 120,
-      "status": "OCZEKUJE",
-      "note": "Składka: sqw"
-    },
-    {
-      "id": "pay_1794659143227_bkvqmf",
-      "feeId": "fee_1794659143227",
-      "userId": "usr_zawodnik_8",
-      "userName": "Maciej Noak",
-      "amount": 120,
-      "status": "OCZEKUJE",
-      "note": "Składka: sqw"
-    },
-    {
-      "id": "pay_1794659143227_s3zcl2",
-      "feeId": "fee_1794659143227",
-      "userId": "usr_zawodnik_9",
-      "userName": "Bartosz Augustynek",
-      "amount": 120,
-      "status": "OCZEKUJE",
-      "note": "Składka: sqw"
-    },
-    {
-      "id": "pay_1794659143227_vnbt2u",
-      "feeId": "fee_1794659143227",
-      "userId": "usr_zawodnik_10",
-      "userName": "Damian Lis",
-      "amount": 120,
-      "status": "OCZEKUJE",
-      "note": "Składka: sqw"
-    }
-  ],
-  "treasuryExpenses": [
-    {
-      "id": "tex_1793966319022",
-      "title": "zakup piłki",
-      "amount": 21,
-      "date": "2026-11-06",
-      "category": "SPRZET",
-      "description": "",
-      "createdByName": "Łukasz (Kierownik)"
-    },
-    {
-      "id": "tex_sponsor_1",
-      "type": "INCOME",
-      "title": "Wsparcie sponsora Dark Angel",
-      "amount": 1500,
-      "date": "2026-11-01",
-      "category": "SPONSOR",
-      "description": "Darowizna na nowe stroje meczowe oraz sprzęt treningowy",
-      "createdByName": "Tomasz (Kierownik)"
-    },
-    {
-      "id": "tex_prize_1",
-      "type": "INCOME",
-      "title": "Nagroda za 1. miejsce w Turnieju Niepodległości",
-      "amount": 600,
-      "date": "2026-10-25",
-      "category": "NAGRODA",
-      "description": "Czek turniejowy za zwycięstwo zespołu Angels ZTP",
-      "createdByName": "Tomasz (Kierownik)"
-    },
-    {
-      "id": "tex_hala_1",
-      "type": "EXPENSE",
-      "title": "Wynajem Hali Sportowej OSiR (Listopad)",
-      "amount": 720,
-      "date": "2026-11-02",
-      "category": "HALA",
-      "description": "Opłata za 4 treningi i 1 sparing ligowy",
-      "createdByName": "Łukasz (Kierownik)"
-    },
-    {
-      "id": "tex_sedzia_1",
-      "type": "EXPENSE",
-      "title": "Opłata sędziowska mecz LALS vs Metro",
-      "amount": 140,
-      "date": "2026-11-05",
-      "category": "SEDZIOWIE",
-      "description": "Dieta dla sędziego głównego i liniowego",
-      "createdByName": "Łukasz (Kierownik)"
-    }
-  ],
-  "announcements": [
-    {
-      "id": "ann_mecz_lals_1",
-      "title": "🏐 Ważny Mecz LALS: Zbiórka na hali 18:45!",
-      "content": "W najbliższy wtorek gramy oficjalny mecz ligowy z Volley Radzymin. Zbiórka na hali o 18:45. Pamiętajcie o czarnych strojach meczowych i deklaracji obecności w ankiecie!",
-      "priority": "PILNY",
-      "category": "MECZ",
-      "isPinned": true,
-      "link": "/events",
-      "createdById": "usr_kierownik",
-      "createdByName": "Łukasz Kremer (Kierownik)",
-      "createdByRole": "KIEROWNIK",
-      "createdAt": "2026-11-08T10:00:00.000Z",
-      "readBy": [
-        {
-          "userId": "usr_trener",
-          "userName": "Hubert Obara",
-          "readAt": "2026-11-12T21:25:07.272Z"
-        }
-      ]
-    },
-    {
-      "id": "ann_taktyka_update",
-      "title": "📋 Nowe rozpiski przyjęcia zagrywki w P1 i P6",
-      "content": "Trener Hubert Obara zaktualizował założenia taktyczne i korytarze przyjęcia zagrywki pod serwis rywali. Prosimy wszystkich przyjmujących i libero o zapoznanie się z tablicą taktyczną.",
-      "priority": "WAZNY",
-      "category": "OGOLNE",
-      "isPinned": false,
-      "link": "/taktyka",
-      "createdById": "usr_trener",
-      "createdByName": "Hubert Obara (Trener)",
-      "createdByRole": "TRENER",
-      "createdAt": "2026-11-07T14:30:00.000Z",
-      "readBy": [
-        {
-          "userId": "usr_trener",
-          "userName": "Hubert Obara",
-          "readAt": "2026-11-12T21:25:07.267Z"
-        }
-      ]
-    },
-    {
-      "id": "ann_fees_nov",
-      "title": "💳 Składki klubowe za Listopad",
-      "content": "Przypominamy o uregulowaniu comiesięcznej składki klubowej (150 zł na halę i ligę). Możliwość opłacenia jednym kliknięciem przez BLIK w zakładce Składki.",
-      "priority": "NORMALNY",
-      "category": "SKLADKI",
-      "isPinned": false,
-      "link": "/fees",
-      "createdById": "usr_kierownik",
-      "createdByName": "Łukasz Kremer",
-      "createdByRole": "KIEROWNIK",
-      "createdAt": "2026-11-05T09:00:00.000Z",
-      "readBy": [
-        {
-          "userId": "usr_trener",
-          "userName": "Hubert Obara",
-          "readAt": "2026-11-12T21:25:07.270Z"
-        }
-      ]
-    }
-  ],
+  "fees": [],
+  "payments": [],
+  "treasuryExpenses": [],
+  "announcements": [],
   "polls": [],
-  "tactics": [
-    {
-      "id": "tac_1793919851792",
-      "title": "Plan: Rotacja P1 (ZAGRYWKA)",
-      "phase": "ZAGRYWKA",
-      "rotation": "P1",
-      "scope": "OGOLNA",
-      "description": "",
-      "courtPositions": [
-        {
-          "id": "p1_r",
-          "name": "Karol (R)",
-          "number": 28,
-          "roleCode": "R",
-          "zone": 1,
-          "x": 80,
-          "y": 94,
-          "task": "Zagrywka taktyczna w strefę 1 lub 5"
-        },
-        {
-          "id": "p1_p1",
-          "name": "Michał (P1)",
-          "number": 8,
-          "roleCode": "P1",
-          "zone": 2,
-          "x": 78,
-          "y": 56,
-          "task": "Blok prawy"
-        },
-        {
-          "id": "p1_s1",
-          "name": "Maciek (Ś1)",
-          "number": 47,
-          "roleCode": "Ś1",
-          "zone": 3,
-          "x": 50,
-          "y": 56,
-          "task": "Blok środkowy"
-        },
-        {
-          "id": "p1_a",
-          "name": "Łukasz (A)",
-          "number": 17,
-          "roleCode": "A",
-          "zone": 4,
-          "x": 18,
-          "y": 56,
-          "task": "Blok lewy"
-        },
-        {
-          "id": "p1_p2",
-          "name": "Jan (P2)",
-          "number": 7,
-          "roleCode": "P2",
-          "zone": 5,
-          "x": 24,
-          "y": 82,
-          "task": "Obrona skosu"
-        },
-        {
-          "id": "p1_l",
-          "name": "Bartosz (L)",
-          "number": 97,
-          "roleCode": "L",
-          "zone": 6,
-          "x": 50,
-          "y": 82,
-          "task": "Obrona środka"
-        }
-      ],
-      "directives": [
-        "Karol (R): Zagrywka taktyczna w strefę 1 lub 5",
-        "Michał (P1): Blok prawy",
-        "Maciek (Ś1): Blok środkowy",
-        "Łukasz (A): Blok lewy",
-        "Jan (P2): Obrona skosu",
-        "Bartosz (L): Obrona środka"
-      ],
-      "drawingData": "data:image/png;base64,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",
-      "posts": [],
-      "createdById": "usr_kierownik",
-      "createdByName": "Łukasz",
-      "createdAt": "2026-11-05T23:04:11.792Z"
-    },
-    {
-      "id": "tac_1793919847134",
-      "title": "Plan: Rotacja P1 (ZAGRYWKA)",
-      "phase": "ZAGRYWKA",
-      "rotation": "P1",
-      "scope": "OGOLNA",
-      "description": "",
-      "courtPositions": [
-        {
-          "id": "p1_r",
-          "name": "Karol (R)",
-          "number": 28,
-          "roleCode": "R",
-          "zone": 1,
-          "x": 80,
-          "y": 94,
-          "task": "Zagrywka taktyczna w strefę 1 lub 5"
-        },
-        {
-          "id": "p1_p1",
-          "name": "Michał (P1)",
-          "number": 8,
-          "roleCode": "P1",
-          "zone": 2,
-          "x": 78,
-          "y": 56,
-          "task": "Blok prawy"
-        },
-        {
-          "id": "p1_s1",
-          "name": "Maciek (Ś1)",
-          "number": 47,
-          "roleCode": "Ś1",
-          "zone": 3,
-          "x": 50,
-          "y": 56,
-          "task": "Blok środkowy"
-        },
-        {
-          "id": "p1_a",
-          "name": "Łukasz (A)",
-          "number": 17,
-          "roleCode": "A",
-          "zone": 4,
-          "x": 18,
-          "y": 56,
-          "task": "Blok lewy"
-        },
-        {
-          "id": "p1_p2",
-          "name": "Jan (P2)",
-          "number": 7,
-          "roleCode": "P2",
-          "zone": 5,
-          "x": 24,
-          "y": 82,
-          "task": "Obrona skosu"
-        },
-        {
-          "id": "p1_l",
-          "name": "Bartosz (L)",
-          "number": 97,
-          "roleCode": "L",
-          "zone": 6,
-          "x": 50,
-          "y": 82,
-          "task": "Obrona środka"
-        }
-      ],
-      "directives": [
-        "Karol (R): Zagrywka taktyczna w strefę 1 lub 5",
-        "Michał (P1): Blok prawy",
-        "Maciek (Ś1): Blok środkowy",
-        "Łukasz (A): Blok lewy",
-        "Jan (P2): Obrona skosu",
-        "Bartosz (L): Obrona środka"
-      ],
-      "drawingData": "data:image/png;base64,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",
-      "posts": [],
-      "createdById": "usr_kierownik",
-      "createdByName": "Łukasz",
-      "createdAt": "2026-11-05T23:04:07.134Z"
-    },
-    {
-      "id": "tac_lals_r1",
-      "title": "Mecz LALS vs KS Metro: R1 (Przyjęcie)",
-      "phase": "PRZYJECIE",
-      "rotation": "P1",
-      "scope": "MECZ_LIGOWY",
-      "eventId": "evt_next_2",
-      "description": "Przyjęcie zagrywki rywala na 3 zawodników: Libero, P1, P2. Dogranie na 2. metr do rozgrywającego (R).",
-      "courtPositions": [
-        {
-          "id": "pos_1",
-          "name": "Tomasz (R)",
-          "number": 1,
-          "roleCode": "R",
-          "x": 80,
-          "y": 82,
-          "zone": 1,
-          "task": "Rozegranie z prawego skrzydła"
-        },
-        {
-          "id": "pos_2",
-          "name": "Kamil (P1)",
-          "number": 2,
-          "roleCode": "P1",
-          "x": 25,
-          "y": 55,
-          "zone": 2,
-          "task": "Atak z lewego skrzydła"
-        },
-        {
-          "id": "pos_3",
-          "name": "Środkowy (Ś1)",
-          "number": 3,
-          "roleCode": "Ś1",
-          "x": 50,
-          "y": 53,
-          "zone": 3,
-          "task": "Szybkie 1. tempo ze środka"
-        },
-        {
-          "id": "pos_4",
-          "name": "Atakujący (A)",
-          "number": 4,
-          "roleCode": "A",
-          "x": 80,
-          "y": 55,
-          "zone": 4,
-          "task": "Atak z prawego skrzydła"
-        },
-        {
-          "id": "pos_5",
-          "name": "Przyjmujący (P2)",
-          "number": 5,
-          "roleCode": "P2",
-          "x": 25,
-          "y": 82,
-          "zone": 5,
-          "task": "Pas przyjęcia lewa flanka"
-        },
-        {
-          "id": "pos_6",
-          "name": "Libero (L)",
-          "number": 6,
-          "roleCode": "L",
-          "x": 50,
-          "y": 82,
-          "zone": 6,
-          "task": "Główny filar odbioru zagrywki"
-        }
-      ],
-      "directives": [
-        "Celować zagrywką w strefę 1/5 rywala",
-        "Podwójny blok do skrzydłowego KS Metro",
-        "Asekuracja ataku na 6. metrze"
-      ],
-      "posts": [
-        {
-          "id": "post_sample_1",
-          "authorId": "usr_tomasz_1",
-          "authorName": "Tomasz (Trener)",
-          "role": "TRENER",
-          "content": "Zwróćcie uwagę na mocną zagrywkę z wyskoku ich nr 7. Przesuwamy linię przyjęcia o 1 metr do tyłu.",
-          "createdAt": "2026-11-06T12:03:16.948Z"
-        }
-      ],
-      "createdAt": "2026-11-06T12:03:16.949Z"
-    },
-    {
-      "id": "tac_lals_r2",
-      "title": "Mecz LALS vs KS Metro: R2 (Kontra/Atak)",
-      "phase": "ATAK",
-      "rotation": "P2",
-      "scope": "MECZ_LIGOWY",
-      "eventId": "evt_next_2",
-      "description": "Wyprowadzenie kontrataku po obronie: szybkie rozegranie na lewe skrzydło lub pipe ze środka II linii.",
-      "courtPositions": [
-        {
-          "id": "pos_1",
-          "name": "Tomasz (R)",
-          "number": 1,
-          "roleCode": "R",
-          "x": 65,
-          "y": 54,
-          "zone": 2,
-          "task": "Rozegranie"
-        },
-        {
-          "id": "pos_2",
-          "name": "Kamil (P1)",
-          "number": 2,
-          "roleCode": "P1",
-          "x": 20,
-          "y": 52,
-          "zone": 4,
-          "task": "Atak ze skrzydła"
-        },
-        {
-          "id": "pos_3",
-          "name": "Środkowy (Ś1)",
-          "number": 3,
-          "roleCode": "Ś1",
-          "x": 50,
-          "y": 52,
-          "zone": 3,
-          "task": "Zwodniczy skok do bloku"
-        },
-        {
-          "id": "pos_4",
-          "name": "Atakujący (A)",
-          "number": 4,
-          "roleCode": "A",
-          "x": 80,
-          "y": 80,
-          "zone": 1,
-          "task": "Atak z II linii (strefa 1)"
-        },
-        {
-          "id": "pos_5",
-          "name": "Przyjmujący (P2)",
-          "number": 5,
-          "roleCode": "P2",
-          "x": 48,
-          "y": 76,
-          "zone": 6,
-          "task": "Opcja Pipe"
-        },
-        {
-          "id": "pos_6",
-          "name": "Libero (L)",
-          "number": 6,
-          "roleCode": "L",
-          "x": 22,
-          "y": 80,
-          "zone": 5,
-          "task": "Obrona przekątnej"
-        }
-      ],
-      "directives": [
-        "Szybkie tempo rozegrania",
-        "Gotowość do ponowienia ataku po bloku"
-      ],
-      "createdAt": "2026-11-06T12:03:16.949Z"
-    },
-    {
-      "id": "tac_sparing_p1",
-      "title": "Sparing: Ustawienie wyjściowe P1",
-      "phase": "PRZYJECIE",
-      "rotation": "P1",
-      "scope": "SPARING",
-      "eventId": "evt_1793959274090",
-      "description": "Testowe warianty obrony i rotacji w meczu sparingowym.",
-      "courtPositions": [
-        {
-          "id": "pos_1",
-          "name": "Rozgrywający (R)",
-          "number": 1,
-          "roleCode": "R",
-          "x": 80,
-          "y": 82,
-          "zone": 1,
-          "task": "Rozegranie"
-        },
-        {
-          "id": "pos_2",
-          "name": "Przyjmujący 1 (P1)",
-          "number": 2,
-          "roleCode": "P1",
-          "x": 25,
-          "y": 55,
-          "zone": 2,
-          "task": "Atak z IV strefy"
-        },
-        {
-          "id": "pos_3",
-          "name": "Środkowy 1 (Ś1)",
-          "number": 3,
-          "roleCode": "Ś1",
-          "x": 50,
-          "y": 53,
-          "zone": 3,
-          "task": "Blok i 1. tempo"
-        },
-        {
-          "id": "pos_4",
-          "name": "Atakujący (A)",
-          "number": 4,
-          "roleCode": "A",
-          "x": 80,
-          "y": 55,
-          "zone": 4,
-          "task": "Atak z prawego skrzydła"
-        },
-        {
-          "id": "pos_5",
-          "name": "Przyjmujący 2 (P2)",
-          "number": 5,
-          "roleCode": "P2",
-          "x": 25,
-          "y": 82,
-          "zone": 5,
-          "task": "Przyjęcie"
-        },
-        {
-          "id": "pos_6",
-          "name": "Libero (L)",
-          "number": 6,
-          "roleCode": "L",
-          "x": 50,
-          "y": 82,
-          "zone": 6,
-          "task": "Asekuracja"
-        }
-      ],
-      "directives": [
-        "Ćwiczenie komunikacji przy piłkach spornych"
-      ],
-      "createdAt": "2026-11-06T12:03:16.949Z"
-    }
-  ],
+  "tactics": [],
   "scoutingReports": [],
   "seasonsArchive": [
     {
@@ -3546,14 +2774,14 @@
       "uploadedBy": "Sztab Klubu"
     }
   ],
-  "activeLeaguePhaseId": "faza_1794658922199",
+  "activeLeaguePhaseId": "faza_1",
   "leaguePhases": [
     {
       "id": "faza_1",
       "name": "Faza I: Grupa Eliminacyjna (Top 3 awans)",
       "shortName": "Faza I",
       "groupName": "Grupa Angels ZTP (7 zespołów)",
-      "isActive": false,
+      "isActive": true,
       "advancementSpots": 3,
       "advancementTargetName": "Awans do Grupy Finałowej (Top 3)",
       "teamsCount": 7,
@@ -3751,144 +2979,9 @@
           ]
         }
       ]
-    },
-    {
-      "id": "faza_1794658922199",
-      "name": "Faza 2",
-      "shortName": "Grupa B",
-      "isActive": true,
-      "advancementSpots": 1,
-      "advancementTargetName": "Mistrz Ligi LALS",
-      "teamsCount": 0,
-      "table": [],
-      "createdAt": "2026-11-14T12:22:02.199Z"
     }
   ],
-  "trainingPlans": [
-    {
-      "id": "train_1",
-      "eventId": "evt_past_1",
-      "title": "Trening: Przyjęcie & Blok sytuacyjny",
-      "date": "2026-11-14",
-      "time": "19:30 - 21:00",
-      "location": "Hala POSiR, ul. Chwiałkowskiego 34, Poznań",
-      "durationMinutes": 90,
-      "mainGoal": "Stabilizacja przyjęcia zagrywki typu float w pasie stref 1 i 5 oraz tempo wyprowadzenia kontrataku na lewe skrzydło",
-      "secondaryGoals": [
-        "Asekuracja bloku środkowego na 6. metrze",
-        "Szybkie tempo rozegrania do Maćka Noaka (Ś1) z 1. tempa przy pozytywnym przyjęciu"
-      ],
-      "intensity": "WYSOKA",
-      "equipmentNeeded": "16 piłek Mikasa V200W, 4 pachołki kierunkowe, guma oporowa, tablica taktyczna",
-      "coachNotes": "Przed meczem ligowym musimy wyeliminować błędy własne w 1. akcji po serwisie. Duży nacisk na komunikację Libero z przyjmującymi.",
-      "videoUrls": [
-        "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-      ],
-      "exercises": [
-        {
-          "id": "ex_1",
-          "title": "Rozgrzewka dynamiczna & Aktywacja barków z gumami",
-          "category": "ROZGRZEWKA",
-          "durationMinutes": 15,
-          "description": "Bieg ze zmianą kierunku, krążenia ramion w trójkach, aktywacja stożka rotatorów z taśmami thera-band, dogrzanie nadgarstków i palców przy siatce.",
-          "keyPoints": [
-            "Prawidłowa postawa siatkarska",
-            "Płynność ruchów rotacyjnych"
-          ]
-        },
-        {
-          "id": "ex_2",
-          "title": "Dogranie zagrywki float w korytarzu 3-osobowym (L + P1 + P2)",
-          "category": "TECHNIKA",
-          "durationMinutes": 25,
-          "description": "Trener zagrywa z podestu rotację float w strefy 1, 6 i 5. Przyjmujący dogrywają na 2. metr w tempo do wbiegającego Karola (R).",
-          "keyPoints": [
-            "Kąt odbicia platformy przedramion",
-            "Nogi ugięte, stabilna podstawa",
-            "Głośne wołanie Moja!"
-          ],
-          "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-        },
-        {
-          "id": "ex_3",
-          "title": "Przejście z obrony do kontrataku (Szóstki zadaniowe)",
-          "category": "TAKTYKA",
-          "durationMinutes": 30,
-          "description": "Szóstka wyjściowa (R + Ś1 + P1 + A + Ś2 + P2 / L) broni ataku rywali po prostej i natychmiast organizuje kontrę: skrzydło lub pajp.",
-          "keyPoints": [
-            "Szybkie cofnięcie skrzydłowego po bloku",
-            "Asekuracja atakującego na 6. metrze przez Libero"
-          ],
-          "courtDrawing": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAAFUCAYAAAD4TEI6AAAQAElEQVR4AezdC5AlVX3H8f+d2ferDRBJaSmlxhjd5bU7++AlLG8ElIcWCBER0QgatRJBIz4SDCWlgCgIBCWUQGkqhkhFfARCKVDKY3c2PHZLEylfhAjysnfZndl53Zxze+bePj33zn2d7j59+js1fadP97mnz/mcnpnf9L1z70Cw95uqLBhwDnAOcA5wDnAOcA5wDtg7BwaEDwQQQAABBJwToEMIFFuAgFXs+aP3CCCAAAIIIOCgAAHLwUmhSwjYEKANBBBAAIH8BAhY+dlzZAQQQAABBBDwVICA1XJi2YEAAggggAACCPQmQMDqzY17IYAAAgggkI8ARy2EAAGrENNEJxFAAAEEEECgSAIErCLNFn1FAAEbArSBAAIIpC5AwEqdmAMggAACCCCAQNkECFhlm3Eb46UNBBBAAAEEEJhTgIA1Jw87EUAAAQQQQKAoAi71k4Dl0mzQFwQQQAABBBDwQoCA5cU0MggEEEDAhgBtIICALQECli1J2kEAAQQQQAABBKYFCFjTEHxBwIYAbSCAAAIIIKAFCFhagQUBBBBAAAEEELAo4FjAsjgymkIAAQQQQAABBHIS6CtgPfPkY8KCAecA5wDnAOeA9+cAv+9K+fu+n2zWV8Dq58DcFwEEEEAAAQQQ8FWAgOXrzDIuBNwSoDcIIIBAqQQIWKWabgaLAAIIIIAAAlkI9BWw9n7VfhJfjrh/QvQS38a6adSzR8KadnDlHOAc4BzgHOAcsHMO6Oyil6RnP0Gsr4DVz4G5LwIIIIAAAggUX4ARNBcgYDV3YSsCCCCAAAIIINCzAAGrZzruiAACCNgQoA0EEPBRgIDl46wyJgQQQAABBBDIVYCAlSs/B7chQBsIIIAAAgi4JkDAcm1G6A8CCCCAAAIIFF5gQKTwY2AACCCAAAIIIICAUwJcwXJqOugMAggggEBdgBUECixAwCrw5NF1BBBAAAEEEHBTgIDl5rzQKwRsCNAGAggggEBOAgSsnOA5LAIIIIAAAgj4K0DAmmtu2YcAAggggAACCPQgQMDqAY27IIAAAgggkKcAx3ZfgIDl/hzRQwQQQAABBBAomAABq2ATRncRQMCGAG0ggAAC6QoQsNL1pXUEEEAAAQQQKKEAAauEk25jyLSBAAIIIIAAAq0FCFitbdiDAAIIIIAAAsUScKa3BCxnpoKOIIAAAggggIAvAgQsX2aScSCAAAI2BGgDAQSsCBCwrDDSCAIIIIAAAggg0BAgYDUsWEPAhgBtIIAAAgggIAQsTgIEEEAAAQQQQMCygHsBy/IAaQ4BBBBAAAEEEMhagICVtTjHQwABBBAopACdRqAbAQJWN1rURQABBBBAAAEEOhAgYHWARBUEELAhQBsIIIBAeQQIWOWZa0aKAAIIIIAAAhkJELAygrZxGNpAAAEEEEAAgWIIELCKMU/0EgEEEEAAAVcF6FcTAQJWExQ2IYAAAggggAAC/QgQsPrR474IIICADQHaQAAB7wQIWN5NKQNCAAEEEEAAgbwFCFh5zwDHtyFAGwgggAACCDglQMByajroDAIIIIAAAgj4IBAFLB9GwhgQQAABBBBAAAFHBAhYjkwE3UAAAQQQmC3AFgSKKkDAKurM0W8EEEAAAQQQcFaAgOXs1NAxBGwI0AYCCCCAQB4CBKw81DkmAggggAACCHgtQMBqM73sRgABBBBAAAEEuhUgYHUrRn0EEEAAAQTyF6AHjgsQsByfILqHAAIIIIAAAsUTIGAVb87oMQII2BCgDQQQQCBFAQJWirg0jQACCCCAAALlFCBglXPebYyaNhBAAAEEEECghQABqwUMmxFAAAEEEECgiAJu9JmA5cY80AsEEEAAAQQQ8EiAgOXRZDIUBBBAwIYAbSCAQP8CBKz+DWkBAQQQQAABBBAwBAhYBgcFBGwI0AYCCCCAQNkFCFhlPwMYPwIIIIAAAghYF3AyYFkfJQ0igAACCCCAAAIZChCwMsTmUAgggAAChRag8wh0LEDA6piKiggggAACCCCAQGcCBKzOnKiFAAI2BGgDAQQQKIkAAaskE80wEUAAAQQQQCA7AQJWdtY2jkQbCCCAAAIIIFAAAQJWASaJLiKAAAIIIOC2AL1LChCwkiKUEUAAAQQQQACBPgUIWH0CcncEEEDAhgBtIICAXwIELL/mk9EggAACCCCAgAMCBCwHJoEu2BCgDQQQQAABBNwRIGC5Mxf0BAEEEEAAAQQ8EagHLE/GwzAQQAABBBBAAIHcBQhYuU8BHUAAAQQQmEOAXQgUUoCAVchpo9MIIIAAAggg4LIAAcvl2aFvCNgQoA0EEEAAgcwFCFiZk3NABBBAAAEEEPBdgIDVfoapgQACCCCAAAIIdCVAwOqKi8oIIIAAAgi4IkA/XBYgYLk8O/QNAQQQQAABBAopQMAq5LTRaQQQsCFAGwgggEBaAgSstGRpFwEEEEAAAQRKK0DAKu3U2xg4bSCAAAIIIIBAMwECVjMVtiGAAAIIIIBAcQUc6DkBy4FJoAsIIIAAAggg4JcAAcuv+WQ0CCCAgA0B2kAAgT4FCFh9AnJ3BBBAAAEEEEAgKUDASopQRsCGAG0ggAACCJRagIBV6uln8AgggAACCCCQhoCrASuNsdImAggggAACCCCQiQABKxNmDoIAAggg4IcAo0CgMwECVmdO1EIAAQQQQAABBDoWIGB1TEVFBBCwIUAbCCCAQBkECFhlmGXGiAACCCCAAAKZChCwMuW2cTDaQAABBBBAAAHXBQhYrs8Q/UMAAQQQQKAIAvTRECBgGRwUEEAAAQQQQACB/gUIWP0b0gICCCBgQ4A2EEDAIwEClkeTyVAQQAABBBBAwA0BApYb80AvbAjQBgIIIIAAAo4IELAcmQi6gQACCCCAAAL+CMQDlj+jYiQIIIAAAggggECOAgSsHPE5NAIIIIBAJwLUQaB4AgSs4s0ZPUYAAQQQQAABxwUIWI5PEN1DwIYAbSCAAAIIZCtAwMrWm6MhgAACCCCAQAkECFgdTTKVEEAAAQQQQACBzgUIWJ1bURMBBBBAAAG3BOiNswIELGenho4hgAACCCCAQFEFrAesv/i/H8tlV1xlLM1wknV0mXpiuGkTveCCC+dB9F2gHZJLtMe8TdbRZbNGVLrsiqtmfc9Fe8xbff/kYtaISsk6uhztMW/19uRi1ohKyTq6HO0xb/X25GLWiErJOroc7TFv9fbkYtaISsk6uhztMW/19uRi1ohKyTq6HO0xb/X25GLWiErJOroc7TFv9fbkYtaISsk6uhztMW/19uRi1ohKyTq6HO0xb/X25GLWiErJOroc7TFv9fbkYtaISsk6uhztMW/19uRi1ohKyTq6HO0xb/X25GLWiErJOroc7TFv9fbkYtZIp2Q9YKXTTVpFAAEEEEAAAQSKI2A9YN32iiPkko/9tbE040jW0WXqieGmTfTitIuaa/rHvHGeRt8F2iG5RHvM22QdXTZrRCW9PblEe8zbZB1dNmtEJb09uUR7zNtkHV02a0QlvT25RHvM22QdXTZrRCW9PblEe8zbZB1dNmtEJb09uUR7zNtkHV02a0QlvT25RHvM22QdXTZrRCW9PblEe8zbZB1dNmtEJb09uUR7zNtkHV02a0QlvT25RHvM22QdXTZrRCW9PblEe8zbZB1dNmtEJb09uUR7zNtkHV02a6RTsh6w0ukmrSKAAAIIIIAAAp0L5F2TgJX3DHB8BBBAAAEEEPBOgIDl3ZQyIAQQQMCGAG0ggEA/AgSsfvS4LwIIIIAAAggg0ESAgNUEhU0I2BCgDQQQQACB8goQsMo794wcAQQQQAABBFIScDhgpTRimkUAAQQQQAABBFIWIGClDEzzCCCAAAKeCTAcBDoQIGB1gEQVBBBAAAEEEECgGwECVjda1EUAARsCtIEAAn0IhPfeL+GWxyUc3qqWbWrdsWVY9Wf48T5G6MddCVh+zCOjQAABBBDwWCAKVCq4bNkmsnwPNVL167tSEVGf4tqH7lNloBH8rrvWtR5m0h81Q5kch4PYFKAtBBBAAIFyCVTVr2sdXIo46vUbVdgq3xUtNWNFnC36jAACCCCAQEkFqmrcehF1MzmlCu4sIqovU6pfqlf1z1owVFe01EOH9W0lWCFglWCSGSICCCCAQLEFlh06JDI2LsHqlRKsmV5Wr5Jg7b4SrHZsGVL9Uv2U6uygFeqHOIs9FR33noDVMRUVEUAAgbQFaB+B5gKDIyMSbDig+U5HtwZrVqlQuHNW78oSsghYs6aeDQgggAACCCBgQyDYsE5dYVsp+tHMeHtlCFkErPiMs154AQaAAAIIIOCegH5Yc1bI2uz3E98JWO6dh/QIAQQQQAAB7wRqISs+qgG/I0hidPGRs44AAggggAACCFgU2PaY8XBh+KOfWmzcraYIWG7NB71BAAEEEGgmwDYvBIJ3vVOMF0ddMF98/SBg+TqzjAsBBBBAAIE2ApOvfZ3s+tzlMnbs8W1qprR7dCylhvNvloCV/xzQAwSyEOAYCCCAwCyBkU9fKuMnniwjl18p4d33zdpve0N4y7caTVZFKue9S3z9IGD5OrOMCwEEEEAAgTYCk6//s0aNPfeM3jx6eJuMnnp6Y7vNtZX7NlqriKz4zS8bZc/WCFidTij1EEAAAQQQ8E1gYsIckQo9+jlSY6e9w9xuraQPMN1Y8pXepzf78oWA5ctMMg4EEEAAgVIK9DPopR98nyy67O9EJieNZqrqSlOormS99IUrje19F2L5SqrmMftu27EGCFiOTQjdQQABBBBAICuBedu2ysLbvy3B2v3UIatqiX2qMDR59PG1hw1fuub62I7uV7d/6pJaO/F7BkP7x4verROwvJtSBoQAAt0JUBsBBLRAsHqVDDz0kPE6VXq7fshw8pA3i357G2PZ/LiEd90rI2pfrV6Tmx0XXyTh5m1SPe0s0e3IzIfnDw/qYRKwtAILAggggAACCMjyC84T/YrrA489OjtoJX30K7HvtZeMqatbRvDasq0exqbOPFekSdKovRF0sj3Pyk2G7dkIGU7qAhwAAQQQQMAvgeXnnlULWvLMM/YGVnsEsirLD1tnr02HWyJgOTw5dA0BBBBAAIE8BYITjpRg9UqRp/5X5LnfR8sLz4qMvCQy1U3PqrL0uENVW+phyJ07u7ljP3VzvS8BK1d+Do4AAggggID7AsHJx0lw7MZoOfoICQ5ZL8HQShWYokWef15k545oGd0lopexUZGJMRm86VpVb5XMe+5F9wdqsYcELIuYNIUAAgh4JcBgEOhQIDjmzRIctiFaDl4rgV42rJFg3YGy7Kv9/Qdih11wrhoBy7kpoUMIIIAAAgggUHQBAlbRZ5D+uyxA3xBAAAEESipAwCrpxDNsBBBAAAEEEEhPwO2Ald64aRkBBBBAAAEEEEhNgICVGi0NI4AAAgj4KsC4EGgnQMBqJ8T+wguEmx6pv6pwq1cb7nj78DYJN29VFPXIrAAAEABJREFUy3DhXRgAAggggEB6AgSs9Gxp2RWBwfn2elJRTQ2om4FFjdA2rALX8GMS/su31U4+OxOgFgIIIOC3AAHL7/lldFqg9vYMeiWlpaICV2VQ5E/fJKG+wqXfh0tf5brznpQOSLMIIIAAAq4LELBcn6EW/WNz5wILTz9WZGpS3UG/r0Ofy5S+v2qqVWhTWUvtFdFXuV7xJ9FVLh26Nj1e28wNAggggEA5BAhY5ZjnUo9y0a+fkmBoPwlW79v/MqTbWCnBmpUiDz8oMqmDm0pb6rMlckXtGRyIwpa6uqVKfCKAAAK+CjCuaQEC1jQEXxDoViD4wHslWKuD26pa4ApWrxR5+hmR6lxpS6Kgde9Puj0c9RFAAAEECiRAwCrQZNHV/AXG1x8kO27/rox8/JKmnQnecqQKW6tEhy29SFVf4VJVk5lr2cskHH5U7eATgYQARQQQ8EKAgOXFNDKItAWqS5bIrk9fKruu/7pMvea1MnbGWTIVBG0PG6zRV7imH1LUz9+aubqlHzaUQQk3Pda2DSoggAACCBRPgIBVvDmjx3MLWN87sW6D7PjO92T81NPrbQ888Qup7NxZL3eyEgztGz1nqx6yVMoaVCFry9ZO7k4dBBBAAIECCRCwCjRZdDVbgZmrVjtvuEmqf/zy+sHn//B7svT8d0tlYqK+rdOVYN3+quq4WuKfFfVw4bb4BtYRQAABBAouMDtgFXxAdB8BGwKj5/+lbP/xg8ZVq8oLL8iSiz4qSz55sQxsD3s+TLDmQJGnnjDvry5m6dfQMjdSaiUQPqxfnX9r9A8DW7b18VW18TDPhWvlzHYEEOhdgIDVux339FBg4tX7yPY775LdF35YZN5gfYTz7/qhLDv9JJl/z931bf2sBCe/rfZEeKMNQpbBkSyEKgjpEKrf1kjm6VfnV2DJSl2XVRvz5tUDWtd35w6ZCnAwBIokMFCkztJXBNIU2PnFq2TnHd+X6ite2TjM5GR01eoTfyMDYe9XrRoNmmvRfxrGtqnf97UAEdtU1tVwy+P14KODlaggJMonTY+Q58OlyUvbCJRKgIBVqulmsK0Edl5zg0wcdZyxu/LM07LstBOtXbUyGo8Vai9amngZB/2G0rEqllaL04wOVyKxH0+VFn3X/5kp+tX1e1hq9022W5HwoU3JjZQRQACBrgViP8G6vi93QMALgR1fv0UmDjnMGMuCW26WFSccJYNPPmlsT6swK2QNqF/06iGxtI7narvhZVdIOKz/q7LFjyYdRKuTtYdX9dU//Z+ZPb9C/1D0qvxy2zdMjnlLzDIlBBBAoAeBFj/FemipBHdhiH4KTK1e0xiY+gW++K8+IIuvvqKxLau1D19gHkk9JBb+2x3mNo9LoX6/xhNOEKnELlep+ZCJ6atTP3tEdBDVry0mFj+Cq74g9ReE1e2qw0dX0HSBBQEEEOhNgIDVmxv38lRgwbVXy4Kf3J/L6IKf3Ceya8Q89j6vN8uelsKHHhEZTPw40uHqd7+UYJ2+0qSWs89ObfSzQls10ZfUjkzDCFgRoBEHBfgp4uCk0KX8BKrLl+V3cHXk4NAhdTVFX7FRBf1ZkemHzHTBzyW84w6R2n8FxsZXrcqKDQdIcNLJsY0prz71m8YBtPvmxxtl1hBAAIEuBQa6rE91BPwWWJZvwNK4wZp9VcjSa9OLesgsvPzK6YJfX2r/l/kqdZVOBZr6yEZH1UOBq6QynnxB1noN+yuqxeDkt8xyV5v5RAABBHoSIGD1xMadEEhZ4Jmn1S/7auMgxxzfWPdpbcs2kXi4mpyU4ODYc+Ik44+nfttw18F2mKtYGc8Ah0PAGwECljdTmetAOLhlgeAtRyVarEr4wJbEtmIXm70URbB2v1wHFbw18ST7Cj8ic50QDo5AgQX46VHgyaPrngusWWVcTZEFC7wZcO0FPQfil65EFuZ55Sou+/xz8ZKED3MVywChgEChBPLrLAErP3uO7KLAZOwJ5jn3L9DHj/en9pDVY3prIZdwk37/wOh9A8V4XFBEXnhBFo2OqpX8P4NjDlfBNtaP5H83xnaxigACCLQSIGC1kmE7Ag4IBOvUQ2axp2KJDDrQqx67MKjfP7DJfafGJDjafKHXJrWy3RS+2Dhexf//5GwMdvYaWxBAoDcBAlZvbtzLU4HqokXujWxirNEn/cv+7vsa5aKvVVW4GjrQuVEERx5q9klfPdz0qLmNUiEFxpYuEf38v3BLdDW15Vfmu5Dz61KnCVguzQZ9yV9gse2A1f+QgvWJALLHHv03mkML885+m8jUpDqyfhhWLVOjEqxJjE3tdebzhstFqrHeDM6T8LprYxtYLZpAOPyYjNy/SSTx/L+m49DzPaxD2FYJf/xg0ypsRGAuAQLWXDrsQ8AVgaoKJLG+hBuT/2UY2+no6tKfPSHB0H5Sf+/AoRxfjqEDo+DGW0X0E96rsZS1/ogO7kkVFwVC/cKxlS4fYq/okaibFculdqXr4g/pDSwIdCTgfMDqaBRUQsB3gVP0i2BO/6JXD1fJFV/2fcROjC84Vj/hfdpd90jZhw9s1mssBRIIh7eKDMR+3ekprQVn/YdLYon/Y0lyjGdcINX5LZ5LmKxLufQCsTOu9BYAIOCsQPDkk2L+411F+MhGIBhKvLL+fPceRs5GojhH0W/WXbviNP08K1HB2Oj9yIgEa1ZJ/Wrq6n0b62v1+kpZXnvbKp3EYvdU33bbH3xkJmTFdrCKwGwBAtZsE7aUWKA60OVDCFla/fYXjaOpH/Th8H81yqylK6C86wfo5Pk79cqsZC0Q1l59f45fbbtUuNLhqU3HBnQ9FcJWrF5pPhdPnQvbH3qkzb3ZjYDIHGchPAiUUGDhQmcHHZxyqtm3SsEfqjBH43ZpSj+MNN3FxEWN6a18cUAgep5Vi19ret4mxiToIFzFh1JRhRVrEiFLbdNXyNQXPhFoKdDiTGxZnx0I+C0Qf56G6yOt6h/9rnfSk/49/dvYQKoS7rlnrMyqCwK7hvYX43lWulO1YKzDsVrGdkiwrrf/Wq2otpqGrOFtag+fCDQXIGA1dynCVvpYRoHaL4zpgeuf+tOrfElXIDjpxMYB9PN5fnBXo8xa7gLhV66X8Ru/afZjZFT08+fqz7M6aIO5v8uS/narhaz4/dRGfSUrvPfe+FbWEagJELBqDNyUWqDaGP3Uy/duFFxc272j0SvV73CvvRpl1tIVUN71Awy4+1ByvY8lWdEvGiqHvtkcbbUqwSH2XwZE5SkJks/J0kdevpeEm3jPSk0RLdxqAQKWVmApt4D+qTktUH3d66fX3PwSHHJwo2O633fd0yizlq6A9p45gr6KNbPO13wFmvzTwbx3vz3VPgX6OVlT8cStDjc4ILWXg1CrfCKgBQhYWoGl3ALxNxmuFOBbIv5zfcrh/3r07azK8OFZ3+iyG09VBs85XZZu/XnqhwyGVomM7TKPo4J3uOkxcxul0goU4LdJaeeGgWcksPDzfy+iHlKIDleV0bXro1VXb7mSks/MPPWrxnHV+VJVv0wbG1hzQmBiQpZlEK5mxhpsWDv7IcNB/uiZ8Sn7VwJW2c8AL8ff3aAWffffpf5ChOqX5u4vOf5+c1xJkTw+gre9tXFYdZ5sv/tHjTJrbgjEr+5m2aNf/UL9kdY4oH7ie6PEWlkFCFhlnXnGbQrEn0+xeIm5z7XS6PZGj7iS0rDIem3x4qyPyPHaCaw/oF2NVPYHbz9FJH5lWURCXsJBKZT7s2nAKjcJoy+jQOWJ9J+zYcs1OPSQRlP6SsqDvDdeA4S1sgkMvOcdIpMTIjueliDHwdf+uzB+fBW4uJIVBynfOgGrfHPOiJsIrDjz7Y2t6gfj9hu/3ii7vlbhOR+uTxH9syZQb2jyta+TXZ+7XBbu/WoJ1u4vweFH1ffltVILWYmHKcNhnvSe13zkfVwCVt4zwPHdEYj9YKwOHeROv9r1RAXCdlXYj4BvAqMf+4SMn3iyjFx+pUytyPPalSlbewmH2M8SEf4AMoXKUyJglWeuGWk7gfAP7Wq4ud/4Yd6mi+y2KAC8Rcyum4q/KHDVtRfcnZyKjYfzJIZRqlUCVqmmm8HOJRAcGXtuk6oYbtmqbvlEoIVA/B8jWlRhc4oC8dxSjRdSPGaHTQfr9m3UrFQk/A/+47QBUp41AlZ3c01t3wWMX5rqB+NPN/k+4sKOb/zIo2X73ffKyN9+urBjoOO9C1QXLmjcWYWYRsHBtRXLHewUXUpbgICVtjDtF0qg9urM8b+GFy6W8JZ/dnsMFbe7l1bvdp9znlT33EvG3nGmTOTx4rCjE2kNjXY7EKjusWe91tSSpfV1Z1biF9UG52XQLQ7hmgABy7UZoT+5C8w/92ypv7K7/st45SrZ9d73594vOmAKDG5pvDzFyCc/a+5MoRTedIvRauX8dxtlChkLzJ/fOOAfvayx7spa/A8fApYrs5JpPwhYmXJzsCIILHn8URn81m0SD1njF35Ydu3zmiJ0vzR9XHjrzSLTTyae2mcfmXjjyr7G3vbOB6w2qqz4zS+NMoWMBeY1rgqNvu/CjA/eyeFil7D0H2qd3IU6XgkQsLyaTgZjS2DZFZeLPPlkozn1A3L8O3dK+N0fNra5shb7Oe5Kl7Lox8CLL6qA1XiYLv3/JItdkog/jJzFYDnGLIHKM8/Ut02pq8xjG/N/Hax6h/TKzp36lqXEAgSsEk++3aH711pwygkiE+PmwF75qtpbYIQ/3Wxuz7NkPDE/z47kcOyB2I+w+Hs0ptGVWL6SqUawS+NQtNleYPmp6vtz5txXfwCNfPHL7e+UYY3gsPXG0cIf/KdRpuC/QOynk/+DZYQIdCsQrNPvbZa4RKR/0S5aLOGWbWrZKi999CPdNttX/XA49vIRqmvLD13bV3uFvvNg40Ucd131ldSGYpirowRr9XmhVvjMTaCye0wWXBcLVQMV9f24TXZe8pnc+jTngZcvm3M3O1MUyKlpAlZO8By2OALB6lUiz/5ORIWZ2b2uyOQ576/9YA8f3DJ7t+Ut4WYVrtRf6/VmK1UZmCjv1ZTKs8/WKWT+Agk3P94oW1rb9YY/F4mbNz8RhI/sBRb/09dEnnvOOPDE6Weo82Cr7PjWvxrbcy9MNv0Bknu36EB6AgSs9Gxp2SOB4LijpfYWGL97Slr+fl2wMApa6grTjosvsj76UL/wqforvd6w+nldC3/1DeVbWXH8RpH4c13UQ4a7PvkpqxDj3zR/Uc9/Z+x9K60eydnGnO5YcOzhIrt3m31U3ydTb3hj9P34wLCMHXWkuT+PEs/by0M912MSsHLl5+BFEwhOPLYWtGpv6toqaamrHVNnnhv9cK89jLjNyrqIfmxSog8VruSJ/4nWS34bHLZOJPb8q/Hj32pNZOeb1NVLNZ/1BtUvySX//fN6kRU3BIKDVsu8O25v3pmFi2Tki9dIOLxNtt/x/eZ1Utgaqj+06s2q79cF555VL7JSDnC01hUAAAsRSURBVAECVjnmmVGmIKCvHtWC1vO/l1ZZq3bYNG4mRyU449Q0Wi5kmwNbYq+4v2ypGWg39f6w4cStsReZrYqsWLtfIX3K0Omll35G9PfjvB/cqb4f1WQlB63+Pqm+ep/o3Nj0qOw+6cRkDWvlcN0Gsy0VzBf/+tfmNkreCxCwvJ9iBpi2QHDMRtEPHw7c9FWRmf9qSvugPJ/DEF7+/vOMslEYHKj9UjW2dVAINz8qEr96pVJ0JXalTPhwUmDpJR9X34+rRIctCbc37+PgPBm99Au18yJ86BF56covNa/Xw9btn7pE5PqbJH7urFhHMJcSfhQhYJVwWhhyEQWWf/U60W+1U/vBrp8TMjkuEl/0v/bHl+qkyMwiU2rIXSzfuFnV59MQaBNuQ/VwrVF/jkJ4zbUiA40XstRVgzXq4UK9wlIYgWDjQbWgNXiPfomEJle19Ejmz5fJjcdGYUudI/o86WepnqYeCqzohmeWqhDMZyzK9ZWAVa75ZrQZCejnhOh/5TeWof1VAIsta/aTYGZZva8E3Sw3qKtlGY2lKIdZ+A+flcHhh2XwkeH6Un81/ulB6F+cO67/2nRpji+HbDR3PnC/WaZUKIFlF31EfX9NX9Xasd1i39s3Fej/Qm5fjRoeChCwPJxUhoRAGQUW3XG7LHvfe2TZeefUl9pVp2rV4Jhaf3DtasX2m281tuvCzgsvqD0ZWq/Xl9ERCT74gXqRlWILBIcfpMLWSllw7dUi4+oqs3l62BucuqJa+eh77bVHS4UTIGAVbsroMAL+CGQxklrI+sMfZh2quv/qWtDSV7VmlonzPyRiPLwjEhw8JHz4J6BfQytYf4Do50/WHtbXb70Tvigys+zcIRJfRneJzCxjoyLJZWJMRC+T4zJw643qavUqWXHfg/7BMaKOBQhYHVNREQEEiioQHHmILLi++1d6X3GQ+QbPRR0//W4vEJxwpAQbD20sh22QIL4cvFaF7ellwxoJksu6AyXQy9oDZPmXvtz+gNTwXoCAVegppvMIINCpwOKv/aPUrlTsUFcm2j0spB5WnH/s4VLR/6zQ6QGohwACCMQECFgxDFYRQMB/geDwDaIfFpJnfz/74SD1END8qz+v9q+SJYm3YPFfhhEiYFGApoSAxUmAAAKlFAiO2zj74SD1MNCSW24rpQeDRgABuwIELLuetIYAAgjYEKANBBAouAABq+ATSPcRQAABBBBAwD0BApZ7c0KPbAjQBgIIIIAAAjkKELByxOfQCCCAAAIIIOCnQKuA5edoGRUCCCCAAAIIIJCBAAErA2QOgQACCCBgS4B2ECiGAAGrGPNELxFAAAEEEECgQAIErAJNFl1FwIYAbSCAAAIIpC9AwErfmCMggAACCCCAQMkECFhdTzh3QAABBBBAAAEE5hYgYM3tw14EEEAAAQSKIUAvnRIgYDk1HXQGAQQQQAABBHwQIGD5MIuMAQEEbAjQBgIIIGBNgIBljZKGEEAAAQQQQACBSICAFTlwa0OANhBAAAEEEECgJkDAqjFwgwACCCCAAAK+CuQxLgJWHuocEwEEEEAAAQS8FiBgeT29DA4BBBCwIUAbCCDQrQABq1sx6iOAAAIIIIAAAm0ECFhtgNiNgA0B2kAAAQQQKJcAAatc881oEUAAAQQQQCADgYIErAwkOAQCCCCAAAIIIGBJgIBlCZJmEEAAAQRKKMCQEWghQMBqAcNmBBBAAAEEEECgVwECVq9y3A8BBGwI0AYCCCDgpQABy8tpZVAIIIAAAgggkKcAAStPfRvHpg0EEEAAAQQQcE6AgOXclNAhBBBAAAEEii9Q9hEQsMp+BjB+BBBAAAEEELAuQMCyTkqDCCCAgA0B2kAAgSILELCKPHv0HQEEEEAAAQScFCBgOTktdMqGAG0ggAACCCCQlwABKy95josAAggggAAC3grMEbC8HTMDQwABBBBAAAEEUhUgYKXKS+MIIIAAAtYFaBCBAggQsAowSXQRAQQQQAABBIolQMAq1nzRWwRsCNAGAggggEDKAgSslIFpHgEEEEAAAQTKJ0DA6mXOuQ8CCCCAAAIIIDCHAAFrDhx2IYAAAgggUCQB+uqOAAHLnbmgJwgggAACCCDgiQABy5OJZBgIIGBDgDYQQAABOwIELDuOtIIAAggggAACCNQFCFh1ClZsCNAGAggggAACCIgQsDgLEEAAAQQQQMB3gczHR8DKnJwDIoAAAggggIDvAgQs32eY8SGAAAI2BGgDAQS6EiBgdcVFZQQQQAABBBBAoL0AAau9ETUQsCFAGwgggAACJRIgYJVoshkqAggggAACCGQjUJyAlY0HR0EAAQQQQAABBPoWIGD1TUgDCCCAAAJlFmDsCDQTIGA1U2EbAggggAACCCDQhwABqw887ooAAjYEaAMBBBDwT4CA5d+cMiIEEEAAAQQQyFmAgJXzBNg4PG0ggAACCCCAgFsCBCy35oPeIIAAAggg4ItAqcdBwCr19DN4BBBAAAEEEEhDgICVhiptIoAAAjYEaAMBBAorQMAq7NTRcQQQQAABBBBwVYCA5erM0C8bArSBAAIIIIBALgIErFzYOSgCCCCAAAII+Cwwd8DyeeSMDQEEEEAAAQQQSEmAgJUSLM0igAACCKQnQMsIuC5AwHJ9hugfAggggAACCBROgIBVuCmjwwjYEKANBBBAAIE0BQhYaerSNgIIIIAAAgiUUoCA1eO0czcEEEAAAQQQQKCVAAGrlQzbEUAAAQQQKJ4APXZEgIDlyETQDQQQQAABBBDwR4CA5c9cMhIEELAhQBsIIICABQEClgVEmkAAAQQQQAABBOICBKy4Bus2BGgDAQQQQACB0gsQsEp/CgCAAAIIIIBAGQSyHSMBK1tvjoYAAggggAACJRAgYJVgkhkiAgggYEOANhBAoHMBAlbnVtREAAEEEEAAAQQ6EiBgdcREJQRsCNAGAggggEBZBAhYZZlpxokAAggggAACmQkUKmBlpsKBEEAAAQQQQACBPgQIWH3gcVcEEEAAAQREBAQEZgkQsGaRsAEBBBBAAAEEEOhPgIDVnx/3RgABGwK0gQACCHgmQMDybEIZDgIIIIAAAgjkL0DAyn8ObPSANhBAAAEEEEDAIQEClkOTQVcQQAABBBDwS6C8oyFglXfuGTkCCCCAAAIIpCRAwEoJlmYRQAABGwK0gQACxRQgYBVz3ug1AggggAACCDgsQMByeHLomg0B2kAAAQQQQCB7AQJW9uYcEQEEEEAAAQQ8F2gbsHoZ/xu/uUVYMOAc4BzgHOAc4BzgHCjCOdBL1ml3n1QCVruDsh8BBBBAAIE+Bbg7Ak4LWA1YPztrtbBgwDnAOcA5wDnAOcA5UMRzwGZisxqwbHaMthBAIGUBmkcAAQQQSE2AgJUaLQ0jgAACCCCAQFkFCFi9zzz3RAABBBBAAAEEmgoQsJqysBEBBBBAAIGiCtBvFwQIWC7MAn1AAAEEEEAAAa8ECFheTSeDQQABGwK0gQACCPQrQMDqV5D7I4AAAggggAACCQECVgKEog0B2kAAAQQQQKDcAgSscs8/o0cAAQQQQKA8AhmOlICVITaHQgABBBBAAIFyCBCwyjHPjBIBBBCwIUAbCCDQoQABq0MoqiGAAAIIIIAAAp0KELA6laIeAjYEaAMBBBBAoBQCBKxSTDODRAABBBBAAIEsBYoWsLK04VgIIIAAAggggEBPAgSsnti4EwIIIIAAAnEB1hEwBQhYpgclBBBAAAEEEECgbwECVt+ENIAAAjYEaAMBBBDwSeD/AQAA///EHyZ2AAAABklEQVQDAOn70FfQs/ilAAAAAElFTkSuQmCC"
-        },
-        {
-          "id": "ex_4",
-          "title": "Gra kontrolna na przewagi (od stanu 20:20)",
-          "category": "GRA",
-          "durationMinutes": 20,
-          "description": "Sparing wewnętrzny z limitem błędów własnych na zagrywce (maks. 1 zepsuty serwis na set).",
-          "keyPoints": [
-            "Chłodna głowa w końcówkach",
-            "Zagrywka taktyczna zamiast błędu"
-          ]
-        }
-      ],
-      "conclusions": [
-        {
-          "id": "concl_1",
-          "authorId": "usr_kamil_trener",
-          "authorName": "Kamil (Trener)",
-          "authorRole": "TRENER",
-          "type": "PLUS",
-          "content": "Świetna intensywność i komunikacja w trójce przyjęcia (Bartosz #97 świetnie dowodził pasem).",
-          "createdAt": "2026-11-12T19:34:45.064Z"
-        },
-        {
-          "id": "concl_2",
-          "authorId": "usr_kamil_trener",
-          "authorName": "Kamil (Trener)",
-          "authorRole": "TRENER",
-          "type": "MINUS",
-          "content": "Przy mocnym serwisie skróconym zbyt późny start do piłki w strefie 2.",
-          "createdAt": "2026-11-12T19:34:45.065Z"
-        },
-        {
-          "id": "concl_3",
-          "authorId": "usr_kamil_trener",
-          "authorName": "Kamil (Trener)",
-          "authorRole": "TRENER",
-          "type": "INDYWIDUALNA",
-          "targetPlayerName": "Tomasz Krupa #1",
-          "content": "Bardziej zdecydowane wejście w piłkę przy pajpie, nie czekać na opadanie piłki.",
-          "createdAt": "2026-11-12T19:34:45.065Z"
-        },
-        {
-          "id": "concl_4",
-          "authorId": "usr_kamil_trener",
-          "authorName": "Kamil (Trener)",
-          "authorRole": "TRENER",
-          "type": "INDYWIDUALNA",
-          "targetPlayerName": "Karol Ordon #28",
-          "content": "Bardzo dobra dystrybucja piłki do środka w trudnych sytuacjach.",
-          "createdAt": "2026-11-12T19:34:45.065Z"
-        }
-      ],
-      "comments": [
-        {
-          "id": "com_1",
-          "authorId": "usr_bartosz",
-          "authorName": "Bartosz Augustynek #97",
-          "authorRole": "ZAWODNIK",
-          "content": "Dobra jednostka! Float dzisiaj mocno siedział, w piątek powtórzmy to ćwiczenie z kontrą z 6. metra.",
-          "createdAt": "2026-11-12T19:34:45.065Z"
-        }
-      ],
-      "createdById": "usr_kamil_trener",
-      "createdByName": "Kamil (Trener)",
-      "createdAt": "2026-11-12T19:34:45.065Z",
-      "updatedAt": "2026-11-12T20:27:15.470Z"
-    }
-  ],
+  "trainingPlans": [],
   "leagueSchedule": [
     {
       "round": 2,
