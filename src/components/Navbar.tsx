@@ -390,6 +390,8 @@ export default function Navbar() {
 
           {/* User Section & Mobile Hamburger */}
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+            <div className="hidden md:block h-6 w-px bg-slate-200 mx-0.5" />
+
             {/* Archive Mode Warning Badge (widoczny tylko gdy przeglądamy miniony sezon) */}
             {isArchiveMode && (
               <a
@@ -408,12 +410,12 @@ export default function Navbar() {
             <div className="relative shrink-0">
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 transition flex items-center justify-center shadow-sm"
+                className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 text-slate-700 transition flex items-center justify-center shadow-sm"
                 title="Powiadomienia"
               >
-                <Bell className="w-4 h-4" />
+                <Bell className="w-4 h-4 text-slate-600" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-sky-600 text-white rounded-full text-[9px] sm:text-[10px] font-black flex items-center justify-center animate-pulse shadow-md">
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-sky-600 text-white rounded-full text-[10px] font-black flex items-center justify-center shadow-md ring-2 ring-white animate-pulse">
                     {unreadCount}
                   </span>
                 )}
@@ -602,11 +604,11 @@ export default function Navbar() {
                 {/* Profile Pill with Photo & Details - Clickable */}
                 <button
                   onClick={() => setShowProfileModal(true)}
-                  className="flex items-center gap-2 sm:gap-2.5 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-sky-300 shadow-sm transition text-left group cursor-pointer"
+                  className="flex items-center gap-2 sm:gap-2.5 h-9 sm:h-10 px-2 sm:px-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-sky-300 shadow-sm transition text-left group cursor-pointer"
                   title="Kliknij, aby otworzyć swój profil"
                 >
-                  {/* Avatar / Photo with hover camera hint */}
-                  <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-xl overflow-hidden shrink-0 border border-slate-200 group-hover:border-sky-400 shadow-sm transition">
+                  {/* Circular Avatar / Photo with hover camera hint */}
+                  <div className="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden shrink-0 ring-1 ring-slate-200 group-hover:ring-sky-400 shadow-sm transition">
                     {user.avatar ? (
                       <img
                         src={user.avatar}
@@ -614,37 +616,66 @@ export default function Navbar() {
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-200"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-sky-500 to-indigo-600 text-white font-black text-xs sm:text-sm flex items-center justify-center">
+                      <div className="w-full h-full bg-gradient-to-tr from-sky-600 via-sky-500 to-indigo-600 text-white font-black text-xs flex items-center justify-center">
                         {user.name.charAt(0)}
                       </div>
                     )}
                     <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white">
-                      <Camera className="w-3.5 h-3.5" />
+                      <Camera className="w-3 h-3" />
                     </div>
                   </div>
 
                   {/* Player Name, Number & Role */}
-                  <div className="hidden lg:flex flex-col text-left">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-black text-slate-900 group-hover:text-sky-700 transition leading-tight">
+                  <div className="hidden lg:flex flex-col text-left justify-center pr-0.5">
+                    <div className="flex items-center gap-1.5 leading-none">
+                      <span className="text-xs font-black text-slate-900 group-hover:text-sky-700 transition">
                         {user.name}
                       </span>
                       {user.number && (
-                        <span className="bg-white text-slate-800 text-[10px] px-1.5 py-0.2 rounded font-mono font-black border border-slate-200">
+                        <span className="text-[10px] font-mono font-black text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">
                           #{user.number}
                         </span>
                       )}
                     </div>
-                    <div className="mt-0.5">
-                      {getRoleBadge(user)}
+                    <div className="flex items-center gap-1 mt-1 leading-none">
+                      {user.isCaptain ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 uppercase tracking-wider">
+                          <Crown className="w-3 h-3 text-amber-500 shrink-0" />
+                          Kapitan
+                        </span>
+                      ) : user.role === 'TRENER' ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-sky-700 uppercase tracking-wider">
+                          <Flame className="w-3 h-3 text-sky-500 shrink-0" />
+                          Trener
+                        </span>
+                      ) : user.role === 'KIEROWNIK' ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 uppercase tracking-wider">
+                          <Crown className="w-3 h-3 text-amber-500 shrink-0" />
+                          Kierownik
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                          {user.position || 'Zawodnik'}
+                        </span>
+                      )}
+                      {user.position && (user.isCaptain || user.role === 'TRENER' || user.role === 'KIEROWNIK') && (
+                        <>
+                          <span className="text-slate-300 text-[9px]">•</span>
+                          <span className="text-[10px] font-medium text-slate-500">
+                            {user.position}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
+
+                  <ChevronDown className="hidden lg:block w-3.5 h-3.5 text-slate-400 group-hover:text-slate-700 transition -ml-0.5" />
                 </button>
 
                 {/* Symmetrical Logout Button */}
                 <button
                   onClick={logout}
-                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 border border-slate-200 text-slate-500 flex items-center justify-center transition shadow-sm"
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white hover:bg-rose-50 hover:text-rose-600 border border-slate-200 hover:border-rose-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition shadow-sm"
                   title="Wyloguj z systemu"
                   aria-label="Wyloguj"
                 >
@@ -671,7 +702,7 @@ export default function Navbar() {
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 transition"
+              className="md:hidden p-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 transition shadow-sm"
               aria-label="Menu"
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -686,25 +717,25 @@ export default function Navbar() {
           {user && (
             <div className="p-3 mb-2 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-slate-200 shadow-sm shrink-0">
+                <div className="relative w-10 h-10 rounded-full overflow-hidden ring-1 ring-slate-200 shadow-sm shrink-0">
                   {user.avatar ? (
                     <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-sky-500 to-indigo-600 text-white font-black text-sm flex items-center justify-center">
+                    <div className="w-full h-full bg-gradient-to-tr from-sky-600 via-sky-500 to-indigo-600 text-white font-black text-sm flex items-center justify-center">
                       {user.name.charAt(0)}
                     </div>
                   )}
                 </div>
                 <div>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 leading-none">
                     <span className="text-xs font-black text-slate-900">{user.name}</span>
                     {user.number && (
-                      <span className="bg-white text-slate-800 text-[10px] px-1 rounded font-mono font-black border border-slate-200">
+                      <span className="bg-sky-50 text-sky-700 text-[10px] px-1.5 py-0.5 rounded font-mono font-black border border-sky-200">
                         #{user.number}
                       </span>
                     )}
                   </div>
-                  <div className="mt-0.5">{getRoleBadge(user)}</div>
+                  <div className="mt-1">{getRoleBadge(user)}</div>
                 </div>
               </div>
 
@@ -714,7 +745,7 @@ export default function Navbar() {
                     setIsMobileMenuOpen(false);
                     setShowProfileModal(true);
                   }}
-                  className="px-2.5 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 text-[11px] font-bold flex items-center gap-1 transition"
+                  className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-sky-50 border border-slate-200 hover:border-sky-300 text-sky-700 text-[11px] font-bold flex items-center gap-1 transition shadow-xs"
                   title="Mój Profil"
                 >
                   <User className="w-3.5 h-3.5" />
@@ -722,7 +753,7 @@ export default function Navbar() {
                 </button>
                 <button
                   onClick={logout}
-                  className="p-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 border border-slate-200 text-slate-500 transition"
+                  className="p-1.5 rounded-xl bg-white hover:bg-rose-50 hover:text-rose-600 border border-slate-200 hover:border-rose-200 text-slate-500 transition shadow-xs"
                   title="Wyloguj"
                 >
                   <LogOut className="w-4 h-4" />
