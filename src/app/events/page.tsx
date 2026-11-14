@@ -670,34 +670,6 @@ function EventsAttendanceContent() {
               </div>
             </div>
           </div>
-
-          {/* Quick Shortcuts to Sparingi, Liga and Taktyka */}
-          <div className="flex items-center gap-1.5 flex-nowrap overflow-x-auto scrollbar-none py-0.5">
-            <Link
-              href="/rozgrywki?tab=sparingi"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-xs uppercase tracking-wider shadow-2xs hover:shadow-xs transition shrink-0 whitespace-nowrap"
-              title="Przejdź do modułu sparingów"
-            >
-              <Swords className="w-3.5 h-3.5 text-amber-600" />
-              <span>Sparingi</span>
-            </Link>
-            <Link
-              href="/rozgrywki?tab=liga"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-bold text-xs uppercase tracking-wider shadow-2xs hover:shadow-xs transition shrink-0 whitespace-nowrap"
-              title="Przejdź do oficjalnej ligi LALS"
-            >
-              <img src="/lals_logo.png" alt="LALS" className="w-3.5 h-3.5 rounded-full bg-white p-0.5 object-contain shrink-0" />
-              <span>Liga LALS</span>
-            </Link>
-            <Link
-              href="/taktyka"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 font-bold text-xs uppercase tracking-wider shadow-2xs hover:shadow-xs transition shrink-0 whitespace-nowrap"
-              title="Przejdź do tablicy taktycznej"
-            >
-              <Target className="w-3.5 h-3.5 text-purple-600" />
-              <span>Taktyka</span>
-            </Link>
-          </div>
         </div>
 
         {/* Right Controls: View Switcher + Primary Action Button */}
