@@ -3370,14 +3370,14 @@
       "uploadedBy": "Sztab Klubu"
     }
   ],
-  "activeLeaguePhaseId": "faza_2",
+  "activeLeaguePhaseId": "faza_1",
   "leaguePhases": [
     {
       "id": "faza_1",
       "name": "Faza I: Grupa Eliminacyjna (Top 3 awans)",
       "shortName": "Faza I",
       "groupName": "Grupa Angels ZTP (7 zespołów)",
-      "isActive": false,
+      "isActive": true,
       "advancementSpots": 3,
       "advancementTargetName": "Awans do Grupy Finałowej (Top 3)",
       "teamsCount": 7,
@@ -3573,102 +3573,6 @@
             "P",
             "P"
           ]
-        }
-      ]
-    },
-    {
-      "id": "faza_2",
-      "name": "Faza II: Grupa Finałowa (7 zespołów)",
-      "shortName": "Faza II",
-      "groupName": "Grupa Mistrzowska LALS (7 zespołów)",
-      "isActive": true,
-      "advancementSpots": 1,
-      "advancementTargetName": "Mistrz LALS 2026/2027",
-      "teamsCount": 7,
-      "table": [
-        {
-          "id": "f1",
-          "position": 1,
-          "teamName": "Angels ZTP",
-          "matchesPlayed": 0,
-          "points": 0,
-          "setsWon": 0,
-          "setsLost": 0,
-          "pointsWon": 0,
-          "pointsLost": 0,
-          "form": []
-        },
-        {
-          "id": "f2",
-          "position": 2,
-          "teamName": "Finalista 2",
-          "matchesPlayed": 0,
-          "points": 0,
-          "setsWon": 0,
-          "setsLost": 0,
-          "pointsWon": 0,
-          "pointsLost": 0,
-          "form": []
-        },
-        {
-          "id": "f3",
-          "position": 3,
-          "teamName": "Finalista 3",
-          "matchesPlayed": 0,
-          "points": 0,
-          "setsWon": 0,
-          "setsLost": 0,
-          "pointsWon": 0,
-          "pointsLost": 0,
-          "form": []
-        },
-        {
-          "id": "f4",
-          "position": 4,
-          "teamName": "Finalista 4",
-          "matchesPlayed": 0,
-          "points": 0,
-          "setsWon": 0,
-          "setsLost": 0,
-          "pointsWon": 0,
-          "pointsLost": 0,
-          "form": []
-        },
-        {
-          "id": "f5",
-          "position": 5,
-          "teamName": "Finalista 5",
-          "matchesPlayed": 0,
-          "points": 0,
-          "setsWon": 0,
-          "setsLost": 0,
-          "pointsWon": 0,
-          "pointsLost": 0,
-          "form": []
-        },
-        {
-          "id": "f6",
-          "position": 6,
-          "teamName": "Finalista 6",
-          "matchesPlayed": 0,
-          "points": 0,
-          "setsWon": 0,
-          "setsLost": 0,
-          "pointsWon": 0,
-          "pointsLost": 0,
-          "form": []
-        },
-        {
-          "id": "f7",
-          "position": 7,
-          "teamName": "Finalista 7",
-          "matchesPlayed": 0,
-          "points": 0,
-          "setsWon": 0,
-          "setsLost": 0,
-          "pointsWon": 0,
-          "pointsLost": 0,
-          "form": []
         }
       ]
     }
