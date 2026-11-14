@@ -349,16 +349,16 @@ function GaleriaContent() {
       {/* Lightbox Modal */}
       {currentPhoto && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col justify-between p-3 sm:p-6 animate-fadeIn"
+          className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex flex-col justify-between p-3 sm:p-6 animate-fadeIn"
           onClick={() => setSelectedPhotoIndex(null)}
         >
           {/* Top Bar */}
-          <div className="flex items-center justify-between text-slate-900 pb-3 border-b border-slate-200" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center justify-between text-white pb-3 border-b border-white/20" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3">
-              <span className="text-xs font-mono text-slate-500">
+              <span className="px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-400/40 text-xs font-mono font-bold shadow-xs">
                 {selectedPhotoIndex! + 1} / {filteredPhotos.length}
               </span>
-              <h3 className="text-sm sm:text-base font-black truncate max-w-xs sm:max-w-md">
+              <h3 className="text-sm sm:text-base font-black truncate max-w-xs sm:max-w-md text-white tracking-wide">
                 {currentPhoto.title}
               </h3>
             </div>
@@ -368,14 +368,15 @@ function GaleriaContent() {
                 target="_blank"
                 rel="noreferrer"
                 download
-                className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-sky-500 transition"
+                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 text-white hover:text-sky-300 hover:border-sky-400 transition shadow-sm"
                 title="Pobierz w pełnym rozmiarze"
               >
                 <Download className="w-4 h-4" />
               </a>
               <button
                 onClick={() => setSelectedPhotoIndex(null)}
-                className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-rose-500 transition"
+                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 text-white hover:text-rose-400 hover:border-rose-400 transition shadow-sm"
+                title="Zamknij"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -387,10 +388,10 @@ function GaleriaContent() {
             {selectedPhotoIndex! > 0 && (
               <button
                 onClick={showPrev}
-                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/60 hover:bg-black/90 text-slate-900 border border-slate-200 transition"
+                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-slate-900/80 hover:bg-sky-600 text-white border border-white/25 transition shadow-lg z-20"
                 aria-label="Poprzednie"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="w-5 h-5 text-white" />
               </button>
             )}
 
@@ -403,19 +404,19 @@ function GaleriaContent() {
             {selectedPhotoIndex! < filteredPhotos.length - 1 && (
               <button
                 onClick={showNext}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/60 hover:bg-black/90 text-slate-900 border border-slate-200 transition"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-slate-900/80 hover:bg-sky-600 text-white border border-white/25 transition shadow-lg z-20"
                 aria-label="Następne"
               >
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-5 h-5 text-white" />
               </button>
             )}
           </div>
 
           {/* Bottom Bar: Caption & Meta */}
-          <div className="bg-white/90 border border-slate-200 rounded-2xl p-3 sm:p-4 text-xs space-y-1 max-w-3xl mx-auto w-full" onClick={(e) => e.stopPropagation()}>
-            {currentPhoto.caption && <p className="text-slate-200">{currentPhoto.caption}</p>}
-            <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200/60">
-              <span>{currentPhoto.matchName ? `Mecz: ${currentPhoto.matchName}` : 'Wydarzenie klubowe'}</span>
+          <div className="bg-slate-900/90 border border-white/20 rounded-2xl p-3 sm:p-4 text-xs space-y-1 max-w-3xl mx-auto w-full backdrop-blur-md shadow-2xl text-white" onClick={(e) => e.stopPropagation()}>
+            {currentPhoto.caption && <p className="text-slate-100 font-medium">{currentPhoto.caption}</p>}
+            <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-400 pt-1 border-t border-white/10">
+              <span className="text-sky-300 font-bold">{currentPhoto.matchName ? `Mecz: ${currentPhoto.matchName}` : 'Wydarzenie klubowe'}</span>
               <span>Data: {currentPhoto.date} {currentPhoto.uploadedBy ? `• Dodał: ${currentPhoto.uploadedBy}` : ''}</span>
             </div>
           </div>
@@ -425,11 +426,11 @@ function GaleriaContent() {
       {/* Add Photo Modal */}
       {showAddModal && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 animate-fadeIn"
+          className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 animate-fadeIn"
           onClick={() => setShowAddModal(false)}
         >
           <div
-            className="cyber-card rounded-3xl p-5 sm:p-6 w-full max-w-lg border border-slate-200 shadow-2xl space-y-4"
+            className="bg-white rounded-3xl p-5 sm:p-6 w-full max-w-lg border border-slate-200 shadow-2xl space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
@@ -553,7 +554,7 @@ function GaleriaContent() {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 text-slate-600 text-xs font-bold hover:bg-slate-700"
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-300 transition"
                 >
                   Anuluj
                 </button>

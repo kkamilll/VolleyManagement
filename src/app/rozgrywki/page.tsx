@@ -5521,11 +5521,11 @@ function RozgrywkiContent() {
 
       {/* Modal: Dodaj Serię Zdjęć do Galerii */}
       {showAddPhotoModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-xl shadow-sm space-y-4 max-h-[92vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-xl shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
             <div className="flex justify-between items-center pb-3 border-b border-slate-200">
               <div className="flex items-center gap-2">
-                <Camera className="w-5 h-5 text-amber-400" />
+                <Camera className="w-5 h-5 text-amber-500" />
                 <h3 className="text-base font-black uppercase text-slate-900">
                   Dodaj Serię Zdjęć / Fotorelację
                 </h3>
@@ -5577,8 +5577,8 @@ function RozgrywkiContent() {
                       onClick={() => setPhotoCategory('MECZ')}
                       className={`py-2 px-1 rounded-xl text-[11px] font-black uppercase transition border ${
                         photoCategory === 'MECZ'
-                          ? 'bg-sky-500/20 text-sky-300 border-sky-400'
-                          : 'bg-slate-100 text-slate-500 border-slate-200 hover:border-slate-300'
+                          ? 'bg-sky-100 text-sky-900 border-sky-400 font-black shadow-xs'
+                          : 'bg-slate-100 text-slate-700 border-slate-300 hover:border-slate-400'
                       }`}
                     >
                       Mecz LALS
@@ -5588,8 +5588,8 @@ function RozgrywkiContent() {
                       onClick={() => setPhotoCategory('SPARING')}
                       className={`py-2 px-1 rounded-xl text-[11px] font-black uppercase transition border ${
                         photoCategory === 'SPARING'
-                          ? 'bg-amber-500/20 text-amber-300 border-amber-400'
-                          : 'bg-slate-100 text-slate-500 border-slate-200 hover:border-slate-300'
+                          ? 'bg-amber-100 text-amber-900 border-amber-400 font-black shadow-xs'
+                          : 'bg-slate-100 text-slate-700 border-slate-300 hover:border-slate-400'
                       }`}
                     >
                       Sparing
@@ -5599,8 +5599,8 @@ function RozgrywkiContent() {
                       onClick={() => setPhotoCategory('TURNIEJ')}
                       className={`py-2 px-1 rounded-xl text-[11px] font-black uppercase transition border ${
                         photoCategory === 'TURNIEJ'
-                          ? 'bg-purple-500/20 text-purple-300 border-purple-400'
-                          : 'bg-slate-100 text-slate-500 border-slate-200 hover:border-slate-300'
+                          ? 'bg-purple-100 text-purple-900 border-purple-400 font-black shadow-xs'
+                          : 'bg-slate-100 text-slate-700 border-slate-300 hover:border-slate-400'
                       }`}
                     >
                       Turniej
@@ -5610,8 +5610,8 @@ function RozgrywkiContent() {
                       onClick={() => setPhotoCategory('INNE')}
                       className={`py-2 px-1 rounded-xl text-[11px] font-black uppercase transition border ${
                         photoCategory === 'INNE'
-                          ? 'bg-slate-700 text-slate-900 border-slate-600'
-                          : 'bg-slate-100 text-slate-500 border-slate-200 hover:border-slate-300'
+                          ? 'bg-slate-800 text-white border-slate-900 font-black shadow-xs'
+                          : 'bg-slate-100 text-slate-700 border-slate-300 hover:border-slate-400'
                       }`}
                     >
                       Inne
@@ -6245,13 +6245,13 @@ function RozgrywkiContent() {
         return (
           <div
             onClick={() => setSelectedPhotoPreview(null)}
-            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 cursor-pointer select-none"
+            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 cursor-pointer select-none"
           >
             <div className="relative max-w-5xl w-full max-h-[92vh] flex flex-col items-center justify-center" onClick={e => e.stopPropagation()}>
               {/* Close Button */}
               <button
                 onClick={() => setSelectedPhotoPreview(null)}
-                className="absolute top-2 right-2 sm:-top-10 sm:right-0 w-9 h-9 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-900 flex items-center justify-center border border-slate-300 transition z-20 shadow-lg text-sm"
+                className="absolute top-2 right-2 sm:-top-10 sm:right-0 w-9 h-9 rounded-full bg-white/15 hover:bg-rose-600 text-white flex items-center justify-center border border-white/30 transition z-20 shadow-lg text-sm"
                 title="Zamknij podgląd"
               >
                 ✕
@@ -6261,7 +6261,7 @@ function RozgrywkiContent() {
               {hasPrev && (
                 <button
                   onClick={handlePrev}
-                  className="absolute left-2 sm:-left-12 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-slate-50 hover:bg-amber-500 hover:text-slate-950 text-slate-900 flex items-center justify-center border border-slate-300 transition z-20 shadow-sm"
+                  className="absolute left-2 sm:-left-12 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-slate-900/80 hover:bg-amber-500 hover:text-slate-950 text-white flex items-center justify-center border border-white/30 transition z-20 shadow-lg"
                   title="Poprzednie zdjęcie w serii"
                 >
                   <ChevronLeft className="w-6 h-6" />
@@ -6272,7 +6272,7 @@ function RozgrywkiContent() {
               {hasNext && (
                 <button
                   onClick={handleNext}
-                  className="absolute right-2 sm:-right-12 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-slate-50 hover:bg-amber-500 hover:text-slate-950 text-slate-900 flex items-center justify-center border border-slate-300 transition z-20 shadow-sm"
+                  className="absolute right-2 sm:-right-12 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-slate-900/80 hover:bg-amber-500 hover:text-slate-950 text-white flex items-center justify-center border border-white/30 transition z-20 shadow-lg"
                   title="Następne zdjęcie w serii"
                 >
                   <ChevronRight className="w-6 h-6" />
@@ -6280,7 +6280,7 @@ function RozgrywkiContent() {
               )}
 
               {/* Photo Display */}
-              <div className="relative rounded-3xl overflow-hidden border border-slate-200 bg-black max-h-[75vh] flex items-center justify-center shadow-sm">
+              <div className="relative rounded-3xl overflow-hidden border border-white/20 bg-black max-h-[75vh] flex items-center justify-center shadow-2xl">
                 <img
                   src={selectedPhotoPreview.url}
                   alt={selectedPhotoPreview.title}
@@ -6289,26 +6289,26 @@ function RozgrywkiContent() {
               </div>
 
               {/* Bottom Info Bar */}
-              <div className="mt-3.5 w-full flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 backdrop-blur-md">
+              <div className="mt-3.5 w-full flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-slate-900/90 border border-white/20 backdrop-blur-md shadow-2xl text-white">
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider">
+                    <span className="text-[10px] font-mono font-bold text-amber-300 uppercase tracking-wider px-2 py-0.5 rounded bg-amber-400/20 border border-amber-400/30">
                       {selectedPhotoPreview.matchName || (selectedPhotoPreview.category === 'TURNIEJ' ? 'Turniej' : selectedPhotoPreview.category === 'SPARING' ? 'Sparing' : 'Mecz LALS')}
                     </span>
                     {selectedPhotoPreview.seriesTitle && (
-                      <span className="text-[10px] text-slate-500 font-bold">
+                      <span className="text-[10px] text-slate-300 font-bold">
                         • {selectedPhotoPreview.seriesTitle}
                       </span>
                     )}
                     {activeIdx >= 0 && (
-                      <span className="text-[10px] font-mono text-slate-500">
+                      <span className="text-[10px] font-mono text-slate-400">
                         [{activeIdx + 1} z {currentTabPhotos.length}]
                       </span>
                     )}
                   </div>
-                  <h3 className="text-sm font-black text-slate-900">{selectedPhotoPreview.title}</h3>
+                  <h3 className="text-sm font-black text-white">{selectedPhotoPreview.title}</h3>
                   {selectedPhotoPreview.caption && (
-                    <p className="text-xs text-slate-600">{selectedPhotoPreview.caption}</p>
+                    <p className="text-xs text-slate-300">{selectedPhotoPreview.caption}</p>
                   )}
                 </div>
 
@@ -6318,10 +6318,10 @@ function RozgrywkiContent() {
                     download={`angels_foto_${selectedPhotoPreview.id}.jpg`}
                     target="_blank"
                     rel="noreferrer"
-                    className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-100 border border-slate-300 text-xs font-bold text-slate-900 transition flex items-center gap-1.5 shadow"
+                    className="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs font-bold text-white hover:text-amber-300 transition flex items-center gap-1.5 shadow"
                     title="Pobierz pełny plik zdjęcia"
                   >
-                    <Download className="w-3.5 h-3.5 text-amber-400" />
+                    <Download className="w-3.5 h-3.5 text-amber-300" />
                     <span>Pobierz</span>
                   </a>
                 </div>
