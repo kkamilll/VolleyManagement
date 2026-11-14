@@ -421,7 +421,7 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
                   max="230"
                   value={height}
                   onChange={e => setHeight(e.target.value)}
-                  placeholder="np. 192"
+                  placeholder="np. 192 (opcjonalnie)"
                   className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:bg-white focus:outline-none focus:border-sky-500 transition"
                 />
                 <Ruler className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />

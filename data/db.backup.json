@@ -8,7 +8,7 @@
       "role": "KIEROWNIK",
       "isCaptain": true,
       "email": "lukasz.kremer@angelsztp.pl",
-      "phone": "+48 506 666 777",
+      "phone": "",
       "status": "Aktywny",
       "passwordHash": "$2a$08$ZQ0QeuDOvE/CoIgY3QZ30.VpGzRnF0wvq5r.4fC4xYezQE7mFNUwy",
       "createdAt": "2026-09-01T10:00:00Z",
@@ -22,8 +22,7 @@
         "canPostAnnouncements": true,
         "canCreatePolls": true,
         "isAdmin": true
-      },
-      "height": 198
+      }
     },
     {
       "id": "usr_trener",
@@ -33,7 +32,7 @@
       "role": "TRENER",
       "isCaptain": false,
       "email": "hubert.obara@angelsztp.pl",
-      "phone": "+48 602 345 678",
+      "phone": "",
       "status": "Aktywny",
       "passwordHash": "$2a$08$ZQ0QeuDOvE/CoIgY3QZ30.VpGzRnF0wvq5r.4fC4xYezQE7mFNUwy",
       "createdAt": "2026-09-01T10:00:00Z",
@@ -47,8 +46,7 @@
         "canPostAnnouncements": true,
         "canCreatePolls": true,
         "isAdmin": false
-      },
-      "height": 192
+      }
     },
     {
       "id": "usr_pujanek",
@@ -58,7 +56,7 @@
       "role": "KIEROWNIK",
       "isCaptain": true,
       "email": "kamil.pujanek@angelsztp.pl",
-      "phone": "+48 502 222 333",
+      "phone": "",
       "status": "Aktywny",
       "passwordHash": "$2a$08$ZQ0QeuDOvE/CoIgY3QZ30.VpGzRnF0wvq5r.4fC4xYezQE7mFNUwy",
       "createdAt": "2026-09-05T12:00:00Z",
@@ -72,8 +70,7 @@
         "canPostAnnouncements": true,
         "canCreatePolls": true,
         "isAdmin": true
-      },
-      "height": 197
+      }
     },
     {
       "id": "usr_krupa",
@@ -83,12 +80,11 @@
       "role": "ZAWODNIK",
       "isCaptain": false,
       "email": "tomasz.krupa@angelsztp.pl",
-      "phone": "+48 501 111 222",
+      "phone": "",
       "status": "Aktywny",
       "passwordHash": "$2a$08$ZQ0QeuDOvE/CoIgY3QZ30.VpGzRnF0wvq5r.4fC4xYezQE7mFNUwy",
       "createdAt": "2026-09-05T12:00:00Z",
-      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/2501166/",
-      "height": 191
+      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/2501166/"
     },
     {
       "id": "usr_zadlo",
@@ -98,12 +94,11 @@
       "role": "ZAWODNIK",
       "isCaptain": false,
       "email": "tomasz.zadlo@angelsztp.pl",
-      "phone": "+48 501 555 777",
+      "phone": "",
       "status": "Aktywny",
       "passwordHash": "$2a$08$ZQ0QeuDOvE/CoIgY3QZ30.VpGzRnF0wvq5r.4fC4xYezQE7mFNUwy",
       "createdAt": "2026-09-05T12:00:00Z",
-      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/3246310/",
-      "height": 182
+      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/3246310/"
     },
     {
       "id": "usr_graczyk",
@@ -113,12 +108,11 @@
       "role": "ZAWODNIK",
       "isCaptain": false,
       "email": "piotr.graczyk@angelsztp.pl",
-      "phone": "+48 503 333 444",
+      "phone": "",
       "status": "Aktywny",
       "passwordHash": "$2a$08$ZQ0QeuDOvE/CoIgY3QZ30.VpGzRnF0wvq5r.4fC4xYezQE7mFNUwy",
       "createdAt": "2026-09-06T12:00:00Z",
-      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/3246307/",
-      "height": 193
+      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/3246307/"
     },
     {
       "id": "usr_smigiel",
@@ -128,12 +122,11 @@
       "role": "ZAWODNIK",
       "isCaptain": false,
       "email": "michal.smigiel@angelsztp.pl",
-      "phone": "+48 504 444 555",
+      "phone": "",
       "status": "Aktywny",
       "passwordHash": "$2a$08$ZQ0QeuDOvE/CoIgY3QZ30.VpGzRnF0wvq5r.4fC4xYezQE7mFNUwy",
       "createdAt": "2026-09-06T12:00:00Z",
-      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/2500853/",
-      "height": 195
+      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/2500853/"
     },
     {
       "id": "usr_kruk",
@@ -143,12 +136,11 @@
       "role": "ZAWODNIK",
       "isCaptain": false,
       "email": "dominik.kruk@angelsztp.pl",
-      "phone": "+48 505 555 666",
+      "phone": "",
       "status": "Aktywny",
       "passwordHash": "$2a$08$ZQ0QeuDOvE/CoIgY3QZ30.VpGzRnF0wvq5r.4fC4xYezQE7mFNUwy",
       "createdAt": "2026-09-07T12:00:00Z",
-      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/2519064/",
-      "height": 198
+      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/2519064/"
     },
     {
       "id": "usr_kulupa",
@@ -158,12 +150,11 @@
       "role": "ZAWODNIK",
       "isCaptain": false,
       "email": "pawel.kulupa@angelsztp.pl",
-      "phone": "+48 505 777 888",
+      "phone": "",
       "status": "Aktywny",
       "passwordHash": "$2a$08$ZQ0QeuDOvE/CoIgY3QZ30.VpGzRnF0wvq5r.4fC4xYezQE7mFNUwy",
       "createdAt": "2026-09-07T12:00:00Z",
-      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/2500844/",
-      "height": 197
+      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/2500844/"
     },
     {
       "id": "usr_shetty",
@@ -173,12 +164,11 @@
       "role": "ZAWODNIK",
       "isCaptain": false,
       "email": "vikhyath.shetty@angelsztp.pl",
-      "phone": "+48 506 181 818",
+      "phone": "",
       "status": "Aktywny",
       "passwordHash": "$2a$08$ZQ0QeuDOvE/CoIgY3QZ30.VpGzRnF0wvq5r.4fC4xYezQE7mFNUwy",
       "createdAt": "2026-09-07T12:00:00Z",
-      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/2500847/",
-      "height": 188
+      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/2500847/"
     },
     {
       "id": "usr_ordon",
@@ -188,12 +178,11 @@
       "role": "ZAWODNIK",
       "isCaptain": false,
       "email": "karol.ordon@angelsztp.pl",
-      "phone": "+48 507 777 888",
+      "phone": "",
       "status": "Aktywny",
       "passwordHash": "$2a$08$ZQ0QeuDOvE/CoIgY3QZ30.VpGzRnF0wvq5r.4fC4xYezQE7mFNUwy",
       "createdAt": "2026-09-08T12:00:00Z",
-      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/2501155/",
-      "height": 196
+      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/2501155/"
     },
     {
       "id": "usr_noak",
@@ -203,12 +192,11 @@
       "role": "ZAWODNIK",
       "isCaptain": false,
       "email": "maciej.noak@angelsztp.pl",
-      "phone": "+48 508 888 999",
+      "phone": "",
       "status": "Aktywny",
       "passwordHash": "$2a$08$ZQ0QeuDOvE/CoIgY3QZ30.VpGzRnF0wvq5r.4fC4xYezQE7mFNUwy",
       "createdAt": "2026-09-08T12:00:00Z",
-      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/2500845/",
-      "height": 194
+      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/2500845/"
     },
     {
       "id": "usr_suwalski",
@@ -218,12 +206,11 @@
       "role": "ZAWODNIK",
       "isCaptain": false,
       "email": "stanislaw.suwalski@angelsztp.pl",
-      "phone": "+48 509 111 222",
+      "phone": "",
       "status": "Aktywny",
       "passwordHash": "$2a$08$ZQ0QeuDOvE/CoIgY3QZ30.VpGzRnF0wvq5r.4fC4xYezQE7mFNUwy",
       "createdAt": "2026-09-09T12:00:00Z",
-      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/3246309/",
-      "height": 197
+      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/3246309/"
     },
     {
       "id": "usr_krol",
@@ -233,12 +220,11 @@
       "role": "ZAWODNIK",
       "isCaptain": false,
       "email": "wit.krol@angelsztp.pl",
-      "phone": "+48 509 919 191",
+      "phone": "",
       "status": "Aktywny",
       "passwordHash": "$2a$08$ZQ0QeuDOvE/CoIgY3QZ30.VpGzRnF0wvq5r.4fC4xYezQE7mFNUwy",
       "createdAt": "2026-09-09T12:00:00Z",
-      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/3262373/",
-      "height": 196
+      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/3262373/"
     },
     {
       "id": "usr_augustynek",
@@ -248,12 +234,11 @@
       "role": "ZAWODNIK",
       "isCaptain": false,
       "email": "bartosz.augustynek@angelsztp.pl",
-      "phone": "+48 509 999 000",
+      "phone": "",
       "status": "Aktywny",
       "passwordHash": "$2a$08$ZQ0QeuDOvE/CoIgY3QZ30.VpGzRnF0wvq5r.4fC4xYezQE7mFNUwy",
       "createdAt": "2026-09-09T12:00:00Z",
-      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/2524996/",
-      "height": 203
+      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/2524996/"
     }
   ],
   "matches": [

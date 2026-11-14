@@ -512,7 +512,7 @@ export default function TeamPage() {
                   <div className="space-y-1.5 text-xs text-slate-500 pt-2 border-t border-slate-100">
                     <div className="flex justify-between items-center">
                       <span>Wzrost:</span>
-                      <strong className="text-slate-800 font-mono">{player.height ? `${player.height} cm` : 'brak danych'}</strong>
+                      <strong className="text-slate-800 font-mono">{player.height ? `${player.height} cm` : '-'}</strong>
                     </div>
                     <div className="flex justify-between items-center">
                       <span>Status:</span>
@@ -630,9 +630,11 @@ export default function TeamPage() {
                     <span className={`px-2.5 py-0.5 rounded-lg text-xs font-black border ${getPositionColor(profileUser.position)}`}>
                       {profileUser.position || 'Zawodnik'}
                     </span>
-                    <span className="text-xs text-slate-500">
-                      • {profileUser.height ? `${profileUser.height} cm` : 'Wzrost niepodany'}
-                    </span>
+                    {profileUser.height ? (
+                      <span className="text-xs text-slate-500">
+                        • {profileUser.height} cm
+                      </span>
+                    ) : null}
                     <span className="text-xs text-emerald-700 font-bold">
                       • {profileUser.status || 'Aktywny'}
                     </span>
@@ -727,7 +729,7 @@ export default function TeamPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-600">
                     <div className="flex justify-between py-1 border-b border-slate-200">
                       <span>Wzrost:</span>
-                      <strong className="text-slate-900 font-mono">{profileUser.height ? `${profileUser.height} cm` : 'brak danych'}</strong>
+                      <strong className="text-slate-900 font-mono">{profileUser.height ? `${profileUser.height} cm` : '-'}</strong>
                     </div>
                     <div className="flex justify-between py-1 border-b border-slate-200">
                       <span>Numer:</span>
@@ -960,6 +962,7 @@ export default function TeamPage() {
                     type="number"
                     value={editHeight}
                     onChange={e => setEditHeight(e.target.value)}
+                    placeholder="np. 192 (opcjonalnie)"
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-slate-900 text-xs focus:bg-white"
                   />
                 </div>
