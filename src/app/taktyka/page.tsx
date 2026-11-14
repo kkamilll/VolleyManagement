@@ -2131,44 +2131,14 @@ function TacticsContent() {
           
           {/* UNIFIED COMPACT TACTICAL CONSOLE */}
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-2.5 sm:p-3 shadow-sm space-y-2">
-            {/* Row 1: Rotation Selector, Phase Selector & Orientation */}
+            {/* Row 1: Phase Selector, Orientation & Quick Reset */}
             <div className="flex flex-wrap items-center justify-between gap-2.5">
-              {/* Rotation P1 - P6 */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider hidden xs:inline">
-                  Rotacja:
+              {/* Phase Selector - 4 distinct phases */}
+              <div className="flex items-center gap-1.5 flex-1 min-w-[280px]">
+                <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider hidden xs:inline shrink-0">
+                  Faza gry:
                 </span>
-                <div className="grid grid-cols-6 gap-1 w-full sm:w-auto">
-                  {(['P1', 'P2', 'P3', 'P4', 'P5', 'P6'] as RotationCode[]).map(r => (
-                    <button
-                      key={r}
-                      onClick={() => applyPreset(r, phase)}
-                      title={
-                        r === 'P1' ? 'P1: Rozgrywający w strefie 1 (linia obrony)' :
-                        r === 'P2' ? 'P2: Rozgrywający w strefie 2 (linia ataku)' :
-                        r === 'P3' ? 'P3: Rozgrywający w strefie 3 (linia ataku)' :
-                        r === 'P4' ? 'P4: Rozgrywający w strefie 4 (linia ataku)' :
-                        r === 'P5' ? 'P5: Rozgrywający w strefie 5 (linia obrony)' :
-                        'P6: Rozgrywający w strefie 6 (linia obrony)'
-                      }
-                      className={`h-8 px-2 rounded-xl text-xs font-black transition border font-mono flex items-center justify-center ${
-                        rotation === r
-                          ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-sm'
-                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 hover:text-slate-900 shadow-2xs'
-                      }`}
-                    >
-                      {r}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Phase Selector - 4 columns, never truncated */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider hidden xs:inline">
-                  Faza:
-                </span>
-                <div className="grid grid-cols-4 gap-1 w-full sm:w-auto">
+                <div className="grid grid-cols-4 gap-1.5 w-full sm:w-auto flex-1 max-w-lg">
                   {[
                     { id: 'PRZYJECIE', label: 'Przyjęcie' },
                     { id: 'OBRONA', label: 'Obrona' },
@@ -2178,10 +2148,10 @@ function TacticsContent() {
                     <button
                       key={p.id}
                       onClick={() => applyPreset(rotation, p.id as TacticalPhase)}
-                      className={`h-8 px-1.5 xs:px-2 sm:px-2.5 rounded-xl text-[10px] xs:text-[11px] sm:text-xs font-black transition border flex items-center justify-center whitespace-nowrap ${
+                      className={`h-8 px-2 rounded-xl text-xs font-black transition border flex items-center justify-center whitespace-nowrap shadow-xs ${
                         phase === p.id
-                          ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
-                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 hover:text-slate-900 shadow-2xs'
+                          ? 'bg-amber-500 text-slate-950 border-amber-400 font-black shadow-sm'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 hover:text-slate-900'
                       }`}
                     >
                       {p.label}
@@ -2192,7 +2162,7 @@ function TacticsContent() {
 
               {/* Orientation Selector: Pionowo / Poziomo */}
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider hidden xs:inline">
+                <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider hidden xs:inline">
                   Widok:
                 </span>
                 <div className="inline-flex items-center p-0.5 bg-slate-100 rounded-xl border border-slate-300">
@@ -2703,7 +2673,7 @@ function TacticsContent() {
                         : 'bg-sky-600 text-white border-white shadow-md'
                     }`}
                   >
-                    {player.roleCode}
+                    {player.number ? `#${player.number}` : player.roleCode}
                   </div>
                   <div className="mt-1 px-1.5 py-0.2 rounded-full backdrop-blur-sm border text-[8.5px] font-bold tracking-tight whitespace-nowrap shadow bg-white border-slate-300 text-slate-800 shadow-sm">
                     {cleanPlayerName}
@@ -2732,7 +2702,7 @@ function TacticsContent() {
         </div>
       </div>
 
-      {/* SEKCJA 2: ZADANIA I USTAWIENIE POZYCJI W ROTACJI */}
+      {/* SEKCJA 2: ZADANIA I USTAWIENIE POZYCJI W DANEJ FAZIE */}
       <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
           <div className="flex items-center gap-2.5">
@@ -2741,7 +2711,7 @@ function TacticsContent() {
             </div>
             <div>
               <h3 className="text-base font-black uppercase text-slate-900 tracking-wide flex items-center gap-2">
-                Zadania i Ustawienie Pozycji: Rotacja {rotation} ({phase})
+                Zadania i Ustawienie Pozycji: {phase === 'PRZYJECIE' ? 'Przyjęcie' : phase === 'OBRONA' ? 'Obrona' : phase === 'ATAK' ? 'Atak' : 'Zagrywka'}
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200">
                   {positions.length} graczy
                 </span>
@@ -2816,7 +2786,7 @@ function TacticsContent() {
               >
                 <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-200">
                   <div className="flex items-center gap-2">
-                    <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-black text-[11px] shadow-sm ${
+                    <span className={`w-7 h-6 rounded-lg flex items-center justify-center font-black text-[11px] shadow-sm ${
                       isLibero
                         ? 'bg-amber-500 text-slate-950'
                         : p.roleCode === 'R'
@@ -2827,7 +2797,7 @@ function TacticsContent() {
                         ? 'bg-purple-500 text-white'
                         : 'bg-orange-500 text-slate-950'
                     }`}>
-                      {p.roleCode}
+                      {p.number ? `#${p.number}` : p.roleCode}
                     </span>
                     <span className="font-bold text-slate-900 text-xs truncate max-w-[130px]">
                       {p.name.replace(/\s*\([^)]*\)/, '')}

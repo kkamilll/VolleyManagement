@@ -140,9 +140,9 @@ export default function LoginPage() {
             >
               <span className="flex items-center gap-2">
                 <ClipboardList className="w-3.5 h-3.5 text-sky-400" />
-                <span>Hubert Obara #12 (Trener)</span>
+                <span>Hubert Rutkowski (Trener)</span>
               </span>
-              <span className="text-[10px] font-mono text-sky-300/80">Taktyka & Treningi</span>
+              <span className="text-[10px] font-mono text-sky-300/80">Sztab trenerski & Taktyka</span>
             </button>
             <button
               type="button"

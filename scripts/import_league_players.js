@@ -195,3 +195,4 @@ if (fs.existsSync(backupPath)) {
 }
 
 console.log('Updated db.json and db.backup.json with official leaguePlayerRankings and synchronized Angels player stats!');
+
