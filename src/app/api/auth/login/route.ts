@@ -6,35 +6,25 @@ import { signToken, AUTH_COOKIE_NAME } from '@/lib/auth';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password, quickUserId } = body;
+    const { email, password } = body;
     const db = readDatabase();
 
-    let user;
+    if (!email || !password) {
+      return NextResponse.json({ error: 'Podaj adres e-mail i hasło' }, { status: 400 });
+    }
 
-    // Fast demo login switcher
-    if (quickUserId) {
-      user = db.users.find(u => u.id === quickUserId);
-      if (!user) {
-        return NextResponse.json({ error: 'Użytkownik nie istnieje' }, { status: 404 });
-      }
-    } else {
-      if (!email || !password) {
-        return NextResponse.json({ error: 'Podaj adres e-mail i hasło' }, { status: 400 });
-      }
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = db.users.find(u => 
+      u.email.toLowerCase() === normalizedEmail ||
+      (normalizedEmail === 'kierownik@volley.pl' && u.name.toLowerCase().includes('kremer'))
+    );
+    if (!user || !user.passwordHash) {
+      return NextResponse.json({ error: 'Nieprawidłowy e-mail lub hasło' }, { status: 401 });
+    }
 
-      const normalizedEmail = email.toLowerCase().trim();
-      user = db.users.find(u => 
-        u.email.toLowerCase() === normalizedEmail ||
-        (normalizedEmail === 'kierownik@volley.pl' && u.name.toLowerCase().includes('kremer'))
-      );
-      if (!user || !user.passwordHash) {
-        return NextResponse.json({ error: 'Nieprawidłowy e-mail lub hasło' }, { status: 401 });
-      }
-
-      const isValid = bcrypt.compareSync(password, user.passwordHash);
-      if (!isValid) {
-        return NextResponse.json({ error: 'Nieprawidłowy e-mail lub hasło' }, { status: 401 });
-      }
+    const isValid = bcrypt.compareSync(password, user.passwordHash);
+    if (!isValid) {
+      return NextResponse.json({ error: 'Nieprawidłowy e-mail lub hasło' }, { status: 401 });
     }
 
     const token = signToken(user);

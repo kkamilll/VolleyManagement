@@ -3,12 +3,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { Lock, Mail, ArrowRight, Shield, Crown, Volleyball, ClipboardList } from 'lucide-react';
+import { Lock, Mail, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, quickSwitch } = useAuth();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -26,14 +26,8 @@ export default function LoginPage() {
     if (success) {
       router.push('/');
     } else {
-      setError('Błędne dane logowania (Domyślne hasło testowe: haslo123)');
+      setError('Nieprawidłowy adres e-mail lub hasło.');
     }
-  };
-
-  const handleQuickLogin = async (userId: string) => {
-    setLoading(true);
-    await quickSwitch(userId);
-    router.push('/');
   };
 
   return (
@@ -103,60 +97,6 @@ export default function LoginPage() {
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
-
-        {/* Collapsible Demo Accounts (for developers/testing only) */}
-        <details className="mt-4 pt-3 border-t border-steel-800/80 group">
-          <summary className="text-[11px] font-mono text-steel-500 hover:text-steel-300 cursor-pointer flex items-center justify-between select-none">
-            <span>Konta demonstracyjne (testy)</span>
-            <span className="text-[10px] text-steel-600 group-open:rotate-180 transition-transform">▼</span>
-          </summary>
-          <div className="mt-2.5 grid grid-cols-1 gap-1.5 animate-fadeIn">
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('usr_kierownik')}
-              className="py-1.5 px-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold transition flex items-center justify-between text-left"
-            >
-              <span className="flex items-center gap-2">
-                <Crown className="w-3.5 h-3.5 text-amber-400" />
-                <span>Łukasz Kremer #17 (Kapitan & Kierownik)</span>
-              </span>
-              <span className="text-[10px] font-mono text-amber-300/80">Pełny dostęp</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('usr_pujanek')}
-              className="py-1.5 px-3 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-bold transition flex items-center justify-between text-left"
-            >
-              <span className="flex items-center gap-2">
-                <Crown className="w-3.5 h-3.5 text-purple-400" />
-                <span>Kamil Pujanek #4 (Admin & Rozgrywający)</span>
-              </span>
-              <span className="text-[10px] font-mono text-purple-300/80">Pełny dostęp</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('usr_trener')}
-              className="py-1.5 px-3 rounded-xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-300 text-xs font-bold transition flex items-center justify-between text-left"
-            >
-              <span className="flex items-center gap-2">
-                <ClipboardList className="w-3.5 h-3.5 text-sky-400" />
-                <span>Hubert Rutkowski (Trener)</span>
-              </span>
-              <span className="text-[10px] font-mono text-sky-300/80">Sztab trenerski & Taktyka</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('usr_krupa')}
-              className="py-1.5 px-3 rounded-xl bg-steel-800/40 hover:bg-steel-800/80 border border-steel-700 text-steel-300 text-xs font-bold transition flex items-center justify-between text-left"
-            >
-              <span className="flex items-center gap-2">
-                <Volleyball className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Tomasz Krupa #1 (Zawodnik)</span>
-              </span>
-              <span className="text-[10px] font-mono text-steel-400">Widok Zawodnika</span>
-            </button>
-          </div>
-        </details>
 
         <div className="mt-5 pt-4 border-t border-steel-800 text-center text-xs text-steel-400">
           Nowy zawodnik w Angels ZTP?{' '}

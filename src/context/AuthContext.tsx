@@ -6,10 +6,9 @@ import { User, Role } from '@/lib/types';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password?: string, quickUserId?: string) => Promise<boolean>;
+  login: (email: string, password?: string) => Promise<boolean>;
   register: (data: any) => Promise<boolean>;
   logout: () => Promise<void>;
-  quickSwitch: (userId: string) => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
@@ -19,7 +18,6 @@ const AuthContext = createContext<AuthContextType>({
   login: async () => false,
   register: async () => false,
   logout: async () => {},
-  quickSwitch: async () => {},
   refreshUser: async () => {},
 });
 
@@ -44,12 +42,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshUser();
   }, []);
 
-  const login = async (email: string, password?: string, quickUserId?: string): Promise<boolean> => {
+  const login = async (email: string, password?: string): Promise<boolean> => {
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, quickUserId }),
+        body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
       if (res.ok && data.user) {
@@ -90,15 +88,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const quickSwitch = async (userId: string) => {
-    setLoading(true);
-    await login('', '', userId);
-    setLoading(false);
-    window.location.reload();
-  };
-
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, quickSwitch, refreshUser }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -50,7 +50,7 @@ import {
 import { User, Role, UserPermissions, SeasonArchive } from '@/lib/types';
 
 function AdminCenterContent() {
-  const { user: currentUser, loading: authLoading, quickSwitch } = useAuth();
+  const { user: currentUser, loading: authLoading } = useAuth();
   const { isArchiveMode, activeArchiveId, enterArchiveMode, exitArchiveMode } = useSeasonArchive();
   const searchParams = useSearchParams();
   const tabParam = searchParams?.get('tab');
@@ -553,65 +553,6 @@ function AdminCenterContent() {
             {currentUser?.email && (
               <span className="text-slate-400 font-mono text-[11px] block">{currentUser.email}</span>
             )}
-          </div>
-
-          {/* Szybki przełącznik profilu w trybie testowym */}
-          <div className="space-y-2 pt-1 text-left">
-            <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block text-center">
-              Przełącz profil jednym kliknięciem (Dostęp do panelu):
-            </span>
-            <div className="grid grid-cols-1 gap-2">
-              <button
-                type="button"
-                onClick={() => quickSwitch('usr_kierownik')}
-                className="p-3 rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-200 text-amber-300 text-xs font-bold transition flex items-center justify-between group shadow-sm"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Crown className="w-4 h-4 text-amber-400" />
-                  <div>
-                    <span className="font-black text-slate-900 block">Kierownik (Łukasz)</span>
-                    <span className="text-[10px] text-amber-300/80">Pełne uprawnienia administratora & Archiwum</span>
-                  </div>
-                </div>
-                <span className="text-[10px] font-mono font-bold text-amber-400 group-hover:translate-x-0.5 transition-transform">
-                  Przełącz →
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => quickSwitch('usr_trener')}
-                className="p-3 rounded-2xl bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-300 text-xs font-bold transition flex items-center justify-between group shadow-sm"
-              >
-                <div className="flex items-center gap-2.5">
-                  <ShieldCheck className="w-4 h-4 text-sky-400" />
-                  <div>
-                    <span className="font-black text-slate-900 block">Trener (Hubert)</span>
-                    <span className="text-[10px] text-sky-300/80">Sztab trenerski, mecze & uprawnienia</span>
-                  </div>
-                </div>
-                <span className="text-[10px] font-mono font-bold text-sky-400 group-hover:translate-x-0.5 transition-transform">
-                  Przełącz →
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => quickSwitch('usr_pujanek')}
-                className="p-3 rounded-2xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-bold transition flex items-center justify-between group shadow-sm"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Volleyball className="w-4 h-4 text-purple-400" />
-                  <div>
-                    <span className="font-black text-slate-900 block">Kamil Pujanek (Konto Główne)</span>
-                    <span className="text-[10px] text-purple-300/80">Zawodnik #4 z pełnymi uprawnieniami Admina</span>
-                  </div>
-                </div>
-                <span className="text-[10px] font-mono font-bold text-purple-400 group-hover:translate-x-0.5 transition-transform">
-                  Przełącz →
-                </span>
-              </button>
-            </div>
           </div>
 
           <div className="flex items-center justify-center gap-3 pt-2 text-xs">
