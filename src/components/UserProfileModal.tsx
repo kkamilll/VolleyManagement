@@ -442,38 +442,7 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
             </div>
           </div>
 
-          {/* Quick Shortcuts */}
-          <div className="pt-2">
-            <span className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">
-              Szybkie skróty do Twojego panelu:
-            </span>
-            <div className="grid grid-cols-3 gap-2">
-              <a
-                href="/fees"
-                onClick={onClose}
-                className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 text-center flex flex-col items-center gap-1 transition shadow-2xs group"
-              >
-                <CreditCard className="w-4 h-4 text-emerald-600 group-hover:scale-110 transition-transform" />
-                <span className="font-bold text-[11px]">Składki</span>
-              </a>
-              <a
-                href="/events"
-                onClick={onClose}
-                className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 text-center flex flex-col items-center gap-1 transition shadow-2xs group"
-              >
-                <Calendar className="w-4 h-4 text-sky-600 group-hover:scale-110 transition-transform" />
-                <span className="font-bold text-[11px]">Terminarz</span>
-              </a>
-              <a
-                href="/team"
-                onClick={onClose}
-                className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 text-center flex flex-col items-center gap-1 transition shadow-2xs group"
-              >
-                <Users className="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform" />
-                <span className="font-bold text-[11px]">Kadra</span>
-              </a>
-            </div>
-          </div>
+
 
           {/* Feedback Messages */}
           {errorMsg && (
