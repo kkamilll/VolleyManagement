@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Announcement } from '@/lib/types';
 import {
   Bell,
-  CheckCircle2,
   Clock,
   AlertTriangle,
   Megaphone,
@@ -14,8 +13,8 @@ import {
   ChevronRight,
   ChevronLeft,
   Timer,
-  ShieldAlert,
-  Sparkles
+  X,
+  Check
 } from 'lucide-react';
 
 const SNOOZE_STORAGE_KEY = 'angels_snoozed_announcements';
@@ -32,9 +31,7 @@ export default function UnreadAnnouncementPopup() {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isOpen, setIsOpen] = useState(false);
   const [marking, setMarking] = useState(false);
-  const [shake, setShake] = useState(false);
   const [showSnoozeOptions, setShowSnoozeOptions] = useState(false);
-  const [noticeToast, setNoticeToast] = useState<string | null>(null);
 
   // Helper to read snoozed map
   const getSnoozeMap = (): SnoozeMap => {
@@ -133,10 +130,9 @@ export default function UnreadAnnouncementPopup() {
   useEffect(() => {
     fetchAnnouncements();
 
-    // Check every 20 seconds for expired snoozes or new announcements
     const interval = setInterval(() => {
       fetchAnnouncements();
-    }, 20000);
+    }, 25000);
 
     const handleExternalRead = () => {
       fetchAnnouncements();
@@ -174,10 +170,6 @@ export default function UnreadAnnouncementPopup() {
         saveSnoozeMap(snoozeMap);
       }
 
-      // Show temporary positive feedback
-      setNoticeToast('✓ Potwierdzono przeczytanie komunikatu');
-      setTimeout(() => setNoticeToast(null), 2500);
-
       // Remove from current active list
       const remaining = activeUnread.filter(a => a.id !== current.id);
       setActiveUnread(remaining);
@@ -204,8 +196,6 @@ export default function UnreadAnnouncementPopup() {
     saveSnoozeMap(snoozeMap);
 
     setShowSnoozeOptions(false);
-    setNoticeToast(`⏰ Odłożono na ${minutes} min. Komunikat pojawi się ponownie.`);
-    setTimeout(() => setNoticeToast(null), 3000);
 
     const remaining = activeUnread.filter(a => a.id !== current.id);
     setActiveUnread(remaining);
@@ -217,12 +207,9 @@ export default function UnreadAnnouncementPopup() {
     }
   };
 
-  // Handle attempt to dismiss without choosing an action
-  const handleBlockedDismiss = () => {
-    setShake(true);
-    setTimeout(() => setShake(false), 600);
-    setNoticeToast('Wybierz: "Potwierdzam przeczytanie" lub "Przypomnij mi później"');
-    setTimeout(() => setNoticeToast(null), 3000);
+  // Standard dismiss via 'X' or backdrop: snoozes for 30 minutes so user is not repeatedly blocked
+  const handleDismiss = () => {
+    handleSnooze(30);
   };
 
   if (!isOpen || !current) return null;
@@ -232,52 +219,54 @@ export default function UnreadAnnouncementPopup() {
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/70 backdrop-blur-md animate-in fade-in duration-200 select-none"
-      onClick={handleBlockedDismiss}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150"
+      onClick={handleDismiss}
     >
       <div
         onClick={e => e.stopPropagation()}
-        className={`bg-white border ${
-          isUrgent 
-            ? 'border-rose-400 shadow-rose-500/20' 
-            : isImportant 
-            ? 'border-amber-400 shadow-amber-500/20' 
-            : 'border-sky-400 shadow-sky-500/20'
-        } rounded-3xl p-5 sm:p-7 w-full max-w-lg shadow-2xl space-y-5 transition-transform duration-200 ${
-          shake ? 'animate-shake' : 'animate-in zoom-in-95'
-        }`}
+        className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-lg shadow-2xl space-y-4 relative animate-in zoom-in-95 duration-150"
       >
+        {/* Top Close Button (X) */}
+        <button
+          type="button"
+          onClick={handleDismiss}
+          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition flex items-center justify-center"
+          title="Zamknij (przypomnij za 30 min)"
+        >
+          <X className="w-4 h-4" />
+        </button>
+
         {/* Top Header: Badge, Step Counter, Pin */}
-        <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-100 flex-wrap">
-          <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center justify-between gap-2 pr-8">
+          <div className="flex items-center gap-2">
             {isUrgent ? (
-              <span className="px-3 py-1 rounded-xl text-xs font-black uppercase tracking-wider bg-rose-600 text-white flex items-center gap-1.5 shadow-sm animate-pulse">
-                <AlertTriangle className="w-4 h-4 text-white" />
-                <span>PILNY KOMUNIKAT</span>
+              <span className="px-2.5 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-300 flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+                <span>Pilny Komunikat</span>
               </span>
             ) : isImportant ? (
-              <span className="px-3 py-1 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 text-slate-950 flex items-center gap-1.5 shadow-sm">
-                <Megaphone className="w-4 h-4 text-slate-950" />
-                <span>WAŻNE OGŁOSZENIE</span>
+              <span className="px-2.5 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1.5">
+                <Megaphone className="w-3.5 h-3.5 text-amber-700" />
+                <span>Ważne Ogłoszenie</span>
               </span>
             ) : (
-              <span className="px-3 py-1 rounded-xl text-xs font-black uppercase tracking-wider bg-sky-600 text-white flex items-center gap-1.5 shadow-sm">
-                <Bell className="w-4 h-4 text-white" />
-                <span>KOMUNIKAT DRUŻYNY</span>
+              <span className="px-2.5 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider bg-sky-100 text-sky-800 border border-sky-300 flex items-center gap-1.5">
+                <Bell className="w-3.5 h-3.5 text-sky-600" />
+                <span>Komunikat Klubu</span>
               </span>
             )}
 
             {current.isPinned && (
-              <span className="px-2.5 py-1 rounded-xl text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-300 flex items-center gap-1">
-                <Pin className="w-3 h-3 text-amber-600 rotate-45" />
-                <span>Przypięty</span>
+              <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1">
+                <Pin className="w-3 h-3 text-amber-500 rotate-45" />
+                <span>Przypięte</span>
               </span>
             )}
           </div>
 
           {/* Multiple items stepper */}
           {activeUnread.length > 1 && (
-            <div className="flex items-center gap-1 text-xs font-mono font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-xl">
+            <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-lg">
               <button
                 type="button"
                 onClick={() => setCurrentIndex(i => Math.max(0, i - 1))}
@@ -285,9 +274,9 @@ export default function UnreadAnnouncementPopup() {
                 className="hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed"
                 title="Poprzedni komunikat"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-3.5 h-3.5" />
               </button>
-              <span>{currentIndex + 1} z {activeUnread.length}</span>
+              <span>{currentIndex + 1}/{activeUnread.length}</span>
               <button
                 type="button"
                 onClick={() => setCurrentIndex(i => Math.min(activeUnread.length - 1, i + 1))}
@@ -295,25 +284,25 @@ export default function UnreadAnnouncementPopup() {
                 className="hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed"
                 title="Następny komunikat"
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
           )}
         </div>
 
         {/* Title & Metadata */}
-        <div className="space-y-2">
-          <h3 className="text-lg sm:text-xl font-black text-slate-950 uppercase tracking-tight font-athletic leading-snug">
+        <div className="space-y-1">
+          <h3 className="text-lg font-black text-slate-950 tracking-tight leading-snug">
             {current.title}
           </h3>
 
           <div className="flex items-center gap-2 text-xs text-slate-500 flex-wrap">
-            <span className="font-bold text-slate-700">
-              Autor: {current.createdByName}
+            <span className="font-semibold text-slate-700">
+              {current.createdByName}
             </span>
             <span>•</span>
             <span className="flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5 text-slate-400" />
+              <Clock className="w-3 h-3 text-slate-400" />
               {new Date(current.createdAt).toLocaleDateString('pl-PL', {
                 day: 'numeric',
                 month: 'long',
@@ -325,18 +314,18 @@ export default function UnreadAnnouncementPopup() {
         </div>
 
         {/* Body Content */}
-        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-sm sm:text-base text-slate-800 leading-relaxed max-h-[40vh] overflow-y-auto whitespace-pre-line font-medium">
+        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700 leading-relaxed max-h-[35vh] overflow-y-auto whitespace-pre-line font-medium">
           {current.content}
         </div>
 
         {/* Optional External / Page Link */}
         {current.link && (
-          <div className="pt-1">
+          <div className="pt-0.5">
             <a
               href={current.link}
               target={current.link.startsWith('http') ? '_blank' : '_self'}
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-300 font-bold text-xs uppercase tracking-wider transition shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 font-bold text-xs transition"
             >
               <span>Otwórz powiązany link</span>
               <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
@@ -344,72 +333,57 @@ export default function UnreadAnnouncementPopup() {
           </div>
         )}
 
-        {/* Notice / Warning Shake Alert */}
-        {noticeToast && (
-          <div className="p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-900 text-xs font-bold flex items-center gap-2 animate-fadeIn">
-            <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0" />
-            <span>{noticeToast}</span>
-          </div>
-        )}
-
         {/* Action Buttons: Confirm Read vs Snooze (Remind me later) */}
-        <div className="pt-3 border-t border-slate-100 space-y-2.5">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
-            {/* Snooze button with dropdown toggle */}
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setShowSnoozeOptions(!showSnoozeOptions)}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition border border-slate-300 shadow-2xs"
-                title="Przypomnij mi później (komunikat pojawi się ponownie)"
-              >
-                <Timer className="w-4 h-4 text-slate-600" />
-                <span>Przypomnij mi później ▾</span>
-              </button>
-
-              {/* Snooze options popover */}
-              {showSnoozeOptions && (
-                <div className="absolute left-0 bottom-full mb-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-20 space-y-1 text-xs">
-                  <div className="px-2 py-1 text-[10px] font-black uppercase text-slate-400">
-                    Wybierz czas odłożenia:
-                  </div>
-                  {[
-                    { label: '⏰ Za 10 minut', minutes: 10 },
-                    { label: '⏰ Za 30 minut', minutes: 30 },
-                    { label: '⏰ Za 1 godzinę', minutes: 60 },
-                    { label: '⏰ Za 3 godziny', minutes: 180 },
-                  ].map(opt => (
-                    <button
-                      key={opt.minutes}
-                      type="button"
-                      onClick={() => handleSnooze(opt.minutes)}
-                      className="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 text-slate-800 font-bold transition flex items-center justify-between"
-                    >
-                      <span>{opt.label}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Primary confirmation button */}
+        <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+          {/* Snooze button with dropdown toggle */}
+          <div className="relative">
             <button
               type="button"
-              onClick={handleConfirmRead}
-              disabled={marking}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-sky-600/20 transition disabled:opacity-50"
+              onClick={() => setShowSnoozeOptions(!showSnoozeOptions)}
+              className="w-full sm:w-auto px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition border border-slate-200"
+              title="Przypomnij mi później"
             >
-              <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
-              <span>{marking ? 'Zapisywanie...' : '✓ Potwierdzam przeczytanie'}</span>
+              <Timer className="w-3.5 h-3.5 text-slate-500" />
+              <span>Przypomnij później ▾</span>
             </button>
+
+            {/* Snooze options popover */}
+            {showSnoozeOptions && (
+              <div className="absolute left-0 bottom-full mb-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 z-20 space-y-0.5 text-xs">
+                <div className="px-2 py-1 text-[10px] font-black uppercase text-slate-400">
+                  Przypomnij za:
+                </div>
+                {[
+                  { label: 'Za 15 minut', minutes: 15 },
+                  { label: 'Za 1 godzinę', minutes: 60 },
+                  { label: 'Za 3 godziny', minutes: 180 },
+                  { label: 'Jutro', minutes: 1440 },
+                ].map(opt => (
+                  <button
+                    key={opt.minutes}
+                    type="button"
+                    onClick={() => handleSnooze(opt.minutes)}
+                    className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-100 text-slate-700 font-medium transition"
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          <p className="text-[11px] text-slate-400 text-center font-medium">
-            Komunikat nie zniknie, dopóki nie potwierdzisz przeczytania lub nie odłożysz na później.
-          </p>
+          {/* Primary confirmation button */}
+          <button
+            type="button"
+            onClick={handleConfirmRead}
+            disabled={marking}
+            className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition disabled:opacity-50"
+          >
+            <Check className="w-3.5 h-3.5 text-emerald-400" />
+            <span>{marking ? 'Zapisywanie...' : 'Potwierdzam przeczytanie'}</span>
+          </button>
         </div>
       </div>
     </div>
   );
 }
-
