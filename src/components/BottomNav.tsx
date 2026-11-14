@@ -183,10 +183,10 @@ export default function BottomNav() {
 
               {user?.role === 'TRENER' && (
                 <a
-                  href="/coach"
+                  href="/taktyka?tab=trainings"
                   onClick={() => setShowMoreMenu(false)}
                   className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${
-                    pathname === '/coach'
+                    pathname.startsWith('/taktyka')
                       ? 'bg-sky-50 border-sky-300 text-sky-800 shadow-sm'
                       : 'bg-slate-50/80 border-slate-200 text-slate-700 hover:bg-sky-50/50 hover:border-sky-200'
                   }`}
@@ -198,8 +198,8 @@ export default function BottomNav() {
                     <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
                   </div>
                   <div>
-                    <div className="text-xs font-black uppercase text-slate-900">Centrum Trenera</div>
-                    <div className="text-[10px] text-slate-500">Zarządzanie meczem</div>
+                    <div className="text-xs font-black uppercase text-slate-900">Warsztat Trenera</div>
+                    <div className="text-[10px] text-slate-500">Taktyka i treningi</div>
                   </div>
                 </a>
               )}

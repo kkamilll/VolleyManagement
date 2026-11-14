@@ -1,12 +1,21 @@
 'use client';
 
-import React, { Suspense } from 'react';
-import { TrainingPlannerContent } from '@/components/TrainingPlanner';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function TrainingPlannerPage() {
+export default function TreningRedirectPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace('/taktyka?tab=trainings');
+  }, [router]);
+
   return (
-    <Suspense fallback={<div className="p-12 text-center text-white">Ładowanie warsztatu trenera...</div>}>
-      <TrainingPlannerContent />
-    </Suspense>
+    <div className="min-h-[50vh] flex items-center justify-center">
+      <div className="flex items-center gap-3 text-sky-400 font-semibold text-sm">
+        <span className="w-4 h-4 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></span>
+        Przekierowywanie do Planów Treningowych...
+      </div>
+    </div>
   );
 }

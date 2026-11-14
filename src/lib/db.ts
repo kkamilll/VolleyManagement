@@ -790,6 +790,17 @@ export function readDatabase(): AppDatabase {
   }
   ensureDataDir();
   if (!fs.existsSync(DB_FILE)) {
+    if (fs.existsSync(BACKUP_FILE)) {
+      try {
+        const backupRaw = fs.readFileSync(BACKUP_FILE, 'utf-8');
+        if (backupRaw.trim() && backupRaw.length >= 50) {
+          const restored = JSON.parse(backupRaw) as AppDatabase;
+          fs.writeFileSync(DB_FILE, backupRaw, 'utf-8');
+          inMemoryCache = restored;
+          return restored;
+        }
+      } catch {}
+    }
     const initial = getInitialData();
     try {
       fs.writeFileSync(DB_FILE, JSON.stringify(initial, null, 2), 'utf-8');
