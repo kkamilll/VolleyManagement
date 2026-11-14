@@ -31,9 +31,11 @@ import {
   FolderArchive,
   Camera,
   Compass,
-  FileText
+  FileText,
+  User
 } from 'lucide-react';
 import { Announcement } from '@/lib/types';
+import UserProfileModal from '@/components/UserProfileModal';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -41,91 +43,6 @@ export default function Navbar() {
   const { isArchiveMode, activeSeason } = useSeasonArchive();
 
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
-  const [avatarPreview, setAvatarPreview] = useState<string>('');
-  const [savingAvatar, setSavingAvatar] = useState<boolean>(false);
-  const [avatarError, setAvatarError] = useState<string | null>(null);
-  const [avatarSuccess, setAvatarSuccess] = useState<string | null>(null);
-
-  const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      setAvatarError('Wybrany plik musi być obrazem (JPG, PNG, WEBP).');
-      return;
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      setAvatarError('Plik jest zbyt duży (maksymalnie 10 MB).');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const maxDim = 400;
-        let width = img.width;
-        let height = img.height;
-        if (width > height) {
-          if (width > maxDim) {
-            height = Math.round((height * maxDim) / width);
-            width = maxDim;
-          }
-        } else {
-          if (height > maxDim) {
-            width = Math.round((width * maxDim) / height);
-            height = maxDim;
-          }
-        }
-
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, width, height);
-          const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
-          setAvatarPreview(resizedDataUrl);
-          setAvatarError(null);
-        }
-      };
-      img.src = event.target?.result as string;
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleSaveAvatar = async () => {
-    if (!user) return;
-    setSavingAvatar(true);
-    setAvatarError(null);
-    try {
-      const res = await fetch('/api/users', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: user.id,
-          avatar: avatarPreview || ''
-        })
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Błąd podczas zapisywania zdjęcia');
-      }
-
-      await refreshUser();
-      setAvatarSuccess('Zdjęcie profilowe zostało zaktualizowane!');
-      setTimeout(() => {
-        setShowProfileModal(false);
-        setAvatarSuccess(null);
-      }, 1000);
-    } catch (err: any) {
-      setAvatarError(err.message || 'Nie udało się zapisać zdjęcia');
-    } finally {
-      setSavingAvatar(false);
-    }
-  };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -684,14 +601,9 @@ export default function Navbar() {
               <div className="flex items-center gap-1.5 sm:gap-2">
                 {/* Profile Pill with Photo & Details - Clickable */}
                 <button
-                  onClick={() => {
-                    setAvatarPreview(user.avatar || '');
-                    setAvatarError(null);
-                    setAvatarSuccess(null);
-                    setShowProfileModal(true);
-                  }}
+                  onClick={() => setShowProfileModal(true)}
                   className="flex items-center gap-2 sm:gap-2.5 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-sky-300 shadow-sm transition text-left group cursor-pointer"
-                  title="Kliknij, aby edytować profil i zmienić zdjęcie"
+                  title="Kliknij, aby otworzyć swój profil"
                 >
                   {/* Avatar / Photo with hover camera hint */}
                   <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-xl overflow-hidden shrink-0 border border-slate-200 group-hover:border-sky-400 shadow-sm transition">
@@ -799,17 +711,14 @@ export default function Navbar() {
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => {
-                    setAvatarPreview(user.avatar || '');
-                    setAvatarError(null);
-                    setAvatarSuccess(null);
                     setIsMobileMenuOpen(false);
                     setShowProfileModal(true);
                   }}
                   className="px-2.5 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 text-[11px] font-bold flex items-center gap-1 transition"
-                  title="Zmień zdjęcie"
+                  title="Mój Profil"
                 >
-                  <Camera className="w-3.5 h-3.5" />
-                  <span>Zdjęcie</span>
+                  <User className="w-3.5 h-3.5" />
+                  <span>Profil</span>
                 </button>
                 <button
                   onClick={logout}
@@ -946,168 +855,11 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* Profile & Avatar Upload Modal */}
-      {showProfileModal && user && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-md shadow-2xl text-slate-800 relative">
-            {/* Close Button */}
-            <button
-              onClick={() => setShowProfileModal(false)}
-              className="absolute top-5 right-5 p-1.5 rounded-xl bg-slate-100 text-slate-400 hover:text-slate-800 hover:bg-slate-200 transition"
-              aria-label="Zamknij"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            {/* Header */}
-            <div className="text-center pb-4 border-b border-slate-100">
-              <div className="inline-flex p-2 rounded-2xl bg-sky-50 text-sky-600 border border-sky-200 mb-2">
-                <Camera className="w-5 h-5" />
-              </div>
-              <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
-                Mój Profil & Zdjęcie
-              </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Ustaw zdjęcie profilowe wyświetlane w składzie, taktyce i terminarzu
-              </p>
-            </div>
-
-            {/* Avatar Preview */}
-            <div className="my-5 flex flex-col items-center">
-              <div className="relative group">
-                <div className="w-28 h-28 rounded-3xl overflow-hidden border-4 border-white shadow-xl ring-2 ring-sky-200 bg-slate-100 flex items-center justify-center">
-                  {avatarPreview ? (
-                    <img
-                      src={avatarPreview}
-                      alt="Podgląd zdjęcia"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-sky-500 to-indigo-600 text-white font-black text-4xl flex items-center justify-center">
-                      {user.name.charAt(0)}
-                    </div>
-                  )}
-                </div>
-
-                {/* Hidden file input */}
-                <input
-                  type="file"
-                  id="avatar-file-upload"
-                  accept="image/png,image/jpeg,image/webp,image/jpg"
-                  className="hidden"
-                  onChange={handleAvatarFileChange}
-                />
-                <label
-                  htmlFor="avatar-file-upload"
-                  className="absolute -bottom-2 -right-2 p-2.5 rounded-2xl bg-sky-600 hover:bg-sky-500 text-white shadow-lg cursor-pointer transition transform hover:scale-105"
-                  title="Wgraj nowe zdjęcie z urządzenia"
-                >
-                  <Camera className="w-4 h-4" />
-                </label>
-              </div>
-
-              <div className="mt-3.5 flex items-center gap-2">
-                <label
-                  htmlFor="avatar-file-upload"
-                  className="px-3.5 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 text-xs font-bold cursor-pointer transition flex items-center gap-1.5 shadow-xs"
-                >
-                  <Camera className="w-3.5 h-3.5" />
-                  Wybierz z telefonu / komputera
-                </label>
-                {avatarPreview && (
-                  <button
-                    type="button"
-                    onClick={() => setAvatarPreview('')}
-                    className="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 text-xs font-bold transition"
-                  >
-                    Usuń
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Alternative URL Input */}
-            <div className="space-y-3">
-              <div>
-                <label className="block text-[11px] font-bold text-slate-600 mb-1">
-                  Lub wklej link do zdjęcia (URL):
-                </label>
-                <input
-                  type="url"
-                  value={avatarPreview.startsWith('data:') ? '' : avatarPreview}
-                  onChange={(e) => setAvatarPreview(e.target.value)}
-                  placeholder="https://example.com/moje-zdjecie.jpg"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white transition"
-                />
-              </div>
-
-              {/* User Quick Info Box */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Imię i nazwisko:</span>
-                  <span className="font-bold text-slate-800">{user.name}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Numer na koszulce:</span>
-                  <span className="font-mono font-bold text-slate-800">
-                    {user.number ? `#${user.number}` : 'Nieprzypisany'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-500">Rola w zespole:</span>
-                  <div className="font-bold text-slate-800">{getRoleBadge(user)}</div>
-                </div>
-                {user.position && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500">Pozycja boiskowa:</span>
-                    <span className="font-bold text-slate-800">{user.position}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Feedback Messages */}
-              {avatarError && (
-                <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-1.5">
-                  <AlertTriangle className="w-4 h-4 shrink-0" />
-                  <span>{avatarError}</span>
-                </div>
-              )}
-              {avatarSuccess && (
-                <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 shrink-0" />
-                  <span>{avatarSuccess}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Footer Actions */}
-            <div className="flex items-center justify-end gap-2.5 mt-5 pt-4 border-t border-slate-100">
-              <button
-                type="button"
-                onClick={() => setShowProfileModal(false)}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition"
-              >
-                Anuluj
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveAvatar}
-                disabled={savingAvatar}
-                className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white shadow-md transition disabled:opacity-50 flex items-center gap-1.5"
-              >
-                {savingAvatar ? (
-                  <span>Zapisywanie...</span>
-                ) : (
-                  <>
-                    <CheckCircle className="w-4 h-4" />
-                    <span>Zapisz zdjęcie</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* User Profile & Settings Modal rendered via React Portal at body level */}
+      <UserProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+      />
     </header>
   );
 }
