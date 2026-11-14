@@ -90,6 +90,11 @@ export default function UnreadAnnouncementPopup() {
     const guestRead = getGuestReadList();
 
     const filtered = all.filter(ann => {
+      // Tylko komunikaty pilne lub przypięte wyświetlają wyskakujące okno (modal).
+      // Zwykłe komunikaty trafiają dyskretnie do dzwoneczka w nagłówku, aby nie przeszkadzać.
+      const isUrgentOrPinned = ann.priority === 'PILNY' || ann.isPinned;
+      if (!isUrgentOrPinned) return false;
+
       // Check if read by current user or guest
       const isRead = user
         ? ann.readBy?.some(r => r.userId === user.id)
