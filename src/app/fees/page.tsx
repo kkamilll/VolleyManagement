@@ -550,16 +550,16 @@ function FeesContent() {
   return (
     <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 pt-6 sm:pt-8 pb-24 md:pb-16 space-y-6 sm:space-y-8">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0 glow-emerald">
+          <div className="w-11 h-11 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0 shadow-sm">
             <CreditCard className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight font-athletic text-gradient-cyan">
+            <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight font-athletic text-slate-900">
               Finanse & Składki
             </h1>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500">
               Skarbiec drużyny, składki członkowskie, opłaty BLIK oraz rejestr wydatków
             </p>
           </div>
@@ -568,21 +568,21 @@ function FeesContent() {
         <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
           <button
             onClick={handleExportExcel}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-md transition"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-emerald-50/50 text-emerald-800 border border-emerald-300 shadow-2xs hover:shadow-xs transition"
             title="Pobierz oficjalny arkusz Excel (.xlsx) ze stanem wpłat"
           >
-            <Download className="w-4 h-4 text-emerald-400" />
-            Eksportuj do Excel (.xlsx)
+            <Download className="w-4 h-4 text-emerald-600" />
+            <span>Eksportuj do Excel (.xlsx)</span>
           </button>
 
           {canManageTreasury && (
             <button
               onClick={handleOpenReminderModal}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 shadow transition"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-amber-50/50 text-amber-900 border border-amber-300 shadow-2xs hover:shadow-xs transition"
               title="Wyślij przypomnienie na WhatsApp lub tablicę drużyny"
             >
-              <BellRing className="w-4 h-4 text-amber-400" />
-              Przypomnij o składkach
+              <BellRing className="w-4 h-4 text-amber-600" />
+              <span>Przypomnij o składkach</span>
             </button>
           )}
 
@@ -593,10 +593,10 @@ function FeesContent() {
                 setExpenseCategory('SPRZET');
                 setShowExpenseModal(true);
               }}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/40 shadow transition"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 shadow-2xs hover:shadow-xs transition"
               title="Zarejestruj wydatek lub przychód kasy drużyny"
             >
-              <Coins className="w-4 h-4 text-amber-400" />
+              <Coins className="w-4 h-4 text-amber-600" />
               <span>+ Wydatek / Przychód</span>
             </button>
           )}
@@ -604,28 +604,28 @@ function FeesContent() {
           {isManager && (
             <button
               onClick={() => setShowCreateModal(true)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition shadow-lg shadow-emerald-500/20"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-sm"
             >
               <Plus className="w-4 h-4" />
-              Nowa Składka
+              <span>Nowa Składka</span>
             </button>
           )}
         </div>
       </div>
 
       {/* Fees Navigation Tabs */}
-      <div className="flex border-b border-slate-800 gap-2 sm:gap-4 overflow-x-auto pb-px">
+      <div className="flex border-b border-slate-200 gap-2 sm:gap-4 overflow-x-auto pb-px">
         <button
           onClick={() => setFeesTab('fees_table')}
           className={`pb-3.5 px-3 sm:px-4 text-xs sm:text-sm font-black uppercase tracking-wider transition flex items-center gap-2 border-b-2 shrink-0 ${
             feesTab === 'fees_table'
-              ? 'border-sky-400 text-sky-400 font-bold'
-              : 'border-transparent text-slate-400 hover:text-white'
+              ? 'border-sky-600 text-sky-950 font-black'
+              : 'border-transparent text-slate-500 hover:text-slate-900 font-bold'
           }`}
         >
-          <FileSpreadsheet className="w-4 h-4" />
+          <FileSpreadsheet className="w-4 h-4 text-sky-600" />
           <span>Tabela Składek</span>
-          <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-900 border border-slate-800 font-mono text-sky-400 font-bold">
+          <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-100 border border-slate-200 font-mono text-slate-700 font-bold">
             {filteredPayments.length}
           </span>
         </button>
@@ -634,13 +634,13 @@ function FeesContent() {
           onClick={() => setFeesTab('expenses_revenues')}
           className={`pb-3.5 px-3 sm:px-4 text-xs sm:text-sm font-black uppercase tracking-wider transition flex items-center gap-2 border-b-2 shrink-0 ${
             feesTab === 'expenses_revenues'
-              ? 'border-amber-400 text-amber-400 font-bold'
-              : 'border-transparent text-slate-400 hover:text-white'
+              ? 'border-amber-500 text-amber-950 font-black'
+              : 'border-transparent text-slate-500 hover:text-slate-900 font-bold'
           }`}
         >
-          <Coins className="w-4 h-4" />
+          <Coins className="w-4 h-4 text-amber-600" />
           <span>Tabela Wydatków i Przychodów</span>
-          <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-900 border border-slate-800 font-mono text-amber-400 font-bold">
+          <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-100 border border-slate-200 font-mono text-slate-700 font-bold">
             {filteredTransactions.length}
           </span>
         </button>
@@ -649,14 +649,14 @@ function FeesContent() {
           onClick={() => setFeesTab('my_fees')}
           className={`pb-3.5 px-3 sm:px-4 text-xs sm:text-sm font-black uppercase tracking-wider transition flex items-center gap-2 border-b-2 shrink-0 ${
             feesTab === 'my_fees'
-              ? 'border-emerald-400 text-emerald-400 font-bold'
-              : 'border-transparent text-slate-400 hover:text-white'
+              ? 'border-emerald-600 text-emerald-950 font-black'
+              : 'border-transparent text-slate-500 hover:text-slate-900 font-bold'
           }`}
         >
-          <CreditCard className="w-4 h-4" />
+          <CreditCard className="w-4 h-4 text-emerald-600" />
           <span>Moje Składki (BLIK)</span>
-          <span className={`px-2 py-0.5 rounded-full text-[10px] bg-slate-900 border font-mono font-bold ${
-            unpaidUserPayments.length > 0 ? 'border-amber-500/40 text-amber-400' : 'border-slate-800 text-emerald-400'
+          <span className={`px-2 py-0.5 rounded-full text-[10px] border font-mono font-bold ${
+            unpaidUserPayments.length > 0 ? 'bg-amber-50 border-amber-300 text-amber-800' : 'bg-slate-100 border-slate-200 text-slate-700'
           }`}>
             {unpaidUserPayments.length > 0 ? `${unpaidUserPayments.length} do opłaty` : userPayments.length}
           </span>
@@ -668,54 +668,62 @@ function FeesContent() {
         <div className="space-y-6">
           {/* Summary Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <div className="cyber-card rounded-3xl p-4 sm:p-5 border border-emerald-500/25 relative overflow-hidden">
-              <div className="flex items-center justify-between text-slate-400 mb-2">
-                <span className="text-[11px] font-black uppercase tracking-wider">Zebrano</span>
-                <CheckCircle className="w-4 h-4 text-emerald-400" />
+            <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-md transition relative overflow-hidden">
+              <div className="flex items-center justify-between text-slate-500 mb-2.5">
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-600">Zebrano</span>
+                <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center shrink-0">
+                  <CheckCircle className="w-4 h-4" />
+                </div>
               </div>
-              <div className="text-xl sm:text-2xl font-black text-emerald-400 font-mono">
+              <div className="text-2xl sm:text-3xl font-black text-emerald-700 font-mono tracking-tight">
                 {summary?.totalCollected || 0} zł
               </div>
-              <span className="text-[10px] text-slate-400 font-medium">
+              <span className="text-[11px] text-slate-500 font-medium block mt-1">
                 {summary?.paidCount || 0} opłaconych wpłat
               </span>
             </div>
 
-            <div className="cyber-card rounded-3xl p-4 sm:p-5 border border-amber-500/25 relative overflow-hidden">
-              <div className="flex items-center justify-between text-slate-400 mb-2">
-                <span className="text-[11px] font-black uppercase tracking-wider">Oczekujące</span>
-                <Clock className="w-4 h-4 text-amber-400" />
+            <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-md transition relative overflow-hidden">
+              <div className="flex items-center justify-between text-slate-500 mb-2.5">
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-600">Oczekujące</span>
+                <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center shrink-0">
+                  <Clock className="w-4 h-4" />
+                </div>
               </div>
-              <div className="text-xl sm:text-2xl font-black text-amber-400 font-mono">
+              <div className="text-2xl sm:text-3xl font-black text-amber-800 font-mono tracking-tight">
                 {summary?.totalPending || 0} zł
               </div>
-              <span className="text-[10px] text-slate-400 font-medium">
+              <span className="text-[11px] text-slate-500 font-medium block mt-1">
                 Przed upływem terminu
               </span>
             </div>
 
-            <div className="cyber-card rounded-3xl p-4 sm:p-5 border border-rose-500/25 relative overflow-hidden">
-              <div className="flex items-center justify-between text-slate-400 mb-2">
-                <span className="text-[11px] font-black uppercase tracking-wider">Zaległe</span>
-                <AlertCircle className="w-4 h-4 text-rose-400" />
+            <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-md transition relative overflow-hidden">
+              <div className="flex items-center justify-between text-slate-500 mb-2.5">
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-600">Zaległe</span>
+                <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center shrink-0">
+                  <AlertCircle className="w-4 h-4" />
+                </div>
               </div>
-              <div className="text-xl sm:text-2xl font-black text-rose-400 font-mono">
+              <div className="text-2xl sm:text-3xl font-black text-rose-700 font-mono tracking-tight">
                 {summary?.totalOverdue || 0} zł
               </div>
-              <span className="text-[10px] text-slate-400 font-medium">
+              <span className="text-[11px] text-slate-500 font-medium block mt-1">
                 Po wyznaczonym terminie
               </span>
             </div>
 
-            <div className="cyber-card rounded-3xl p-4 sm:p-5 border border-sky-500/25 relative overflow-hidden">
-              <div className="flex items-center justify-between text-slate-400 mb-2">
-                <span className="text-[11px] font-black uppercase tracking-wider">Ściągalność</span>
-                <TrendingUp className="w-4 h-4 text-sky-400" />
+            <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-md transition relative overflow-hidden">
+              <div className="flex items-center justify-between text-slate-500 mb-2.5">
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-600">Ściągalność</span>
+                <div className="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 border border-sky-200 flex items-center justify-center shrink-0">
+                  <TrendingUp className="w-4 h-4" />
+                </div>
               </div>
-              <div className="text-xl sm:text-2xl font-black text-sky-400 font-mono">
+              <div className="text-2xl sm:text-3xl font-black text-sky-800 font-mono tracking-tight">
                 {summary?.paymentsCount ? Math.round((summary.paidCount / summary.paymentsCount) * 100) : 0}%
               </div>
-              <span className="text-[10px] text-slate-400 font-medium">
+              <span className="text-[11px] text-slate-500 font-medium block mt-1">
                 Łącznie: {summary?.totalExpected || 0} zł
               </span>
             </div>
@@ -723,16 +731,16 @@ function FeesContent() {
 
           {/* Quick Player Pending Banner */}
           {unpaidUserPayments.length > 0 && (
-            <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-amber-500/15 via-slate-900/90 to-sky-500/15 border border-amber-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+            <div className="p-4 sm:p-5 rounded-3xl bg-amber-50/70 border border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30">
+                <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 border border-amber-200 shadow-2xs">
                   <Smartphone className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-black text-white">
+                  <h4 className="text-sm font-black text-slate-900">
                     Masz {unpaidUserPayments.length} nieopłaconą składkę ({unpaidUserPayments.reduce((a, c) => a + c.amount, 0)} zł)
                   </h4>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-600">
                     Możesz uregulować ją natychmiast za pomocą 6-cyfrowego kodu BLIK lub tradycyjnego przelewu.
                   </p>
                 </div>
@@ -741,14 +749,14 @@ function FeesContent() {
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   onClick={() => handleOpenPaymentModal(unpaidUserPayments[0])}
-                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-md shadow-amber-500/20 flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-sm flex items-center gap-1.5"
                 >
                   <Smartphone className="w-3.5 h-3.5" />
                   <span>Zapłać teraz (BLIK)</span>
                 </button>
                 <button
                   onClick={() => setFeesTab('my_fees')}
-                  className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-bold border border-slate-700 transition"
+                  className="px-3 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold border border-slate-200 transition shadow-2xs"
                 >
                   Moje składki
                 </button>
@@ -824,7 +832,7 @@ function FeesContent() {
                 <select
                   value={filterFeeId}
                   onChange={e => setFilterFeeId(e.target.value)}
-                  className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none"
+                  className="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-sky-500 shadow-2xs font-bold"
                 >
                   <option value="ALL">Wszystkie składki</option>
                   {fees.map(f => (
@@ -835,7 +843,7 @@ function FeesContent() {
                 <select
                   value={filterStatus}
                   onChange={e => setFilterStatus(e.target.value)}
-                  className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none"
+                  className="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-sky-500 shadow-2xs font-bold"
                 >
                   <option value="ALL">Wszystkie statusy</option>
                   <option value="OPLACONE">Tylko Opłacone</option>
@@ -849,7 +857,7 @@ function FeesContent() {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="border-b border-slate-800 text-slate-400 font-black uppercase text-[10px] tracking-wider">
+                  <tr className="border-b border-slate-200 text-slate-500 font-black uppercase text-[10px] tracking-wider bg-slate-50/50">
                     <th className="py-3 px-3">Zawodnik</th>
                     <th className="py-3 px-3">Tytuł Składki</th>
                     <th className="py-3 px-3">Termin</th>
@@ -860,7 +868,7 @@ function FeesContent() {
                     <th className="py-3 px-3 text-right">Akcja</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody className="divide-y divide-slate-100">
                   {paginatedPayments.length === 0 ? (
                     <tr>
                       <td colSpan={8} className="py-8 text-center text-slate-500 font-bold">
@@ -871,51 +879,56 @@ function FeesContent() {
                     paginatedPayments.map(pay => {
                       const fee = fees.find(f => f.id === pay.feeId);
                       const isPaid = pay.status === 'OPLACONE';
+                      const isOverdue = pay.status === 'ZALEGLE';
                       return (
-                        <tr key={pay.id} className="hover:bg-slate-900/40 transition">
-                          <td className="py-3 px-3 font-bold text-white flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-lg bg-slate-800 flex items-center justify-center text-[10px] text-sky-400 font-mono">
+                        <tr key={pay.id} className="hover:bg-slate-50/70 transition">
+                          <td className="py-3 px-3 font-bold text-slate-900 flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-xl bg-sky-50 text-sky-700 border border-sky-200 flex items-center justify-center text-[10px] font-mono font-bold">
                               {pay.userName.charAt(0)}
                             </div>
                             {pay.userName}
                           </td>
-                          <td className="py-3 px-3 text-slate-300 font-medium">
+                          <td className="py-3 px-3 text-slate-800 font-medium">
                             {fee?.title || 'Składka'}
                           </td>
-                          <td className="py-3 px-3 text-slate-400 font-mono">
+                          <td className="py-3 px-3 text-slate-500 font-mono">
                             {fee?.dueDate || '-'}
                           </td>
-                          <td className="py-3 px-3 text-right font-mono font-black text-white">
+                          <td className="py-3 px-3 text-right font-mono font-black text-slate-900">
                             {pay.amount} zł
                           </td>
-                          <td className="py-3 px-3 text-right font-mono font-bold text-sky-400">
+                          <td className="py-3 px-3 text-right font-mono font-bold text-sky-700">
                             {pay.overpayment ? `+${pay.overpayment} zł` : '-'}
                           </td>
                           <td className="py-3 px-3 text-center">
                             <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
-                              isPaid ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                              isPaid
+                                ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
+                                : isOverdue
+                                ? 'bg-rose-50 text-rose-800 border border-rose-300'
+                                : 'bg-amber-50 text-amber-800 border border-amber-300'
                             }`}>
                               {pay.status}
                             </span>
                           </td>
-                          <td className="py-3 px-3 text-slate-400 font-mono text-[11px]">
+                          <td className="py-3 px-3 text-slate-500 font-mono text-[11px]">
                             {pay.paymentMethod ? `${pay.paymentMethod} • ${pay.transactionId || ''}` : '-'}
                           </td>
                           <td className="py-3 px-3 text-right">
                             {isPaid ? (
                               <button
                                 onClick={() => openReceipt(pay, fee)}
-                                className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-400 hover:text-sky-300"
+                                className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-700 hover:text-sky-900"
                               >
                                 <Receipt className="w-3.5 h-3.5" /> Druk
                               </button>
                             ) : canManageTreasury ? (
                               <button
                                 onClick={() => handleQuickCashPayment(pay)}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 transition"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-black uppercase bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 transition shadow-2xs"
                                 title="Oznacz wpłatę gotówki do ręki"
                               >
-                                <Check className="w-3 h-3" /> Gotówka
+                                <Check className="w-3 h-3 text-emerald-700" /> Gotówka
                               </button>
                             ) : null}
                           </td>
@@ -929,15 +942,15 @@ function FeesContent() {
 
             {/* Pagination Bar */}
             {totalPaymentsPages > 1 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-800/80">
-                <span className="text-xs text-slate-400 font-medium">
-                  Wyświetlanie <span className="text-white font-bold">{((paymentsPage - 1) * PAYMENTS_PER_PAGE) + 1}</span>–<span className="text-white font-bold">{Math.min(paymentsPage * PAYMENTS_PER_PAGE, filteredPayments.length)}</span> z <span className="text-white font-bold">{filteredPayments.length}</span> rozliczeń
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-200">
+                <span className="text-xs text-slate-500 font-medium">
+                  Wyświetlanie <span className="text-slate-900 font-bold">{((paymentsPage - 1) * PAYMENTS_PER_PAGE) + 1}</span>–<span className="text-slate-900 font-bold">{Math.min(paymentsPage * PAYMENTS_PER_PAGE, filteredPayments.length)}</span> z <span className="text-slate-900 font-bold">{filteredPayments.length}</span> rozliczeń
                 </span>
                 <div className="flex items-center gap-1.5">
                   <button
                     onClick={() => setPaymentsPage(p => Math.max(1, p - 1))}
                     disabled={paymentsPage === 1}
-                    className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition"
+                    className="p-1.5 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed transition shadow-2xs"
                     title="Poprzednia strona"
                   >
                     <ChevronLeft className="w-4 h-4" />
@@ -947,10 +960,10 @@ function FeesContent() {
                       <button
                         key={idx}
                         onClick={() => setPaymentsPage(idx + 1)}
-                        className={`min-w-[28px] h-7 px-2 rounded-lg text-xs font-black transition ${
+                        className={`min-w-[28px] h-7 px-2 rounded-xl text-xs font-black transition ${
                           paymentsPage === idx + 1
-                            ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/20'
-                            : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                            ? 'bg-sky-600 text-white shadow-xs'
+                            : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
                         }`}
                       >
                         {idx + 1}
@@ -960,7 +973,7 @@ function FeesContent() {
                   <button
                     onClick={() => setPaymentsPage(p => Math.min(totalPaymentsPages, p + 1))}
                     disabled={paymentsPage === totalPaymentsPages}
-                    className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition"
+                    className="p-1.5 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed transition shadow-2xs"
                     title="Następna strona"
                   >
                     <ChevronRight className="w-4 h-4" />
@@ -1074,14 +1087,14 @@ function FeesContent() {
                   placeholder="Szukaj po tytule, opisie, autorze..."
                   value={searchTransaction}
                   onChange={e => setSearchTransaction(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:bg-white"
                 />
               </div>
 
               <select
                 value={filterTransType}
                 onChange={e => setFilterTransType(e.target.value as any)}
-                className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none font-bold"
+                className="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-amber-500 font-bold shadow-2xs"
               >
                 <option value="ALL">Wszystkie operacje</option>
                 <option value="EXPENSE">🔴 Tylko Wydatki</option>
@@ -1091,7 +1104,7 @@ function FeesContent() {
               <select
                 value={filterTransCategory}
                 onChange={e => setFilterTransCategory(e.target.value)}
-                className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none"
+                className="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-amber-500 shadow-2xs"
               >
                 <option value="ALL">Wszystkie kategorie</option>
                 <option value="HALA">🏢 Hala sportowa</option>
@@ -1114,7 +1127,7 @@ function FeesContent() {
                     setFilterTransCategory('ALL');
                     setSearchTransaction('');
                   }}
-                  className="text-[11px] font-bold text-slate-400 hover:text-rose-400 transition underline underline-offset-2 ml-1"
+                  className="text-[11px] font-bold text-slate-500 hover:text-rose-600 transition underline underline-offset-2 ml-1"
                 >
                   Wyczyść filtry
                 </button>
@@ -1125,7 +1138,7 @@ function FeesContent() {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="border-b border-slate-800 text-slate-400 font-black uppercase text-[10px] tracking-wider">
+                  <tr className="border-b border-slate-200 text-slate-500 font-black uppercase text-[10px] tracking-wider bg-slate-50/50">
                     <th className="py-3 px-3">Data</th>
                     <th className="py-3 px-3">Typ</th>
                     <th className="py-3 px-3">Kategoria</th>
@@ -1135,7 +1148,7 @@ function FeesContent() {
                     {canManageTreasury && <th className="py-3 px-3 text-right">Akcja</th>}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody className="divide-y divide-slate-100">
                   {paginatedTransactions.length === 0 ? (
                     <tr>
                       <td colSpan={canManageTreasury ? 7 : 6} className="py-8 text-center text-slate-500 font-bold">
@@ -1148,24 +1161,24 @@ function FeesContent() {
                       const badge = getCategoryBadge(trans.category, trans.type || 'EXPENSE');
 
                       return (
-                        <tr key={trans.id} className="hover:bg-slate-900/40 transition">
-                          <td className="py-3 px-3 text-slate-400 font-mono text-[11px]">
+                        <tr key={trans.id} className="hover:bg-slate-50/70 transition">
+                          <td className="py-3 px-3 text-slate-500 font-mono text-[11px]">
                             {trans.date}
                           </td>
                           <td className="py-3 px-3">
                             <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border ${
                               isIncome
-                                ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                                : 'bg-rose-500/15 text-rose-300 border-rose-500/30'
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                                : 'bg-rose-50 text-rose-800 border-rose-300'
                             }`}>
                               {isIncome ? (
                                 <>
-                                  <ArrowUpRight className="w-3 h-3 text-emerald-400" />
+                                  <ArrowUpRight className="w-3 h-3 text-emerald-600" />
                                   <span>Przychód</span>
                                 </>
                               ) : (
                                 <>
-                                  <ArrowDownRight className="w-3 h-3 text-rose-400" />
+                                  <ArrowDownRight className="w-3 h-3 text-rose-600" />
                                   <span>Wydatek</span>
                                 </>
                               )}
@@ -1178,16 +1191,16 @@ function FeesContent() {
                             </span>
                           </td>
                           <td className="py-3 px-3">
-                            <div className="font-bold text-white text-xs">{trans.title}</div>
+                            <div className="font-bold text-slate-900 text-xs">{trans.title}</div>
                             {trans.description && (
-                              <div className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">{trans.description}</div>
+                              <div className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">{trans.description}</div>
                             )}
                           </td>
-                          <td className="py-3 px-3 text-slate-400 text-[11px]">
+                          <td className="py-3 px-3 text-slate-500 text-[11px]">
                             {trans.createdByName}
                           </td>
                           <td className="py-3 px-3 text-right font-mono font-black text-sm">
-                            <span className={isIncome ? 'text-emerald-400' : 'text-rose-400'}>
+                            <span className={isIncome ? 'text-emerald-700' : 'text-rose-600'}>
                               {isIncome ? `+${trans.amount} zł` : `-${trans.amount} zł`}
                             </span>
                           </td>
@@ -1195,7 +1208,7 @@ function FeesContent() {
                             <td className="py-3 px-3 text-right">
                               <button
                                 onClick={() => handleDeleteTransaction(trans.id)}
-                                className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-slate-800 transition"
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
                                 title="Usuń wpis"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -1212,15 +1225,15 @@ function FeesContent() {
 
             {/* Pagination */}
             {totalTransPages > 1 && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-800/80">
-                <span className="text-xs text-slate-400 font-medium">
-                  Wyświetlanie <span className="text-white font-bold">{((transPage - 1) * TRANS_PER_PAGE) + 1}</span>–<span className="text-white font-bold">{Math.min(transPage * TRANS_PER_PAGE, filteredTransactions.length)}</span> z <span className="text-white font-bold">{filteredTransactions.length}</span> transakcji
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-200">
+                <span className="text-xs text-slate-500 font-medium">
+                  Wyświetlanie <span className="text-slate-900 font-bold">{((transPage - 1) * TRANS_PER_PAGE) + 1}</span>–<span className="text-slate-900 font-bold">{Math.min(transPage * TRANS_PER_PAGE, filteredTransactions.length)}</span> z <span className="text-slate-900 font-bold">{filteredTransactions.length}</span> transakcji
                 </span>
                 <div className="flex items-center gap-1.5">
                   <button
                     onClick={() => setTransPage(p => Math.max(1, p - 1))}
                     disabled={transPage === 1}
-                    className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition"
+                    className="p-1.5 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed transition shadow-2xs"
                     title="Poprzednia strona"
                   >
                     <ChevronLeft className="w-4 h-4" />
@@ -1230,10 +1243,10 @@ function FeesContent() {
                       <button
                         key={idx}
                         onClick={() => setTransPage(idx + 1)}
-                        className={`min-w-[28px] h-7 px-2 rounded-lg text-xs font-black transition ${
+                        className={`min-w-[28px] h-7 px-2 rounded-xl text-xs font-black transition ${
                           transPage === idx + 1
-                            ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                            : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                            ? 'bg-amber-500 text-slate-950 shadow-xs'
+                            : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
                         }`}
                       >
                         {idx + 1}
@@ -1243,7 +1256,7 @@ function FeesContent() {
                   <button
                     onClick={() => setTransPage(p => Math.min(totalTransPages, p + 1))}
                     disabled={transPage === totalTransPages}
-                    className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition"
+                    className="p-1.5 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 disabled:opacity-30 disabled:cursor-not-allowed transition shadow-2xs"
                     title="Następna strona"
                   >
                     <ChevronRight className="w-4 h-4" />
@@ -1258,16 +1271,16 @@ function FeesContent() {
       {/* 3. DLA ZAWODNIKA: MOJE SKŁADKI */}
       {feesTab === 'my_fees' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-200">
             <div className="flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-emerald-400" />
-              <h2 className="text-base sm:text-lg font-black text-white uppercase tracking-wider">
+              <CreditCard className="w-5 h-5 text-emerald-600" />
+              <h2 className="text-base sm:text-lg font-black text-slate-900 uppercase tracking-wider">
                 Moje Składki ({user?.name})
               </h2>
             </div>
             {treasury?.userOverpayments > 0 && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/15 border border-sky-500/40 text-sky-300 text-xs font-bold">
-                <Sparkles className="w-3.5 h-3.5" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-sky-800 text-xs font-bold">
+                <Sparkles className="w-3.5 h-3.5 text-sky-600" />
                 Masz {treasury.userOverpayments} zł nadpłaty w skarbcu
               </span>
             )}
