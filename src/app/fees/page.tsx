@@ -14,6 +14,8 @@ import {
   Smartphone, 
   Sparkles, 
   Trash2, 
+  RotateCcw,
+  Settings,
   Crown,
   Printer,
   Coins,
@@ -59,6 +61,7 @@ function FeesContent() {
 
   // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showManageFeesModal, setShowManageFeesModal] = useState(false);
   const [showExpenseModal, setShowExpenseModal] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<FeePayment | null>(null);
@@ -224,6 +227,52 @@ function FeesContent() {
       }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const handleDeleteFee = async (feeId: string, feeTitle?: string) => {
+    const fTitle = feeTitle || fees.find(f => f.id === feeId)?.title || 'tę składkę';
+    if (!confirm(`Czy na pewno chcesz bezpowrotnie usunąć składkę "${fTitle}"?\n\nUsunięta zostanie ta składka oraz wszystkie przypisane do niej rozliczenia zawodników.`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/fees?id=${feeId}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (res.ok) {
+        if (filterFeeId === feeId) {
+          setFilterFeeId('ALL');
+        }
+        await fetchFeesData();
+        alert(data.message || 'Składka została pomyślnie usunięta.');
+      } else {
+        alert(data.error || 'Błąd podczas usuwania składki');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Wystąpił błąd podczas usuwania składki');
+    }
+  };
+
+  const handleResetPayment = async (paymentId: string, playerName?: string) => {
+    if (!confirm(`Czy na pewno chcesz cofnąć status wpłaty dla zawodnika ${playerName || ''}?\n\nPłatność powróci do statusu "Oczekuje".`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/fees?paymentId=${paymentId}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (res.ok) {
+        await fetchFeesData();
+        alert(data.message || 'Status wpłaty został pomyślnie cofnięty.');
+      } else {
+        alert(data.error || 'Błąd podczas cofania statusu wpłaty');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Wystąpił błąd podczas cofania wpłaty');
     }
   };
 
@@ -602,13 +651,24 @@ function FeesContent() {
           )}
 
           {isManager && (
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-sm"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Nowa Składka</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setShowManageFeesModal(true)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 shadow-2xs transition"
+                title="Przeglądaj i usuwaj zdefiniowane składki"
+              >
+                <Settings className="w-4 h-4 text-slate-500" />
+                <span>Zarządzaj składkami ({fees.length})</span>
+              </button>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-sm"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Nowa Składka</span>
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -840,6 +900,18 @@ function FeesContent() {
                   ))}
                 </select>
 
+                {isManager && filterFeeId !== 'ALL' && (
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteFee(filterFeeId)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition shadow-2xs"
+                    title="Usuń tę składkę oraz przypisane do niej rozliczenia zawodników"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                    <span>Usuń tę składkę</span>
+                  </button>
+                )}
+
                 <select
                   value={filterStatus}
                   onChange={e => setFilterStatus(e.target.value)}
@@ -916,20 +988,34 @@ function FeesContent() {
                           </td>
                           <td className="py-3 px-3 text-right">
                             {isPaid ? (
-                              <button
-                                onClick={() => openReceipt(pay, fee)}
-                                className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-700 hover:text-sky-900"
-                              >
-                                <Receipt className="w-3.5 h-3.5" /> Druk
-                              </button>
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  onClick={() => openReceipt(pay, fee)}
+                                  className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-700 hover:text-sky-900"
+                                >
+                                  <Receipt className="w-3.5 h-3.5" /> Druk
+                                </button>
+                                {canManageTreasury && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleResetPayment(pay.id, pay.userName)}
+                                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
+                                    title="Cofnij status wpłaty (jeśli oznaczono przez pomyłkę)"
+                                  >
+                                    <RotateCcw className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
+                              </div>
                             ) : canManageTreasury ? (
-                              <button
-                                onClick={() => handleQuickCashPayment(pay)}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-black uppercase bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 transition shadow-2xs"
-                                title="Oznacz wpłatę gotówki do ręki"
-                              >
-                                <Check className="w-3 h-3 text-emerald-700" /> Gotówka
-                              </button>
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  onClick={() => handleQuickCashPayment(pay)}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-black uppercase bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 transition shadow-2xs"
+                                  title="Oznacz wpłatę gotówki do ręki"
+                                >
+                                  <Check className="w-3 h-3 text-emerald-700" /> Gotówka
+                                </button>
+                              </div>
                             ) : null}
                           </td>
                         </tr>
@@ -1674,6 +1760,95 @@ function FeesContent() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Zarządzanie Składkami Klubowymi (Lista i Usuwanie) */}
+      {showManageFeesModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-xl p-6 shadow-2xl relative text-slate-800 max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4 shrink-0">
+              <div>
+                <h3 className="text-base font-black text-slate-900 uppercase">Zarządzanie Składkami Klubowymi</h3>
+                <p className="text-xs text-slate-500 mt-0.5">Lista zdefiniowanych składek. Możesz usunąć błędnie wprowadzone pozycje.</p>
+              </div>
+              <button onClick={() => setShowManageFeesModal(false)} className="text-slate-400 hover:text-slate-700 p-1">✕</button>
+            </div>
+
+            <div className="overflow-y-auto space-y-2.5 pr-1 flex-1">
+              {fees.length === 0 ? (
+                <div className="py-8 text-center text-slate-500 text-xs font-bold">
+                  Brak utworzonych składek w klubie.
+                </div>
+              ) : (
+                fees.map(f => {
+                  const feePayments = payments.filter(p => p.feeId === f.id);
+                  const paidCount = feePayments.filter(p => p.status === 'OPLACONE').length;
+                  return (
+                    <div key={f.id} className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50/70 hover:bg-slate-50 transition flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-black text-slate-900 text-xs truncate">{f.title}</span>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-white text-sky-800 border border-sky-200">
+                            {f.amount} zł
+                          </span>
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-600 bg-white border border-slate-200">
+                            Termin: {f.dueDate}
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-2">
+                          <span>Opłacone: <strong>{paidCount}/{feePayments.length}</strong></span>
+                          {f.description && <span className="truncate max-w-[200px] text-slate-400">• {f.description}</span>}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFilterFeeId(f.id);
+                            setShowManageFeesModal(false);
+                          }}
+                          className="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-white hover:bg-sky-50 text-sky-700 border border-slate-200 transition shadow-2xs"
+                          title="Pokaż tylko tę składkę w tabeli"
+                        >
+                          Pokaż w tabeli
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteFee(f.id, f.title)}
+                          className="p-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition shadow-2xs"
+                          title="Usuń tę składkę oraz powiązane rozliczenia"
+                        >
+                          <Trash2 className="w-4 h-4 text-rose-600" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            <div className="pt-4 border-t border-slate-100 flex justify-between items-center shrink-0 mt-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowManageFeesModal(false);
+                  setShowCreateModal(true);
+                }}
+                className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
+              >
+                <Plus className="w-3.5 h-3.5" /> Dodaj nową składkę
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowManageFeesModal(false)}
+                className="px-4 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition"
+              >
+                Zamknij
+              </button>
+            </div>
           </div>
         </div>
       )}

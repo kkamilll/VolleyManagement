@@ -211,9 +211,31 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: true, message: 'Wpis z księgi wydatków/przychodów został usunięty' });
     }
 
+    const paymentId = searchParams.get('paymentId');
+    if (paymentId) {
+      const db = readDatabase();
+      const payment = db.payments.find(p => p.id === paymentId);
+      if (!payment) {
+        return NextResponse.json({ error: 'Nie znaleziono płatności' }, { status: 404 });
+      }
+      // Revert status to OCZEKUJE and clean up payment fields
+      payment.status = 'OCZEKUJE';
+      delete payment.paidAt;
+      delete payment.paymentMethod;
+      delete payment.transactionId;
+      delete payment.verifiedByManager;
+      delete payment.overpayment;
+      delete payment.splitTarget;
+      if (payment.baseAmount) {
+        payment.amount = payment.baseAmount;
+      }
+      writeDatabase(db);
+      return NextResponse.json({ success: true, message: `Status wpłaty dla zawodnika ${payment.userName} został cofnięty (oczekuje na wpłatę).` });
+    }
+
     const id = searchParams.get('id');
     if (!id) {
-      return NextResponse.json({ error: 'Brak ID składki lub transakcji' }, { status: 400 });
+      return NextResponse.json({ error: 'Brak ID składki, wpłaty lub transakcji' }, { status: 400 });
     }
 
     const db = readDatabase();
