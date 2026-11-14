@@ -146,41 +146,54 @@ export function TrainingPlannerContent({
   const fetchPlans = async () => {
     try {
       setLoading(true);
-      const [tRes, tacRes] = await Promise.all([
+      const [tRes, tacRes, evRes] = await Promise.all([
         fetch('/api/trainings'),
-        fetch('/api/tactics')
+        fetch('/api/tactics'),
+        fetch('/api/events')
       ]);
 
       let allEvents: EventItem[] = [];
       let pList: TrainingPlan[] = [];
+
+      if (evRes.ok) {
+        const evData = await evRes.json();
+        allEvents = (evData.events || []).sort((a: EventItem, b: EventItem) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      }
 
       if (tRes.ok) {
         const d = await tRes.json();
         pList = d.plans || [];
         setPlans(pList);
         setPlayers(d.players || []);
-
-        allEvents = (d.events || []).sort((a: EventItem, b: EventItem) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        setEvents(allEvents);
-
-        let targetEventId = queryEventId;
-        if (!targetEventId && allEvents.length > 0) {
-          const upcoming = allEvents.find((e: EventItem) => new Date(e.date).getTime() >= Date.now() - 3600000 * 3);
-          targetEventId = (upcoming || allEvents[0]).id;
+        if (allEvents.length === 0 && d.events) {
+          allEvents = (d.events || []).sort((a: EventItem, b: EventItem) => new Date(b.date).getTime() - new Date(a.date).getTime());
         }
+      }
+      setEvents(allEvents);
 
-        if (targetEventId) {
-          setSelectedEventId(targetEventId);
-          const match = pList.find((p: TrainingPlan) => p.eventId === targetEventId || p.id === targetEventId);
-          if (match) setSelectedPlan(match);
-          else if (pList.length > 0) setSelectedPlan(pList[0]);
-        } else if (queryPlanId) {
-          const match = pList.find((p: TrainingPlan) => p.id === queryPlanId);
-          if (match) setSelectedPlan(match);
-          else if (pList.length > 0) setSelectedPlan(pList[0]);
-        } else if (pList.length > 0 && !activePlan) {
-          setSelectedPlan(pList[0]);
-        }
+      let targetEventId = queryEventId;
+      if (!targetEventId && allEvents.length > 0) {
+        const candidateEvents = mode === 'MATCHES'
+          ? allEvents.filter(e => e.type === 'MECZ' || e.type === 'SPARING' || e.type === 'TURNIEJ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals')))
+          : mode === 'TRAININGS'
+          ? allEvents.filter(e => e.type === 'TRENING')
+          : allEvents;
+
+        const upcoming = candidateEvents.find((e: EventItem) => new Date(e.date).getTime() >= Date.now() - 3600000 * 24);
+        targetEventId = (upcoming || candidateEvents[0] || allEvents[0]).id;
+      }
+
+      if (targetEventId) {
+        setSelectedEventId(targetEventId);
+        const match = pList.find((p: TrainingPlan) => p.eventId === targetEventId || p.id === targetEventId);
+        if (match) setSelectedPlan(match);
+        else if (pList.length > 0) setSelectedPlan(pList[0]);
+      } else if (queryPlanId) {
+        const match = pList.find((p: TrainingPlan) => p.id === queryPlanId);
+        if (match) setSelectedPlan(match);
+        else if (pList.length > 0) setSelectedPlan(pList[0]);
+      } else if (pList.length > 0 && !activePlan) {
+        setSelectedPlan(pList[0]);
       }
 
       if (tacRes.ok) {

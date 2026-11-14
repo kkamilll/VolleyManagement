@@ -784,6 +784,107 @@
       "createdById": "usr_hubert",
       "createdByName": "Hubert Obara",
       "createdAt": "2026-11-12T22:50:07.093Z"
+    },
+    {
+      "id": "evt_tr_20261117",
+      "title": "Trening taktyczny: Zagrywka i system blok-obrona",
+      "type": "TRENING",
+      "date": "2026-11-17T19:00:00.000Z",
+      "location": "Hala OSiR, Luboń",
+      "description": "Przygotowanie do kolejnej kolejki LALS. Doskonalenie celowanego serwisu i asekuracja ataku.",
+      "costPerPerson": 0,
+      "status": "ANKIETA",
+      "attendees": [
+        {
+          "userId": "usr_trener",
+          "userName": "Hubert Rutkowski",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_kierownik",
+          "userName": "Łukasz Kremer",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_pujanek",
+          "userName": "Kamil Pujanek",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_zadlo",
+          "userName": "Tomasz Żądło",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_obara",
+          "userName": "Hubert Obara",
+          "status": "BEDE"
+        }
+      ],
+      "createdById": "usr_trener",
+      "createdByName": "Hubert Rutkowski",
+      "createdAt": "2026-11-14T11:00:00.000Z"
+    },
+    {
+      "id": "evt_tr_20261119",
+      "title": "Trening meczowy: Gra szóstkami i tempo rozegrania",
+      "type": "TRENING",
+      "date": "2026-11-19T19:00:00.000Z",
+      "location": "Hala OSiR, Luboń",
+      "description": "Weryfikacja wariantów rozegrania ze środkowymi i pajp z 6. metra.",
+      "costPerPerson": 0,
+      "status": "ANKIETA",
+      "attendees": [
+        {
+          "userId": "usr_trener",
+          "userName": "Hubert Rutkowski",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_kierownik",
+          "userName": "Łukasz Kremer",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_pujanek",
+          "userName": "Kamil Pujanek",
+          "status": "BEDE"
+        }
+      ],
+      "createdById": "usr_trener",
+      "createdByName": "Hubert Rutkowski",
+      "createdAt": "2026-11-14T11:00:00.000Z"
+    },
+    {
+      "id": "evt_sp_20261121",
+      "title": "Sparing kontrolny: Angels ZTP vs UKS Rataje Poznań",
+      "type": "SPARING",
+      "date": "2026-11-21T16:00:00.000Z",
+      "location": "Hala OSiR, Luboń",
+      "opponent": "UKS Rataje Poznań",
+      "description": "Mecz sparingowy testujący zmienników i alternatywne ustawienia w obronie.",
+      "costPerPerson": 0,
+      "status": "ANKIETA",
+      "attendees": [
+        {
+          "userId": "usr_trener",
+          "userName": "Hubert Rutkowski",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_kierownik",
+          "userName": "Łukasz Kremer",
+          "status": "BEDE"
+        },
+        {
+          "userId": "usr_pujanek",
+          "userName": "Kamil Pujanek",
+          "status": "BEDE"
+        }
+      ],
+      "createdById": "usr_trener",
+      "createdByName": "Hubert Rutkowski",
+      "createdAt": "2026-11-14T11:00:00.000Z"
     }
   ],
   "leagueReports": [
