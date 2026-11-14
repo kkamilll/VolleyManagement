@@ -12,17 +12,18 @@ export async function GET(req: NextRequest) {
   const matches = db.matches || [];
   const events = db.events || [];
   
-  // Extract players from users
-  const players = db.users
-    .filter(u => u.role === 'ZAWODNIK')
-    .map(u => ({
-      id: u.id,
-      name: u.name,
-      number: u.number,
-      position: u.position,
-      height: u.height,
-      status: u.status
-    }));
+  // Extract players and coaching staff from users
+  const players = (db.users || []).map(u => ({
+    id: u.id,
+    name: u.name,
+    number: u.number,
+    role: u.role,
+    position: u.position,
+    height: u.height,
+    status: u.status,
+    isCaptain: u.isCaptain,
+    isCoach: u.role === 'TRENER' || Boolean((u as any).isCoach)
+  }));
 
   return NextResponse.json({
     tactics,

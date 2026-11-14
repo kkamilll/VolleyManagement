@@ -393,6 +393,29 @@ function TacticsContent() {
   const [linkedMatchId, setLinkedMatchId] = useState<string>('');
   const [tacticComment, setTacticComment] = useState('');
   const [saving, setSaving] = useState(false);
+  const noteTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const [showCourtPositions, setShowCourtPositions] = useState(false);
+
+  const insertTagIntoNote = (tag: string) => {
+    const textarea = noteTextareaRef.current;
+    if (!textarea) {
+      setTacticComment(prev => prev ? `${prev} ${tag} ` : `${tag} `);
+      return;
+    }
+    const start = textarea.selectionStart ?? tacticComment.length;
+    const end = textarea.selectionEnd ?? tacticComment.length;
+    const before = tacticComment.substring(0, start);
+    const after = tacticComment.substring(end);
+    const spaceBefore = before.length > 0 && !before.endsWith(' ') && !before.endsWith('\n') ? ' ' : '';
+    const spaceAfter = ' ';
+    const newText = `${before}${spaceBefore}${tag}${spaceAfter}${after}`;
+    setTacticComment(newText);
+    setTimeout(() => {
+      textarea.focus();
+      const newPos = start + spaceBefore.length + tag.length + spaceAfter.length;
+      textarea.setSelectionRange(newPos, newPos);
+    }, 10);
+  };
 
   // Player Suggestions / Discussion Feed State
   const [newPostContent, setNewPostContent] = useState('');
@@ -410,6 +433,36 @@ function TacticsContent() {
 
   // Board Orientation: 'vertical' (pionowo) vs 'horizontal' (poziomo)
   const [boardOrientation, setBoardOrientation] = useState<'vertical' | 'horizontal'>('vertical');
+
+  // Full squad list for @ mentions & tactical notes
+  const allSquadMembers = useMemo(() => {
+    const list = (players && players.length > 0 ? players : [
+      { id: 'usr_kremer', name: 'Łukasz Kremer', number: 17, role: 'KIEROWNIK', isCaptain: true },
+      { id: 'usr_rutkowski', name: 'Hubert Rutkowski', number: null, role: 'TRENER', isCoach: true },
+      { id: 'usr_obara', name: 'Hubert Obara', number: 12, role: 'ZAWODNIK' },
+      { id: 'usr_pujanek', name: 'Kamil Pujanek', number: 4, role: 'KIEROWNIK', isCaptain: true },
+      { id: 'usr_smigiel', name: 'Michał Śmigiel', number: 8, role: 'ZAWODNIK' },
+      { id: 'usr_augustynek', name: 'Bartosz Augustynek', number: 97, role: 'ZAWODNIK' },
+      { id: 'usr_graczyk', name: 'Piotr Graczyk', number: 7, role: 'ZAWODNIK' },
+      { id: 'usr_kruk', name: 'Dominik Kruk', number: 10, role: 'ZAWODNIK' },
+      { id: 'usr_krupa', name: 'Tomasz Krupa', number: 1, role: 'ZAWODNIK' },
+      { id: 'usr_noak', name: 'Maciej Noak', number: 47, role: 'ZAWODNIK' },
+      { id: 'usr_krol', name: 'Wit Król', number: 91, role: 'ZAWODNIK' },
+      { id: 'usr_ordon', name: 'Karol Ordon', number: 28, role: 'ZAWODNIK' },
+      { id: 'usr_suwalski', name: 'Stanisław Suwalski', number: 55, role: 'ZAWODNIK' },
+      { id: 'usr_zadlo', name: 'Tomasz Żądło', number: 5, role: 'ZAWODNIK' },
+      { id: 'usr_kulupa', name: 'Paweł Kulupa', number: 3, role: 'ZAWODNIK' },
+      { id: 'usr_shetty', name: 'Vikhyath Shetty', number: 19, role: 'ZAWODNIK' }
+    ]);
+
+    return [...list].sort((a: any, b: any) => {
+      if (a.isCoach || a.role === 'TRENER') return -1;
+      if (b.isCoach || b.role === 'TRENER') return 1;
+      if (a.isCaptain && !b.isCaptain) return -1;
+      if (!a.isCaptain && b.isCaptain) return 1;
+      return (a.number || 999) - (b.number || 999);
+    });
+  }, [players]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -956,6 +1009,8 @@ function TacticsContent() {
   // Load a saved tactic onto the board (with legacy auto-adaptation)
   const loadSavedTactic = (tactic: TacticalPlay) => {
     setSelectedTactic(tactic);
+    setTacticTitle(tactic.title || '');
+    setTacticComment(tactic.tacticalNotes || tactic.description || '');
     setRotation(tactic.rotation);
     setPhase(tactic.phase);
     if (tactic.courtPositions && tactic.courtPositions.length > 0) {
@@ -989,6 +1044,8 @@ function TacticsContent() {
   // Start fresh clean draft on the board
   const handleStartNewDraft = () => {
     setSelectedTactic(null);
+    setTacticTitle('');
+    setTacticComment('');
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext('2d');
@@ -1013,13 +1070,14 @@ function TacticsContent() {
           type: 'UPDATE_TACTIC',
           tactic: {
             id: selectedTactic.id,
-            title: selectedTactic.title,
+            title: tacticTitle || selectedTactic.title,
             phase,
             rotation,
             courtPositions: positions,
             directives: positions.map(p => `${p.name}: ${p.task || 'Pozycja w strefie'}`),
             drawingData,
-            tacticalNotes: selectedTactic.tacticalNotes
+            tacticalNotes: tacticComment || selectedTactic.tacticalNotes || '',
+            description: tacticComment || selectedTactic.description || ''
           }
         })
       });
@@ -2689,125 +2747,217 @@ function TacticsContent() {
         </div>
       </div>
 
-      {/* SEKCJA 2: ZADANIA I USTAWIENIE POZYCJI */}
+      {/* SEKCJA 2: ODPRAWA & OGÓLNA NOTATKA TAKTYCZNA (Z OZNACZANIEM ZAWODNIKÓW @) */}
       <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center border border-sky-200">
-              <Users className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200">
+              <FileText className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-base font-black uppercase text-slate-900 tracking-wide flex items-center gap-2">
-                Zadania i Pozycje Zawodników {tacticTitle ? `• ${tacticTitle}` : ''}
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200">
-                  {positions.length} graczy
-                </span>
+                Odprawa & Założenia Taktyczne {tacticTitle ? `• ${tacticTitle}` : ''}
               </h3>
               <p className="text-xs text-slate-500">
-                Szczegółowe zadania taktyczne i dyspozycje dla każdego zawodnika na boisku.
+                Ogólna notatka taktyczna dla całej drużyny. Wpisz założenia meczowe i oznaczaj dowolnych zawodników z kadry (@).
               </p>
             </div>
           </div>
 
           {canEdit && (
-            <button
-              onClick={handleSaveTactic}
-              disabled={saving}
-              className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition flex items-center gap-1.5 shadow-md shadow-amber-500/20 self-start sm:self-auto"
-            >
-              <Save className="w-3.5 h-3.5" />
-              <span>{saving ? 'Zapisywanie...' : 'Zapisz ten zrzut'}</span>
-            </button>
+            <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+              {selectedTactic && (
+                <button
+                  type="button"
+                  onClick={handleQuickUpdateCurrentTactic}
+                  disabled={saving}
+                  className="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-sm"
+                  title="Zapisz zmiany w aktualnie otwartej taktyce"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>{saving ? 'Zapisywanie...' : 'Zaktualizuj taktykę'}</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={handleSaveTactic}
+                disabled={saving}
+                className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition flex items-center gap-1.5 shadow-md shadow-amber-500/20"
+                title="Zapisz ten zrzut tablicy i notatkę jako nową taktykę"
+              >
+                <Save className="w-3.5 h-3.5" />
+                <span>{saving ? 'Zapisywanie...' : 'Zapisz ten zrzut'}</span>
+              </button>
+            </div>
           )}
         </div>
 
-        {/* If a player is selected, show an inline task editor */}
-        {selectedPlayerId && selectedPlayerId !== 'ball' && !selectedPlayerId.startsWith('opp_') && (() => {
-          const sel = positions.find(p => p.id === selectedPlayerId);
-          if (!sel) return null;
-          return (
-            <div className="p-4 rounded-2xl bg-sky-50 border-2 border-sky-300 space-y-2.5 animate-fadeIn">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded-lg bg-sky-600 text-white font-black text-xs">
-                    {sel.roleCode}
-                  </span>
-                  <span className="text-sm font-bold text-slate-900">{sel.name}</span>
-                  <span className="text-xs text-sky-700 font-medium">• Strefa nominalna: {sel.zone}</span>
-                </div>
+        {/* 1. PASEK OZNACZANIA ZAWODNIKÓW (@WZMIANKI) */}
+        <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[11px] font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+              <span className="w-4 h-4 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center text-[10px] font-black">@</span>
+              Kliknij, aby oznaczyć zawodnika w notatce:
+            </span>
+            <span className="text-[10px] text-slate-400 font-medium">
+              Pełna kadra ({allSquadMembers.length} osób)
+            </span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-1.5 max-h-36 overflow-y-auto pr-1 scrollbar-thin">
+            {allSquadMembers.map(member => {
+              const isCoach = member.isCoach || member.role === 'TRENER';
+              const isCaptain = member.isCaptain;
+              const tagLabel = `@${member.name}${member.number ? ` (#${member.number})` : isCoach ? ' (Trener)' : ''}`;
+
+              return (
                 <button
-                  onClick={() => setSelectedPlayerId(null)}
-                  className="text-xs text-slate-600 hover:text-slate-900 px-2 py-0.5 rounded-lg bg-white border border-slate-300 shadow-2xs"
+                  key={member.id}
+                  type="button"
+                  onClick={() => insertTagIntoNote(tagLabel)}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition shadow-2xs border ${
+                    isCaptain
+                      ? 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-300'
+                      : isCoach
+                      ? 'bg-sky-50 hover:bg-sky-100 text-sky-900 border-sky-300'
+                      : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
+                  }`}
+                  title={`Wstaw wzmiankę: ${tagLabel}`}
                 >
-                  Zamknij edycję
+                  <span className={`w-5 h-5 rounded-md flex items-center justify-center font-black text-[10px] ${
+                    isCaptain
+                      ? 'bg-amber-400 text-slate-950'
+                      : isCoach
+                      ? 'bg-sky-500 text-white'
+                      : 'bg-slate-200 text-slate-700'
+                  }`}>
+                    {member.number ? `#${member.number}` : isCoach ? 'T' : '•'}
+                  </span>
+                  <span>{member.name}</span>
+                  {isCaptain && <span className="text-[10px] text-amber-700 font-black">👑</span>}
+                  {isCoach && <span className="text-[10px] text-sky-700 font-bold">(Trener)</span>}
                 </button>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <input
-                  type="text"
-                  value={sel.task || ''}
-                  onChange={e => handleUpdatePlayerTask(sel.id, e.target.value)}
-                  placeholder="Wpisz zadanie zawodnika w tej rotacji (np. 'Asekuracja prostej, szybkie przejście do kontry...')"
-                  className="flex-1 bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-sky-500 shadow-2xs"
-                />
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 2. SZYBKIE ETYKIETY TAKTYCZNE */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">
+            Szybkie tagi:
+          </span>
+          {[
+            { label: '🛡️ Przyjęcie', tag: '[Przyjęcie]' },
+            { label: '⚡ Atak & Kontra', tag: '[Atak]' },
+            { label: '🧱 Blok-Obrona', tag: '[Blok-Obrona]' },
+            { label: '🎯 Zagrywka', tag: '[Zagrywka]' },
+            { label: '🔄 Zmiana zadaniowa', tag: '[Zmiana]' },
+            { label: '🚑 Asekuracja', tag: '[Asekuracja]' },
+            { label: '⏱️ Końcówka seta', tag: '[Końcówka]' }
+          ].map(t => (
+            <button
+              key={t.tag}
+              type="button"
+              onClick={() => insertTagIntoNote(`\n${t.tag}:`)}
+              className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-bold transition border border-slate-200 shadow-2xs"
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* 3. GŁÓWNY EDYTOR NOTATKI TAKTYCZNEJ */}
+        <div className="space-y-2">
+          <div className="relative">
+            <textarea
+              ref={noteTextareaRef}
+              rows={5}
+              value={tacticComment}
+              onChange={e => setTacticComment(e.target.value)}
+              placeholder={`Wpisz ogólne założenia taktyczne i zadania dla drużyny, np.:
+- Zagrywka: celujemy w strefę 1 i 5 rywala, aby odrzucić rozgrywającego od siatki.
+- Środek: @Michał Śmigiel i @Maciej Noak zamykają krótką, a skrzydłowi asekurują skos.
+- Atak: @Łukasz Kremer i @Bartosz Augustynek grają wysokie piłki na pojedynczy blok.
+- Zmiany: @Hubert Obara wchodzi na drugą linię do obrony w końcówkach setów.
+(Kliknij powyżej nazwisko dowolnego zawodnika z kadry, aby szybko go oznaczyć).`}
+              className="w-full bg-slate-50/50 hover:bg-white focus:bg-white border-2 border-slate-200 focus:border-amber-400 text-slate-900 placeholder:text-slate-400 rounded-2xl p-4 text-xs sm:text-sm font-medium leading-relaxed focus:outline-none shadow-inner transition"
+            />
+          </div>
+
+          <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+            <div className="flex items-center gap-2">
+              <span>Znaki: <strong className="text-slate-600">{tacticComment.length}</strong></span>
+              {tacticComment.includes('@') && (
+                <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[10px] font-bold">
+                  Zawiera wzmianki o zawodnikach (@)
+                </span>
+              )}
+            </div>
+            {tacticComment && (
+              <button
+                type="button"
+                onClick={() => setTacticComment('')}
+                className="text-[11px] text-slate-400 hover:text-rose-600 transition"
+              >
+                Wyczyść notatkę
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* 4. OPCJONALNY PODGLĄD POZYCJI 6 GRACZY NA BOISKU */}
+        <div className="pt-2 border-t border-slate-100">
+          <button
+            type="button"
+            onClick={() => setShowCourtPositions(!showCourtPositions)}
+            className="w-full py-2.5 px-4 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-between transition"
+          >
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4 text-sky-600" />
+              <span>Pozycje nominalne 6 graczy na boisku (opcjonalny podgląd stref)</span>
+            </div>
+            <span className="text-[11px] text-slate-500 font-bold">
+              {showCourtPositions ? 'Zwiń ▲' : 'Rozwiń ▼'}
+            </span>
+          </button>
+
+          {showCourtPositions && (
+            <div className="mt-3 pt-3 border-t border-slate-100 space-y-3 animate-fadeIn">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+                {positions.map(p => {
+                  const isLibero = p.roleCode === 'L';
+                  return (
+                    <div
+                      key={p.id}
+                      onClick={() => setSelectedPlayerId(selectedPlayerId === p.id ? null : p.id)}
+                      className={`p-2.5 rounded-xl border text-xs cursor-pointer transition ${
+                        selectedPlayerId === p.id
+                          ? 'bg-sky-50 border-sky-300 text-slate-900 shadow-sm ring-1 ring-sky-300'
+                          : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-1 pb-1 border-b border-slate-100">
+                        <span className={`w-5 h-5 rounded flex items-center justify-center font-black text-[10px] ${
+                          isLibero ? 'bg-amber-500 text-slate-950' : 'bg-sky-500 text-white'
+                        }`}>
+                          {p.number ? `#${p.number}` : p.roleCode}
+                        </span>
+                        <span className="text-[10px] font-mono font-bold text-slate-500">Strefa {p.zone}</span>
+                      </div>
+                      <p className="font-bold text-slate-900 text-[11px] truncate mt-1">
+                        {p.name.replace(/\s*\([^)]*\)/, '')}
+                      </p>
+                      {p.task && <p className="text-[10px] text-slate-500 line-clamp-2 mt-0.5">{p.task}</p>}
+                    </div>
+                  );
+                })}
               </div>
             </div>
-          );
-        })()}
-
-        {/* Responsive Grid of all 7 positions */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-          {positions.map(p => {
-            const isSelected = selectedPlayerId === p.id;
-            const isLibero = p.roleCode === 'L';
-
-            return (
-              <div
-                key={p.id}
-                onClick={() => setSelectedPlayerId(isSelected ? null : p.id)}
-                className={`p-3.5 rounded-2xl border text-xs cursor-pointer transition-all ${
-                  isSelected
-                    ? 'bg-sky-50 border-sky-300 text-slate-900 shadow-md ring-2 ring-sky-200'
-                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-2xs'
-                }`}
-              >
-                <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-200">
-                  <div className="flex items-center gap-2">
-                    <span className={`w-7 h-6 rounded-lg flex items-center justify-center font-black text-[11px] shadow-sm ${
-                      isLibero
-                        ? 'bg-amber-500 text-slate-950'
-                        : p.roleCode === 'R'
-                        ? 'bg-emerald-500 text-slate-950'
-                        : p.roleCode.startsWith('P')
-                        ? 'bg-sky-500 text-slate-950'
-                        : p.roleCode.startsWith('S') || p.roleCode.startsWith('Ś')
-                        ? 'bg-purple-500 text-white'
-                        : 'bg-orange-500 text-slate-950'
-                    }`}>
-                      {p.number ? `#${p.number}` : p.roleCode}
-                    </span>
-                    <span className="font-bold text-slate-900 text-xs truncate max-w-[130px]">
-                      {p.name.replace(/\s*\([^)]*\)/, '')}
-                    </span>
-                  </div>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200 shrink-0">
-                    Strefa {p.zone}
-                  </span>
-                </div>
-
-                <div className="pt-2">
-                  <p className="text-[11.5px] text-slate-600 leading-snug line-clamp-3">
-                    {p.task ? (
-                      p.task
-                    ) : (
-                      <span className="text-slate-400 italic">Podstawowa pozycja nominalna (kliknij, by dodać zadanie)</span>
-                    )}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
+          )}
         </div>
+      </div>
 
         {/* SEKCJA: SUGESTIE I WNIOSKI ZAWODNIKÓW & DYSKUSJA TAKTYCZNA */}
         {selectedTactic && (
@@ -3001,7 +3151,6 @@ function TacticsContent() {
             )}
           </div>
         )}
-      </div>
       </>
       )}
 
