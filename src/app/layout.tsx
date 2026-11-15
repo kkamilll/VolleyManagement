@@ -8,6 +8,7 @@ import BottomNav from '@/components/BottomNav';
 import Footer from '@/components/Footer';
 import PwaInstallPrompt from '@/components/PwaInstallPrompt';
 import UnreadAnnouncementPopup from '@/components/UnreadAnnouncementPopup';
+import AuthGuard from '@/components/AuthGuard';
 
 export const metadata: Metadata = {
   title: 'Angels ZTP Volleyball Team',
@@ -60,17 +61,19 @@ export default function RootLayout({
 
         <div className="relative z-10 flex flex-col min-h-screen">
           <AuthProvider>
-            <SeasonArchiveProvider>
-              <ArchiveModeBanner />
-              <UnreadAnnouncementPopup />
-              <Navbar />
-              <main className="flex-1 pb-24 md:pb-16">
-                {children}
-              </main>
-              <Footer />
-              <BottomNav />
-              <PwaInstallPrompt />
-            </SeasonArchiveProvider>
+            <AuthGuard>
+              <SeasonArchiveProvider>
+                <ArchiveModeBanner />
+                <UnreadAnnouncementPopup />
+                <Navbar />
+                <main className="flex-1 pb-24 md:pb-16">
+                  {children}
+                </main>
+                <Footer />
+                <BottomNav />
+                <PwaInstallPrompt />
+              </SeasonArchiveProvider>
+            </AuthGuard>
           </AuthProvider>
         </div>
       </body>

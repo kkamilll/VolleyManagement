@@ -193,6 +193,10 @@ export default function Navbar() {
     }
   };
 
+  if (pathname === '/login' || pathname === '/register') {
+    return null;
+  }
+
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md text-slate-800 shadow-sm border-b border-slate-200">
       {/* Main Navbar */}

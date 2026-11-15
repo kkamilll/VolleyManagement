@@ -63,6 +63,10 @@ export default function BottomNav() {
     }
   ];
 
+  if (pathname === '/login' || pathname === '/register') {
+    return null;
+  }
+
   return (
     <>
       {/* Mobile Bottom Sheet Drawer for "Klub / Więcej" */}
