@@ -403,7 +403,7 @@ function GaleriaContent() {
           <div className="flex items-center justify-between text-xs">
             <span className="font-bold text-slate-700 flex items-center gap-1.5">
               <Layers className="w-3.5 h-3.5 text-sky-600" />
-              <span>Dedykowane Albumy z Meczów ({uniqueAlbums.length}):</span>
+              <span>Albumy z Meczów ({uniqueAlbums.length}):</span>
             </span>
             {selectedAlbum !== 'ALL' && (
               <button
