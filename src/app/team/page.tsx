@@ -227,7 +227,7 @@ export default function TeamPage() {
   });
 
   const [playersPage, setPlayersPage] = useState(1);
-  const PLAYERS_PER_PAGE = 8;
+  const PLAYERS_PER_PAGE = 30; // Więcej zawodników na jednej stronie (pełna kadra bez uciążliwego stronicowania)
 
   useEffect(() => {
     setPlayersPage(1);
@@ -418,7 +418,7 @@ export default function TeamPage() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
           {paginatedPlayers.map(player => {
             const stats = player.stats || {};
             const isLukaszCaptain = player.isCaptain || player.role === 'KIEROWNIK';
@@ -427,7 +427,7 @@ export default function TeamPage() {
             return (
               <div
                 key={player.id}
-                className={`rounded-3xl p-5 sm:p-6 shadow-sm transition-all duration-200 flex flex-col justify-between group hover:shadow-lg hover:-translate-y-1 ${
+                className={`rounded-3xl p-4 sm:p-5 shadow-sm transition-all duration-200 flex flex-col justify-between group hover:shadow-lg hover:-translate-y-1 ${
                   isLukaszCaptain
                     ? 'bg-gradient-to-b from-amber-50/50 via-white to-white border-2 border-amber-300 hover:border-amber-400'
                     : 'bg-white border border-slate-200/90 hover:border-sky-400'

@@ -3245,8 +3245,8 @@ function RozgrywkiContent() {
       {activeTab === 'liga' && (
         <div className="space-y-6">
           {/* Liga Subtabs (Tabela, Wyniki, Statystyki) */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
-            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200 overflow-x-auto scrollbar-none max-w-full">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+            <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200">
               <button
                 onClick={() => setLigaSubTab('tabela')}
                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition whitespace-nowrap ${
@@ -3278,11 +3278,11 @@ function RozgrywkiContent() {
                 }`}
               >
                 <BarChart3 className="w-3.5 h-3.5" />
-                <span>Statystyki & VolleyStation</span>
+                <span>Statystyki VolleyStation</span>
               </button>
             </div>
 
-            <div className="flex items-center gap-2 overflow-x-auto scrollbar-none shrink-0 self-start sm:self-auto py-0.5 flex-nowrap">
+            <div className="flex flex-wrap items-center gap-2 py-0.5">
               {ligaSubTab === 'tabela' && (
                 <>
                   {canManageMatches && (

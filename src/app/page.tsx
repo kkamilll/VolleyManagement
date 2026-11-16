@@ -162,109 +162,114 @@ function DashboardContent() {
         </div>
       </div>
 
-      {/* 2. ELEGANCKA, PROFESJONALNA KARTA MECZU NA SZCZYCIE (HERO MATCH CARD) */}
+      {/* 2. NOWOCZESNA KARTA MECZU DNIA (MATCHDAY HERO CENTER) */}
       {(nextEvent || officialNextMatch) ? (
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-sky-950 text-white p-5 sm:p-7 shadow-2xl border border-sky-500/30 space-y-6">
-          {/* Ambient Lighting Accents */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/15 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative overflow-hidden rounded-3xl bg-white border border-slate-200/90 shadow-xl text-slate-900 transition-all">
+          {/* Subtelny akcent boiska w tle */}
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-sky-500 via-amber-400 to-sky-600" />
+          <div className="absolute -right-20 -top-20 w-80 h-80 bg-sky-100/50 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-amber-100/40 rounded-full blur-3xl pointer-events-none" />
 
           {/* GÓRNY PASEK: KATEGORIA, RUNDA, DATA I GODZINA */}
-          <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-white/10 text-xs">
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 flex items-center gap-1.5 shadow-md shadow-amber-500/20 font-sans">
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 px-6 pt-5 pb-4 border-b border-slate-100 bg-slate-50/70">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-3 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider bg-amber-400 text-slate-950 flex items-center gap-1.5 shadow-xs font-sans">
                 <Flame className="w-3.5 h-3.5 fill-slate-950" />
                 Najbliższy Mecz Ligowy
               </span>
               {officialNextMatch && (
-                <span className="px-2.5 py-1 rounded-xl text-[10px] font-mono font-bold bg-white/10 text-sky-200 border border-white/15">
-                  LALS Runda {officialNextMatch.round} • Nr {officialNextMatch.matchNumber}
+                <span className="px-2.5 py-1 rounded-xl text-[11px] font-mono font-bold bg-white text-slate-700 border border-slate-200 shadow-2xs">
+                  LALS Runda {officialNextMatch.round} • Mecz #{officialNextMatch.matchNumber}
                 </span>
               )}
             </div>
 
-            <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-white/5 border border-white/10 text-sky-200 font-mono font-bold">
-              <Clock className="w-3.5 h-3.5 text-sky-400" />
+            <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-white border border-slate-200 text-slate-700 font-mono text-xs font-bold shadow-2xs">
+              <Clock className="w-3.5 h-3.5 text-sky-600" />
               <span>
                 {officialNextMatch?.dateStr || (nextEvent ? new Date(nextEvent.date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' }) : '')} • godz. {officialNextMatch?.timeStr || (nextEvent ? new Date(nextEvent.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) : '')}
               </span>
             </div>
           </div>
 
-          {/* ŚRODKOWY SCOREBOARD: POJEDYNEK DRUŻYN */}
-          <div className="relative z-10 grid grid-cols-1 md:grid-cols-7 items-center gap-6 py-2">
-            
-            {/* GOSPODARZ (ANGELS ZTP) */}
-            <div className="md:col-span-3 flex items-center gap-4">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-sky-400 via-sky-500 to-blue-700 p-0.5 shadow-xl shadow-sky-500/30 shrink-0 flex items-center justify-center">
-                <div className="w-full h-full rounded-2xl bg-slate-950/80 backdrop-blur-md flex items-center justify-center text-white">
-                  <Volleyball className="w-8 h-8 sm:w-10 sm:h-10 text-sky-300 drop-shadow" />
+          {/* GŁÓWNY POJEDYNEK DRUŻYN (SCOREBOARD DUEL) */}
+          <div className="relative z-10 px-6 sm:px-8 py-6">
+            <div className="grid grid-cols-1 md:grid-cols-7 items-center gap-6">
+              
+              {/* GOSPODARZ (ANGELS ZTP) */}
+              <div className="md:col-span-3 flex items-center gap-4 sm:gap-5">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-700 p-1 shadow-lg shadow-sky-500/20 shrink-0 flex items-center justify-center">
+                  <div className="w-full h-full rounded-xl bg-white flex items-center justify-center text-sky-600">
+                    <Volleyball className="w-8 h-8 sm:w-10 sm:h-10 text-sky-600 drop-shadow-xs" />
+                  </div>
+                </div>
+                <div className="space-y-1 min-w-0">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-sky-100 text-sky-800 border border-sky-200 font-mono">
+                    Gospodarz • 2. Miejsce
+                  </span>
+                  <h2 className="text-xl sm:text-2xl font-black tracking-tight uppercase font-athletic text-slate-900 truncate">
+                    {officialNextMatch?.homeTeam || 'Angels ZTP'}
+                  </h2>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Luboń, Poznań
+                  </p>
                 </div>
               </div>
-              <div className="space-y-1 min-w-0">
-                <span className="inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest bg-sky-500/20 text-sky-300 border border-sky-400/30 font-mono">
-                  Gospodarz • 2. Miejsce
-                </span>
-                <h2 className="text-xl sm:text-2xl font-black tracking-tight uppercase font-athletic text-white truncate drop-shadow-sm">
-                  {officialNextMatch?.homeTeam || 'Angels ZTP'}
-                </h2>
-                <span className="text-xs text-slate-300 font-medium block">
-                  Luboń, Poznań
-                </span>
-              </div>
-            </div>
 
-            {/* ŚRODEK (VS & LOKALIZACJA) */}
-            <div className="md:col-span-1 flex flex-col items-center justify-center text-center space-y-1.5 py-2 md:py-0 border-y md:border-y-0 md:border-x border-white/10">
-              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-amber-400/20 to-amber-600/30 border border-amber-400/40 flex items-center justify-center text-xs font-black uppercase text-amber-300 tracking-wider font-mono shadow-inner shadow-amber-500/20">
-                VS
-              </div>
-              <div className="text-[11px] text-sky-200/90 font-medium flex items-center gap-1 justify-center pt-0.5">
-                <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                <span className="truncate max-w-[140px]">{nextEvent?.location || 'Hala OSiR, Luboń'}</span>
-              </div>
-            </div>
-
-            {/* RYWAL (COCO JUMBO) */}
-            <div className="md:col-span-3 flex items-center md:flex-row-reverse gap-4 md:text-right">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-amber-700 p-0.5 shadow-xl shadow-amber-500/30 shrink-0 flex items-center justify-center">
-                <div className="w-full h-full rounded-2xl bg-slate-950/80 backdrop-blur-md flex items-center justify-center text-white">
-                  <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-amber-300 drop-shadow" />
+              {/* ŚRODEK (VS & HALA) */}
+              <div className="md:col-span-1 flex flex-col items-center justify-center text-center space-y-2 py-2 md:py-0">
+                <div className="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-sm font-black text-slate-700 font-mono shadow-inner">
+                  VS
+                </div>
+                <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-[11px] font-semibold text-slate-600 max-w-[150px] truncate">
+                  <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                  <span className="truncate">{nextEvent?.location || 'Hala OSiR, Luboń'}</span>
                 </div>
               </div>
-              <div className="space-y-1 min-w-0">
-                <span className="inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest bg-amber-500/20 text-amber-300 border border-amber-400/30 font-mono">
-                  Rywal • 4. Miejsce
-                </span>
-                <h2 className="text-xl sm:text-2xl font-black tracking-tight uppercase font-athletic text-white truncate drop-shadow-sm">
-                  {officialNextMatch?.awayTeam || nextEvent?.opponent || 'Coco Jumbo'}
-                </h2>
-                <span className="text-xs text-slate-300 font-medium block">
-                  Stawka: Utrzymanie strefy awansu (Top 3)
-                </span>
-              </div>
-            </div>
 
+              {/* GOŚĆ (RYWAL) */}
+              <div className="md:col-span-3 flex items-center md:flex-row-reverse gap-4 sm:gap-5 md:text-right">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 p-1 shadow-lg shadow-amber-500/20 shrink-0 flex items-center justify-center">
+                  <div className="w-full h-full rounded-xl bg-white flex items-center justify-center text-amber-600">
+                    <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-amber-600 drop-shadow-xs" />
+                  </div>
+                </div>
+                <div className="space-y-1 min-w-0">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200 font-mono">
+                    Rywal • 4. Miejsce
+                  </span>
+                  <h2 className="text-xl sm:text-2xl font-black tracking-tight uppercase font-athletic text-slate-900 truncate">
+                    {officialNextMatch?.awayTeam || nextEvent?.opponent || 'Coco Jumbo'}
+                  </h2>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Stawka: Utrzymanie strefy awansu (Top 3)
+                  </p>
+                </div>
+              </div>
+
+            </div>
           </div>
 
-          {/* ZINTEGROWANY DOLNY PASEK: DEKLARACJA OBECNOŚCI & TAKTYKA */}
-          <div className="relative z-10 pt-4 border-t border-white/10 flex flex-col lg:flex-row items-center justify-between gap-4">
+          {/* DOLNY PASEK: OBECNOŚĆ, SKŁAD & TAKTYKA */}
+          <div className="relative z-10 px-6 sm:px-8 py-4 bg-slate-50/80 border-t border-slate-200/90 flex flex-col lg:flex-row items-center justify-between gap-4">
             
-            {/* Lewa strona: Twoja deklaracja obecności */}
+            {/* Twoja deklaracja obecności */}
             <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-              <span className="text-xs font-bold text-sky-200 shrink-0 font-mono">Twoja obecność:</span>
+              <span className="text-xs font-black uppercase tracking-wider text-slate-700 shrink-0">
+                Twoja obecność:
+              </span>
               {nextEvent && (
-                <div className="inline-flex items-center gap-1.5 p-1 rounded-2xl bg-slate-950/60 border border-white/15 shadow-inner">
+                <div className="inline-flex items-center gap-1.5 p-1 rounded-2xl bg-white border border-slate-200 shadow-2xs">
                   <button
                     onClick={() => handleQuickAttendance(nextEvent.id, 'BEDE')}
                     disabled={updatingAttendance}
                     className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer active:scale-95 ${
                       myStatusRecord?.status === 'BEDE'
-                        ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/30 ring-2 ring-emerald-400/50'
-                        : 'text-slate-300 hover:text-white hover:bg-white/10'
+                        ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-500/30'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
                     <span>Będę</span>
                   </button>
                   <button
@@ -272,11 +277,11 @@ function DashboardContent() {
                     disabled={updatingAttendance}
                     className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer active:scale-95 ${
                       myStatusRecord?.status === 'NIEPEWNE'
-                        ? 'bg-amber-400 text-slate-950 shadow-lg shadow-amber-500/30 ring-2 ring-amber-300/50'
-                        : 'text-slate-300 hover:text-white hover:bg-white/10'
+                        ? 'bg-amber-500 text-slate-950 shadow-sm ring-2 ring-amber-400/40'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    <HelpCircle className="w-3.5 h-3.5" />
+                    <HelpCircle className="w-3.5 h-3.5 text-amber-800" />
                     <span>Może</span>
                   </button>
                   <button
@@ -284,33 +289,33 @@ function DashboardContent() {
                     disabled={updatingAttendance}
                     className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer active:scale-95 ${
                       myStatusRecord?.status === 'NIE_BEDE'
-                        ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30 ring-2 ring-rose-400/50'
-                        : 'text-slate-300 hover:text-white hover:bg-white/10'
+                        ? 'bg-rose-600 text-white shadow-sm ring-2 ring-rose-500/30'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    <AlertCircle className="w-3.5 h-3.5" />
+                    <AlertCircle className="w-3.5 h-3.5 text-rose-200" />
                     <span>Nieobecny</span>
                   </button>
                 </div>
               )}
             </div>
 
-            {/* Prawa strona: Zadeklarowany skład oraz Przycisk do taktyki */}
-            <div className="flex items-center justify-between lg:justify-end gap-4 w-full lg:w-auto">
+            {/* Skład & Przejście do Taktyki */}
+            <div className="flex items-center justify-between lg:justify-end gap-3 sm:gap-4 w-full lg:w-auto">
               <Link 
                 href={`/events?eventId=${nextEvent?.id || 'evt_lals_1972'}`}
-                className="text-xs text-sky-200 hover:text-white transition flex items-center gap-1.5 font-medium px-2.5 py-1 rounded-xl hover:bg-white/5"
+                className="text-xs text-slate-600 hover:text-sky-700 transition flex items-center gap-1.5 font-bold px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-sky-300 shadow-2xs"
               >
-                <Users className="w-4 h-4 text-sky-400" />
-                <span>Skład: <strong className="text-white font-black">{attendingCount === 1 ? '1 obecny' : `${attendingCount} obecnych`}</strong> &rarr;</span>
+                <Users className="w-4 h-4 text-sky-600" />
+                <span>Skład: <strong className="text-slate-900">{attendingCount === 1 ? '1 obecny' : `${attendingCount} obecnych`}</strong> &rarr;</span>
               </Link>
 
               <Link
                 href={`/taktyka?eventId=${nextEvent?.id || 'evt_lals_1972'}`}
-                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-300 text-slate-950 font-black text-xs flex items-center gap-2 transition shadow-lg shadow-amber-500/25 shrink-0 cursor-pointer active:scale-95"
+                className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-2 transition shadow-sm hover:shadow shrink-0 cursor-pointer active:scale-95"
               >
-                <Target className="w-4 h-4" />
-                <span>Założenia Taktyczne na Mecz &rarr;</span>
+                <Target className="w-4 h-4 text-sky-200" />
+                <span>Założenia Taktyczne &rarr;</span>
               </Link>
             </div>
 

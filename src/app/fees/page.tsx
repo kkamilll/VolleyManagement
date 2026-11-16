@@ -608,9 +608,9 @@ function FeesContent() {
   return (
     <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 pt-6 sm:pt-8 pb-24 md:pb-16 space-y-6 sm:space-y-8">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0 shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0 shadow-sm">
             <CreditCard className="w-6 h-6" />
           </div>
           <div>
@@ -623,62 +623,70 @@ function FeesContent() {
           </div>
         </div>
 
+        {/* Action Controls Toolbar - Ułożony i uporządkowany zestaw akcji */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
-          <button
-            onClick={handleExportExcel}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-emerald-50/50 text-emerald-800 border border-emerald-300 shadow-2xs hover:shadow-xs transition"
-            title="Pobierz oficjalny arkusz Excel (.xlsx) ze stanem wpłat"
-          >
-            <Download className="w-4 h-4 text-emerald-600" />
-            <span>Eksportuj do Excel (.xlsx)</span>
-          </button>
-
-          {canManageTreasury && (
+          {/* Narzędzia pomocnicze w spójnym kontenerze */}
+          <div className="inline-flex items-center gap-1 p-1 rounded-2xl bg-slate-100 border border-slate-200 shadow-2xs">
             <button
-              onClick={handleOpenReminderModal}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-amber-50/50 text-amber-900 border border-amber-300 shadow-2xs hover:shadow-xs transition"
-              title="Wyślij przypomnienie na WhatsApp lub tablicę drużyny"
+              onClick={handleExportExcel}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 hover:text-emerald-800 hover:bg-white transition"
+              title="Pobierz oficjalny arkusz Excel (.xlsx) ze stanem wpłat"
             >
-              <BellRing className="w-4 h-4 text-amber-600" />
-              <span>Przypomnij o składkach</span>
+              <Download className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Eksport (.xlsx)</span>
             </button>
-          )}
 
-          {canManageTreasury && (
-            <button
-              onClick={() => {
-                setTransactionType('EXPENSE');
-                setExpenseCategory('SPRZET');
-                setShowExpenseModal(true);
-              }}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 shadow-2xs hover:shadow-xs transition"
-              title="Zarejestruj wydatek lub przychód kasy drużyny"
-            >
-              <Coins className="w-4 h-4 text-amber-600" />
-              <span>+ Wydatek / Przychód</span>
-            </button>
-          )}
+            {canManageTreasury && (
+              <button
+                onClick={handleOpenReminderModal}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 hover:text-amber-900 hover:bg-white transition"
+                title="Wyślij przypomnienie na WhatsApp lub tablicę drużyny"
+              >
+                <BellRing className="w-3.5 h-3.5 text-amber-600" />
+                <span>Przypomnij</span>
+              </button>
+            )}
 
-          {isManager && (
-            <div className="flex items-center gap-2">
+            {isManager && (
               <button
                 type="button"
                 onClick={() => setShowManageFeesModal(true)}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 shadow-2xs transition"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 hover:bg-white transition"
                 title="Przeglądaj i usuwaj zdefiniowane składki"
               >
-                <Settings className="w-4 h-4 text-slate-500" />
-                <span>Zarządzaj składkami ({fees.length})</span>
+                <Settings className="w-3.5 h-3.5 text-slate-500" />
+                <span>Składki ({fees.length})</span>
               </button>
+            )}
+          </div>
+
+          {/* Główne Akcje Dodawania */}
+          <div className="flex items-center gap-2">
+            {canManageTreasury && (
+              <button
+                onClick={() => {
+                  setTransactionType('EXPENSE');
+                  setExpenseCategory('SPRZET');
+                  setShowExpenseModal(true);
+                }}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 shadow-2xs hover:shadow-xs transition"
+                title="Zarejestruj wydatek lub przychód kasy drużyny"
+              >
+                <Coins className="w-4 h-4 text-amber-600" />
+                <span>+ Wydatek / Przychód</span>
+              </button>
+            )}
+
+            {isManager && (
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-sm"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-sm hover:shadow"
               >
                 <Plus className="w-4 h-4" />
                 <span>Nowa Składka</span>
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 

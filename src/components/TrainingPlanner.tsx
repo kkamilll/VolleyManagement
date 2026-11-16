@@ -778,7 +778,7 @@ export function TrainingPlannerContent({
       {/* Main Layout Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Left Column: Events Selector List (Treningi, Sparingi, Mecze) */}
-        <div className="lg:col-span-4 xl:col-span-3 space-y-3">
+        <div className="lg:col-span-5 xl:col-span-4 space-y-3">
           <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-sm space-y-3">
             <div className="flex items-center justify-between pb-2 border-b border-slate-200">
               <div>
@@ -964,7 +964,7 @@ export function TrainingPlannerContent({
                         </div>
                       </div>
 
-                      <h4 className="font-black text-xs line-clamp-1 text-slate-900">
+                      <h4 className="font-black text-sm text-slate-900 leading-snug line-clamp-2">
                         {ev.title}
                       </h4>
 
@@ -993,42 +993,109 @@ export function TrainingPlannerContent({
         </div>
 
         {/* Right Column: Selected Training Plan Workspace */}
-        <div className="lg:col-span-8 xl:col-span-9 space-y-4">
+        <div className="lg:col-span-7 xl:col-span-8 space-y-4">
           {!activePlan ? (
             activeEvent ? (
-              <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 text-center space-y-5 shadow-sm">
-                <div className="w-14 h-14 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto border border-sky-200 shadow-sm">
-                  <Volleyball className="w-7 h-7" />
-                </div>
+              <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+                {/* Górny Nagłówek Wybranego Wydarzenia */}
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-5 border-b border-slate-100">
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 border border-sky-200 shadow-2xs">
+                      <Volleyball className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                        <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider bg-sky-100 text-sky-800 border border-sky-200 font-mono">
+                          {activeEvent.type === 'SPARING' ? 'Sparing Drużyny' : activeEvent.type === 'MECZ' ? 'Mecz Ligowy LALS' : 'Trening Zespołu'}
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 font-mono">
+                          {new Date(activeEvent.date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' })}
+                        </span>
+                      </div>
+                      <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                        {activeEvent.title}
+                      </h3>
+                      <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 mt-1">
+                        <span className="flex items-center gap-1 font-medium">
+                          <Clock className="w-3.5 h-3.5 text-sky-600" />
+                          {new Date(activeEvent.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                        <span>•</span>
+                        <span className="flex items-center gap-1 font-medium">
+                          <MapPin className="w-3.5 h-3.5 text-rose-500" />
+                          {activeEvent.location || 'Hala OSiR, Luboń'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
 
-                <div className="space-y-1.5 max-w-lg mx-auto">
-                  <span className="px-3 py-1 rounded-full text-xs font-black uppercase bg-sky-100 text-sky-800 border border-sky-200">
-                    {activeEvent.type === 'SPARING' ? 'Wybrany Sparing' : activeEvent.type === 'MECZ' ? 'Wybrany Mecz Ligowy LALS' : 'Wybrany Trening z Terminarza'}
-                  </span>
-                  <h3 className="text-xl font-black text-slate-900 mt-2">{activeEvent.title}</h3>
-                  <p className="text-xs text-slate-500">
-                    📅 {new Date(activeEvent.date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })} • 📍 {activeEvent.location}
-                  </p>
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold mt-2">
-                    <Users className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Deklaracje z Terminarza: {activeEvent.attendees?.filter(a => a.status === 'BEDE').length || 0} obecnych</span>
+                  <div className="flex sm:flex-col items-center sm:items-end gap-2 shrink-0">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold">
+                      <Users className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>{activeEvent.attendees?.filter(a => a.status === 'BEDE').length || 0} obecnych</span>
+                    </div>
+                    <Link
+                      href={`/events?eventId=${activeEvent.id}`}
+                      className="text-[11px] font-bold text-sky-600 hover:text-sky-800 transition"
+                    >
+                      Terminarz i lista obecności &rarr;
+                    </Link>
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 max-w-md mx-auto text-xs text-slate-600 space-y-3">
-                  <p>
-                    Ta jednostka nie posiada jeszcze rozpisanych założeń taktycznych, ćwiczeń i materiałów.
-                  </p>
+                {/* 3 Panele Przygotowania Taktycznego */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                    <div className="flex items-center gap-2 text-xs font-black text-slate-800 uppercase tracking-wider">
+                      <Target className="w-4 h-4 text-sky-600" />
+                      <span>Założenia</span>
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      Brak jeszcze rozpisanej taktyki i planu na to spotkanie.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                    <div className="flex items-center gap-2 text-xs font-black text-slate-800 uppercase tracking-wider">
+                      <Users className="w-4 h-4 text-emerald-600" />
+                      <span>Skład Meczowy</span>
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      {activeEvent.attendees?.filter(a => a.status === 'BEDE').length || 0} zawodników potwierdziło gotowość do gry.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                    <div className="flex items-center gap-2 text-xs font-black text-slate-800 uppercase tracking-wider">
+                      <Compass className="w-4 h-4 text-amber-600" />
+                      <span>Ustawienia</span>
+                    </div>
+                    <p className="text-xs text-slate-500">
+                      Możesz rozrysować schemat rotacji i zagrywek na tablicy.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Przyciski Akcji */}
+                <div className="pt-2 flex flex-wrap items-center gap-3">
                   {canManage && (
                     <button
                       onClick={() => handleQuickCreatePlanForEvent(activeEvent)}
                       disabled={creating}
-                      className="w-full px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider transition shadow-sm flex items-center justify-center gap-2"
+                      className="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider transition shadow-sm hover:shadow flex items-center justify-center gap-2 cursor-pointer active:scale-95"
                     >
                       <Plus className="w-4 h-4" />
                       <span>{creating ? 'Tworzenie rozpiski...' : activeEvent.type === 'SPARING' ? 'Rozpisz założenia dla tego sparingu' : activeEvent.type === 'MECZ' ? 'Rozpisz taktykę na ten mecz ligowy' : 'Rozpisz ćwiczenia dla tego treningu'}</span>
                     </button>
                   )}
+
+                  <Link
+                    href={`/taktyka?tab=board&eventId=${activeEvent.id}`}
+                    className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 hover:border-slate-300 font-bold text-xs transition flex items-center gap-2 shadow-2xs"
+                  >
+                    <Compass className="w-4 h-4 text-sky-600" />
+                    <span>Tablica taktyczna</span>
+                  </Link>
                 </div>
               </div>
             ) : (
