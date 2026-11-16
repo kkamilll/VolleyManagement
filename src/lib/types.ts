@@ -183,6 +183,7 @@ export interface EventItem {
   liveScore?: LiveScore;
   bestAction?: string;
   socialDraft?: string;
+  coachPostMatchNote?: string;
   createdById: string;
   createdByName: string;
   createdAt: string;

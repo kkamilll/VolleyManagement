@@ -155,7 +155,7 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { id, title, type, date, endDate, location, opponent, description, status, costPerPerson, actualAttendees, result, tournamentMatches, lineup, liveScore, bestAction, socialDraft } = body;
+    const { id, title, type, date, endDate, location, opponent, description, status, costPerPerson, actualAttendees, result, tournamentMatches, lineup, liveScore, bestAction, socialDraft, coachPostMatchNote } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'Brak ID wydarzenia' }, { status: 400 });
@@ -224,6 +224,7 @@ export async function PUT(request: Request) {
     if (liveScore !== undefined) event.liveScore = liveScore;
     if (bestAction !== undefined) event.bestAction = bestAction;
     if (socialDraft !== undefined) event.socialDraft = socialDraft;
+    if (coachPostMatchNote !== undefined) event.coachPostMatchNote = coachPostMatchNote.trim();
 
     writeDatabase(db);
 

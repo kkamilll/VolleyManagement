@@ -112,6 +112,10 @@ function EventsAttendanceContent() {
   const [expandedNoteEventId, setExpandedNoteEventId] = useState<string | null>(null);
   const [submittingAttendanceId, setSubmittingAttendanceId] = useState<string | null>(null);
   const [staffBypassLock, setStaffBypassLock] = useState<Record<string, boolean>>({});
+  // Post-match coach notes state
+  const [editingCoachNoteEventId, setEditingCoachNoteEventId] = useState<string | null>(null);
+  const [coachNoteText, setCoachNoteText] = useState<string>('');
+  const [savingCoachNote, setSavingCoachNote] = useState<boolean>(false);
   // Tabela obecności: filtr dla każdego wydarzenia (ALL, BEDE, NIEPEWNE, NIE_BEDE, BRAK)
   const [attendanceTableFilter, setAttendanceTableFilter] = useState<Record<string, 'ALL' | 'BEDE' | 'NIEPEWNE' | 'NIE_BEDE' | 'BRAK'>>({});
 
@@ -124,7 +128,7 @@ function EventsAttendanceContent() {
   const canManage = Boolean(
     !isArchiveMode && user && (user.role === 'TRENER' || user.role === 'KIEROWNIK' || user.isCaptain)
   );
-  const isCoach = user?.role === 'TRENER';
+  const isCoach = user?.role === 'TRENER' || user?.role === 'KIEROWNIK';
 
   const getPositionBadgeStyle = (position?: string) => {
     if (!position) return 'bg-slate-900 text-slate-400 border-slate-800';
@@ -515,6 +519,13 @@ function EventsAttendanceContent() {
       alert('Musisz być zalogowany, aby zadeklarować obecność');
       return;
     }
+    const targetEvt = events.find(e => e.id === eventId);
+    const isPast = targetEvt ? (targetEvt.status === 'ZAKONCZONY' || new Date(targetEvt.date).getTime() < Date.now()) : false;
+    if (isPast && !canManage) {
+      alert('Termin tego wydarzenia już minął. Głosowanie na obecność zostało zamknięte.');
+      return;
+    }
+
     setSubmittingAttendanceId(eventId);
     try {
       const chosenNote = note !== undefined ? note : (attendanceNotes[eventId] || undefined);
@@ -525,11 +536,42 @@ function EventsAttendanceContent() {
       });
       if (res.ok) {
         await fetchData();
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Błąd zapisu obecności');
       }
     } catch (e) {
       console.error(e);
     } finally {
       setSubmittingAttendanceId(null);
+    }
+  };
+
+  // 1b. Save Coach Post-Match Note
+  const handleSavePostMatchNote = async (eventId: string) => {
+    setSavingCoachNote(true);
+    try {
+      const res = await fetch('/api/events', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: eventId,
+          coachPostMatchNote: coachNoteText
+        })
+      });
+      if (res.ok) {
+        setEditingCoachNoteEventId(null);
+        await fetchData();
+        alert('Notatka pomeczowa trenera została pomyślnie zapisana!');
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Błąd zapisu notatki pomeczowej');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Wystąpił błąd podczas zapisywania');
+    } finally {
+      setSavingCoachNote(false);
     }
   };
 
@@ -1269,42 +1311,50 @@ function EventsAttendanceContent() {
                             </div>
 
                             <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                disabled={submittingAttendanceId === event.id}
-                                onClick={() => handleAttendance(event.id, 'BEDE')}
-                                className={`px-3 py-1.5 rounded-xl text-xs font-black transition border ${
-                                  myAttendance?.status === 'BEDE'
-                                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-                                    : 'bg-slate-50 text-emerald-800 border-slate-200 hover:bg-emerald-50'
-                                }`}
-                              >
-                                Będę 👍
-                              </button>
-                              <button
-                                type="button"
-                                disabled={submittingAttendanceId === event.id}
-                                onClick={() => handleAttendance(event.id, 'NIEPEWNE')}
-                                className={`px-3 py-1.5 rounded-xl text-xs font-black transition border ${
-                                  myAttendance?.status === 'NIEPEWNE'
-                                    ? 'bg-amber-600 text-white border-amber-600 shadow-sm'
-                                    : 'bg-slate-50 text-amber-800 border-slate-200 hover:bg-amber-50'
-                                }`}
-                              >
-                                Niepewne 🤔
-                              </button>
-                              <button
-                                type="button"
-                                disabled={submittingAttendanceId === event.id}
-                                onClick={() => handleAttendance(event.id, 'NIE_BEDE')}
-                                className={`px-3 py-1.5 rounded-xl text-xs font-black transition border ${
-                                  myAttendance?.status === 'NIE_BEDE'
-                                    ? 'bg-rose-600 text-white border-rose-600 shadow-sm'
-                                    : 'bg-slate-50 text-rose-800 border-slate-200 hover:bg-rose-50'
-                                }`}
-                              >
-                                Nie będę 👎
-                              </button>
+                              {Boolean(event.status === 'ZAKONCZONY' || new Date(event.date).getTime() < Date.now()) && !canManage ? (
+                                <span className="px-2.5 py-1 rounded-xl text-xs font-bold text-slate-500 bg-slate-100 border border-slate-200">
+                                  🔒 Zakończono (tylko wgląd)
+                                </span>
+                              ) : (
+                                <>
+                                  <button
+                                    type="button"
+                                    disabled={submittingAttendanceId === event.id}
+                                    onClick={() => handleAttendance(event.id, 'BEDE')}
+                                    className={`px-3 py-1.5 rounded-xl text-xs font-black transition border ${
+                                      myAttendance?.status === 'BEDE'
+                                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                                        : 'bg-slate-50 text-emerald-800 border-slate-200 hover:bg-emerald-50'
+                                    }`}
+                                  >
+                                    Będę 👍
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={submittingAttendanceId === event.id}
+                                    onClick={() => handleAttendance(event.id, 'NIEPEWNE')}
+                                    className={`px-3 py-1.5 rounded-xl text-xs font-black transition border ${
+                                      myAttendance?.status === 'NIEPEWNE'
+                                        ? 'bg-amber-600 text-white border-amber-600 shadow-sm'
+                                        : 'bg-slate-50 text-amber-800 border-slate-200 hover:bg-amber-50'
+                                    }`}
+                                  >
+                                    Niepewne 🤔
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={submittingAttendanceId === event.id}
+                                    onClick={() => handleAttendance(event.id, 'NIE_BEDE')}
+                                    className={`px-3 py-1.5 rounded-xl text-xs font-black transition border ${
+                                      myAttendance?.status === 'NIE_BEDE'
+                                        ? 'bg-rose-600 text-white border-rose-600 shadow-sm'
+                                        : 'bg-slate-50 text-rose-800 border-slate-200 hover:bg-rose-50'
+                                    }`}
+                                  >
+                                    Nie będę 👎
+                                  </button>
+                                </>
+                              )}
                               <button
                                 type="button"
                                 onClick={() => {
@@ -1345,6 +1395,7 @@ function EventsAttendanceContent() {
                 const myAttendance = event.attendees.find(a => a.userId === user?.id);
 
                 const isFinished = event.status === 'ZAKONCZONY';
+                const isEventPast = Boolean(event.status === 'ZAKONCZONY' || new Date(event.date).getTime() < Date.now());
 
                 // Wyrazista kolorystyka każdego elementu wg typu jednostki (Trening = Zieleń, Sparing = Złoto/Bursztyn, Turniej = Purpura, Mecz = Błękit)
                 const typeThemeStyles: Record<string, {
@@ -1682,6 +1733,15 @@ function EventsAttendanceContent() {
                             }`}
                           >
                             {myAttendance.status === 'BEDE' ? '✓ Będę' : myAttendance.status === 'NIEPEWNE' ? '? Niepewny' : '✗ Nieobecny'}
+                            {isEventPast && <span className="text-[9px] opacity-75 font-normal ml-1 font-mono">(zapisano)</span>}
+                          </span>
+                        ) : isEventPast && !canManage ? (
+                          <span
+                            className="px-3 py-2 rounded-xl text-[11px] font-bold bg-slate-100 text-slate-500 border border-slate-200 shadow-2xs flex items-center gap-1 select-none"
+                            title="Termin meczu minął — wydarzenie archiwalne (tylko do wglądu)"
+                          >
+                            <Lock className="w-3.5 h-3.5 text-slate-400" />
+                            <span>Zakończone</span>
                           </span>
                         ) : (
                           <button
@@ -1883,6 +1943,95 @@ function EventsAttendanceContent() {
                           </div>
                         )}
 
+                        {/* SECTION: WNIOSKI & NOTATKA POMECZOWA TRENERA (Tylko do odczytu dla graczy, edycja dla trenera i sztabu) */}
+                        {isEventPast && (
+                          <div className="p-5 rounded-2xl bg-white border border-amber-200/90 shadow-sm space-y-3.5 text-slate-800">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-100">
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+                                  <ClipboardList className="w-4 h-4 text-amber-700" />
+                                </div>
+                                <div className="space-y-0.5">
+                                  <div className="flex items-center gap-2">
+                                    <h4 className="text-xs sm:text-sm font-black uppercase text-slate-900 tracking-wider">
+                                      Wnioski & Odprawa Pomeczowa Trenera
+                                    </h4>
+                                    <span className="px-2 py-0.5 rounded text-[9px] font-black uppercase bg-amber-100 text-amber-900 border border-amber-200">
+                                      Odprawa
+                                    </span>
+                                  </div>
+                                  <p className="text-[11px] text-slate-500">
+                                    Oficjalne podsumowanie po meczu: uwagi taktyczne, plusy i wnioski na kolejne treningi.
+                                  </p>
+                                </div>
+                              </div>
+
+                              {canManage && editingCoachNoteEventId !== event.id && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditingCoachNoteEventId(event.id);
+                                    setCoachNoteText(event.coachPostMatchNote || matchInfo.match?.coachComments || '');
+                                  }}
+                                  className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-2xs w-fit shrink-0"
+                                >
+                                  <Edit3 className="w-3.5 h-3.5 stroke-[2.5]" />
+                                  <span>{event.coachPostMatchNote ? 'Edytuj notatkę' : '+ Dodaj notatkę trenera'}</span>
+                                </button>
+                              )}
+                            </div>
+
+                            {/* Edycja notatki dla trenera / sztabu */}
+                            {editingCoachNoteEventId === event.id ? (
+                              <div className="p-4 rounded-xl bg-amber-50/50 border border-amber-200 space-y-3 animate-fadeIn">
+                                <label className="block text-xs font-bold text-slate-800">
+                                  Treść notatki / wniosków pomeczowych (widoczna dla całej kadry):
+                                </label>
+                                <textarea
+                                  rows={4}
+                                  value={coachNoteText}
+                                  onChange={e => setCoachNoteText(e.target.value)}
+                                  placeholder="Wpisz analizę meczu, wyróżnienia graczy, elementy wymagające poprawy na treningach..."
+                                  className="w-full p-3 rounded-xl bg-white border border-slate-300 text-xs text-slate-900 focus:outline-none focus:border-amber-500 shadow-2xs leading-relaxed"
+                                />
+                                <div className="flex items-center gap-2 justify-end">
+                                  <button
+                                    type="button"
+                                    disabled={savingCoachNote}
+                                    onClick={() => setEditingCoachNoteEventId(null)}
+                                    className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition"
+                                  >
+                                    Anuluj
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={savingCoachNote}
+                                    onClick={() => handleSavePostMatchNote(event.id)}
+                                    className="px-4 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-black uppercase tracking-wider transition shadow-sm flex items-center gap-1.5"
+                                  >
+                                    <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                                    <span>{savingCoachNote ? 'Zapisywanie...' : 'Zapisz notatkę'}</span>
+                                  </button>
+                                </div>
+                              </div>
+                            ) : event.coachPostMatchNote || matchInfo.match?.coachComments ? (
+                              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                                <p className="text-xs text-slate-800 leading-relaxed whitespace-pre-wrap">
+                                  {event.coachPostMatchNote || matchInfo.match?.coachComments}
+                                </p>
+                                <div className="text-[10px] text-slate-400 font-mono pt-1.5 border-t border-slate-200 flex items-center justify-between">
+                                  <span>👔 Sztab Szkoleniowy Angels ZTP</span>
+                                  <span>Wpis zarchiwizowany</span>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-center text-xs text-slate-500 italic">
+                                Trener nie zamieścił jeszcze oficjalnej notatki pomeczowej do tego spotkania.
+                              </div>
+                            )}
+                          </div>
+                        )}
+
                         {/* SECTION 1: CZYTELNA ANKIETA OBECNOŚCI DLA WSZYSTKICH (ZAWODNICY + TRENER + SZTAB) */}
                         <div className="p-5 rounded-2xl bg-white border border-slate-200 space-y-4 shadow-sm text-slate-800">
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
@@ -1918,93 +2067,135 @@ function EventsAttendanceContent() {
                               <Lock className="w-4 h-4 text-amber-600" />
                               <span>Tryb archiwalny: Deklarowanie i zmiana obecności są zablokowane (Tylko do odczytu)</span>
                             </div>
+                          ) : isEventPast && !canManage ? (
+                            <div className="p-4 sm:p-5 rounded-2xl bg-slate-100/90 border border-slate-200 text-slate-700 text-xs font-medium flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-2xl bg-slate-200 text-slate-600 flex items-center justify-center shrink-0">
+                                  <Lock className="w-4 h-4" />
+                                </div>
+                                <div className="space-y-0.5">
+                                  <div className="font-black text-slate-900 uppercase text-xs tracking-wide flex items-center gap-1.5">
+                                    <span>Głosowanie Zamknięte</span>
+                                    <span className="px-1.5 py-0.2 rounded bg-slate-200 text-slate-700 text-[9px] font-mono font-bold uppercase">Archiwum</span>
+                                  </div>
+                                  <div className="text-[11px] text-slate-500">
+                                    Termin jednostki minął — ankieta została zamknięta. Poniższa lista obecności oraz statystyki są wyłącznie do wglądu.
+                                  </div>
+                                </div>
+                              </div>
+                              {myAttendance ? (
+                                <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-800 font-bold text-xs shrink-0 shadow-2xs">
+                                  <span className="text-slate-400 text-[10px] uppercase font-mono">Twój zapis:</span>
+                                  <span className={myAttendance.status === 'BEDE' ? 'text-emerald-700 font-black' : myAttendance.status === 'NIEPEWNE' ? 'text-amber-700 font-black' : 'text-rose-700 font-black'}>
+                                    {myAttendance.status === 'BEDE' ? '✓ Obecny' : myAttendance.status === 'NIEPEWNE' ? '? Niepewny' : '✗ Nieobecny'}
+                                  </span>
+                                  {myAttendance.note && (
+                                    <span className="text-slate-500 text-[11px] italic font-normal max-w-[140px] truncate" title={myAttendance.note}>
+                                      &quot;{myAttendance.note}&quot;
+                                    </span>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-[11px] text-slate-400 italic px-3 py-1 rounded-lg bg-slate-200/60 shrink-0">
+                                  Brak głosu przed jednostką
+                                </span>
+                              )}
+                            </div>
                           ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            {/* Option: BEDE */}
-                            <button
-                              type="button"
-                              disabled={submittingAttendanceId === event.id}
-                              onClick={() => handleAttendance(event.id, 'BEDE')}
-                              className={`p-3.5 rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between gap-2 group ${
-                                myAttendance?.status === 'BEDE'
-                                  ? 'bg-emerald-50 border-emerald-400 text-emerald-950 shadow-sm ring-2 ring-emerald-400'
-                                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-emerald-300 hover:bg-emerald-50/40'
-                              }`}
-                            >
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs font-black uppercase tracking-wide flex items-center gap-1.5">
-                                  <CheckCircle2 className={`w-4 h-4 ${myAttendance?.status === 'BEDE' ? 'text-emerald-600' : 'text-slate-400 group-hover:text-emerald-600'}`} />
-                                  Będę na 100%
-                                </span>
-                                {myAttendance?.status === 'BEDE' && (
-                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-emerald-600 text-white">
-                                    Wybrano
+                            <div className="space-y-3">
+                              {isEventPast && canManage && (
+                                <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold flex items-center gap-2">
+                                  <Shield className="w-4 h-4 text-amber-600 shrink-0" />
+                                  <span>Termin jednostki minął (zawodnicy nie mogą już edytować głosów). Jako Trener/Sztab masz uprawnienia do korekty frekwencji.</span>
+                                </div>
+                              )}
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                              {/* Option: BEDE */}
+                              <button
+                                type="button"
+                                disabled={submittingAttendanceId === event.id}
+                                onClick={() => handleAttendance(event.id, 'BEDE')}
+                                className={`p-3.5 rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between gap-2 group ${
+                                  myAttendance?.status === 'BEDE'
+                                    ? 'bg-emerald-50 border-emerald-400 text-emerald-950 shadow-sm ring-2 ring-emerald-400'
+                                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-emerald-300 hover:bg-emerald-50/40'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs font-black uppercase tracking-wide flex items-center gap-1.5">
+                                    <CheckCircle2 className={`w-4 h-4 ${myAttendance?.status === 'BEDE' ? 'text-emerald-600' : 'text-slate-400 group-hover:text-emerald-600'}`} />
+                                    Będę na 100%
                                   </span>
-                                )}
-                              </div>
-                              <p className="text-[11px] text-slate-500 group-hover:text-slate-700">
-                                Potwierdzam gotowość do udziału na hali.
-                              </p>
-                            </button>
+                                  {myAttendance?.status === 'BEDE' && (
+                                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-emerald-600 text-white">
+                                      Wybrano
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-[11px] text-slate-500 group-hover:text-slate-700">
+                                  Potwierdzam gotowość do udziału na hali.
+                                </p>
+                              </button>
 
-                            {/* Option: NIEPEWNE */}
-                            <button
-                              type="button"
-                              disabled={submittingAttendanceId === event.id}
-                              onClick={() => handleAttendance(event.id, 'NIEPEWNE')}
-                              className={`p-3.5 rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between gap-2 group ${
-                                myAttendance?.status === 'NIEPEWNE'
-                                  ? 'bg-amber-50 border-amber-400 text-amber-950 shadow-sm ring-2 ring-amber-400'
-                                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-amber-300 hover:bg-amber-50/40'
-                              }`}
-                            >
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs font-black uppercase tracking-wide flex items-center gap-1.5">
-                                  <HelpCircle className={`w-4 h-4 ${myAttendance?.status === 'NIEPEWNE' ? 'text-amber-600' : 'text-slate-400 group-hover:text-amber-600'}`} />
-                                  Niepewny / Być może
-                                </span>
-                                {myAttendance?.status === 'NIEPEWNE' && (
-                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-600 text-white">
-                                    Wybrano
+                              {/* Option: NIEPEWNE */}
+                              <button
+                                type="button"
+                                disabled={submittingAttendanceId === event.id}
+                                onClick={() => handleAttendance(event.id, 'NIEPEWNE')}
+                                className={`p-3.5 rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between gap-2 group ${
+                                  myAttendance?.status === 'NIEPEWNE'
+                                    ? 'bg-amber-50 border-amber-400 text-amber-950 shadow-sm ring-2 ring-amber-400'
+                                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-amber-300 hover:bg-amber-50/40'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs font-black uppercase tracking-wide flex items-center gap-1.5">
+                                    <HelpCircle className={`w-4 h-4 ${myAttendance?.status === 'NIEPEWNE' ? 'text-amber-600' : 'text-slate-400 group-hover:text-amber-600'}`} />
+                                    Niepewny / Być może
                                   </span>
-                                )}
-                              </div>
-                              <p className="text-[11px] text-slate-500 group-hover:text-slate-700">
-                                Dam znać przed zbiórką (np. praca / korek).
-                              </p>
-                            </button>
+                                  {myAttendance?.status === 'NIEPEWNE' && (
+                                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-600 text-white">
+                                      Wybrano
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-[11px] text-slate-500 group-hover:text-slate-700">
+                                  Dam znać przed zbiórką (np. praca / korek).
+                                </p>
+                              </button>
 
-                            {/* Option: NIE_BEDE */}
-                            <button
-                              type="button"
-                              disabled={submittingAttendanceId === event.id}
-                              onClick={() => handleAttendance(event.id, 'NIE_BEDE')}
-                              className={`p-3.5 rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between gap-2 group ${
-                                myAttendance?.status === 'NIE_BEDE'
-                                  ? 'bg-rose-50 border-rose-400 text-rose-950 shadow-sm ring-2 ring-rose-400'
-                                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-rose-300 hover:bg-rose-50/40'
-                              }`}
-                            >
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs font-black uppercase tracking-wide flex items-center gap-1.5">
-                                  <XCircle className={`w-4 h-4 ${myAttendance?.status === 'NIE_BEDE' ? 'text-rose-600' : 'text-slate-400 group-hover:text-rose-600'}`} />
-                                  Nie będę obecny
-                                </span>
-                                {myAttendance?.status === 'NIE_BEDE' && (
-                                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-rose-600 text-white">
-                                    Wybrano
+                              {/* Option: NIE_BEDE */}
+                              <button
+                                type="button"
+                                disabled={submittingAttendanceId === event.id}
+                                onClick={() => handleAttendance(event.id, 'NIE_BEDE')}
+                                className={`p-3.5 rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between gap-2 group ${
+                                  myAttendance?.status === 'NIE_BEDE'
+                                    ? 'bg-rose-50 border-rose-400 text-rose-950 shadow-sm ring-2 ring-rose-400'
+                                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-rose-300 hover:bg-rose-50/40'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs font-black uppercase tracking-wide flex items-center gap-1.5">
+                                    <XCircle className={`w-4 h-4 ${myAttendance?.status === 'NIE_BEDE' ? 'text-rose-600' : 'text-slate-400 group-hover:text-rose-600'}`} />
+                                    Nie będę obecny
                                   </span>
-                                )}
-                              </div>
-                              <p className="text-[11px] text-slate-500 group-hover:text-slate-700">
-                                Zgłaszam nieobecność (zwolnienie / wyjazd).
-                              </p>
-                            </button>
-                          </div>
+                                  {myAttendance?.status === 'NIE_BEDE' && (
+                                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-rose-600 text-white">
+                                      Wybrano
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-[11px] text-slate-500 group-hover:text-slate-700">
+                                  Zgłaszam nieobecność (zwolnienie / wyjazd).
+                                </p>
+                              </button>
+                            </div>
+                            </div>
                           )}
 
                           {/* Optional note input toggle */}
-                          {!isArchiveMode && (
+                          {!isArchiveMode && (!isEventPast || canManage) && (
                           <div className="pt-1">
                             {expandedNoteEventId === event.id ? (
                               <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2 animate-fadeIn">

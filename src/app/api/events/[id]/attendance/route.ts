@@ -31,6 +31,16 @@ export async function POST(
       return NextResponse.json({ error: 'Wydarzenie nie istnieje' }, { status: 404 });
     }
 
+    const isPast = Boolean(event.status === 'ZAKONCZONY' || new Date(event.date).getTime() < Date.now());
+    const isStaff = user.role === 'TRENER' || user.role === 'KIEROWNIK' || user.isCaptain;
+
+    if (isPast && !isStaff) {
+      return NextResponse.json(
+        { error: 'Termin wydarzenia już minął. Głosowanie na obecność jest zamknięte i dostępne wyłącznie do wglądu.' },
+        { status: 403 }
+      );
+    }
+
     if (!event.attendees) {
       event.attendees = [];
     }
