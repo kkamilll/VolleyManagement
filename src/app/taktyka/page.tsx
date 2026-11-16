@@ -2819,82 +2819,7 @@ function TacticsContent() {
           )}
         </div>
 
-        {/* 1. PASEK OZNACZANIA ZAWODNIKÓW (@WZMIANKI) */}
-        <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[11px] font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-              <span className="w-4 h-4 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center text-[10px] font-black">@</span>
-              Kliknij, aby oznaczyć zawodnika w notatce:
-            </span>
-            <span className="text-[10px] text-slate-400 font-medium">
-              Pełna kadra ({allSquadMembers.length} osób)
-            </span>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-1.5 max-h-36 overflow-y-auto pr-1 scrollbar-thin">
-            {allSquadMembers.map(member => {
-              const isCoach = member.isCoach || member.role === 'TRENER';
-              const isCaptain = member.isCaptain;
-              const tagLabel = `@${member.name}${member.number ? ` (#${member.number})` : isCoach ? ' (Trener)' : ''}`;
-
-              return (
-                <button
-                  key={member.id}
-                  type="button"
-                  onClick={() => insertTagIntoNote(tagLabel)}
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition shadow-2xs border ${
-                    isCaptain
-                      ? 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-300'
-                      : isCoach
-                      ? 'bg-sky-50 hover:bg-sky-100 text-sky-900 border-sky-300'
-                      : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
-                  }`}
-                  title={`Wstaw wzmiankę: ${tagLabel}`}
-                >
-                  <span className={`w-5 h-5 rounded-md flex items-center justify-center font-black text-[10px] ${
-                    isCaptain
-                      ? 'bg-amber-400 text-slate-950'
-                      : isCoach
-                      ? 'bg-sky-500 text-white'
-                      : 'bg-slate-200 text-slate-700'
-                  }`}>
-                    {member.number ? `#${member.number}` : isCoach ? 'T' : '•'}
-                  </span>
-                  <span>{member.name}</span>
-                  {isCaptain && <span className="text-[10px] text-amber-700 font-black">👑</span>}
-                  {isCoach && <span className="text-[10px] text-sky-700 font-bold">(Trener)</span>}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 2. SZYBKIE ETYKIETY TAKTYCZNE */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">
-            Szybkie tagi:
-          </span>
-          {[
-            { label: '🛡️ Przyjęcie', tag: '[Przyjęcie]' },
-            { label: '⚡ Atak & Kontra', tag: '[Atak]' },
-            { label: '🧱 Blok-Obrona', tag: '[Blok-Obrona]' },
-            { label: '🎯 Zagrywka', tag: '[Zagrywka]' },
-            { label: '🔄 Zmiana zadaniowa', tag: '[Zmiana]' },
-            { label: '🚑 Asekuracja', tag: '[Asekuracja]' },
-            { label: '⏱️ Końcówka seta', tag: '[Końcówka]' }
-          ].map(t => (
-            <button
-              key={t.tag}
-              type="button"
-              onClick={() => insertTagIntoNote(`\n${t.tag}:`)}
-              className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-bold transition border border-slate-200 shadow-2xs"
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-
-        {/* 3. GŁÓWNY EDYTOR NOTATKI TAKTYCZNEJ */}
+        {/* GŁÓWNY EDYTOR NOTATKI TAKTYCZNEJ */}
         <div className="space-y-2">
           <div className="relative">
             <textarea
@@ -2904,10 +2829,9 @@ function TacticsContent() {
               onChange={e => setTacticComment(e.target.value)}
               placeholder={`Wpisz ogólne założenia taktyczne i zadania dla drużyny, np.:
 - Zagrywka: celujemy w strefę 1 i 5 rywala, aby odrzucić rozgrywającego od siatki.
-- Środek: @Michał Śmigiel i @Maciej Noak zamykają krótką, a skrzydłowi asekurują skos.
-- Atak: @Łukasz Kremer i @Bartosz Augustynek grają wysokie piłki na pojedynczy blok.
-- Zmiany: @Hubert Obara wchodzi na drugą linię do obrony w końcówkach setów.
-(Kliknij powyżej nazwisko dowolnego zawodnika z kadry, aby szybko go oznaczyć).`}
+- Środek: zamykamy krótką, a skrzydłowi asekurują skos.
+- Atak: wysokie piłki na pojedynczy blok.
+- Zmiany zadaniowe w końcówkach setów.`}
               className="w-full bg-slate-50/50 hover:bg-white focus:bg-white border-2 border-slate-200 focus:border-amber-400 text-slate-900 placeholder:text-slate-400 rounded-2xl p-4 text-xs sm:text-sm font-medium leading-relaxed focus:outline-none shadow-inner transition"
             />
           </div>
