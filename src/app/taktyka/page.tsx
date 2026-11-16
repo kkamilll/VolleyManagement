@@ -1995,6 +1995,32 @@ function TacticsContent() {
             )}
           </div>
         )}
+
+        {tacticsSection === 'matches' && (
+          <div className="flex items-center gap-2 justify-end w-full lg:w-auto text-xs font-bold text-slate-600">
+            <span className="hidden sm:inline">Rozgrywki LALS: 20 rund ligowych</span>
+            <Link
+              href="/rozgrywki"
+              className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-2xs font-bold flex items-center gap-1.5"
+            >
+              <Trophy className="w-3.5 h-3.5 text-amber-500" />
+              <span>Tabela & Terminarz LALS &rarr;</span>
+            </Link>
+          </div>
+        )}
+
+        {tacticsSection === 'trainings' && (
+          <div className="flex items-center gap-2 justify-end w-full lg:w-auto text-xs font-bold text-slate-600">
+            <span className="hidden sm:inline">Treningi klubowe: Hala OSiR / POSiR</span>
+            <Link
+              href="/events"
+              className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-2xs font-bold flex items-center gap-1.5"
+            >
+              <Calendar className="w-3.5 h-3.5 text-sky-600" />
+              <span>Kalendarz & Obecność &rarr;</span>
+            </Link>
+          </div>
+        )}
       </div>
 
       {tacticsSection === 'board' && (

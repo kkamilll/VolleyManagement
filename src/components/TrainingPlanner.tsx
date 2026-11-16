@@ -735,7 +735,7 @@ export function TrainingPlannerContent({
   }, [materials, activeEvent]);
 
   return (
-    <div className="w-full max-w-[2000px] mx-auto px-2 sm:px-6 lg:px-10 xl:px-12 pt-4 sm:pt-6 pb-24 md:pb-12 space-y-4">
+    <div className={hideHeader ? "w-full space-y-4" : "w-full max-w-[2000px] mx-auto px-2 sm:px-6 lg:px-10 xl:px-12 pt-4 sm:pt-6 pb-24 md:pb-12 space-y-4"}>
       {/* Top Header */}
       {!hideHeader && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-sky-200">
@@ -911,11 +911,20 @@ export function TrainingPlannerContent({
                   const isSelected = activeEvent?.id === ev.id;
                   const plan = plans.find(p => p.eventId === ev.id || p.id === ev.id);
                   const exCount = plan?.exercises?.length || 0;
-                  const conclCount = plan?.conclusions?.length || 0;
                   const attendeesCount = ev.attendees?.filter(a => a.status === 'BEDE').length || 0;
                   const evDate = new Date(ev.date);
                   const isSparing = ev.type === 'SPARING';
                   const isMatch = ev.type === 'MECZ' || Boolean(ev.opponent && ev.title.toLowerCase().includes('lals'));
+
+                  // Ekstrakcja rundy oraz nazwy rywala
+                  const roundMatch = ev.title.match(/R(\d+)/i) || ev.title.match(/Runda\s*(\d+)/i);
+                  const roundLabel = roundMatch ? `R${roundMatch[1]}` : (isMatch ? 'LALS' : isSparing ? 'Sparing' : 'Trening');
+                  
+                  let cleanOpponent = ev.opponent || '';
+                  if (!cleanOpponent && ev.title.includes(' vs ')) {
+                    const parts = ev.title.split(' vs ');
+                    cleanOpponent = parts[0].includes('Angels') ? parts[1].trim() : parts[0].replace(/.*:\s*/, '').trim();
+                  }
 
                   return (
                     <div
@@ -925,38 +934,27 @@ export function TrainingPlannerContent({
                         if (plan) setSelectedPlan(plan);
                         else setSelectedPlan(null);
                       }}
-                      className={`p-3 rounded-2xl border transition cursor-pointer text-left space-y-1.5 ${
+                      className={`p-3.5 rounded-2xl border transition cursor-pointer text-left space-y-2 ${
                         isSelected
                           ? isSparing
-                            ? 'bg-amber-50/50 border-amber-400 ring-2 ring-amber-300 text-slate-900 shadow-sm'
+                            ? 'bg-amber-50/60 border-amber-400 ring-2 ring-amber-300 text-slate-900 shadow-sm'
                             : isMatch
-                            ? 'bg-indigo-50/50 border-indigo-400 ring-2 ring-indigo-300 text-slate-900 shadow-sm'
-                            : 'bg-sky-50 border-sky-400 ring-2 ring-sky-300 text-slate-900 shadow-sm'
+                            ? 'bg-sky-50/70 border-sky-400 ring-2 ring-sky-300 text-slate-900 shadow-sm'
+                            : 'bg-emerald-50/60 border-emerald-400 ring-2 ring-emerald-300 text-slate-900 shadow-sm'
                           : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700'
                       }`}
                     >
-                      <div className="flex items-center justify-between text-[10px]">
-                        <span className="font-mono font-bold text-slate-700 flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-sky-600" />
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="font-mono font-bold text-slate-600 flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5 text-sky-600" />
                           {evDate.toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' })} • {evDate.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
                         </span>
 
-                        <div className="flex items-center gap-1">
-                          {isSparing ? (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-100 text-amber-900 border border-amber-300">
-                              ⚔️ Sparing
-                            </span>
-                          ) : isMatch ? (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-indigo-100 text-indigo-900 border border-indigo-300">
-                              🏐 LALS
-                            </span>
-                          ) : (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-sky-100 text-sky-800 border border-sky-300">
-                              🏋️ Trening
-                            </span>
-                          )}
-
-                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
+                        <div className="flex items-center gap-1.5">
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase font-mono bg-slate-100 text-slate-800 border border-slate-200">
+                            {roundLabel}
+                          </span>
+                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${
                             plan ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-600 border border-slate-200'
                           }`}>
                             {plan ? `✓ Rozpisany (${exCount})` : 'Do rozpisania'}
@@ -964,25 +962,34 @@ export function TrainingPlannerContent({
                         </div>
                       </div>
 
-                      <h4 className="font-black text-sm text-slate-900 leading-snug line-clamp-2">
-                        {ev.title}
-                      </h4>
+                      {/* Czytelny Tytuł / Rywal */}
+                      <div>
+                        {cleanOpponent ? (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">VS</span>
+                            <h4 className="font-black text-sm text-slate-900 uppercase font-athletic tracking-tight truncate">
+                              {cleanOpponent}
+                            </h4>
+                          </div>
+                        ) : (
+                          <h4 className="font-black text-sm text-slate-900 tracking-tight line-clamp-1">
+                            {ev.title}
+                          </h4>
+                        )}
+                        <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+                          <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
+                          <span className="truncate">{ev.location}</span>
+                        </p>
+                      </div>
 
-                      <p className="text-[11px] text-slate-500 line-clamp-1 flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
-                        <span>{ev.location}</span>
-                      </p>
-
-                      <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1 border-t border-slate-100">
+                      <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1.5 border-t border-slate-100">
                         <span className="text-emerald-700 font-bold flex items-center gap-1">
                           <Users className="w-3 h-3" />
                           {attendeesCount} obecnych (Terminarz)
                         </span>
-                        {plan && conclCount > 0 && (
-                          <span className="text-purple-700 font-bold">
-                            ✓ {conclCount} wniosków
-                          </span>
-                        )}
+                        <span className="text-sky-600 font-bold group-hover:underline">
+                          Wybierz &rarr;
+                        </span>
                       </div>
                     </div>
                   );
@@ -995,110 +1002,144 @@ export function TrainingPlannerContent({
         {/* Right Column: Selected Training Plan Workspace */}
         <div className="lg:col-span-7 xl:col-span-8 space-y-4">
           {!activePlan ? (
-            activeEvent ? (
-              <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
-                {/* Górny Nagłówek Wybranego Wydarzenia */}
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-5 border-b border-slate-100">
-                  <div className="flex items-start gap-3.5">
-                    <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 border border-sky-200 shadow-2xs">
-                      <Volleyball className="w-6 h-6" />
+            activeEvent ? (() => {
+              const roundMatch = activeEvent.title.match(/R(\d+)/i) || activeEvent.title.match(/Runda\s*(\d+)/i);
+              const roundNum = roundMatch ? roundMatch[1] : null;
+              let oppName = activeEvent.opponent || '';
+              if (!oppName && activeEvent.title.includes(' vs ')) {
+                const parts = activeEvent.title.split(' vs ');
+                oppName = parts[0].includes('Angels') ? parts[1].trim() : parts[0].replace(/.*:\s*/, '').trim();
+              }
+              const attendingCount = activeEvent.attendees?.filter(a => a.status === 'BEDE').length || 0;
+
+              return (
+                <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+                  {/* Górny pasek metadanych */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="px-3 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider bg-sky-100 text-sky-800 border border-sky-200 font-mono">
+                        {activeEvent.type === 'SPARING' ? '⚔️ Sparing' : activeEvent.type === 'MECZ' ? `🏐 LALS ${roundNum ? `• Runda ${roundNum}` : ''}` : '🏋️ Trening'}
+                      </span>
+                      <span className="px-2.5 py-1 rounded-xl text-xs font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                        {new Date(activeEvent.date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' })}
+                      </span>
                     </div>
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                        <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider bg-sky-100 text-sky-800 border border-sky-200 font-mono">
-                          {activeEvent.type === 'SPARING' ? 'Sparing Drużyny' : activeEvent.type === 'MECZ' ? 'Mecz Ligowy LALS' : 'Trening Zespołu'}
-                        </span>
-                        <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 font-mono">
-                          {new Date(activeEvent.date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' })}
-                        </span>
+
+                    <div className="flex items-center gap-2">
+                      <span className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold font-mono">
+                        <Users className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>{attendingCount} zadeklarowanych</span>
+                      </span>
+                      <Link
+                        href={`/events?eventId=${activeEvent.id}`}
+                        className="text-xs text-sky-600 hover:text-sky-800 font-bold px-2 py-1 rounded-lg hover:bg-sky-50 transition"
+                      >
+                        Terminarz &rarr;
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Duel Scoreboard Card */}
+                  <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-50 via-white to-slate-50 border border-slate-200 shadow-2xs">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left">
+                      {/* Gospodarz */}
+                      <div className="flex items-center gap-3.5">
+                        <div className="w-12 h-12 rounded-2xl bg-sky-600 text-white flex items-center justify-center font-black text-xl shadow-sm shrink-0 border border-sky-400">
+                          👼
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-mono font-bold uppercase text-sky-700 block">Gospodarz</span>
+                          <h4 className="text-xl font-black text-slate-900 uppercase font-athletic tracking-tight">Angels ZTP</h4>
+                        </div>
                       </div>
-                      <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                        {activeEvent.title}
-                      </h3>
-                      <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 mt-1">
-                        <span className="flex items-center gap-1 font-medium">
+
+                      {/* VS & Szczegóły Miejsca */}
+                      <div className="flex flex-col items-center justify-center px-4 py-1">
+                        <div className="w-9 h-9 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-xs font-black text-slate-700 font-mono">
+                          VS
+                        </div>
+                        <span className="text-xs font-mono font-bold text-slate-800 flex items-center gap-1 mt-1.5">
                           <Clock className="w-3.5 h-3.5 text-sky-600" />
                           {new Date(activeEvent.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
                         </span>
-                        <span>•</span>
-                        <span className="flex items-center gap-1 font-medium">
-                          <MapPin className="w-3.5 h-3.5 text-rose-500" />
-                          {activeEvent.location || 'Hala OSiR, Luboń'}
+                        <span className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                          <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
+                          <span>{activeEvent.location || 'Hala OSiR, Luboń'}</span>
                         </span>
+                      </div>
+
+                      {/* Gość */}
+                      <div className="flex items-center sm:flex-row-reverse gap-3.5 text-center sm:text-right">
+                        <div className="w-12 h-12 rounded-2xl bg-slate-800 text-white flex items-center justify-center font-black text-xl shadow-sm shrink-0 border border-slate-700">
+                          🏐
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-mono font-bold uppercase text-amber-600 block">Przeciwnik</span>
+                          <h4 className="text-xl font-black text-slate-900 uppercase font-athletic tracking-tight">
+                            {oppName || 'Rywal Ligowy'}
+                          </h4>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex sm:flex-col items-center sm:items-end gap-2 shrink-0">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold">
-                      <Users className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>{activeEvent.attendees?.filter(a => a.status === 'BEDE').length || 0} obecnych</span>
+                  {/* 2 Kafelki Przygotowania Taktycznego */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                          <Target className="w-4 h-4 text-sky-600" />
+                          Założenia Meczowe
+                        </span>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                          Do rozpisania
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 leading-relaxed">
+                        Zdefiniuj cele meczowe, taktykę zagrywki, kierunki ataku i asekurację bloku.
+                      </p>
                     </div>
+
+                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                          <Compass className="w-4 h-4 text-amber-600" />
+                          Ustawienie Wyjściowe (P1–P6)
+                        </span>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-300">
+                          Tablica
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 leading-relaxed">
+                        Rozrysuj schemat rotacji, strefy przyjęcia libero i pozycje obrony na tablicy taktycznej.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Pasek Głównych Akcji */}
+                  <div className="flex flex-wrap items-center gap-3 pt-2">
+                    {canManage && (
+                      <button
+                        onClick={() => handleQuickCreatePlanForEvent(activeEvent)}
+                        disabled={creating}
+                        className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider transition shadow-sm hover:shadow flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>{creating ? 'Tworzenie rozpiski...' : 'Rozpisz taktykę na ten mecz'}</span>
+                      </button>
+                    )}
+
                     <Link
-                      href={`/events?eventId=${activeEvent.id}`}
-                      className="text-[11px] font-bold text-sky-600 hover:text-sky-800 transition"
+                      href={`/taktyka?tab=board&eventId=${activeEvent.id}`}
+                      className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 hover:border-slate-300 font-bold text-xs transition flex items-center justify-center gap-2 shadow-2xs"
                     >
-                      Terminarz i lista obecności &rarr;
+                      <Compass className="w-4 h-4 text-sky-600" />
+                      <span>Tablica Taktyczna</span>
                     </Link>
                   </div>
                 </div>
-
-                {/* 3 Panele Przygotowania Taktycznego */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
-                    <div className="flex items-center gap-2 text-xs font-black text-slate-800 uppercase tracking-wider">
-                      <Target className="w-4 h-4 text-sky-600" />
-                      <span>Założenia</span>
-                    </div>
-                    <p className="text-xs text-slate-500">
-                      Brak jeszcze rozpisanej taktyki i planu na to spotkanie.
-                    </p>
-                  </div>
-
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
-                    <div className="flex items-center gap-2 text-xs font-black text-slate-800 uppercase tracking-wider">
-                      <Users className="w-4 h-4 text-emerald-600" />
-                      <span>Skład Meczowy</span>
-                    </div>
-                    <p className="text-xs text-slate-500">
-                      {activeEvent.attendees?.filter(a => a.status === 'BEDE').length || 0} zawodników potwierdziło gotowość do gry.
-                    </p>
-                  </div>
-
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
-                    <div className="flex items-center gap-2 text-xs font-black text-slate-800 uppercase tracking-wider">
-                      <Compass className="w-4 h-4 text-amber-600" />
-                      <span>Ustawienia</span>
-                    </div>
-                    <p className="text-xs text-slate-500">
-                      Możesz rozrysować schemat rotacji i zagrywek na tablicy.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Przyciski Akcji */}
-                <div className="pt-2 flex flex-wrap items-center gap-3">
-                  {canManage && (
-                    <button
-                      onClick={() => handleQuickCreatePlanForEvent(activeEvent)}
-                      disabled={creating}
-                      className="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider transition shadow-sm hover:shadow flex items-center justify-center gap-2 cursor-pointer active:scale-95"
-                    >
-                      <Plus className="w-4 h-4" />
-                      <span>{creating ? 'Tworzenie rozpiski...' : activeEvent.type === 'SPARING' ? 'Rozpisz założenia dla tego sparingu' : activeEvent.type === 'MECZ' ? 'Rozpisz taktykę na ten mecz ligowy' : 'Rozpisz ćwiczenia dla tego treningu'}</span>
-                    </button>
-                  )}
-
-                  <Link
-                    href={`/taktyka?tab=board&eventId=${activeEvent.id}`}
-                    className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 hover:border-slate-300 font-bold text-xs transition flex items-center gap-2 shadow-2xs"
-                  >
-                    <Compass className="w-4 h-4 text-sky-600" />
-                    <span>Tablica taktyczna</span>
-                  </Link>
-                </div>
-              </div>
-            ) : (
+              );
+            })() : (
               <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center text-slate-500 space-y-3 shadow-sm">
                 <Volleyball className="w-12 h-12 text-slate-400 mx-auto" />
                 <h3 className="text-base font-bold text-slate-900">Wybierz jednostkę z listy po lewej</h3>
