@@ -5238,9 +5238,9 @@ function RozgrywkiContent() {
                                   <Compass className="w-3.5 h-3.5 text-sky-600" />
                                   <span>📸 Zrzut Taktyczny na Turniej: {linked[0].title}</span>
                                 </span>
-                                <a href={`/taktyka?eventId=${event.id}&tacticId=${linked[0].id}`} className="text-xs text-sky-700 font-bold hover:underline">
+                                <Link href={`/taktyka?eventId=${event.id}&tacticId=${linked[0].id}`} className="text-xs text-sky-700 font-bold hover:underline">
                                   Otwórz w Tablicy →
-                                </a>
+                                </Link>
                               </div>
                               {linked[0].drawingData && (
                                 <div className="aspect-[21/9] bg-white rounded-xl overflow-hidden border border-slate-200 max-h-36">

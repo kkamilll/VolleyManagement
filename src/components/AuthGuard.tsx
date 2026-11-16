@@ -23,30 +23,29 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     }
   }, [user, loading, isPublicRoute, router]);
 
-  // When loading authentication status on a protected route, show a branded loading screen
-  if (loading && !isPublicRoute) {
+  // Only show a loading placeholder when we do not yet have a cached user and auth state is still resolving
+  if (loading && !user && !isPublicRoute) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white p-4">
-        <div className="relative w-20 h-20 mb-4 animate-pulse">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f6f8fb] text-slate-800 p-4">
+        <div className="relative w-16 h-16 mb-4 animate-pulse">
           <img
             src="/logo.jpg"
             alt="Angels ZTP"
-            className="w-full h-full object-contain rounded-2xl shadow-2xl border border-sky-500/30"
+            className="w-full h-full object-contain rounded-2xl shadow-md border border-slate-200"
           />
         </div>
-        <div className="flex items-center gap-2.5 text-xs font-mono text-sky-400">
-          <span className="w-3.5 h-3.5 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></span>
-          <span>Weryfikacja dostępu do systemu Angels ZTP...</span>
+        <div className="flex items-center gap-2.5 text-xs font-semibold text-slate-500">
+          <span className="w-4 h-4 border-2 border-sky-600 border-t-transparent rounded-full animate-spin"></span>
+          <span>Wczytywanie aplikacji...</span>
         </div>
       </div>
     );
   }
 
-  // If not logged in and on a protected route, do not flash protected content
-  if (!user && !isPublicRoute) {
+  // If not logged in and on a protected route and finished loading, do not flash protected content
+  if (!user && !loading && !isPublicRoute) {
     return null;
   }
 
   return <>{children}</>;
 }
-

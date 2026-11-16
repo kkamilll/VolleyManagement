@@ -204,7 +204,7 @@ export default function Navbar() {
         <div className="max-w-[2000px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 flex items-center justify-between h-16">
           {/* Logo & Brand with Angels ZTP Logo */}
           <div className="flex items-center gap-3 shrink-0">
-            <a href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
+            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
               <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white p-0.5 shadow-sm border border-slate-200 group-hover:border-sky-400 group-hover:shadow-md transition overflow-hidden shrink-0 flex items-center justify-center">
                 <img 
                   src="/logo.jpg" 
@@ -220,12 +220,12 @@ export default function Navbar() {
                   VOLLEYBALL TEAM
                 </span>
               </div>
-            </a>
+            </Link>
           </div>
 
           {/* Desktop Nav Links */}
           <nav className="hidden xl:flex items-center space-x-1 lg:space-x-1.5 shrink-0">
-            <a
+            <Link
               href="/"
               className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname === '/'
@@ -235,9 +235,9 @@ export default function Navbar() {
             >
               <LayoutDashboard className="w-4 h-4 text-sky-600" />
               Pulpit
-            </a>
+            </Link>
 
-            <a
+            <Link
               href="/events"
               className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname.startsWith('/events')
@@ -247,11 +247,11 @@ export default function Navbar() {
             >
               <Calendar className="w-4 h-4 text-amber-600" />
               <span>Terminarz</span>
-            </a>
+            </Link>
 
             {/* Rozgrywki with dropdown */}
             <div className="relative group shrink-0">
-              <a
+              <Link
                 href="/rozgrywki"
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                   pathname.startsWith('/rozgrywki')
@@ -262,37 +262,37 @@ export default function Navbar() {
                 <Volleyball className="w-4 h-4 text-amber-600" />
                 <span>Rozgrywki</span>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition" />
-              </a>
+              </Link>
 
               {/* Submenu Dropdown */}
               <div className="absolute left-0 top-full pt-1.5 hidden group-hover:block z-50">
                 <div className="w-56 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 space-y-0.5">
-                  <a
+                  <Link
                     href="/rozgrywki?tab=sparingi"
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-amber-700 hover:bg-amber-50 transition"
                   >
                     <Calendar className="w-4 h-4 text-amber-500" />
                     <span>Sparingi</span>
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/rozgrywki?tab=liga"
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-sky-700 hover:bg-sky-50 transition"
                   >
                     <img src="/lals_logo.png" alt="LALS" className="w-4 h-4 rounded-full object-contain" />
                     <span>Liga LALS & Tabela</span>
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/rozgrywki?tab=turnieje"
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-purple-700 hover:bg-purple-50 transition"
                   >
                     <Trophy className="w-4 h-4 text-purple-500" />
                     <span>Turnieje</span>
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
 
-            <a
+            <Link
               href="/fees"
               className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname === '/fees'
@@ -302,9 +302,9 @@ export default function Navbar() {
             >
               <CreditCard className="w-4 h-4 text-emerald-600" />
               Składki
-            </a>
+            </Link>
 
-            <a
+            <Link
               href="/team"
               className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname === '/team'
@@ -314,11 +314,11 @@ export default function Navbar() {
             >
               <Users className="w-4 h-4 text-slate-600" />
               Kadra
-            </a>
+            </Link>
 
             {/* Taktyka & Trening with dropdown */}
             <div className="relative group shrink-0">
-              <a
+              <Link
                 href="/taktyka"
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                   pathname.startsWith('/taktyka') || pathname.startsWith('/trening') || pathname.startsWith('/coach')
@@ -329,37 +329,37 @@ export default function Navbar() {
                 <Target className="w-4 h-4 text-sky-600" />
                 <span>Taktyka & Trening</span>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition" />
-              </a>
+              </Link>
 
               {/* Submenu Dropdown */}
               <div className="absolute left-0 top-full pt-1.5 hidden group-hover:block z-50">
                 <div className="w-64 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 space-y-0.5">
-                  <a
+                  <Link
                     href="/taktyka?tab=board"
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-sky-700 hover:bg-sky-50 transition"
                   >
                     <Compass className="w-4 h-4 text-sky-500" />
                     <span>Tablica Taktyczna (Boisko)</span>
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/taktyka?tab=matches"
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-amber-700 hover:bg-amber-50 transition"
                   >
                     <Trophy className="w-4 h-4 text-amber-500" />
                     <span>Rozpiski & Mecze LALS</span>
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/taktyka?tab=trainings"
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 transition"
                   >
                     <Volleyball className="w-4 h-4 text-emerald-500" />
                     <span>Konspekty Treningowe</span>
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
 
-            <a
+            <Link
               href="/galeria"
               className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname === '/galeria'
@@ -369,10 +369,10 @@ export default function Navbar() {
             >
               <Camera className="w-4 h-4 text-sky-600" />
               Galeria
-            </a>
+            </Link>
 
             {(user?.role === 'KIEROWNIK' || user?.role === 'TRENER' || user?.isCaptain || user?.permissions?.isAdmin) && (
-              <a
+              <Link
                 href="/admin"
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                   pathname === '/admin'
@@ -382,7 +382,7 @@ export default function Navbar() {
               >
                 <Shield className="w-4 h-4 text-amber-600" />
                 <span>Admin</span>
-              </a>
+              </Link>
             )}
           </nav>
 
@@ -392,7 +392,7 @@ export default function Navbar() {
 
             {/* Archive Mode Warning Badge (widoczny tylko gdy przeglądamy miniony sezon) */}
             {isArchiveMode && (
-              <a
+              <Link
                 href="/admin?tab=seasons"
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-amber-500/50 bg-amber-500/20 text-amber-300 text-xs font-black transition shadow-sm glow-gold shrink-0"
                 title={`Tryb archiwum: ${activeSeason?.name || ''}`}
@@ -401,7 +401,7 @@ export default function Navbar() {
                 <span className="text-[11px] font-mono whitespace-nowrap">
                   Archiwum: {activeSeason?.name || 'Sezon'}
                 </span>
-              </a>
+              </Link>
             )}
 
             {/* Notifications Bell */}
@@ -682,18 +682,18 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="flex items-center gap-1.5">
-                <a
+                <Link
                   href="/login"
                   className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-sm transition"
                 >
                   Logowanie
-                </a>
-                <a
+                </Link>
+                <Link
                   href="/register"
                   className="hidden xs:inline-flex px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-500 text-white shadow-sm transition"
                 >
                   Dołącz
-                </a>
+                </Link>
               </div>
             )}
 
@@ -760,116 +760,128 @@ export default function Navbar() {
             </div>
           )}
 
-          <a
+          <Link
             href="/"
+            onClick={() => setIsMobileMenuOpen(false)}
             className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
               pathname === '/' ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'text-slate-700 hover:bg-slate-100'
             }`}
           >
             <LayoutDashboard className="w-4 h-4 text-sky-600" />
             <span>Pulpit</span>
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/events"
+            onClick={() => setIsMobileMenuOpen(false)}
             className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
               pathname.startsWith('/events') ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'text-slate-700 hover:bg-slate-100'
             }`}
           >
             <Calendar className="w-4 h-4 text-amber-600" />
             <span>Terminarz & Frekwencja</span>
-          </a>
+          </Link>
 
           <div className="pt-1 pb-1 border-y border-slate-200 space-y-1">
             <span className="text-[10px] font-black uppercase text-slate-400 px-3 tracking-wider">Rozgrywki</span>
-            <a
+            <Link
               href="/rozgrywki?tab=sparingi"
+              onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-800 transition"
             >
               <Calendar className="w-4 h-4 text-amber-500" />
               <span>1. Sparingi</span>
-            </a>
-            <a
+            </Link>
+            <Link
               href="/rozgrywki?tab=liga"
+              onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-800 transition"
             >
               <img src="/lals_logo.png" alt="LALS" className="w-4 h-4 rounded-full object-contain" />
               <span>2. Liga LALS & Tabela</span>
-            </a>
-            <a
+            </Link>
+            <Link
               href="/rozgrywki?tab=turnieje"
+              onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-purple-50 hover:text-purple-800 transition"
             >
               <Trophy className="w-4 h-4 text-purple-500" />
               <span>3. Turnieje</span>
-            </a>
+            </Link>
           </div>
 
-          <a
+          <Link
             href="/fees"
+            onClick={() => setIsMobileMenuOpen(false)}
             className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
               pathname === '/fees' ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'text-slate-700 hover:bg-slate-100'
             }`}
           >
             <CreditCard className="w-4 h-4 text-emerald-600" />
             <span>Składki i Płatności (BLIK)</span>
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/team"
+            onClick={() => setIsMobileMenuOpen(false)}
             className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
               pathname === '/team' ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'text-slate-700 hover:bg-slate-100'
             }`}
           >
             <Users className="w-4 h-4 text-slate-600" />
             <span>Kadra Drużyny</span>
-          </a>
+          </Link>
 
           <div className="pt-2 pb-1 border-t border-slate-100 space-y-1">
             <div className="px-3 text-[10px] font-black uppercase tracking-wider text-slate-400">Taktyka & Trening</div>
-            <a
+            <Link
               href="/taktyka?tab=board"
+              onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition"
             >
               <Compass className="w-4 h-4 text-sky-600" />
               <span>Tablica Taktyczna (Boisko)</span>
-            </a>
-            <a
+            </Link>
+            <Link
               href="/taktyka?tab=matches"
+              onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-700 transition"
             >
               <Trophy className="w-4 h-4 text-amber-600" />
               <span>Rozpiski & Mecze LALS</span>
-            </a>
-            <a
+            </Link>
+            <Link
               href="/taktyka?tab=trainings"
+              onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition"
             >
               <Volleyball className="w-4 h-4 text-emerald-600" />
               <span>Konspekty Treningowe</span>
-            </a>
+            </Link>
           </div>
 
-          <a
+          <Link
             href="/galeria"
+            onClick={() => setIsMobileMenuOpen(false)}
             className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
               pathname === '/galeria' ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'text-slate-700 hover:bg-slate-100'
             }`}
           >
             <Camera className="w-4 h-4 text-sky-600" />
             <span>Galeria Zdjęć</span>
-          </a>
+          </Link>
 
           {(user?.role === 'KIEROWNIK' || user?.role === 'TRENER' || user?.permissions?.isAdmin) && (
-            <a
+            <Link
               href="/admin"
+              onClick={() => setIsMobileMenuOpen(false)}
               className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
                 pathname === '/admin' ? 'bg-amber-50 text-amber-800 border border-amber-300' : 'text-amber-700 hover:bg-amber-50'
               }`}
             >
               <Shield className="w-4 h-4 text-amber-600" />
               <span>Centrum Administracji</span>
-            </a>
+            </Link>
           )}
 
           {/* PWA Install Button in Mobile Menu */}

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import {
@@ -99,7 +100,7 @@ export default function BottomNav() {
 
             {/* Quick Grid Links */}
             <div className="grid grid-cols-2 gap-2.5 pt-1">
-              <a
+              <Link
                 href="/fees"
                 onClick={() => setShowMoreMenu(false)}
                 className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${
@@ -118,9 +119,9 @@ export default function BottomNav() {
                   <div className="text-xs font-black uppercase text-slate-900">Składki & BLIK</div>
                   <div className="text-[10px] text-slate-500">Skarbiec i opłaty</div>
                 </div>
-              </a>
+              </Link>
 
-              <a
+              <Link
                 href="/team"
                 onClick={() => setShowMoreMenu(false)}
                 className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${
@@ -139,9 +140,9 @@ export default function BottomNav() {
                   <div className="text-xs font-black uppercase text-slate-900">Kadra Drużyny</div>
                   <div className="text-[10px] text-slate-500">Skład, pozycje i radar</div>
                 </div>
-              </a>
+              </Link>
 
-              <a
+              <Link
                 href="/galeria"
                 onClick={() => setShowMoreMenu(false)}
                 className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${
@@ -160,10 +161,10 @@ export default function BottomNav() {
                   <div className="text-xs font-black uppercase text-slate-900">Galeria Zdjęć</div>
                   <div className="text-[10px] text-slate-500">Zdjęcia meczowe i pucharowe</div>
                 </div>
-              </a>
+              </Link>
 
               {(user?.role === 'KIEROWNIK' || user?.role === 'TRENER' || user?.permissions?.isAdmin) && (
-                <a
+                <Link
                   href="/admin"
                   onClick={() => setShowMoreMenu(false)}
                   className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${
@@ -182,11 +183,11 @@ export default function BottomNav() {
                     <div className="text-xs font-black uppercase text-slate-900">Admin Klubowy</div>
                     <div className="text-[10px] text-slate-500">Uprawnienia i finanse</div>
                   </div>
-                </a>
+                </Link>
               )}
 
               {user?.role === 'TRENER' && (
-                <a
+                <Link
                   href="/taktyka?tab=trainings"
                   onClick={() => setShowMoreMenu(false)}
                   className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${
@@ -205,7 +206,7 @@ export default function BottomNav() {
                     <div className="text-xs font-black uppercase text-slate-900">Warsztat Trenera</div>
                     <div className="text-[10px] text-slate-500">Taktyka i treningi</div>
                   </div>
-                </a>
+                </Link>
               )}
             </div>
 
@@ -270,7 +271,7 @@ export default function BottomNav() {
             }
 
             return (
-              <a
+              <Link
                 key={item.label}
                 href={item.href}
                 className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition group relative ${
@@ -290,7 +291,7 @@ export default function BottomNav() {
                 {active && (
                   <span className="w-1.5 h-1.5 rounded-full bg-sky-600 absolute bottom-0" />
                 )}
-              </a>
+              </Link>
             );
           })}
         </div>

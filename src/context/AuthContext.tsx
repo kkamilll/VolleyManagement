@@ -21,18 +21,59 @@ const AuthContext = createContext<AuthContextType>({
   refreshUser: async () => {},
 });
 
+const AUTH_CACHE_KEY = 'angels_auth_user_cache';
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem(AUTH_CACHE_KEY);
+        if (cached) {
+          return JSON.parse(cached);
+        }
+      } catch (e) {
+        console.error('Failed to parse cached user:', e);
+      }
+    }
+    return null;
+  });
+
+  const [loading, setLoading] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem(AUTH_CACHE_KEY);
+        if (cached) {
+          return false;
+        }
+      } catch (e) {}
+    }
+    return true;
+  });
 
   const refreshUser = async () => {
     try {
       const res = await fetch('/api/auth/me');
-      const data = await res.json();
-      setUser(data.user || null);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.user) {
+          setUser(data.user);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(AUTH_CACHE_KEY, JSON.stringify(data.user));
+          }
+        } else {
+          setUser(null);
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem(AUTH_CACHE_KEY);
+          }
+        }
+      } else {
+        setUser(null);
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(AUTH_CACHE_KEY);
+        }
+      }
     } catch (e) {
       console.error(e);
-      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -52,6 +93,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await res.json();
       if (res.ok && data.user) {
         setUser(data.user);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(AUTH_CACHE_KEY, JSON.stringify(data.user));
+        }
         return true;
       }
       return false;
@@ -70,6 +114,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await res.json();
       if (res.ok && data.user) {
         setUser(data.user);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(AUTH_CACHE_KEY, JSON.stringify(data.user));
+        }
         return true;
       }
       return false;
@@ -82,6 +129,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
       setUser(null);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(AUTH_CACHE_KEY);
+      }
       window.location.href = '/login';
     } catch (e) {
       console.error(e);
@@ -96,4 +146,3 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export const useAuth = () => useContext(AuthContext);
-
