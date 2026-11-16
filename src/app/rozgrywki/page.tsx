@@ -2071,12 +2071,41 @@ function RozgrywkiContent() {
           : (sm.awaySetsWon! > sm.homeSetsWon!);
       }
 
+      // Połącz z oficjalnym raportem VolleyStation z leagueReports
+      const matchedReport = (leagueReports || []).find(rep => {
+        if (rep.matchNumber && sm.matchNumber && String(rep.matchNumber) === String(sm.matchNumber)) return true;
+        if (rep.round && sm.round && String(rep.round) === String(sm.round) &&
+            (norm(rep.homeTeam?.teamName || '') === norm(sm.homeTeam) || norm(rep.awayTeam?.teamName || '') === norm(sm.awayTeam))) {
+          return true;
+        }
+        return false;
+      });
+
       // Połącz z ewentualnym szczegółowym raportem setów w matches
       const matchedLocal = matches.find(m =>
         m.matchType === 'Mecz ligowy' &&
         m.date.slice(0, 10) === (sm.date || '').slice(0, 10) &&
         (norm(m.opponent) === norm(sm.awayTeam) || norm(m.opponent) === norm(sm.homeTeam))
       );
+
+      const finalHomeSets = matchedReport?.homeSetsWon !== undefined ? matchedReport.homeSetsWon : sm.homeSetsWon;
+      const finalAwaySets = matchedReport?.awaySetsWon !== undefined ? matchedReport.awaySetsWon : sm.awaySetsWon;
+      const finalIsFinished = matchedReport ? true : isFinished;
+      let finalIsWin = isWin;
+      if (finalIsFinished && isAngels && finalHomeSets !== undefined && finalAwaySets !== undefined) {
+        finalIsWin = isHomeAngels ? (finalHomeSets > finalAwaySets) : (finalAwaySets > finalHomeSets);
+      }
+
+      const finalSets: VolleyballSet[] | undefined = matchedReport?.sets && matchedReport.sets.length > 0
+        ? matchedReport.sets.map(s => ({
+            setNumber: s.setNumber,
+            teamScore: isHomeAngels ? s.homeScore : s.awayScore,
+            opponentScore: isHomeAngels ? s.awayScore : s.homeScore,
+          }))
+        : matchedLocal?.sets;
+
+      const finalMvp = matchedReport?.mvp?.name || matchedLocal?.mvp;
+      const finalUrl = matchedReport?.volleyStationUrl || sm.url;
 
       items.push({
         id: `vs_${sm.matchNumber || sm.round}_${norm(sm.homeTeam)}_${norm(sm.awayTeam)}`,
@@ -2087,17 +2116,57 @@ function RozgrywkiContent() {
         date: sm.date || '2026-11-15T18:00:00',
         dateHeader: sm.dateStr || formatVolleyDate(sm.date || '2026-11-15T18:00:00'),
         timeStr: sm.timeStr || (sm.date && sm.date.includes('T') ? sm.date.slice(11, 16) : '18:00'),
-        isFinished,
-        homeSetsWon: sm.homeSetsWon,
-        awaySetsWon: sm.awaySetsWon,
+        isFinished: finalIsFinished,
+        homeSetsWon: finalHomeSets,
+        awaySetsWon: finalAwaySets,
         isAngels,
-        isWin,
-        url: sm.url,
-        sets: matchedLocal?.sets,
-        mvp: matchedLocal?.mvp,
+        isWin: finalIsWin,
+        url: finalUrl,
+        sets: finalSets,
+        mvp: finalMvp,
         notes: matchedLocal?.notes,
         phaseId: matchedLocal?.leaguePhaseId || 'faza_1'
       });
+    });
+
+    // 1b. Dodaj oficjalne protokoły VolleyStation (leagueReports), jeśli któregoś brakuje w leagueSchedule
+    (leagueReports || []).forEach(rep => {
+      const alreadyPresent = items.some(it =>
+        (rep.matchNumber && it.matchNumber && String(it.matchNumber) === String(rep.matchNumber)) ||
+        (rep.round && it.round && String(it.round) === String(rep.round) &&
+          (norm(it.awayTeam) === norm(rep.awayTeam?.teamName || '') || norm(it.homeTeam) === norm(rep.homeTeam?.teamName || '')))
+      );
+      if (!alreadyPresent && rep.homeTeam && rep.awayTeam) {
+        const isHomeAngels = norm(rep.homeTeam.teamName).includes('angel');
+        const isAwayAngels = norm(rep.awayTeam.teamName).includes('angel');
+        const isAngels = isHomeAngels || isAwayAngels;
+        const hasSets = rep.homeSetsWon !== undefined && rep.awaySetsWon !== undefined;
+        const isWin = isAngels && hasSets ? (isHomeAngels ? (rep.homeSetsWon! > rep.awaySetsWon!) : (rep.awaySetsWon! > rep.homeSetsWon!)) : undefined;
+
+        items.push({
+          id: `rep_${rep.id}`,
+          round: rep.round,
+          matchNumber: rep.matchNumber,
+          homeTeam: cleanTeamName(rep.homeTeam.teamName),
+          awayTeam: cleanTeamName(rep.awayTeam.teamName),
+          date: rep.date,
+          dateHeader: formatVolleyDate(rep.date),
+          timeStr: rep.date && rep.date.includes('T') ? rep.date.slice(11, 16) : '18:00',
+          isFinished: true,
+          homeSetsWon: rep.homeSetsWon,
+          awaySetsWon: rep.awaySetsWon,
+          isAngels,
+          isWin,
+          sets: rep.sets?.map(s => ({
+            setNumber: s.setNumber,
+            teamScore: isHomeAngels ? s.homeScore : s.awayScore,
+            opponentScore: isHomeAngels ? s.awayScore : s.homeScore,
+          })),
+          mvp: rep.mvp?.name,
+          url: rep.volleyStationUrl,
+          phaseId: 'faza_1'
+        });
+      }
     });
 
     // 2. Dodaj mecze z matches (jeśli jakiegoś brakuje w leagueSchedule)
@@ -2175,7 +2244,7 @@ function RozgrywkiContent() {
     });
 
     return items;
-  }, [leagueSchedule, matches, events]);
+  }, [leagueSchedule, matches, events, leagueReports]);
 
   const filteredUnifiedSchedule = useMemo(() => {
     return unifiedLeagueSchedule.filter(item => {
@@ -2497,6 +2566,251 @@ function RozgrywkiContent() {
               </button>
             </div>
           </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderMatchReportsSection = () => {
+    return (
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+          <div>
+            <h4 className="text-base font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+              <FileText className="w-4 h-4 text-sky-600" />
+              <span>Protokoły Meczowe VolleyStation ({leagueReports.length})</span>
+            </h4>
+            <p className="text-xs text-slate-500">
+              Oficjalne raporty meczowe ligi LALS, wyniki poszczególnych setów, czas gry i statystyki punktowe.
+            </p>
+          </div>
+          {canManageMatches && (
+            <button
+              type="button"
+              onClick={() => setShowVolleyStationImportModal(true)}
+              className="px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm w-fit"
+            >
+              <Upload className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>+ Import Protokołu</span>
+            </button>
+          )}
+        </div>
+
+        {leagueReports.length === 0 ? (
+          <div className="p-8 text-center bg-white border border-slate-200 rounded-3xl space-y-2 shadow-sm">
+            <Volleyball className="w-10 h-10 text-slate-300 mx-auto" />
+            <h5 className="text-sm font-bold text-slate-800">Brak zapisanych protokołów meczowych</h5>
+            <p className="text-xs text-slate-500 max-w-md mx-auto">
+              Użyj przycisku &quot;Import Terminarza&quot; lub &quot;Dodaj Wynik&quot; powyżej, aby dodać rezultaty spotkań.
+            </p>
+          </div>
+        ) : (
+          leagueReports.map(rep => {
+            const isExpanded = Boolean(expandedReports[rep.id]);
+            const isOurTeamHome = rep.homeTeam?.teamName?.toLowerCase().includes('angel');
+            const isOurTeamAway = rep.awayTeam?.teamName?.toLowerCase().includes('angel');
+            const ourSets = isOurTeamHome ? rep.homeSetsWon : (isOurTeamAway ? rep.awaySetsWon : undefined);
+            const oppSets = isOurTeamHome ? rep.awaySetsWon : (isOurTeamAway ? rep.homeSetsWon : undefined);
+            const isWin = ourSets !== undefined && oppSets !== undefined && ourSets > oppSets;
+
+            return (
+              <div
+                key={rep.id}
+                className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden transition"
+              >
+                {/* Header Row */}
+                <div
+                  onClick={() => toggleReport(rep.id)}
+                  className="p-4 sm:p-5 cursor-pointer hover:bg-slate-50 transition flex flex-col md:flex-row md:items-center justify-between gap-3 select-none"
+                >
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="w-10 h-10 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center shrink-0">
+                      <Volleyball className="w-5 h-5 text-sky-600" />
+                    </div>
+
+                    <div className="min-w-0 space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {(rep.round || rep.matchNumber) && (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-sky-800 border border-slate-200">
+                            {rep.round ? `Runda ${rep.round}` : ''} {rep.matchNumber ? `Nr ${rep.matchNumber}` : ''}
+                          </span>
+                        )}
+                        <span className="text-[11px] font-mono text-slate-500">
+                          {new Date(rep.date).toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                        </span>
+                        {ourSets !== undefined && oppSets !== undefined && (
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                            isWin
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                              : 'bg-rose-50 text-rose-800 border-rose-300'
+                          }`}>
+                            {isWin ? '✓ Wygrana' : '✗ Przegrana'}
+                          </span>
+                        )}
+                      </div>
+
+                      <h4 className="text-base font-black text-slate-900 truncate">
+                        {rep.matchTitle}
+                      </h4>
+                    </div>
+                  </div>
+
+                  {/* Sets, Meta Badges & Actions */}
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    {/* Sets score breakdown */}
+                    {rep.sets && rep.sets.length > 0 && (
+                      <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-slate-700 bg-slate-50 px-2.5 py-1 rounded-xl border border-slate-200">
+                        {rep.sets.map((s, idx) => (
+                          <span key={s.setNumber}>
+                            {idx > 0 && <span className="text-slate-400">, </span>}
+                            <span className={s.homeScore > s.awayScore ? 'text-sky-700 font-black' : 'text-slate-600'}>{s.homeScore}</span>
+                            :<span className={s.awayScore > s.homeScore ? 'text-sky-700 font-black' : 'text-slate-600'}>{s.awayScore}</span>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {rep.duration && (
+                      <span className="px-2 py-1 rounded-xl bg-slate-50 text-[10px] font-bold text-slate-600 border border-slate-200 flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-sky-600" />
+                        <span>{rep.duration}</span>
+                      </span>
+                    )}
+
+                    {rep.mvp && (
+                      <span className="px-2 py-1 rounded-xl bg-amber-50 text-[10px] font-bold text-amber-900 border border-amber-300 flex items-center gap-1">
+                        <Crown className="w-3 h-3 text-amber-600" />
+                        <span>MVP: {rep.mvp.name}</span>
+                      </span>
+                    )}
+
+                    {rep.volleyStationUrl && (
+                      <a
+                        href={rep.volleyStationUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        className="p-1.5 rounded-xl bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition"
+                        title="Otwórz oficjalny protokół w VolleyStation"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+
+                    {canManageMatches && (
+                      <button
+                        type="button"
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleDeleteReport(rep.id);
+                        }}
+                        className="p-1.5 rounded-xl bg-white hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 transition"
+                        title="Usuń ten raport"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+
+                    <div className="p-1 text-slate-500">
+                      <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Collapsible Detailed Stats Tables */}
+                {isExpanded && (
+                  <div className="p-4 sm:p-6 bg-slate-50 border-t border-slate-200 space-y-6 animate-fadeIn">
+                    {/* Meta Bar: Sędzia, Widzowie, Czas */}
+                    <div className="flex flex-wrap items-center justify-between text-xs text-slate-500 pb-3 border-b border-slate-200 gap-2">
+                      <div className="flex items-center gap-3">
+                        {rep.referee && <span>👔 <strong>Pierwszy sędzia:</strong> {rep.referee}</span>}
+                        {rep.spectators !== undefined && <span>👥 <strong>Widzów:</strong> {rep.spectators}</span>}
+                      </div>
+                      {rep.mvp && (
+                        <span className="text-amber-800 font-bold flex items-center gap-1">
+                          <Crown className="w-3.5 h-3.5 text-amber-500" />
+                          MVP Meczu: {rep.mvp.number ? `#${rep.mvp.number} ` : ''}{rep.mvp.name} ({rep.mvp.teamName || 'MVP'})
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Tables Grid: Home Team and Away Team */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {[rep.homeTeam, rep.awayTeam].map((team, tIdx) => {
+                        if (!team) return null;
+                        const isAngels = team.teamName?.toLowerCase().includes('angel');
+                        return (
+                          <div
+                            key={team.teamName || tIdx}
+                            className={`rounded-2xl border p-4 space-y-3 ${
+                              isAngels
+                                ? 'bg-sky-50 border-sky-300 shadow-sm'
+                                : 'bg-white border-slate-200 shadow-2xs'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+                              <h5 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                                {isAngels && <span className="w-2 h-2 rounded-full bg-sky-600" />}
+                                {team.teamName}
+                              </h5>
+                              <span className="text-xs font-mono font-black text-amber-800">
+                                {team.totals?.points || 0} pkt
+                              </span>
+                            </div>
+
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-xs text-left">
+                                <thead className="bg-slate-50 text-slate-500 uppercase font-black text-[9px] tracking-wider">
+                                  <tr>
+                                    <th className="p-1.5 w-7 text-center">#</th>
+                                    <th className="p-1.5">Zawodnik</th>
+                                    <th className="p-1.5 text-center font-black text-amber-700">ABS</th>
+                                    <th className="p-1.5 text-center">Ata</th>
+                                    <th className="p-1.5 text-center">Blk</th>
+                                    <th className="p-1.5 text-center">Ser</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 font-mono">
+                                  {(team.players || []).map(p => (
+                                    <tr key={p.name} className="hover:bg-slate-50 transition">
+                                      <td className="p-1.5 text-center text-sky-600 font-bold">{p.number}</td>
+                                      <td className="p-1.5 font-sans font-bold text-slate-900 truncate max-w-[140px]">
+                                        {p.name}
+                                        {rep.mvp?.name && rep.mvp.name.toLowerCase() === p.name.toLowerCase() && (
+                                          <span className="ml-1 text-[9px] text-amber-600 font-black">⭐ MVP</span>
+                                        )}
+                                      </td>
+                                      <td className="p-1.5 text-center font-black text-amber-800">{p.points}</td>
+                                      <td className="p-1.5 text-center text-slate-600">{p.attack}</td>
+                                      <td className="p-1.5 text-center text-slate-600">{p.block}</td>
+                                      <td className="p-1.5 text-center text-slate-600">{p.serve}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                                {team.totals && (
+                                  <tfoot className="bg-slate-50 font-mono font-black text-slate-900 border-t border-slate-300">
+                                    <tr>
+                                      <td colSpan={2} className="p-2 font-sans font-black uppercase text-[10px] text-slate-500">
+                                        Razem
+                                      </td>
+                                      <td className="p-2 text-center text-amber-800 font-black">{team.totals.points}</td>
+                                      <td className="p-2 text-center">{team.totals.attack}</td>
+                                      <td className="p-2 text-center">{team.totals.block}</td>
+                                      <td className="p-2 text-center">{team.totals.serve}</td>
+                                    </tr>
+                                  </tfoot>
+                                )}
+                              </table>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })
         )}
       </div>
     );
@@ -3795,6 +4109,11 @@ function RozgrywkiContent() {
                 </div>
               </div>
 
+              {/* Oficjalne Protokoły Meczowe VolleyStation (Wyniki, Sety & MVP) */}
+              {leagueScheduleStatus !== 'UPCOMING' && leagueReports.length > 0 && (
+                renderMatchReportsSection()
+              )}
+
               {/* Grouped Matches by Date (VolleyStation Format) */}
               {groupedScheduleByDate.length === 0 ? (
                 <div className="bg-white border border-slate-200 rounded-3xl p-10 text-center text-slate-500 shadow-sm space-y-2">
@@ -4398,249 +4717,6 @@ function RozgrywkiContent() {
                   </div>
                 </div>
               )}
-
-              {/* Match Reports List (Protokoły Meczowe) */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between px-1">
-                  <h4 className="text-base font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-sky-600" />
-                    <span>Protokoły Meczowe VolleyStation ({leagueReports.length})</span>
-                  </h4>
-                </div>
-
-                {leagueReports.length === 0 ? (
-                  <div className="p-12 text-center bg-white border border-slate-200 rounded-3xl space-y-3 shadow-sm">
-                    <BarChart3 className="w-12 h-12 text-slate-400 mx-auto" />
-                    <h5 className="text-base font-bold text-slate-900">Brak zapisanych protokołów</h5>
-                    <p className="text-xs text-slate-500 max-w-md mx-auto">
-                      Użyj przycisku &quot;Importuj z VolleyStation&quot; powyżej, aby wkleić statystyki lub terminarz skopiowany bezpośrednio ze strony ligi.
-                    </p>
-                    {canManageMatches && (
-                      <button
-                        type="button"
-                        onClick={() => setShowVolleyStationImportModal(true)}
-                        className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold transition shadow-sm"
-                      >
-                        Wklej dane z VolleyStation
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  leagueReports.map(rep => {
-                    const isExpanded = Boolean(expandedReports[rep.id]);
-                    const isOurTeamHome = rep.homeTeam?.teamName?.toLowerCase().includes('angel');
-                    const isOurTeamAway = rep.awayTeam?.teamName?.toLowerCase().includes('angel');
-                    const ourSets = isOurTeamHome ? rep.homeSetsWon : (isOurTeamAway ? rep.awaySetsWon : undefined);
-                    const oppSets = isOurTeamHome ? rep.awaySetsWon : (isOurTeamAway ? rep.homeSetsWon : undefined);
-                    const isWin = ourSets !== undefined && oppSets !== undefined && ourSets > oppSets;
-
-                    return (
-                      <div
-                        key={rep.id}
-                        className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden transition"
-                      >
-                        {/* Header Row */}
-                        <div
-                          onClick={() => toggleReport(rep.id)}
-                          className="p-4 sm:p-5 cursor-pointer hover:bg-slate-50 transition flex flex-col md:flex-row md:items-center justify-between gap-3 select-none"
-                        >
-                          <div className="flex items-center gap-3.5 min-w-0">
-                            <div className="w-10 h-10 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center shrink-0">
-                              <Volleyball className="w-5 h-5 text-sky-600" />
-                            </div>
-
-                            <div className="min-w-0 space-y-1">
-                              <div className="flex flex-wrap items-center gap-2">
-                                {(rep.round || rep.matchNumber) && (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-sky-800 border border-slate-200">
-                                    {rep.round ? `Runda ${rep.round}` : ''} {rep.matchNumber ? `Nr ${rep.matchNumber}` : ''}
-                                  </span>
-                                )}
-                                <span className="text-[11px] font-mono text-slate-500">
-                                  {new Date(rep.date).toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
-                                </span>
-                                {ourSets !== undefined && oppSets !== undefined && (
-                                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
-                                    isWin
-                                      ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                                      : 'bg-rose-50 text-rose-800 border-rose-300'
-                                  }`}>
-                                    {isWin ? '✓ Wygrana' : '✗ Przegrana'}
-                                  </span>
-                                )}
-                              </div>
-
-                              <h4 className="text-base font-black text-slate-900 truncate">
-                                {rep.matchTitle}
-                              </h4>
-                            </div>
-                          </div>
-
-                          {/* Sets, Meta Badges & Actions */}
-                          <div className="flex flex-wrap items-center gap-2.5">
-                            {/* Sets score breakdown */}
-                            {rep.sets && rep.sets.length > 0 && (
-                              <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-slate-700 bg-slate-50 px-2.5 py-1 rounded-xl border border-slate-200">
-                                {rep.sets.map((s, idx) => (
-                                  <span key={s.setNumber}>
-                                    {idx > 0 && <span className="text-slate-400">, </span>}
-                                    <span className={s.homeScore > s.awayScore ? 'text-sky-700 font-black' : 'text-slate-600'}>{s.homeScore}</span>
-                                    :<span className={s.awayScore > s.homeScore ? 'text-sky-700 font-black' : 'text-slate-600'}>{s.awayScore}</span>
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-
-                            {rep.duration && (
-                              <span className="px-2 py-1 rounded-xl bg-slate-50 text-[10px] font-bold text-slate-600 border border-slate-200 flex items-center gap-1">
-                                <Clock className="w-3 h-3 text-sky-600" />
-                                <span>{rep.duration}</span>
-                              </span>
-                            )}
-
-                            {rep.mvp && (
-                              <span className="px-2 py-1 rounded-xl bg-amber-50 text-[10px] font-bold text-amber-900 border border-amber-300 flex items-center gap-1">
-                                <Crown className="w-3 h-3 text-amber-600" />
-                                <span>MVP: {rep.mvp.name}</span>
-                              </span>
-                            )}
-
-                            {rep.volleyStationUrl && (
-                              <a
-                                href={rep.volleyStationUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                onClick={e => e.stopPropagation()}
-                                className="p-1.5 rounded-xl bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition"
-                                title="Otwórz oficjalny protokół w VolleyStation"
-                              >
-                                <ExternalLink className="w-3.5 h-3.5" />
-                              </a>
-                            )}
-
-                            {canManageMatches && (
-                              <button
-                                type="button"
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  handleDeleteReport(rep.id);
-                                }}
-                                className="p-1.5 rounded-xl bg-white hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 transition"
-                                title="Usuń ten raport"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            )}
-
-                            <div className="p-1 text-slate-500">
-                              <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Collapsible Detailed Stats Tables */}
-                        {isExpanded && (
-                          <div className="p-4 sm:p-6 bg-slate-50 border-t border-slate-200 space-y-6 animate-fadeIn">
-                            {/* Meta Bar: Sędzia, Widzowie, Czas */}
-                            <div className="flex flex-wrap items-center justify-between text-xs text-slate-500 pb-3 border-b border-slate-200 gap-2">
-                              <div className="flex items-center gap-3">
-                                {rep.referee && <span>👔 <strong>Pierwszy sędzia:</strong> {rep.referee}</span>}
-                                {rep.spectators !== undefined && <span>👥 <strong>Widzów:</strong> {rep.spectators}</span>}
-                              </div>
-                              {rep.mvp && (
-                                <span className="text-amber-400 font-bold flex items-center gap-1">
-                                  <Crown className="w-3.5 h-3.5" />
-                                  MVP Meczu: {rep.mvp.number ? `#${rep.mvp.number} ` : ''}{rep.mvp.name} ({rep.mvp.teamName || 'MVP'})
-                                </span>
-                              )}
-                            </div>
-
-                            {/* Tables Grid: Home Team and Away Team */}
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                              {[rep.homeTeam, rep.awayTeam].map((team, tIdx) => {
-                                if (!team) return null;
-                                const isAngels = team.teamName?.toLowerCase().includes('angel');
-                                return (
-                                  <div
-                                    key={team.teamName || tIdx}
-                                    className={`rounded-2xl border p-4 space-y-3 ${
-                                      isAngels
-                                        ? 'bg-sky-50 border-sky-300 shadow-sm'
-                                        : 'bg-white border-slate-200 shadow-xs'
-                                    }`}
-                                  >
-                                    <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-                                      <h5 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                                        {isAngels && <span className="w-2 h-2 rounded-full bg-sky-600" />}
-                                        {team.teamName}
-                                      </h5>
-                                      <span className="text-xs font-mono font-black text-amber-800">
-                                        {team.totals?.points || 0} pkt
-                                      </span>
-                                    </div>
-
-                                    <div className="overflow-x-auto">
-                                      <table className="w-full text-xs text-left">
-                                        <thead className="bg-slate-50 text-slate-500 uppercase font-black text-[9px] tracking-wider">
-                                          <tr>
-                                            <th className="p-1.5 w-7 text-center">#</th>
-                                            <th className="p-1.5">Zawodnik</th>
-                                            <th className="p-1.5 text-center font-black text-amber-700">ABS</th>
-                                            <th className="p-1.5 text-center">Ata</th>
-                                            <th className="p-1.5 text-center">Blk</th>
-                                            <th className="p-1.5 text-center">Ser</th>
-                                          </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-slate-800/40 font-mono">
-                                          {(team.players || []).map(p => (
-                                            <tr key={p.name} className="hover:bg-slate-50 transition">
-                                              <td className="p-1.5 text-center text-sky-400 font-bold">{p.number}</td>
-                                              <td className="p-1.5 font-sans font-bold text-slate-900 truncate max-w-[140px]">
-                                                {p.name}
-                                                {rep.mvp?.name && rep.mvp.name.toLowerCase() === p.name.toLowerCase() && (
-                                                  <span className="ml-1 text-[9px] text-amber-400 font-black">⭐ MVP</span>
-                                                )}
-                                              </td>
-                                              <td className="p-1.5 text-center font-black text-amber-400">{p.points}</td>
-                                              <td className="p-1.5 text-center text-slate-600">{p.attack}</td>
-                                              <td className="p-1.5 text-center text-slate-600">{p.block}</td>
-                                              <td className="p-1.5 text-center text-slate-600">{p.serve}</td>
-                                            </tr>
-                                          ))}
-                                        </tbody>
-                                        {team.totals && (
-                                          <tfoot className="bg-slate-50 font-mono font-black text-slate-900 border-t border-slate-300">
-                                            <tr>
-                                              <td colSpan={2} className="p-2 font-sans font-black uppercase text-[10px] text-slate-500">
-                                                Razem
-                                              </td>
-                                              <td className="p-2 text-center text-amber-400 font-black">{team.totals.points}</td>
-                                              <td className="p-2 text-center">{team.totals.attack}</td>
-                                              <td className="p-2 text-center">{team.totals.block}</td>
-                                              <td className="p-2 text-center">{team.totals.serve}</td>
-                                            </tr>
-                                            {team.totals.opponentErrors !== undefined && (
-                                              <tr>
-                                                <td colSpan={6} className="p-1.5 text-[10px] text-slate-500 font-sans text-right">
-                                                  Błędy przeciwnika: <strong className="text-slate-600">{team.totals.opponentErrors}</strong>
-                                                </td>
-                                              </tr>
-                                            )}
-                                          </tfoot>
-                                        )}
-                                      </table>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })
-                )}
-              </div>
             </div>
           )}
 
