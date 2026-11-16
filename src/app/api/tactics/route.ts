@@ -176,11 +176,34 @@ export async function POST(req: NextRequest) {
 
       // Resolve opponent if matchId or eventId provided
       let resolvedOpponent = targetOpponent || existing.targetOpponent;
-      if (matchId) {
-        const m = (db.matches || []).find((match: any) => match.id === matchId);
+      let resolvedMatchId = matchId !== undefined ? (matchId || undefined) : existing.matchId;
+      let resolvedEventId = eventId !== undefined ? (eventId || undefined) : existing.eventId;
+
+      if (resolvedEventId && !resolvedMatchId) {
+        const ev = (db.events || []).find((e: any) => e.id === resolvedEventId);
+        if (ev) {
+          const m = (db.matches || []).find((match: any) =>
+            match.id === resolvedEventId.replace('evt_', 'mat_') ||
+            (ev.opponent && match.opponent && match.opponent.toLowerCase() === ev.opponent.toLowerCase())
+          );
+          if (m) resolvedMatchId = m.id;
+        }
+      } else if (resolvedMatchId && !resolvedEventId) {
+        const m = (db.matches || []).find((match: any) => match.id === resolvedMatchId);
+        if (m) {
+          const ev = (db.events || []).find((e: any) =>
+            e.id === resolvedMatchId.replace('mat_', 'evt_') ||
+            (m.opponent && e.opponent && e.opponent.toLowerCase() === m.opponent.toLowerCase())
+          );
+          if (ev) resolvedEventId = ev.id;
+        }
+      }
+
+      if (resolvedMatchId) {
+        const m = (db.matches || []).find((match: any) => match.id === resolvedMatchId);
         if (m) resolvedOpponent = m.opponent;
-      } else if (eventId) {
-        const ev = (db.events || []).find((e: any) => e.id === eventId);
+      } else if (resolvedEventId) {
+        const ev = (db.events || []).find((e: any) => e.id === resolvedEventId);
         if (ev && ev.opponent) resolvedOpponent = ev.opponent;
       }
 
@@ -191,8 +214,8 @@ export async function POST(req: NextRequest) {
         rotation: rotation || existing.rotation,
         scope: scope || existing.scope,
         targetOpponent: resolvedOpponent,
-        matchId: matchId !== undefined ? (matchId || undefined) : existing.matchId,
-        eventId: eventId !== undefined ? (eventId || undefined) : existing.eventId,
+        matchId: resolvedMatchId,
+        eventId: resolvedEventId,
         description: description !== undefined ? description.trim() : existing.description,
         courtPositions: courtPositions || existing.courtPositions,
         directives: Array.isArray(directives) ? directives.filter(Boolean) : existing.directives,
@@ -221,14 +244,38 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Podaj tytuł taktyki' }, { status: 400 });
       }
 
+      let resolvedMatchId = matchId || undefined;
+      let resolvedEventId = eventId || undefined;
+
+      if (resolvedEventId && !resolvedMatchId) {
+        const ev = (db.events || []).find((e: any) => e.id === resolvedEventId);
+        if (ev) {
+          const m = (db.matches || []).find((match: any) =>
+            match.id === resolvedEventId.replace('evt_', 'mat_') ||
+            (ev.opponent && match.opponent && match.opponent.toLowerCase() === ev.opponent.toLowerCase())
+          );
+          if (m) resolvedMatchId = m.id;
+        }
+      } else if (resolvedMatchId && !resolvedEventId) {
+        const m = (db.matches || []).find((match: any) => match.id === resolvedMatchId);
+        if (m) {
+          const ev = (db.events || []).find((e: any) =>
+            e.id === resolvedMatchId.replace('mat_', 'evt_') ||
+            (m.opponent && e.opponent && e.opponent.toLowerCase() === m.opponent.toLowerCase())
+          );
+          if (ev) resolvedEventId = ev.id;
+        }
+      }
+
       let detectedScope: TacticScope = 'OGOLNA';
-      if (matchId) {
+      if (resolvedMatchId) {
         detectedScope = 'MECZ_LIGOWY';
-      } else if (eventId) {
-        const ev = (db.events || []).find((e: any) => e.id === eventId);
+      } else if (resolvedEventId) {
+        const ev = (db.events || []).find((e: any) => e.id === resolvedEventId);
         if (ev) {
           if (ev.type === 'TRENING') detectedScope = 'TRENING';
           else if (ev.type === 'TURNIEJ') detectedScope = 'TURNIEJ';
+          else if (ev.type === 'MECZ') detectedScope = 'MECZ_LIGOWY';
           else detectedScope = 'SPARING';
         } else {
           detectedScope = 'SPARING';
@@ -237,11 +284,11 @@ export async function POST(req: NextRequest) {
       const validScope: TacticScope = scope || detectedScope;
 
       let resolvedOpponent = targetOpponent ? targetOpponent.trim() : undefined;
-      if (!resolvedOpponent && matchId) {
-        const m = (db.matches || []).find((match: any) => match.id === matchId);
+      if (!resolvedOpponent && resolvedMatchId) {
+        const m = (db.matches || []).find((match: any) => match.id === resolvedMatchId);
         if (m) resolvedOpponent = m.opponent;
-      } else if (!resolvedOpponent && eventId) {
-        const ev = (db.events || []).find((e: any) => e.id === eventId);
+      } else if (!resolvedOpponent && resolvedEventId) {
+        const ev = (db.events || []).find((e: any) => e.id === resolvedEventId);
         if (ev && ev.opponent) resolvedOpponent = ev.opponent;
       }
 
@@ -252,8 +299,8 @@ export async function POST(req: NextRequest) {
         rotation: rotation || 'P1',
         scope: validScope,
         targetOpponent: resolvedOpponent,
-        matchId: matchId || undefined,
-        eventId: eventId || undefined,
+        matchId: resolvedMatchId,
+        eventId: resolvedEventId,
         description: description ? description.trim() : '',
         courtPositions: courtPositions || [],
         directives: Array.isArray(directives) ? directives.filter(Boolean) : [],
@@ -308,17 +355,49 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Podaj tytuł materiału oraz wgraj plik (PDF lub grafikę)' }, { status: 400 });
       }
 
+      let resolvedMatchId = matchId || undefined;
+      let resolvedEventId = eventId || undefined;
+
+      if (resolvedEventId && !resolvedMatchId) {
+        const ev = (db.events || []).find((e: any) => e.id === resolvedEventId);
+        if (ev) {
+          const m = (db.matches || []).find((match: any) =>
+            match.id === resolvedEventId.replace('evt_', 'mat_') ||
+            (ev.opponent && match.opponent && match.opponent.toLowerCase() === ev.opponent.toLowerCase())
+          );
+          if (m) resolvedMatchId = m.id;
+        }
+      } else if (resolvedMatchId && !resolvedEventId) {
+        const m = (db.matches || []).find((match: any) => match.id === resolvedMatchId);
+        if (m) {
+          const ev = (db.events || []).find((e: any) =>
+            e.id === resolvedMatchId.replace('mat_', 'evt_') ||
+            (m.opponent && e.opponent && e.opponent.toLowerCase() === m.opponent.toLowerCase())
+          );
+          if (ev) resolvedEventId = ev.id;
+        }
+      }
+
+      let resolvedOpponent = opponentName ? opponentName.trim() : undefined;
+      if (!resolvedOpponent && resolvedMatchId) {
+        const m = (db.matches || []).find((match: any) => match.id === resolvedMatchId);
+        if (m) resolvedOpponent = m.opponent;
+      } else if (!resolvedOpponent && resolvedEventId) {
+        const ev = (db.events || []).find((e: any) => e.id === resolvedEventId);
+        if (ev && ev.opponent) resolvedOpponent = ev.opponent;
+      }
+
       const newMaterial: TacticalMaterial = {
         id: `mat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
         title: title.trim(),
-        type: type === 'PDF' ? 'PDF' : 'IMAGE',
+        type: type === 'PDF' ? 'PDF' : type === 'VIDEO' ? 'VIDEO' : 'IMAGE',
         fileUrl,
         fileName: fileName ? fileName.trim() : undefined,
         fileSize: fileSize ? fileSize.trim() : undefined,
         scope: scope || 'OGOLNE',
-        eventId: eventId || undefined,
-        matchId: matchId || undefined,
-        opponentName: opponentName ? opponentName.trim() : undefined,
+        eventId: resolvedEventId,
+        matchId: resolvedMatchId,
+        opponentName: resolvedOpponent,
         description: description ? description.trim() : undefined,
         uploadedById: user.id,
         uploadedByName: user.name,

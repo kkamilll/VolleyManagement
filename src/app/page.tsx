@@ -121,6 +121,12 @@ function DashboardContent() {
   );
   const officialNextMatch = angelsScheduleMatches.find((m: any) => !m.isFinished);
 
+  // Zespoły najbliższego meczu
+  const homeTeamName = officialNextMatch?.homeTeam || (nextEvent?.title?.includes('vs') ? nextEvent.title.split('vs')[0].replace(/^.*:\s*/, '').trim() : 'Angels ZTP');
+  const awayTeamName = officialNextMatch?.awayTeam || nextEvent?.opponent || (nextEvent?.title?.includes('vs') ? nextEvent.title.split('vs')[1].trim() : 'Rywal');
+  const isAngelsHome = homeTeamName.includes('Angels');
+  const isAngelsAway = awayTeamName.includes('Angels');
+
   // Status obecności użytkownika na najbliższym wydarzeniu
   const myStatusRecord = nextEvent?.attendees?.find(a => a.userId === user?.id);
   const attendingAttendees = nextEvent?.attendees?.filter(a => a.status === 'BEDE') || [];
@@ -135,7 +141,7 @@ function DashboardContent() {
   const urgentAnnouncement = announcements.find(a => a.isPinned || a.priority === 'PILNY' || a.priority === 'WAZNY');
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7 space-y-6">
+    <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-28 sm:pb-12 space-y-5 sm:space-y-6">
       
       {/* 1. NAGŁÓWEK: TYLKO NAJBLIŻSZE SPRAWY */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
@@ -171,7 +177,7 @@ function DashboardContent() {
           <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-amber-100/40 rounded-full blur-3xl pointer-events-none" />
 
           {/* GÓRNY PASEK: KATEGORIA, RUNDA, DATA I GODZINA */}
-          <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 px-6 pt-5 pb-4 border-b border-slate-100 bg-slate-50/70">
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-2.5 px-4 sm:px-6 pt-4 pb-3.5 border-b border-slate-100 bg-slate-50/70">
             <div className="flex flex-wrap items-center gap-2">
               <span className="px-3 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider bg-amber-400 text-slate-950 flex items-center gap-1.5 shadow-xs font-sans">
                 <Flame className="w-3.5 h-3.5 fill-slate-950" />
@@ -193,26 +199,33 @@ function DashboardContent() {
           </div>
 
           {/* GŁÓWNY POJEDYNEK DRUŻYN (SCOREBOARD DUEL) */}
-          <div className="relative z-10 px-6 sm:px-8 py-6">
+          <div className="relative z-10 px-4 sm:px-8 py-5 sm:py-6">
             <div className="grid grid-cols-1 md:grid-cols-7 items-center gap-6">
               
-              {/* GOSPODARZ (ANGELS ZTP) */}
+              {/* GOSPODARZ */}
               <div className="md:col-span-3 flex items-center gap-4 sm:gap-5">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-700 p-1 shadow-lg shadow-sky-500/20 shrink-0 flex items-center justify-center">
-                  <div className="w-full h-full rounded-xl bg-white flex items-center justify-center text-sky-600">
-                    <Volleyball className="w-8 h-8 sm:w-10 sm:h-10 text-sky-600 drop-shadow-xs" />
+                <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl p-1 shadow-lg shrink-0 flex items-center justify-center ${
+                  isAngelsHome 
+                    ? 'bg-gradient-to-br from-sky-500 to-blue-700 shadow-sky-500/20' 
+                    : 'bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/20'
+                }`}>
+                  <div className="w-full h-full rounded-xl bg-white flex items-center justify-center">
+                    {isAngelsHome ? (
+                      <Volleyball className="w-8 h-8 sm:w-10 sm:h-10 text-sky-600 drop-shadow-xs" />
+                    ) : (
+                      <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-amber-600 drop-shadow-xs" />
+                    )}
                   </div>
                 </div>
                 <div className="space-y-1 min-w-0">
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-sky-100 text-sky-800 border border-sky-200 font-mono">
-                    Gospodarz • 2. Miejsce
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider font-mono ${
+                    isAngelsHome ? 'bg-sky-100 text-sky-800 border border-sky-200' : 'bg-slate-100 text-slate-700 border border-slate-200'
+                  }`}>
+                    {isAngelsHome ? 'Gospodarz • Angels ZTP' : 'Gospodarz'}
                   </span>
                   <h2 className="text-xl sm:text-2xl font-black tracking-tight uppercase font-athletic text-slate-900 truncate">
-                    {officialNextMatch?.homeTeam || 'Angels ZTP'}
+                    {homeTeamName}
                   </h2>
-                  <p className="text-xs text-slate-500 font-medium">
-                    Luboń, Poznań
-                  </p>
                 </div>
               </div>
 
@@ -227,23 +240,30 @@ function DashboardContent() {
                 </div>
               </div>
 
-              {/* GOŚĆ (RYWAL) */}
+              {/* GOŚĆ */}
               <div className="md:col-span-3 flex items-center md:flex-row-reverse gap-4 sm:gap-5 md:text-right">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 p-1 shadow-lg shadow-amber-500/20 shrink-0 flex items-center justify-center">
-                  <div className="w-full h-full rounded-xl bg-white flex items-center justify-center text-amber-600">
-                    <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-amber-600 drop-shadow-xs" />
+                <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl p-1 shadow-lg shrink-0 flex items-center justify-center ${
+                  isAngelsAway 
+                    ? 'bg-gradient-to-br from-sky-500 to-blue-700 shadow-sky-500/20' 
+                    : 'bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/20'
+                }`}>
+                  <div className="w-full h-full rounded-xl bg-white flex items-center justify-center">
+                    {isAngelsAway ? (
+                      <Volleyball className="w-8 h-8 sm:w-10 sm:h-10 text-sky-600 drop-shadow-xs" />
+                    ) : (
+                      <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-amber-600 drop-shadow-xs" />
+                    )}
                   </div>
                 </div>
                 <div className="space-y-1 min-w-0">
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200 font-mono">
-                    Rywal • 4. Miejsce
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider font-mono ${
+                    isAngelsAway ? 'bg-sky-100 text-sky-800 border border-sky-200' : 'bg-slate-100 text-slate-700 border border-slate-200'
+                  }`}>
+                    {isAngelsAway ? 'Gość • Angels ZTP' : 'Gość'}
                   </span>
                   <h2 className="text-xl sm:text-2xl font-black tracking-tight uppercase font-athletic text-slate-900 truncate">
-                    {officialNextMatch?.awayTeam || nextEvent?.opponent || 'Coco Jumbo'}
+                    {awayTeamName}
                   </h2>
-                  <p className="text-xs text-slate-500 font-medium">
-                    Stawka: Utrzymanie strefy awansu (Top 3)
-                  </p>
                 </div>
               </div>
 
@@ -251,49 +271,49 @@ function DashboardContent() {
           </div>
 
           {/* DOLNY PASEK: OBECNOŚĆ, SKŁAD & TAKTYKA */}
-          <div className="relative z-10 px-6 sm:px-8 py-4 bg-slate-50/80 border-t border-slate-200/90 flex flex-col lg:flex-row items-center justify-between gap-4">
+          <div className="relative z-10 px-4 sm:px-8 py-4 bg-slate-50/80 border-t border-slate-200/90 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3.5">
             
             {/* Twoja deklaracja obecności */}
-            <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full lg:w-auto">
               <span className="text-xs font-black uppercase tracking-wider text-slate-700 shrink-0">
                 Twoja obecność:
               </span>
               {nextEvent && (
-                <div className="inline-flex items-center gap-1.5 p-1 rounded-2xl bg-white border border-slate-200 shadow-2xs">
+                <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-white border border-slate-200 shadow-2xs w-full sm:w-auto">
                   <button
                     onClick={() => handleQuickAttendance(nextEvent.id, 'BEDE')}
                     disabled={updatingAttendance}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+                    className={`py-2 sm:py-1.5 px-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
                       myStatusRecord?.status === 'BEDE'
                         ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-500/30'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
                     <span>Będę</span>
                   </button>
                   <button
                     onClick={() => handleQuickAttendance(nextEvent.id, 'NIEPEWNE')}
                     disabled={updatingAttendance}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+                    className={`py-2 sm:py-1.5 px-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
                       myStatusRecord?.status === 'NIEPEWNE'
                         ? 'bg-amber-500 text-slate-950 shadow-sm ring-2 ring-amber-400/40'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    <HelpCircle className="w-3.5 h-3.5 text-amber-800" />
+                    <HelpCircle className="w-3.5 h-3.5 text-amber-800 shrink-0" />
                     <span>Może</span>
                   </button>
                   <button
                     onClick={() => handleQuickAttendance(nextEvent.id, 'NIE_BEDE')}
                     disabled={updatingAttendance}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+                    className={`py-2 sm:py-1.5 px-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
                       myStatusRecord?.status === 'NIE_BEDE'
                         ? 'bg-rose-600 text-white shadow-sm ring-2 ring-rose-500/30'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    <AlertCircle className="w-3.5 h-3.5 text-rose-200" />
+                    <AlertCircle className="w-3.5 h-3.5 text-rose-200 shrink-0" />
                     <span>Nieobecny</span>
                   </button>
                 </div>
@@ -301,20 +321,20 @@ function DashboardContent() {
             </div>
 
             {/* Skład & Przejście do Taktyki */}
-            <div className="flex items-center justify-between lg:justify-end gap-3 sm:gap-4 w-full lg:w-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full lg:w-auto">
               <Link 
-                href={`/events?eventId=${nextEvent?.id || 'evt_lals_1972'}`}
-                className="text-xs text-slate-600 hover:text-sky-700 transition flex items-center gap-1.5 font-bold px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-sky-300 shadow-2xs"
+                href={nextEvent?.id ? `/events?eventId=${nextEvent.id}` : '/events'}
+                className="text-xs text-slate-700 hover:text-sky-700 transition flex items-center justify-center gap-1.5 font-bold py-2.5 sm:py-2 px-3.5 rounded-xl bg-white border border-slate-200 hover:border-sky-300 shadow-2xs"
               >
-                <Users className="w-4 h-4 text-sky-600" />
+                <Users className="w-4 h-4 text-sky-600 shrink-0" />
                 <span>Skład: <strong className="text-slate-900">{attendingCount === 1 ? '1 obecny' : `${attendingCount} obecnych`}</strong> &rarr;</span>
               </Link>
 
               <Link
-                href={`/taktyka?eventId=${nextEvent?.id || 'evt_lals_1972'}`}
-                className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-2 transition shadow-sm hover:shadow shrink-0 cursor-pointer active:scale-95"
+                href={nextEvent?.id ? `/taktyka?eventId=${nextEvent.id}` : '/taktyka'}
+                className="py-2.5 sm:py-2 px-4 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-sm hover:shadow cursor-pointer active:scale-95"
               >
-                <Target className="w-4 h-4 text-sky-200" />
+                <Target className="w-4 h-4 text-sky-200 shrink-0" />
                 <span>Założenia Taktyczne &rarr;</span>
               </Link>
             </div>

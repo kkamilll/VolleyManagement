@@ -23,9 +23,6 @@ function TreningPageInner() {
                 Warsztat Trenera
               </span>
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Konspekty jednostek treningowych, schematy ćwiczeń z rysunkami boiska, cele i lista obecności z Terminarza.
-            </p>
           </div>
         </div>
 

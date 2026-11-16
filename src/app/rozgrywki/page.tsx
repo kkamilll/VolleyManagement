@@ -2580,9 +2580,6 @@ function RozgrywkiContent() {
               <FileText className="w-4 h-4 text-sky-600" />
               <span>Protokoły Meczowe VolleyStation ({leagueReports.length})</span>
             </h4>
-            <p className="text-xs text-slate-500">
-              Oficjalne raporty meczowe ligi LALS, wyniki poszczególnych setów, czas gry i statystyki punktowe.
-            </p>
           </div>
           {canManageMatches && (
             <button
@@ -2656,63 +2653,67 @@ function RozgrywkiContent() {
                   </div>
 
                   {/* Sets, Meta Badges & Actions */}
-                  <div className="flex flex-wrap items-center gap-2.5">
-                    {/* Sets score breakdown */}
-                    {rep.sets && rep.sets.length > 0 && (
-                      <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-slate-700 bg-slate-50 px-2.5 py-1 rounded-xl border border-slate-200">
-                        {rep.sets.map((s, idx) => (
-                          <span key={s.setNumber}>
-                            {idx > 0 && <span className="text-slate-400">, </span>}
-                            <span className={s.homeScore > s.awayScore ? 'text-sky-700 font-black' : 'text-slate-600'}>{s.homeScore}</span>
-                            :<span className={s.awayScore > s.homeScore ? 'text-sky-700 font-black' : 'text-slate-600'}>{s.awayScore}</span>
-                          </span>
-                        ))}
+                  <div className="flex flex-wrap items-center justify-between md:justify-end gap-2.5 w-full md:w-auto pt-2 md:pt-0 border-t md:border-t-0 border-slate-100">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {/* Sets score breakdown */}
+                      {rep.sets && rep.sets.length > 0 && (
+                        <div className="flex items-center gap-1 text-[11px] font-mono font-bold text-slate-700 bg-slate-50 px-2.5 py-1 rounded-xl border border-slate-200">
+                          {rep.sets.map((s, idx) => (
+                            <span key={s.setNumber}>
+                              {idx > 0 && <span className="text-slate-400">, </span>}
+                              <span className={s.homeScore > s.awayScore ? 'text-sky-700 font-black' : 'text-slate-600'}>{s.homeScore}</span>
+                              :<span className={s.awayScore > s.homeScore ? 'text-sky-700 font-black' : 'text-slate-600'}>{s.awayScore}</span>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {rep.duration && (
+                        <span className="px-2 py-1 rounded-xl bg-slate-50 text-[10px] font-bold text-slate-600 border border-slate-200 flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-sky-600" />
+                          <span>{rep.duration}</span>
+                        </span>
+                      )}
+
+                      {rep.mvp && (
+                        <span className="px-2 py-1 rounded-xl bg-amber-50 text-[10px] font-bold text-amber-900 border border-amber-300 flex items-center gap-1">
+                          <Crown className="w-3 h-3 text-amber-600" />
+                          <span>MVP: {rep.mvp.name}</span>
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-1.5 shrink-0 ml-auto md:ml-0">
+                      {rep.volleyStationUrl && (
+                        <a
+                          href={rep.volleyStationUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          className="p-1.5 rounded-xl bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition"
+                          title="Otwórz oficjalny protokół w VolleyStation"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+
+                      {canManageMatches && (
+                        <button
+                          type="button"
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleDeleteReport(rep.id);
+                          }}
+                          className="p-1.5 rounded-xl bg-white hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 transition"
+                          title="Usuń ten raport"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+
+                      <div className="p-1 text-slate-500">
+                        <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                       </div>
-                    )}
-
-                    {rep.duration && (
-                      <span className="px-2 py-1 rounded-xl bg-slate-50 text-[10px] font-bold text-slate-600 border border-slate-200 flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-sky-600" />
-                        <span>{rep.duration}</span>
-                      </span>
-                    )}
-
-                    {rep.mvp && (
-                      <span className="px-2 py-1 rounded-xl bg-amber-50 text-[10px] font-bold text-amber-900 border border-amber-300 flex items-center gap-1">
-                        <Crown className="w-3 h-3 text-amber-600" />
-                        <span>MVP: {rep.mvp.name}</span>
-                      </span>
-                    )}
-
-                    {rep.volleyStationUrl && (
-                      <a
-                        href={rep.volleyStationUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        onClick={e => e.stopPropagation()}
-                        className="p-1.5 rounded-xl bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition"
-                        title="Otwórz oficjalny protokół w VolleyStation"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                    )}
-
-                    {canManageMatches && (
-                      <button
-                        type="button"
-                        onClick={e => {
-                          e.stopPropagation();
-                          handleDeleteReport(rep.id);
-                        }}
-                        className="p-1.5 rounded-xl bg-white hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 transition"
-                        title="Usuń ten raport"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-
-                    <div className="p-1 text-slate-500">
-                      <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                     </div>
                   </div>
                 </div>
@@ -2817,7 +2818,7 @@ function RozgrywkiContent() {
   };
 
   return (
-    <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 pt-6 sm:pt-8 pb-24 md:pb-16 space-y-6 sm:space-y-8">
+    <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 pt-5 sm:pt-8 pb-28 md:pb-16 space-y-6 sm:space-y-8">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div className="flex items-center gap-3">
@@ -2828,13 +2829,6 @@ function RozgrywkiContent() {
             <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight font-athletic text-slate-900">
               {activeTab === 'liga' ? 'Lubońska Amatorska Liga Siatkówki (LALS)' : activeTab === 'sparingi' ? 'Mecze Sparingowe' : 'Turnieje Siatkarskie'}
             </h1>
-            <p className="text-xs text-slate-500">
-              {activeTab === 'liga'
-                ? 'Oficjalne mecze ligowe LALS • Terminarz, wyniki i tabela zespołów'
-                : activeTab === 'sparingi'
-                ? 'Mecze kontrolne i sparingi przygotowawcze zespołu Angels ZTP'
-                : 'Turnieje pucharowe, faza grupowa i drabinki meczowe'}
-            </p>
           </div>
         </div>
       </div>
@@ -3558,12 +3552,13 @@ function RozgrywkiContent() {
       {/* 2. TAB: LIGA */}
       {activeTab === 'liga' && (
         <div className="space-y-6">
-          {/* Liga Subtabs (Tabela, Wyniki, Statystyki) */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-200">
-            <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200">
+          {/* Liga Subtabs (Tabela, Wyniki, Statystyki) & Dedicated Actions Bar */}
+          <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+            {/* 3 Główne Zakładki Ligi - stały, pojedynczy rząd */}
+            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200 overflow-x-auto scrollbar-none shrink-0 w-full sm:w-auto">
               <button
                 onClick={() => setLigaSubTab('tabela')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition whitespace-nowrap ${
+                className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition whitespace-nowrap ${
                   ligaSubTab === 'tabela'
                     ? 'bg-sky-600 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
@@ -3574,7 +3569,7 @@ function RozgrywkiContent() {
               </button>
               <button
                 onClick={() => setLigaSubTab('wyniki')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition whitespace-nowrap ${
+                className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition whitespace-nowrap ${
                   ligaSubTab === 'wyniki'
                     ? 'bg-sky-600 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
@@ -3585,7 +3580,7 @@ function RozgrywkiContent() {
               </button>
               <button
                 onClick={() => setLigaSubTab('statystyki')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition whitespace-nowrap ${
+                className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition whitespace-nowrap ${
                   ligaSubTab === 'statystyki'
                     ? 'bg-sky-600 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
@@ -3596,7 +3591,8 @@ function RozgrywkiContent() {
               </button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 py-0.5">
+            {/* Dedykowany, stały pasek akcji dla danej zakładki */}
+            <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-0.5 justify-start xl:justify-end w-full xl:w-auto shrink-0">
               {ligaSubTab === 'tabela' && (
                 <>
                   {canManageMatches && (
@@ -3604,16 +3600,16 @@ function RozgrywkiContent() {
                       <button
                         type="button"
                         onClick={handleOpenCreatePhase}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
                         title="Utwórz nowy etap / nową tabelę (np. Faza Finałowa) i wklej zestawienie"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                        <span>+ Nowa Tabela</span>
+                        <span>Nowa Tabela</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => handleOpenEditTable(currentLeaguePhase?.id || 'faza_1', 'text')}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
                       >
                         <Upload className="w-3.5 h-3.5 text-sky-600" />
                         <span>Import Tabeli</span>
@@ -3621,7 +3617,7 @@ function RozgrywkiContent() {
                       <button
                         type="button"
                         onClick={() => handleOpenEditTable(currentLeaguePhase?.id || 'faza_1')}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                         <span>Edytuj Tabelę</span>
@@ -3632,7 +3628,7 @@ function RozgrywkiContent() {
                     href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
                   >
                     <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
                     <span>VolleyStation ↗</span>
@@ -3645,19 +3641,19 @@ function RozgrywkiContent() {
                     <>
                       <button
                         type="button"
-                        onClick={() => setShowImportScheduleModal(true)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
-                      >
-                        <Upload className="w-3.5 h-3.5 text-sky-600" />
-                        <span>Import Terminarza</span>
-                      </button>
-                      <button
-                        type="button"
                         onClick={() => setShowAddMatchModal(true)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Dodaj Wynik</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowImportScheduleModal(true)}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                      >
+                        <Upload className="w-3.5 h-3.5 text-sky-600" />
+                        <span>Import Terminarza</span>
                       </button>
                     </>
                   )}
@@ -3665,36 +3661,14 @@ function RozgrywkiContent() {
                     href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
                   >
                     <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
                     <span>VolleyStation ↗</span>
                   </a>
                 </>
               )}
-              {ligaSubTab === 'statystyki' && (
-                <>
-                  {canManageMatches && (
-                    <button
-                      type="button"
-                      onClick={() => setShowVolleyStationImportModal(true)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
-                    >
-                      <Upload className="w-3.5 h-3.5" />
-                      <span>Import Statystyk</span>
-                    </button>
-                  )}
-                  <a
-                    href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
-                    <span>VolleyStation ↗</span>
-                  </a>
-                </>
-              )}
+
             </div>
           </div>
 
@@ -3727,7 +3701,7 @@ function RozgrywkiContent() {
               </div>
 
               {/* Tabela Controls Bar */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-slate-50 border border-slate-200 rounded-2xl">
+              <div className="flex items-center justify-between gap-3 p-2.5 bg-slate-50 border border-slate-200 rounded-2xl">
                 {/* Przełącznik tabel ligowych i przycisk Nowa Tabela */}
                 <div className="flex items-center gap-1.5 p-1 bg-white rounded-xl border border-slate-200 overflow-x-auto scrollbar-none">
                   <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider px-2 flex items-center gap-1">
@@ -3766,23 +3740,12 @@ function RozgrywkiContent() {
                       type="button"
                       onClick={handleOpenCreatePhase}
                       className="px-2.5 py-1 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition flex items-center gap-1 shrink-0"
-                      title="Utwórz nowy etap / nową tabelę ligową (nie gryzie się z Faza I)"
+                      title="Utwórz nowy etap / nową tabelę ligową"
                     >
                       <Plus className="w-3 h-3 text-emerald-600" />
-                      <span>+ Nowa tabela</span>
+                      <span>Nowa tabela</span>
                     </button>
                   )}
-                </div>
-
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs text-slate-600 font-medium">
-                    Drużyn w tabeli: <strong className="text-slate-900 font-mono font-bold">{leagueTable.length}</strong>
-                  </span>
-                  <span className="text-slate-300">•</span>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-sky-800 border border-slate-200 shadow-2xs">
-                    <span>Oficjalna Tabela VolleyStation</span>
-                    <span className="text-[9px] px-1 py-0.2 rounded font-mono font-black bg-sky-600 text-white">LIVE</span>
-                  </span>
                 </div>
               </div>
 
@@ -3878,7 +3841,7 @@ function RozgrywkiContent() {
                             </td>
 
                             <td className={`py-3 px-4 font-sans font-bold text-slate-900 text-sm sticky left-[48px] ${stickyCellBg} z-10 border-r border-slate-200 min-w-[190px]`}>
-                              <div className="flex items-center gap-2 flex-wrap">
+                              <div className="flex items-center gap-2">
                                 {team.teamUrl ? (
                                   <a
                                     href={team.teamUrl}
@@ -3891,16 +3854,6 @@ function RozgrywkiContent() {
                                   </a>
                                 ) : (
                                   <span>{team.teamName}</span>
-                                )}
-                                {isAngels && (
-                                  <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-sky-100 text-sky-800 border border-sky-300">
-                                    Nasz Klub
-                                  </span>
-                                )}
-                                {isAdvancing && (
-                                  <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300 hidden md:inline-flex">
-                                    🟢 Awans
-                                  </span>
                                 )}
                               </div>
                             </td>
@@ -4347,9 +4300,6 @@ function RozgrywkiContent() {
                     <BarChart3 className="w-5 h-5 text-sky-600" />
                     <span>Statystyki VolleyStation & Liderzy Ligi</span>
                   </h3>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Oficjalne dane meczowe, protokoły punktowe i rankingi indywidualne z ligi LALS.
-                  </p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2.5">
@@ -6666,18 +6616,6 @@ function RozgrywkiContent() {
                   <span>Wgraj Zdjęcie / Screen (OCR)</span>
                 </button>
               </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  const example = `14.11.2026 19:30 Angels ZTP vs Gladiatorzy BUD-WENT 3:1 (25:21, 23:25, 25:18, 25:20)\n21.11.2026 18:00 Angels ZTP vs Volleyboars\n28.11.2026 20:00 Afera Volley vs Angels ZTP`;
-                  setRawScheduleInput(example);
-                  handleParseScheduleText(example);
-                }}
-                className="text-xs text-sky-400 hover:text-sky-300 font-bold underline"
-              >
-                + Wstaw przykład
-              </button>
             </div>
 
             <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
@@ -6990,17 +6928,6 @@ function RozgrywkiContent() {
                     Wklejony tekst z VolleyStation:
                   </label>
                   <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setVolleyStationRawInput(`[Runda: 7Nr 1926GGladiatorzy BUD-WENT3:2AAngels ZTP](https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583864/)[Runda: 7Nr 1925KKoty Broniszewice0:3AAfera Volley](https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583846/)[Runda: 7Nr 1924CCzelendż1:3VVolleyboars](https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583847/)
-18 października 2026, Niedziela
-[Runda: 5Nr 1889VVolleyboars0:3CCoco Jumbo](https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583848/)[Runda: 5Nr 1887AAngels ZTP3:0KKoty Broniszewice](https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583849/)[Runda: 5Nr 1888AAfera Volley3:0CCzelendż](https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/matches/2583850/)`);
-                      }}
-                      className="text-[11px] font-bold text-sky-400 hover:text-sky-300 underline"
-                    >
-                      + Wstaw przykładowy terminarz
-                    </button>
                     <span className="text-[10px] text-slate-500 font-mono">
                       {volleyStationRawInput.length} zn.
                     </span>

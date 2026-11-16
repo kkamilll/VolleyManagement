@@ -333,27 +333,27 @@ export default function Navbar() {
 
               {/* Submenu Dropdown */}
               <div className="absolute left-0 top-full pt-1.5 hidden group-hover:block z-50">
-                <div className="w-64 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 space-y-0.5">
+                <div className="w-52 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 space-y-0.5">
                   <Link
                     href="/taktyka?tab=board"
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-sky-700 hover:bg-sky-50 transition"
                   >
                     <Compass className="w-4 h-4 text-sky-500" />
-                    <span>Tablica Taktyczna (Boisko)</span>
+                    <span>Tablica taktyczna</span>
                   </Link>
                   <Link
                     href="/taktyka?tab=matches"
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-amber-700 hover:bg-amber-50 transition"
                   >
                     <Trophy className="w-4 h-4 text-amber-500" />
-                    <span>Rozpiski Meczowe (LALS / Sparingi)</span>
+                    <span>Rozpiski meczowe</span>
                   </Link>
                   <Link
                     href="/trening"
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 transition"
                   >
                     <Volleyball className="w-4 h-4 text-emerald-500" />
-                    <span>Przejdź do Treningów &rarr;</span>
+                    <span>Treningi</span>
                   </Link>
                 </div>
               </div>
@@ -853,7 +853,7 @@ export default function Navbar() {
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition"
             >
               <Compass className="w-4 h-4 text-sky-600" />
-              <span>Tablica Taktyczna (Boisko)</span>
+              <span>Tablica taktyczna</span>
             </Link>
             <Link
               href="/taktyka?tab=matches"
@@ -861,7 +861,7 @@ export default function Navbar() {
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-700 transition"
             >
               <Trophy className="w-4 h-4 text-amber-600" />
-              <span>Rozpiski Meczowe (Mecze / Sparingi)</span>
+              <span>Rozpiski meczowe</span>
             </Link>
             <Link
               href="/trening"
@@ -869,7 +869,7 @@ export default function Navbar() {
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition"
             >
               <Volleyball className="w-4 h-4 text-emerald-600" />
-              <span>Konspekty Treningowe (/trening)</span>
+              <span>Treningi</span>
             </Link>
           </div>
 

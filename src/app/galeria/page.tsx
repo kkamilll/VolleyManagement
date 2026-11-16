@@ -40,7 +40,6 @@ function GaleriaContent() {
   const [loading, setLoading] = useState(true);
   const [categoryFilter, setCategoryFilter] = useState<'ALL' | 'MECZ' | 'SPARING' | 'TURNIEJ' | 'INNE'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedAlbum, setSelectedAlbum] = useState<string>('ALL');
 
   // Lightbox modal state
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
@@ -96,28 +95,10 @@ function GaleriaContent() {
     fetchPhotos();
   }, []);
 
-  // Unique albums / series
-  const uniqueAlbums = useMemo(() => {
-    const map = new Map<string, { title: string; count: number; category: string }>();
-    photos.forEach(p => {
-      const key = p.seriesTitle || p.matchName;
-      if (key) {
-        const existing = map.get(key) || { title: key, count: 0, category: p.category || 'MECZ' };
-        existing.count += 1;
-        map.set(key, existing);
-      }
-    });
-    return Array.from(map.values());
-  }, [photos]);
-
   const filteredPhotos = useMemo(() => {
     return photos.filter((p) => {
       if (categoryFilter !== 'ALL' && p.category !== categoryFilter) {
         return false;
-      }
-      if (selectedAlbum !== 'ALL') {
-        const pAlbum = p.seriesTitle || p.matchName;
-        if (pAlbum !== selectedAlbum) return false;
       }
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -129,7 +110,7 @@ function GaleriaContent() {
       }
       return true;
     });
-  }, [photos, categoryFilter, selectedAlbum, searchQuery]);
+  }, [photos, categoryFilter, searchQuery]);
 
   // Client-side image resize and optimization
   const processPhotoFiles = async (files: FileList | File[]) => {
@@ -333,9 +314,6 @@ function GaleriaContent() {
               Galeria Zdjęć & Fotorelacje
             </h1>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Albumy i zdjęcia z meczów ligowych LALS, sparingów oraz wydarzeń Angels ZTP.
-          </p>
         </div>
 
         {canManage && (
@@ -364,7 +342,6 @@ function GaleriaContent() {
               key={cat.id}
               onClick={() => {
                 setCategoryFilter(cat.id as any);
-                setSelectedAlbum('ALL');
               }}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0 ${
                 categoryFilter === cat.id
@@ -396,55 +373,6 @@ function GaleriaContent() {
           />
         </div>
       </div>
-
-      {/* Album Badges Horizontal Scroll if albums exist */}
-      {uniqueAlbums.length > 0 && (
-        <div className="p-3 bg-white border border-slate-200 rounded-2xl shadow-2xs space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-slate-700 flex items-center gap-1.5">
-              <Layers className="w-3.5 h-3.5 text-sky-600" />
-              <span>Albumy z Meczów ({uniqueAlbums.length}):</span>
-            </span>
-            {selectedAlbum !== 'ALL' && (
-              <button
-                type="button"
-                onClick={() => setSelectedAlbum('ALL')}
-                className="text-[11px] font-bold text-sky-600 hover:text-sky-700 underline"
-              >
-                Pokaż wszystkie zdjęcia
-              </button>
-            )}
-          </div>
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            <button
-              onClick={() => setSelectedAlbum('ALL')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition shrink-0 border ${
-                selectedAlbum === 'ALL'
-                  ? 'bg-slate-900 text-white border-slate-900 shadow-2xs'
-                  : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300'
-              }`}
-            >
-              Wszystkie albumy
-            </button>
-            {uniqueAlbums.map(album => (
-              <button
-                key={album.title}
-                onClick={() => setSelectedAlbum(album.title)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition shrink-0 flex items-center gap-1.5 border ${
-                  selectedAlbum === album.title
-                    ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-2xs font-black'
-                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300'
-                }`}
-              >
-                <span>{album.title}</span>
-                <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-white/70 text-slate-800 font-mono">
-                  {album.count}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Loading state */}
       {loading ? (

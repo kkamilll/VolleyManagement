@@ -37,6 +37,8 @@ import {
   HelpCircle,
   Filter,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Crown,
   Swords,
   UserCheck,
@@ -53,7 +55,10 @@ import {
   Unlock,
   FlaskConical,
   Smartphone,
-  Maximize2
+  Maximize2,
+  Play,
+  Image as ImageIcon,
+  Video
 } from 'lucide-react';
 import {
   TacticalPlay,
@@ -65,7 +70,8 @@ import {
   TacticScope,
   EventItem,
   MatchResult,
-  TacticalMaterial
+  TacticalMaterial,
+  AttendanceRecord
 } from '@/lib/types';
 
 // Default initial positions for 5-1 rotations on Full Court (Siatka w połowie: y=50%, Angels ZTP: y=52-95%)
@@ -302,17 +308,22 @@ function TacticsContent() {
     )
   );
 
-  // Section switcher: 1. Tablica (Brudnopis), 2. Mecze, Sparingi & Turnieje, 3. Treningi
-  const [tacticsSection, setTacticsSection] = useState<'board' | 'matches' | 'trainings'>('board');
+  // Section switcher: 1. Tablica, 2. Rozpiski Meczowe, 3. Sparingi, 4. Turnieje, 5. Treningi
+  const [tacticsSection, setTacticsSection] = useState<'board' | 'matches' | 'sparingi' | 'turnieje' | 'trainings'>('board');
   const [showLoadTacticModal, setShowLoadTacticModal] = useState(false);
   const [loadTacticSearch, setLoadTacticSearch] = useState('');
 
   useEffect(() => {
-    const tab = searchParams.get('tab');
-    if (tab === 'training' || tab === 'trening' || tab === 'treningi' || tab === 'trainings') {
-      window.location.href = '/trening';
-    } else if (tab === 'matches' || tab === 'mecze' || tab === 'sparingi' || tab === 'turnieje' || tab === 'playbook' || tab === 'debrief' || tab === 'odprawa') {
+    const tab = searchParams.get('tab')?.toLowerCase();
+    const type = searchParams.get('type')?.toUpperCase();
+    if (tab === 'sparingi' || tab === 'sparing' || tab === 'sparrings' || type === 'SPARING') {
+      setTacticsSection('sparingi');
+    } else if (tab === 'turnieje' || tab === 'turniej' || tab === 'tournaments' || type === 'TURNIEJ') {
+      setTacticsSection('turnieje');
+    } else if (tab === 'matches' || tab === 'mecze' || tab === 'mecz' || tab === 'playbook' || tab === 'debrief' || tab === 'odprawa' || type === 'MECZ' || type === 'MECZ_LIGOWY') {
       setTacticsSection('matches');
+    } else if (tab === 'training' || tab === 'trening' || tab === 'treningi' || tab === 'trainings' || type === 'TRENING') {
+      setTacticsSection('trainings');
     } else if (tab === 'board' || tab === 'taktyka' || tab === 'tablica') {
       setTacticsSection('board');
     }
@@ -324,6 +335,7 @@ function TacticsContent() {
   const [phase, setPhase] = useState<TacticalPhase>('PRZYJECIE');
   const [positions, setPositions] = useState<CourtPlayerPosition[]>(ROTATION_DEFAULTS.P1.PRZYJECIE);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const selectedPlayer = positions.find(p => p.id === selectedPlayerId);
   const [draggingId, setDraggingId] = useState<string | null>(null);
 
   // Volleyball Ball marker on court
@@ -373,7 +385,7 @@ function TacticsContent() {
   const [materials, setMaterials] = useState<TacticalMaterial[]>([]);
   const [showAddMaterialModal, setShowAddMaterialModal] = useState(false);
   const [materialTitle, setMaterialTitle] = useState('');
-  const [materialType, setMaterialType] = useState<'PDF' | 'IMAGE'>('PDF');
+  const [materialType, setMaterialType] = useState<'PDF' | 'IMAGE' | 'VIDEO'>('PDF');
   const [materialFileUrl, setMaterialFileUrl] = useState('');
   const [materialFileName, setMaterialFileName] = useState('');
   const [materialFileSize, setMaterialFileSize] = useState('');
@@ -381,12 +393,33 @@ function TacticsContent() {
   const [materialEventId, setMaterialEventId] = useState('');
   const [materialDescription, setMaterialDescription] = useState('');
   const [uploadingMaterial, setUploadingMaterial] = useState(false);
-  const [materialFilter, setMaterialFilter] = useState<'ALL' | 'PDF' | 'IMAGE'>('ALL');
+  const [materialFilter, setMaterialFilter] = useState<'ALL' | 'PDF' | 'IMAGE' | 'VIDEO'>('ALL');
+  const [showQuickDrawModal, setShowQuickDrawModal] = useState(false);
+  const [quickDrawTitle, setQuickDrawTitle] = useState('');
+  const [quickDrawPhase, setQuickDrawPhase] = useState<TacticalPhase>('PRZYJECIE');
+  const [quickDrawRotation, setQuickDrawRotation] = useState<RotationCode>('P1');
+  const [quickDrawColor, setQuickDrawColor] = useState('#00e5ff');
+  const [quickDrawHistory, setQuickDrawHistory] = useState<ImageData[]>([]);
+  const [isQuickDrawing, setIsQuickDrawing] = useState(false);
+  const quickDrawCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [previewMedia, setPreviewMedia] = useState<TacticalMaterial | null>(null);
   const [selectedPdfViewer, setSelectedPdfViewer] = useState<TacticalMaterial | null>(null);
   const [selectedImagePreview, setSelectedImagePreview] = useState<TacticalMaterial | null>(null);
 
   // Save Modal State
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [lastAddedTactic, setLastAddedTactic] = useState<{
+    id: string;
+    title: string;
+    matchTitle: string;
+    rotation?: string;
+    phase?: string;
+  } | null>(null);
+  const [savedPostNotification, setSavedPostNotification] = useState<{ id: string; title: string; matchTitle: string } | null>(null);
+  const [showAddNoteModal, setShowAddNoteModal] = useState(false);
+  const [notePostTitle, setNotePostTitle] = useState('');
+  const [notePostContent, setNotePostContent] = useState('');
+  const [savingNote, setSavingNote] = useState(false);
   const [tacticTitle, setTacticTitle] = useState('');
   const [tacticScope, setTacticScope] = useState<TacticScope>('OGOLNA');
   const [linkedEventId, setLinkedEventId] = useState<string>('');
@@ -483,25 +516,556 @@ function TacticsContent() {
   // Can the user effectively drag/draw right now?
   const isEffectiveEditor = !isArchiveMode && Boolean(canEdit || isSandboxMode);
 
-  // Active target event or match based on unit selector
+  // Dedykowana lista opcji wyboru meczu / wydarzenia w zależności od wybranej sekcji (zabezpieczona przed duplikatami)
+  const sectionTargetOptions = useMemo(() => {
+    if (tacticsSection === 'matches') {
+      const list: Array<{
+        key: string;
+        id: string;
+        type: string;
+        title: string;
+        opponent: string;
+        date: string;
+        location: string;
+      }> = [];
+      const seenOpponents = new Set<string>();
+
+      events
+        .filter(e => e.type === 'MECZ' || (e.title && (e.title.toLowerCase().includes('lals') || e.title.toLowerCase().includes('mecz'))))
+        .forEach(e => {
+          const oppKey = (e.opponent || e.title).toLowerCase().trim();
+          seenOpponents.add(oppKey);
+          list.push({
+            key: `EVENT_${e.id}`,
+            id: e.id,
+            type: 'MECZ',
+            title: e.opponent ? `${e.title.includes('(R') ? e.title.split(':')[0] + ': ' : ''}vs ${e.opponent}` : e.title,
+            opponent: e.opponent || e.title,
+            date: e.date,
+            location: e.location || 'Hala OSiR, Luboń'
+          });
+        });
+
+      matches.forEach(m => {
+        const oppKey = m.opponent.toLowerCase().trim();
+        if (!seenOpponents.has(oppKey)) {
+          seenOpponents.add(oppKey);
+          list.push({
+            key: `MATCH_${m.id}`,
+            id: m.id,
+            type: 'MECZ',
+            title: `vs ${m.opponent}`,
+            opponent: m.opponent,
+            date: m.date,
+            location: m.location || 'Hala POSiR'
+          });
+        }
+      });
+
+      return list.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    } else if (tacticsSection === 'sparingi') {
+      return events
+        .filter(e => e.type === 'SPARING')
+        .map(e => ({
+          key: `EVENT_${e.id}`,
+          id: e.id,
+          type: 'SPARING',
+          title: e.opponent ? `vs ${e.opponent}` : e.title,
+          opponent: e.opponent || e.title,
+          date: e.date,
+          location: e.location || 'Hala POSiR'
+        }))
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    } else if (tacticsSection === 'turnieje') {
+      return events
+        .filter(e => e.type === 'TURNIEJ')
+        .map(e => ({
+          key: `EVENT_${e.id}`,
+          id: e.id,
+          type: 'TURNIEJ',
+          title: e.title,
+          opponent: e.opponent || '',
+          date: e.date,
+          location: e.location || 'Hala POSiR'
+        }))
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    } else if (tacticsSection === 'trainings') {
+      return events
+        .filter(e => e.type === 'TRENING')
+        .map(e => ({
+          key: `EVENT_${e.id}`,
+          id: e.id,
+          type: 'TRENING',
+          title: e.title,
+          opponent: '',
+          date: e.date,
+          location: e.location || 'Hala POSiR'
+        }))
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    }
+    return [];
+  }, [tacticsSection, matches, events]);
+
+  // Active target event or match based on unit selector (with bi-directional auto-sync & section scoping)
   const activeTargetEvent = useMemo(() => {
+    if (tacticsSection !== 'board') {
+      const exists = sectionTargetOptions.some(opt => opt.key === selectedContextKey);
+      if (!exists) return null;
+    }
     if (selectedContextKey.startsWith('EVENT_')) {
       const id = selectedContextKey.replace('EVENT_', '');
       return events.find(e => e.id === id) || null;
     }
+    if (selectedContextKey.startsWith('MATCH_')) {
+      const matchId = selectedContextKey.replace('MATCH_', '');
+      const m = matches.find(match => match.id === matchId);
+      const ev = events.find(e => e.id === matchId.replace('mat_', 'evt_') || (m?.opponent && e.opponent && e.opponent.toLowerCase() === m.opponent.toLowerCase()));
+      return ev || null;
+    }
     return null;
-  }, [selectedContextKey, events]);
+  }, [selectedContextKey, events, matches, tacticsSection, sectionTargetOptions]);
 
   const activeTargetMatch = useMemo(() => {
+    if (tacticsSection !== 'board') {
+      const exists = sectionTargetOptions.some(opt => opt.key === selectedContextKey);
+      if (!exists) return null;
+    }
     if (selectedContextKey.startsWith('MATCH_')) {
       const id = selectedContextKey.replace('MATCH_', '');
       return matches.find(m => m.id === id) || null;
     }
+    if (selectedContextKey.startsWith('EVENT_')) {
+      const eventId = selectedContextKey.replace('EVENT_', '');
+      const ev = events.find(e => e.id === eventId);
+      const m = matches.find(match => match.id === eventId.replace('mat_', 'evt_') || (ev?.opponent && match.opponent && match.opponent.toLowerCase() === ev.opponent.toLowerCase()));
+      return m || null;
+    }
     return null;
-  }, [selectedContextKey, matches]);
+  }, [selectedContextKey, matches, events, tacticsSection, sectionTargetOptions]);
 
   // Backward compatibility alias for single targetEvent
   const targetEvent = activeTargetEvent;
+
+  // Materiały taktyczne (pliki, wideo, zdjęcia) dla aktualnego meczu/wydarzenia
+  const currentUnitMaterials = useMemo(() => {
+    return materials.filter(m => {
+      if (activeTargetEvent && m.eventId === activeTargetEvent.id) return true;
+      if (activeTargetMatch && m.matchId === activeTargetMatch.id) return true;
+      if (activeTargetEvent && m.matchId && m.matchId === activeTargetEvent.id.replace('evt_', 'mat_')) return true;
+      if (activeTargetMatch && m.eventId && m.eventId === activeTargetMatch.id.replace('mat_', 'evt_')) return true;
+      const opp = (activeTargetEvent?.opponent || activeTargetMatch?.opponent || '').toLowerCase().trim();
+      if (opp && opp.length >= 3) {
+        if (m.opponentName && m.opponentName.toLowerCase().includes(opp)) return true;
+        if (m.title && m.title.toLowerCase().includes(opp)) return true;
+        if (m.description && m.description.toLowerCase().includes(opp)) return true;
+      }
+      return false;
+    });
+  }, [materials, activeTargetEvent, activeTargetMatch]);
+
+  // Zapisane schematy i tablice taktyczne dla aktualnego meczu/wydarzenia (Feed postów ze schematami)
+  const currentUnitTactics = useMemo(() => {
+    return tactics.filter(t => {
+      if (activeTargetEvent && t.eventId === activeTargetEvent.id) return true;
+      if (activeTargetMatch && t.matchId === activeTargetMatch.id) return true;
+      if (activeTargetEvent && t.matchId && t.matchId === activeTargetEvent.id.replace('evt_', 'mat_')) return true;
+      if (activeTargetMatch && t.eventId && t.eventId === activeTargetMatch.id.replace('mat_', 'evt_')) return true;
+      const opp = (activeTargetEvent?.opponent || activeTargetMatch?.opponent || '').toLowerCase().trim();
+      if (opp && opp.length >= 3) {
+        if (t.targetOpponent && t.targetOpponent.toLowerCase().includes(opp)) return true;
+        if (t.title && t.title.toLowerCase().includes(opp)) return true;
+        if (t.description && t.description.toLowerCase().includes(opp)) return true;
+        if (t.tacticalNotes && t.tacticalNotes.toLowerCase().includes(opp)) return true;
+      }
+      return false;
+    });
+  }, [tactics, activeTargetEvent, activeTargetMatch]);
+
+  // Głosowanie w ankiecie obecności (Messenger style)
+  const handleVoteAttendance = async (status: 'BEDE' | 'NIEPEWNE' | 'NIE_BEDE') => {
+    if (!user) {
+      alert('Zaloguj się, aby zagłosować w ankiecie');
+      return;
+    }
+    if (!activeTargetEvent) return;
+
+    try {
+      const res = await fetch(`/api/events/${activeTargetEvent.id}/attendance`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      if (res.ok) {
+        const updated: AttendanceRecord = {
+          userId: user.id,
+          userName: user.name,
+          userRole: user.role,
+          status,
+          updatedAt: new Date().toISOString()
+        };
+        setEvents(prev => prev.map(e => {
+          if (e.id !== activeTargetEvent.id) return e;
+          const remaining = (e.attendees || []).filter(a => a.userId !== user.id && a.userName.toLowerCase() !== user.name.toLowerCase());
+          return {
+            ...e,
+            attendees: [...remaining, updated]
+          };
+        }));
+      }
+    } catch (err) {
+      console.error('Error voting attendance:', err);
+    }
+  };
+
+  const getPlayerInitials = (name: string) => {
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    return name.slice(0, 2).toUpperCase();
+  };
+
+  // Załaduj zapisany schemat z listy meczu bezpośrednio na główną tablicę taktyczną
+  const handleLoadTacticToBoard = (tac: TacticalPlay) => {
+    setSelectedTactic(tac);
+    setLastAddedTactic(null);
+    setTacticTitle(tac.title);
+    if (tac.rotation) setRotation(tac.rotation);
+    if (tac.phase) setPhase(tac.phase);
+    if (tac.courtPositions && tac.courtPositions.length > 0) setPositions(tac.courtPositions);
+    if (tac.description || tac.tacticalNotes) setTacticComment(tac.description || tac.tacticalNotes || '');
+    if (tac.eventId) {
+      setLinkedEventId(tac.eventId);
+      setSelectedContextKey(`EVENT_${tac.eventId}`);
+    } else if (tac.matchId) {
+      setLinkedMatchId(tac.matchId);
+      setSelectedContextKey(`MATCH_${tac.matchId}`);
+    }
+    setTacticsSection('board');
+  };
+
+  // Otwórz czystą tablicę taktyczną z ustawionym kontekstem tego meczu
+  const handleOpenBoardForCurrentTarget = () => {
+    if (activeTargetEvent) {
+      setLinkedEventId(activeTargetEvent.id);
+      setLinkedMatchId('');
+      setSelectedContextKey(`EVENT_${activeTargetEvent.id}`);
+      setTacticTitle(`Mecz vs ${activeTargetEvent.opponent || 'Rywal'}: Ustawienie ${rotation} (${phase})`);
+    } else if (activeTargetMatch) {
+      setLinkedMatchId(activeTargetMatch.id);
+      setLinkedEventId('');
+      setSelectedContextKey(`MATCH_${activeTargetMatch.id}`);
+      setTacticTitle(`Mecz vs ${activeTargetMatch.opponent}: Ustawienie ${rotation} (${phase})`);
+    }
+    setTacticsSection('board');
+  };
+
+  // Otwórz modal dodawania załącznika / wideo / zdjęcia dla tego meczu
+  const handleOpenAddMaterialForCurrentTarget = (initialType: 'IMAGE' | 'PDF' | 'VIDEO' = 'IMAGE') => {
+    const defaultScope: TacticScope = tacticsSection === 'matches' ? 'MECZ_LIGOWY' : tacticsSection === 'sparingi' ? 'SPARING' : 'TURNIEJ';
+    setMaterialScope(defaultScope);
+    setMaterialType(initialType);
+    setMaterialEventId(activeTargetEvent?.id || '');
+    setMaterialTitle(
+      initialType === 'VIDEO'
+        ? `Wideo z meczu vs ${activeTargetEvent?.opponent || activeTargetMatch?.opponent || 'Rywal'}`
+        : `Materiały vs ${activeTargetEvent?.opponent || activeTargetMatch?.opponent || 'Rywal'}`
+    );
+    setMaterialFileUrl('');
+    setMaterialFileName('');
+    setMaterialFileSize('');
+    setMaterialDescription('');
+    setShowAddMaterialModal(true);
+  };
+
+  // Szybkie rysowanie schematu boiska w dedykowanym modalu dla tego meczu
+  const handleOpenQuickDrawModal = () => {
+    const opp = activeTargetEvent?.opponent || activeTargetMatch?.opponent || 'Rywal';
+    setQuickDrawTitle(`Mecz vs ${opp}: Schemat ${rotation} (${phase})`);
+    setQuickDrawPhase(phase);
+    setQuickDrawRotation(rotation);
+    setQuickDrawHistory([]);
+    setShowQuickDrawModal(true);
+  };
+
+  // Funkcja pomocnicza: Wyciąganie ID i miniatury YouTube
+  const getYoutubeId = (url: string) => {
+    const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+    return m ? m[1] : null;
+  };
+
+  // Quick Draw Mouse & Touch handlers
+  const startQuickDraw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    const canvas = quickDrawCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    setQuickDrawHistory(prev => [...prev.slice(-10), ctx.getImageData(0, 0, canvas.width, canvas.height)]);
+
+    const rect = canvas.getBoundingClientRect();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+
+    ctx.strokeStyle = quickDrawColor;
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    setIsQuickDrawing(true);
+  };
+
+  const drawQuickDraw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    if (!isQuickDrawing) return;
+    const canvas = quickDrawCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  };
+
+  const stopQuickDraw = () => {
+    setIsQuickDrawing(false);
+  };
+
+  const handleUndoQuickDraw = () => {
+    if (quickDrawHistory.length === 0) return;
+    const canvas = quickDrawCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const last = quickDrawHistory[quickDrawHistory.length - 1];
+    ctx.putImageData(last, 0, 0);
+    setQuickDrawHistory(prev => prev.slice(0, -1));
+  };
+
+  const handleClearQuickDraw = () => {
+    setQuickDrawHistory([]);
+    const canvas = quickDrawCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+
+    ctx.strokeStyle = '#94a3b8';
+    ctx.setLineDash([6, 6]);
+    ctx.beginPath();
+    ctx.moveTo(20, (canvas.height - 40) * 0.35 + 20);
+    ctx.lineTo(canvas.width - 20, (canvas.height - 40) * 0.35 + 20);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(15, 20);
+    ctx.lineTo(canvas.width - 15, 20);
+    ctx.stroke();
+  };
+
+  // Quick draw canvas background initializer
+  useEffect(() => {
+    if (showQuickDrawModal && quickDrawCanvasRef.current) {
+      const canvas = quickDrawCanvasRef.current;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Dark background
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Volleyball lines
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+
+      // Attack line (3m)
+      ctx.strokeStyle = '#94a3b8';
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.moveTo(20, (canvas.height - 40) * 0.35 + 20);
+      ctx.lineTo(canvas.width - 20, (canvas.height - 40) * 0.35 + 20);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Net
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(15, 20);
+      ctx.lineTo(canvas.width - 15, 20);
+      ctx.stroke();
+    }
+  }, [showQuickDrawModal]);
+
+  const handleSaveQuickDrawTactic = async () => {
+    if (!quickDrawCanvasRef.current || !quickDrawTitle.trim()) return;
+    setSaving(true);
+    try {
+      const canvas = quickDrawCanvasRef.current;
+      const drawingData = canvas.toDataURL('image/png');
+      const scope: TacticScope = tacticsSection === 'matches' ? 'MECZ_LIGOWY' : tacticsSection === 'sparingi' ? 'SPARING' : 'TURNIEJ';
+
+      const res = await fetch('/api/tactics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'TACTIC',
+          tactic: {
+            title: quickDrawTitle.trim(),
+            phase: quickDrawPhase,
+            rotation: quickDrawRotation,
+            scope,
+            eventId: activeTargetEvent?.id || undefined,
+            matchId: activeTargetMatch?.id || undefined,
+            description: `Schemat taktyczny rozrysowany pisakiem na mecz vs ${activeTargetEvent?.opponent || activeTargetMatch?.opponent || 'Rywal'}.`,
+            courtPositions: positions,
+            directives: [
+              `Faza: ${quickDrawPhase}`,
+              `Rotacja wyjściowa: ${quickDrawRotation}`,
+              `Data rozrysowania: ${new Date().toLocaleDateString('pl-PL')}`
+            ],
+            drawingData,
+            tacticalNotes: `Wariant taktyczny z tablicy: ${quickDrawTitle.trim()}`
+          }
+        })
+      });
+
+      if (res.ok) {
+        setShowQuickDrawModal(false);
+        await fetchData();
+      } else {
+        alert('Błąd zapisu schematu taktycznego');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Wystąpił błąd podczas zapisywania');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+    // Pełna zunifikowana lista wszystkich meczów i wydarzeń do wyboru w nagłówku tablicy
+  const allTargetOptions = useMemo(() => {
+    const list: Array<{
+      key: string;
+      id: string;
+      type: string;
+      title: string;
+      opponent: string;
+      date: string;
+      icon: string;
+    }> = [];
+    const seen = new Set<string>();
+
+    events.forEach(e => {
+      const oppKey = `${e.type}_${(e.opponent || e.title).toLowerCase().trim()}`;
+      if (!seen.has(oppKey)) {
+        seen.add(oppKey);
+        const icon = e.type === 'TRENING' ? '🏐' : e.type === 'SPARING' ? '⚔️' : e.type === 'TURNIEJ' ? '🏆' : '🏐';
+        list.push({
+          key: `EVENT_${e.id}`,
+          id: e.id,
+          type: e.type,
+          title: e.opponent ? `${e.title.includes('(R') ? e.title.split(':')[0] + ' ' : ''}vs ${e.opponent}` : e.title,
+          opponent: e.opponent || e.title,
+          date: e.date,
+          icon
+        });
+      }
+    });
+
+    matches.forEach(m => {
+      const oppKey = `MECZ_${m.opponent.toLowerCase().trim()}`;
+      if (!seen.has(oppKey)) {
+        seen.add(oppKey);
+        list.push({
+          key: `MATCH_${m.id}`,
+          id: m.id,
+          type: 'MECZ',
+          title: `vs ${m.opponent}`,
+          opponent: m.opponent,
+          date: m.date,
+          icon: '🏆'
+        });
+      }
+    });
+
+    return list.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }, [events, matches]);
+
+  // Automatyczny wybór pierwszego meczu/wydarzenia przy wejściu w sekcję rozpisek
+  useEffect(() => {
+    if (tacticsSection !== 'board') {
+      const matchExists = sectionTargetOptions.some(opt => opt.key === selectedContextKey);
+      if (!matchExists) {
+        if (sectionTargetOptions.length > 0) {
+          setSelectedContextKey(sectionTargetOptions[0].key);
+        } else {
+          setSelectedContextKey('');
+          setTacticComment('');
+          setSelectedTactic(null);
+          setLastAddedTactic(null);
+        }
+      }
+    }
+  }, [tacticsSection, sectionTargetOptions, selectedContextKey]);
+
+  // Indeks aktualnie wybranego meczu w liście danej sekcji
+  const currentSectionTargetIndex = useMemo(() => {
+    return sectionTargetOptions.findIndex(opt => opt.key === selectedContextKey);
+  }, [sectionTargetOptions, selectedContextKey]);
+
+  const handlePrevTarget = () => {
+    if (currentSectionTargetIndex > 0) {
+      setSelectedContextKey(sectionTargetOptions[currentSectionTargetIndex - 1].key);
+    }
+  };
+
+  const handleNextTarget = () => {
+    if (currentSectionTargetIndex >= 0 && currentSectionTargetIndex < sectionTargetOptions.length - 1) {
+      setSelectedContextKey(sectionTargetOptions[currentSectionTargetIndex + 1].key);
+    }
+  };
+
+  // Dodawanie i usuwanie dyrektyw punktowych
+  const handleAddUnitDirective = () => {
+    if (!newDirectiveInput.trim()) return;
+    setUnitDirectives(prev => [...prev, newDirectiveInput.trim()]);
+    setNewDirectiveInput('');
+  };
+
+  const handleRemoveUnitDirective = (index: number) => {
+    setUnitDirectives(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Przypisanie zawodnika ze składu do pozycji nominalnej (R, Ś1, P1, A, Ś2, P2, L)
+  const handleAssignPlayerToCourtRole = (roleCode: string, memberId: string) => {
+    const member = allSquadMembers.find(m => m.id === memberId);
+    if (!member) return;
+    setPositions(prev =>
+      prev.map(p =>
+        p.roleCode === roleCode
+          ? { ...p, name: `${member.name} (${roleCode})`, number: member.number || p.number }
+          : p
+      )
+    );
+  };
 
   // Sync context key when URL searchParams provide an ID
   useEffect(() => {
@@ -516,6 +1080,36 @@ function TacticsContent() {
 
   // Synchronize tactical directives and scope when active target changes
   useEffect(() => {
+    if (!activeTargetEvent && !activeTargetMatch) {
+      setTacticComment('');
+      setUnitDirectives([]);
+      setLinkedEventId('');
+      setLinkedMatchId('');
+      return;
+    }
+
+    // 1. Sprawdź, czy istnieje już zapisana taktyka dla tego meczu / wydarzenia w bazie
+    let foundTactic: TacticalPlay | null = null;
+    if (activeTargetEvent) {
+      foundTactic = tactics.find(t => t.eventId === activeTargetEvent.id) || null;
+    } else if (activeTargetMatch) {
+      foundTactic = tactics.find(t => t.matchId === activeTargetMatch.id) || null;
+    }
+
+    if (foundTactic) {
+      setLinkedEventId(foundTactic.eventId || '');
+      setLinkedMatchId(foundTactic.matchId || '');
+      setTacticScope(foundTactic.scope || 'MECZ_LIGOWY');
+      if (foundTactic.tacticalNotes || foundTactic.description) {
+        setTacticComment(foundTactic.tacticalNotes || foundTactic.description || '');
+      }
+      if (foundTactic.directives && foundTactic.directives.length > 0) {
+        setUnitDirectives(foundTactic.directives);
+      }
+      return;
+    }
+
+    // 2. Jeśli nie ma jeszcze zapisanej taktyki, przygotuj szablon wyjściowy
     if (activeTargetEvent) {
       setLinkedEventId(activeTargetEvent.id);
       setLinkedMatchId('');
@@ -527,6 +1121,7 @@ function TacticsContent() {
           '🛡️ Asekuracja atakującego: gracz II linii na 6. metrze',
           '🏐 Zagrywka taktyczna w strefę 1 lub 5 rywali'
         ]);
+        setTacticComment('Główne akcenty treningowe: zgranie rozegrania ze środkowymi, przyjęcie zagrywki z rotacji P1 i P6 oraz organizacja kontrataku po obronie.');
       } else if (activeTargetEvent.type === 'SPARING') {
         setTacticScope('SPARING');
         setUnitDirectives([
@@ -535,6 +1130,7 @@ function TacticsContent() {
           '🛑 Podwójny blok zamykający prostą na skrzydłach',
           '🔄 Test wariantów gry zmienników w 2. i 3. secie'
         ]);
+        setTacticComment(`Odprawa sparingowa vs ${activeTargetEvent.opponent || 'Rywal'}: Skupiamy się na płynności przejść z przyjęcia do ataku oraz zgraniu bloku z obroną w polu.`);
       } else if (activeTargetEvent.type === 'TURNIEJ') {
         setTacticScope('TURNIEJ');
         setUnitDirectives([
@@ -542,6 +1138,7 @@ function TacticsContent() {
           '🎯 Stabilne przyjęcie i eliminacja serii punktowych rywala',
           '⚡ Szybkie tempo na skrzydłach i zero przestojów'
         ]);
+        setTacticComment('Strategia turniejowa: ekonomiczne gospodarowanie siłami, agresywna zagrywka od pierwszej piłki i maksymalna koncentracja w końcówkach setów.');
       } else {
         setTacticScope('MECZ_LIGOWY');
         setUnitDirectives([
@@ -550,6 +1147,7 @@ function TacticsContent() {
           '🛡️ Strefowy podwójny blok na skrzydłowego rywali',
           '🏐 Libero czyści pole za blokiem na 6. metrze'
         ]);
+        setTacticComment(`Plan taktyczny na mecz LALS vs ${activeTargetEvent.opponent || 'Rywal'}: Odrzucenie rywala od siatki trudnym serwisem po skosie, odcięcie lewego skrzydła podwójnym blokiem.`);
       }
     } else if (activeTargetMatch) {
       setLinkedMatchId(activeTargetMatch.id);
@@ -561,6 +1159,7 @@ function TacticsContent() {
         '🛡️ Podwójny blok zamykający prostą na skrzydle',
         '🏐 Asekuracja i czyszczenie kiwek na 6. metrze'
       ]);
+      setTacticComment(`Założenia ligowe vs ${activeTargetMatch.opponent}: Skupienie na własnej zagrywce, asekuracja za blokiem i szybkie tempo na skrzydłach Tomasz Krupa / Łukasz Kremer.`);
     } else {
       setLinkedEventId('');
       setLinkedMatchId('');
@@ -570,8 +1169,9 @@ function TacticsContent() {
         'Asekuracja i organizacja rozegrania',
         'Zgranie i komunikacja na boisku'
       ]);
+      setTacticComment('');
     }
-  }, [activeTargetEvent, activeTargetMatch]);
+  }, [activeTargetEvent, activeTargetMatch, tactics]);
 
   // Fetch tactics and events
   const fetchData = async () => {
@@ -796,6 +1396,7 @@ function TacticsContent() {
 
   // Drawing event handlers (Mouse + Touch)
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (lastAddedTactic) setLastAddedTactic(null);
     if (activeTool === 'move') return;
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -858,6 +1459,7 @@ function TacticsContent() {
 
   // Touch drawing handlers for smartphones and tablets
   const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (lastAddedTactic) setLastAddedTactic(null);
     if (activeTool === 'move' || e.touches.length === 0) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -1044,6 +1646,7 @@ function TacticsContent() {
   // Start fresh clean draft on the board
   const handleStartNewDraft = () => {
     setSelectedTactic(null);
+    setLastAddedTactic(null);
     setTacticTitle('');
     setTacticComment('');
     const canvas = canvasRef.current;
@@ -1138,7 +1741,14 @@ function TacticsContent() {
         setTacticComment('');
         await fetchData();
         if (d.tactic) {
-          setSelectedTactic(d.tactic);
+          setLastAddedTactic({
+            id: d.tactic.id,
+            title: d.tactic.title || tacticTitle,
+            matchTitle: activeTargetEvent ? activeTargetEvent.title : (activeTargetMatch ? `vs ${activeTargetMatch.opponent}` : 'Ogólna'),
+            rotation,
+            phase
+          });
+          setSelectedTactic(null);
         }
         alert('Zrzut taktyczny został pomyślnie zapisany i przypisany do meczu!');
       } else {
@@ -1227,6 +1837,120 @@ function TacticsContent() {
     alert(`Ustawiono ${Math.min(confirmed.length, 6)} potwierdzonych graczy z ankiety (${confirmed.map(c => c.userName).join(', ')}) na nominalnych pozycjach boiskowych!`);
   };
 
+  // 1-Click Save board tactic directly as a post to the active match
+  const handleSaveAsMatchPost = async () => {
+    if (!activeTargetEvent && !activeTargetMatch && selectedContextKey === 'GENERAL') {
+      handleOpenSaveModal();
+      return;
+    }
+    setSaving(true);
+    try {
+      const canvas = canvasRef.current;
+      const drawingData = canvas ? canvas.toDataURL('image/png') : undefined;
+
+      const opp = activeTargetEvent?.opponent || activeTargetMatch?.opponent || 'Rywal';
+      const unitType = activeTargetEvent?.type || 'MECZ';
+      const typeLabel = unitType === 'TRENING' ? 'Trening' : unitType === 'SPARING' ? 'Sparing' : unitType === 'TURNIEJ' ? 'Turniej' : 'Mecz';
+      
+      const title = `Schemat taktyczny: Ustawienie ${rotation} (${phase})`;
+      const desc = tacticComment.trim() || `Wariant taktyczny z tablicy: rotacja ${rotation}, faza ${phase}`;
+
+      const res = await fetch('/api/tactics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'TACTIC',
+          tactic: {
+            title,
+            phase,
+            rotation,
+            scope: unitType === 'TRENING' ? 'TRENING' : unitType === 'SPARING' ? 'SPARING' : unitType === 'TURNIEJ' ? 'TURNIEJ' : 'MECZ_LIGOWY',
+            eventId: activeTargetEvent?.id,
+            matchId: activeTargetMatch?.id,
+            targetOpponent: opp,
+            description: desc,
+            courtPositions: positions,
+            directives: positions.map(p => `${p.name}: ${p.task || 'Pozycja w strefie'}`),
+            drawingData,
+            tacticalNotes: desc
+          }
+        })
+      });
+
+      if (res.ok) {
+        const d = await res.json();
+        await fetchData();
+        if (d.tactic) {
+          setLastAddedTactic({
+            id: d.tactic.id,
+            title: d.tactic.title || title,
+            matchTitle: `${typeLabel} vs ${opp}`,
+            rotation: d.tactic.rotation || rotation,
+            phase: d.tactic.phase || phase
+          });
+          setSelectedTactic(null);
+        }
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Błąd zapisu schematu');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Wystąpił błąd podczas zapisywania');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Save text note directly as a post to the active match
+  const handleSaveNotePost = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!notePostContent.trim()) return;
+    setSavingNote(true);
+    try {
+      const opp = activeTargetEvent?.opponent || activeTargetMatch?.opponent || 'Rywal';
+      const unitType = activeTargetEvent?.type || 'MECZ';
+      const title = notePostTitle.trim() || `Założenia taktyczne: vs ${opp}`;
+
+      const res = await fetch('/api/tactics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'TACTIC',
+          tactic: {
+            title,
+            phase: 'PRZYJECIE',
+            rotation: 'P1',
+            scope: unitType === 'TRENING' ? 'TRENING' : unitType === 'SPARING' ? 'SPARING' : unitType === 'TURNIEJ' ? 'TURNIEJ' : 'MECZ_LIGOWY',
+            eventId: activeTargetEvent?.id,
+            matchId: activeTargetMatch?.id,
+            targetOpponent: opp,
+            description: notePostContent.trim(),
+            courtPositions: positions,
+            directives: unitDirectives.length > 0 ? unitDirectives : [],
+            drawingData: undefined,
+            tacticalNotes: notePostContent.trim()
+          }
+        })
+      });
+
+      if (res.ok) {
+        setShowAddNoteModal(false);
+        setNotePostTitle('');
+        setNotePostContent('');
+        await fetchData();
+      } else {
+        const err = await res.json();
+        alert(err.error || 'Błąd zapisu notatki');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Błąd serwera');
+    } finally {
+      setSavingNote(false);
+    }
+  };
+
   // 1-Click Save linked directly to active target unit
   const handleQuickSaveForUnit = async () => {
     if (!activeTargetEvent && !activeTargetMatch) {
@@ -1242,7 +1966,7 @@ function TacticsContent() {
       let scope: TacticScope = 'OGOLNA';
       let eventId: string | undefined = undefined;
       let matchId: string | undefined = undefined;
-      let desc = '';
+      let desc = tacticComment.trim() ? tacticComment : '';
 
       if (activeTargetEvent) {
         eventId = activeTargetEvent.id;
@@ -1250,26 +1974,26 @@ function TacticsContent() {
         if (activeTargetEvent.type === 'TRENING') {
           scope = 'TRENING';
           defaultTitle = `Trening [${dateStr}]: ${activeTargetEvent.title} • Rotacja ${rotation} (${phase})`;
-          desc = `Założenia treningowe: ${unitDirectives.join('; ')}`;
+          if (!desc) desc = `Założenia treningowe: ${unitDirectives.join('; ')}`;
         } else if (activeTargetEvent.type === 'SPARING') {
           scope = 'SPARING';
           defaultTitle = `Sparing [${dateStr}] vs ${activeTargetEvent.opponent || 'Rywal'}: Rotacja ${rotation} (${phase})`;
-          desc = `Plan sparingowy: ${unitDirectives.join('; ')}`;
+          if (!desc) desc = `Plan sparingowy: ${unitDirectives.join('; ')}`;
         } else if (activeTargetEvent.type === 'TURNIEJ') {
           scope = 'TURNIEJ';
           defaultTitle = `Turniej [${dateStr}] ${activeTargetEvent.title}: Rotacja ${rotation} (${phase})`;
-          desc = `Taktyka turniejowa: ${unitDirectives.join('; ')}`;
+          if (!desc) desc = `Taktyka turniejowa: ${unitDirectives.join('; ')}`;
         } else {
           scope = 'MECZ_LIGOWY';
           defaultTitle = `Mecz LALS [${dateStr}] vs ${activeTargetEvent.opponent || 'Rywal'}: Rotacja ${rotation} (${phase})`;
-          desc = `Odprawa meczowa LALS: ${unitDirectives.join('; ')}`;
+          if (!desc) desc = `Odprawa meczowa LALS: ${unitDirectives.join('; ')}`;
         }
       } else if (activeTargetMatch) {
         matchId = activeTargetMatch.id;
         scope = 'MECZ_LIGOWY';
         const dateStr = new Date(activeTargetMatch.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' });
         defaultTitle = `Mecz LALS [${dateStr}] vs ${activeTargetMatch.opponent}: Rotacja ${rotation} (${phase})`;
-        desc = `Odprawa na mecz ligowy: ${unitDirectives.join('; ')}`;
+        if (!desc) desc = `Odprawa na mecz ligowy: ${unitDirectives.join('; ')}`;
       }
 
       const res = await fetch('/api/tactics', {
@@ -1297,7 +2021,14 @@ function TacticsContent() {
         const d = await res.json();
         await fetchData();
         if (d.tactic) {
-          setSelectedTactic(d.tactic);
+          setLastAddedTactic({
+            id: d.tactic.id,
+            title: d.tactic.title || tacticTitle,
+            matchTitle: activeTargetEvent ? activeTargetEvent.title : (activeTargetMatch ? `vs ${activeTargetMatch.opponent}` : 'Ogólna'),
+            rotation,
+            phase
+          });
+          setSelectedTactic(null);
         }
         alert(`Pomyślnie zapisano taktykę dla tej jednostki! Pojawi się ona bezpośrednio w terminarzu i profilu meczu.`);
       } else {
@@ -1760,6 +2491,11 @@ function TacticsContent() {
     };
   }, [tactics, matches, events]);
 
+  const matchesCount = useMemo(() => events.filter(e => e.type === 'MECZ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals'))).length, [events]);
+  const sparringsCount = useMemo(() => events.filter(e => e.type === 'SPARING').length, [events]);
+  const tournamentsCount = useMemo(() => events.filter(e => e.type === 'TURNIEJ').length, [events]);
+  const trainingsCount = useMemo(() => events.filter(e => e.type === 'TRENING').length, [events]);
+
   const filteredTactics = useMemo(() => {
     if (isLockedToUnit) {
       return unitTactics;
@@ -1811,8 +2547,9 @@ function TacticsContent() {
   }, [isLockedToUnit, unitTactics, tactics, playbookCategory, playbookMatchFilter, playbookSearch, matches, events]);
 
   return (
-    <div className="w-full max-w-[2000px] mx-auto px-2 sm:px-6 lg:px-10 xl:px-12 pt-4 sm:pt-6 pb-24 md:pb-12 space-y-3 sm:space-y-4">
+    <div className="w-full max-w-[2000px] mx-auto px-2 sm:px-6 lg:px-10 xl:px-12 pt-4 sm:pt-6 pb-28 md:pb-16 space-y-3 sm:space-y-4">
       {/* Top Header - Unified Taktyka & Trening Hub */}
+      {/* GŁÓWNY NAGŁÓWEK MODUŁU */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 shrink-0 shadow-sm">
@@ -1820,11 +2557,8 @@ function TacticsContent() {
           </div>
           <div>
             <h1 className="text-base sm:text-2xl font-black text-slate-900 uppercase tracking-tight font-athletic leading-tight">
-              Taktyka & Treningi
+              Taktyka
             </h1>
-            <span className="hidden sm:inline-block text-[11px] text-slate-500 font-medium">
-              Centrum Taktyczne • Rozpiski Treningowe • Tablica Taktyczna • Wnioski i Odprawa
-            </span>
           </div>
         </div>
 
@@ -1832,57 +2566,100 @@ function TacticsContent() {
           <div className="flex items-center gap-2 shrink-0">
             {isArchiveMode ? (
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 text-xs font-bold shadow-sm">
-                <span>🔒 Archiwum: Tylko do odczytu</span>
+                <span>🔒 Archiwum</span>
               </div>
             ) : (
               <button
                 onClick={() => setShowRequestEditModal(true)}
-                className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-black uppercase tracking-wider transition shadow-sm bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm bg-amber-500 hover:bg-amber-400 text-slate-950"
               >
-                <span>✋ Poproś o edycję / Zgłoś uwagę</span>
+                <span>Zgłoś uwagę</span>
               </button>
             )}
           </div>
         )}
       </div>
 
-      {/* GŁÓWNY PODZIAŁ MODUŁU TAKTYKI - 3 ZAKŁADKI & KONSOLA AKCJI */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 p-1.5 rounded-2xl bg-slate-100 border border-slate-200 shadow-sm">
-        {/* 2 Główne Zakładki Taktyki + Przejście do Treningów */}
-        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none w-full lg:w-auto">
+      {/* GŁÓWNY PODZIAŁ MODUŁU TAKTYKI: TABLICA + ROZPISKI (MECZE, SPARINGI, TURNIEJE, TRENINGI) */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 p-1.5 rounded-2xl bg-slate-100 border border-slate-300 shadow-xs">
+        {/* 5 Głównych Zakładek Taktyki - responsywny pasek z płynnym przewijaniem na telefonach */}
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none w-full lg:w-auto pb-0.5">
           <button
             type="button"
-            onClick={() => setTacticsSection('board')}
-            className={`flex-1 lg:flex-initial flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
+            onClick={() => { setTacticsSection('board'); setSelectedTactic(null); setLastAddedTactic(null); }}
+            className={`shrink-0 flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
               tacticsSection === 'board'
                 ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
-                : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-50'
+                : 'bg-white text-slate-700 hover:text-slate-900 border-slate-300 hover:bg-slate-50'
             }`}
           >
             <Compass className={`w-4 h-4 ${tacticsSection === 'board' ? 'text-amber-300' : 'text-sky-600'}`} />
-            <span>Tablica Taktyczna (Boisko)</span>
+            <span>Tablica</span>
           </button>
 
           <button
             type="button"
-            onClick={() => setTacticsSection('matches')}
-            className={`flex-1 lg:flex-initial flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
+            onClick={() => { setTacticsSection('matches'); setSelectedTactic(null); setLastAddedTactic(null); }}
+            className={`shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
               tacticsSection === 'matches'
                 ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
-                : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-50'
+                : 'bg-white text-slate-700 hover:text-slate-900 border-slate-300 hover:bg-slate-50'
             }`}
           >
-            <Trophy className={`w-4 h-4 ${tacticsSection === 'matches' ? 'text-amber-300' : 'text-amber-500'}`} />
-            <span>Rozpiski Meczowe (Mecze / Sparingi / Turnieje)</span>
+            <Trophy className={`w-4 h-4 ${tacticsSection === 'matches' ? 'text-amber-300' : 'text-sky-600'}`} />
+            <span>Mecze</span>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'matches' ? 'bg-white/20 text-white font-black' : 'bg-slate-100 text-slate-600'}`}>
+              {matchesCount}
+            </span>
           </button>
 
-          <Link
-            href="/trening"
-            className="flex-1 lg:flex-initial flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap bg-white text-slate-700 hover:text-emerald-700 hover:border-emerald-300 hover:bg-emerald-50/50 shadow-2xs"
+          <button
+            type="button"
+            onClick={() => { setTacticsSection('sparingi'); setSelectedTactic(null); setLastAddedTactic(null); }}
+            className={`shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
+              tacticsSection === 'sparingi'
+                ? 'bg-amber-500 text-slate-950 border-amber-400 font-black shadow-sm'
+                : 'bg-white text-slate-700 hover:text-slate-900 border-slate-300 hover:bg-slate-50'
+            }`}
           >
-            <Volleyball className="w-4 h-4 text-emerald-600" />
-            <span>Plany Treningowe &rarr;</span>
-          </Link>
+            <Swords className={`w-4 h-4 ${tacticsSection === 'sparingi' ? 'text-slate-950' : 'text-amber-600'}`} />
+            <span>Sparingi</span>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'sparingi' ? 'bg-slate-950/20 text-slate-950 font-black' : 'bg-slate-100 text-slate-600'}`}>
+              {sparringsCount}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => { setTacticsSection('turnieje'); setSelectedTactic(null); setLastAddedTactic(null); }}
+            className={`shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
+              tacticsSection === 'turnieje'
+                ? 'bg-purple-600 text-white border-purple-600 shadow-sm'
+                : 'bg-white text-slate-700 hover:text-slate-900 border-slate-300 hover:bg-slate-50'
+            }`}
+          >
+            <Crown className={`w-4 h-4 ${tacticsSection === 'turnieje' ? 'text-amber-300' : 'text-purple-600'}`} />
+            <span>Turnieje</span>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'turnieje' ? 'bg-white/20 text-white font-black' : 'bg-slate-100 text-slate-600'}`}>
+              {tournamentsCount}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setTacticsSection('trainings')}
+            className={`shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
+              tacticsSection === 'trainings'
+                ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                : 'bg-white text-slate-700 hover:text-slate-900 border-slate-300 hover:bg-slate-50'
+            }`}
+          >
+            <Volleyball className={`w-4 h-4 ${tacticsSection === 'trainings' ? 'text-amber-300' : 'text-emerald-600'}`} />
+            <span>Treningi</span>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'trainings' ? 'bg-white/20 text-white font-black' : 'bg-slate-100 text-slate-600'}`}>
+              {trainingsCount}
+            </span>
+          </button>
         </div>
 
         {/* Prawa strona w trybie Tablicy: Kontekst i szybkie przyciski */}
@@ -1979,83 +2756,119 @@ function TacticsContent() {
                 </button>
 
                 <button
-                  onClick={handleOpenSaveModal}
-                  className="px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs transition flex items-center gap-1.5 shadow-sm"
-                  title="Zapisz ten schemat"
+                  onClick={handleSaveAsMatchPost}
+                  disabled={saving}
+                  className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition flex items-center gap-1.5 shadow-sm active:scale-95 disabled:opacity-50"
+                  title="Zapisz ten schemat bezpośrednio jako post do wybranego meczu"
                 >
-                  <Save className="w-3.5 h-3.5" />
-                  <span>Zapisz</span>
+                  <Save className="w-3.5 h-3.5 text-amber-300" />
+                  <span>{saving ? 'Zapisuję...' : (activeTargetEvent || activeTargetMatch ? `Zapisz do meczu: ${activeTargetEvent?.opponent || activeTargetMatch?.opponent || 'LALS'}` : 'Zapisz schemat')}</span>
+                </button>
+
+                <button
+                  onClick={handleOpenSaveModal}
+                  className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold transition flex items-center gap-1 shadow-2xs"
+                  title="Więcej opcji zapisu (baza ogólna, własny tytuł)"
+                >
+                  <Save className="w-3.5 h-3.5 text-sky-600" />
+                  <span>Więcej...</span>
                 </button>
               </div>
             )}
-          </div>
-        )}
-
-        {tacticsSection === 'matches' && (
-          <div className="flex items-center gap-2 justify-end w-full lg:w-auto text-xs font-bold text-slate-600">
-            <span className="hidden sm:inline">Rozgrywki LALS: 20 rund ligowych</span>
-            <Link
-              href="/rozgrywki"
-              className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-2xs font-bold flex items-center gap-1.5"
-            >
-              <Trophy className="w-3.5 h-3.5 text-amber-500" />
-              <span>Tabela & Terminarz LALS &rarr;</span>
-            </Link>
-          </div>
-        )}
-
-        {tacticsSection === 'trainings' && (
-          <div className="flex items-center gap-2 justify-end w-full lg:w-auto text-xs font-bold text-slate-600">
-            <span className="hidden sm:inline">Treningi klubowe: Hala OSiR / POSiR</span>
-            <Link
-              href="/events"
-              className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-2xs font-bold flex items-center gap-1.5"
-            >
-              <Calendar className="w-3.5 h-3.5 text-sky-600" />
-              <span>Kalendarz & Obecność &rarr;</span>
-            </Link>
           </div>
         )}
       </div>
 
       {tacticsSection === 'board' && (
         <>
-          {/* SLIM ACTIVE TACTIC STATUS PILL (Tylko gdy wczytano schemat) */}
+          {/* PASEK OSTATNIO DODANEGO SCHEMATU (Znika po kliknięciu Nowy szkic / dodaniu nowego / zamknięciu) */}
+          {lastAddedTactic && (
+            <div className="p-3 sm:p-3.5 rounded-2xl bg-sky-50 border border-sky-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs animate-in slide-in-from-top duration-200 mb-3">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-xl bg-sky-600 text-white flex items-center justify-center text-sm shrink-0 font-bold shadow-xs">
+                  🎯
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-sky-200 text-sky-900">
+                      Ostatnio dodano:
+                    </span>
+                    <span className="text-xs font-black text-slate-900 truncate">
+                      {lastAddedTactic.title}
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-white text-sky-800 border border-sky-200">
+                      {lastAddedTactic.matchTitle}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTacticsSection(activeTargetEvent?.type === 'SPARING' ? 'sparingi' : activeTargetEvent?.type === 'TURNIEJ' ? 'turnieje' : 'matches');
+                    setLastAddedTactic(null);
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-white text-sky-900 border border-sky-200 font-bold text-xs hover:bg-sky-50 transition shadow-2xs flex items-center gap-1"
+                >
+                  <span>Wpisy meczu &rarr;</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLastAddedTactic(null);
+                    handleStartNewDraft();
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs transition flex items-center gap-1 shadow-xs"
+                  title="Wyczyść i rozrysuj nowy schemat"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Nowy szkic</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLastAddedTactic(null)}
+                  className="w-7 h-7 rounded-xl bg-slate-200/70 hover:bg-slate-300 text-slate-600 flex items-center justify-center text-xs font-bold transition"
+                  title="Zamknij"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* TRYB EDYCJI ISTNIEJĄCEGO SCHEMATU (Tylko gdy kliknięto 'Otwórz na tablicy' w feedzie meczu) */}
           {selectedTactic && (() => {
             const target = getTacticTargetInfo(selectedTactic);
             return (
-              <div className="p-3 sm:p-3.5 rounded-2xl bg-sky-50 border border-sky-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+              <div className="p-3 sm:p-3.5 rounded-2xl bg-amber-50 border border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs mb-3">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-8 h-8 rounded-xl bg-sky-600 text-white flex items-center justify-center text-sm shrink-0 font-bold shadow-xs">
-                    🎯
+                  <div className="w-8 h-8 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center text-sm shrink-0 font-bold shadow-xs">
+                    ✏️
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-200 text-amber-950">
+                        Edytujesz schemat:
+                      </span>
                       <span className="text-xs font-black text-slate-900 truncate">
                         {selectedTactic.title}
                       </span>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-white text-sky-800 border border-sky-200">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-white text-slate-800 border border-amber-200">
                         {target.icon} {target.label}
                       </span>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-white text-amber-800 border border-amber-300">
-                        {selectedTactic.rotation} • {selectedTactic.phase}
-                      </span>
                     </div>
-                    {selectedTactic.description && (
-                      <p className="text-[11px] text-slate-600 line-clamp-1 mt-0.5">
-                        {selectedTactic.description}
-                      </p>
-                    )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
                   {canEdit && (
                     <button
                       onClick={handleQuickUpdateCurrentTactic}
                       disabled={saving}
-                      className="px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-xs"
-                      title="Nadpisz zmiany w tej taktyce"
+                      className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-xs"
+                      title="Zapisz zmiany w tym schemacie"
                     >
                       <Save className="w-3.5 h-3.5" />
                       <span>{saving ? 'Zapisywanie...' : 'Zapisz zmiany'}</span>
@@ -2064,10 +2877,17 @@ function TacticsContent() {
                   <button
                     onClick={handleStartNewDraft}
                     className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold transition flex items-center gap-1 shadow-2xs"
-                    title="Wróć do czystego szkicu"
+                    title="Opuść edycję i zacznij czysty szkic"
                   >
                     <Plus className="w-3.5 h-3.5 text-slate-500" />
                     <span>Nowy szkic</span>
+                  </button>
+                  <button
+                    onClick={() => setSelectedTactic(null)}
+                    className="w-7 h-7 rounded-xl bg-slate-200/70 hover:bg-slate-300 text-slate-600 flex items-center justify-center text-xs font-bold transition"
+                    title="Zamknij tryb edycji"
+                  >
+                    ✕
                   </button>
                 </div>
               </div>
@@ -2077,75 +2897,11 @@ function TacticsContent() {
       {/* SEKCJA 1: TABLICA TAKTYCZNA (BOISKO I KONSOLA ROZGRYWANIA) */}
       <div className="bg-white border border-slate-200 rounded-3xl p-3 sm:p-5 shadow-sm space-y-4">
           
-          {/* NOWOCZESNA KONSOLA TAKTYCZNA (ROTACJE, FAZY GRY I NARZĘDZIA) */}
-          <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-3 sm:p-4 shadow-sm space-y-3">
-            {/* Pasek 1: Wybór Rotacji (P1-P6) oraz Fazy Gry */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-200">
-              
-              {/* Rotacje P1 - P6 */}
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 font-mono shrink-0">
-                  Rotacja:
-                </span>
-                <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                  {(['P1', 'P2', 'P3', 'P4', 'P5', 'P6'] as RotationCode[]).map(rot => (
-                    <button
-                      key={rot}
-                      type="button"
-                      onClick={() => applyPreset(rot, phase)}
-                      className={`min-w-[34px] h-7 px-2 rounded-lg text-xs font-black transition flex items-center justify-center font-mono cursor-pointer active:scale-95 ${
-                        rotation === rot
-                          ? 'bg-sky-600 text-white shadow-sm ring-1 ring-sky-500'
-                          : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
-                      }`}
-                      title={`Ustaw rotację ${rot}`}
-                    >
-                      {rot}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Fazy Gry: Przyjęcie, Atak, Obrona, Zagrywka */}
-              <div className="flex flex-wrap items-center gap-1.5">
-                {[
-                  { id: 'PRZYJECIE', label: 'Przyjęcie', icon: '🛡️' },
-                  { id: 'ATAK', label: 'Atak', icon: '⚔️' },
-                  { id: 'OBRONA', label: 'Obrona / Blok', icon: '🧱' },
-                  { id: 'ZAGRYWKA', label: 'Zagrywka', icon: '🎯' }
-                ].map(ph => (
-                  <button
-                    key={ph.id}
-                    type="button"
-                    onClick={() => applyPreset(rotation, ph.id as TacticalPhase)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border cursor-pointer active:scale-95 ${
-                      phase === ph.id
-                        ? 'bg-amber-400 text-slate-950 border-amber-500 shadow-sm font-black'
-                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900 shadow-2xs'
-                    }`}
-                  >
-                    <span>{ph.icon}</span>
-                    <span>{ph.label}</span>
-                  </button>
-                ))}
-
-                <button
-                  type="button"
-                  onClick={handleResetPositions}
-                  className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 text-xs font-bold transition flex items-center gap-1 shadow-2xs ml-auto lg:ml-2 cursor-pointer"
-                  title="Przywróć domyślne pozycje dla tej rotacji"
-                >
-                  <RotateCcw className="w-3.5 h-3.5 text-amber-600" />
-                  <span className="hidden sm:inline">Reset</span>
-                </button>
-              </div>
-
-            </div>
-
-            {/* Pasek 2: Narzędzia Rysowania, Kolory, Elementy Boiska i Widok */}
+          {/* KONSOLA TAKTYCZNA (NARZĘDZIA RYSOWANIA, KOLORY I WIDOK) */}
+          <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-3 sm:p-4 shadow-sm">
             <div className="flex flex-wrap items-center justify-between gap-2.5">
               
-              {/* Narzędzia (Przesuń, Pisak, Strzałka, Gumka) */}
+              {/* Narzędzia (Przesuń, Pisak, Strzałka, Gumka, Reset) */}
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setActiveTool('move')}
@@ -2197,6 +2953,16 @@ function TacticsContent() {
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
+
+                <button
+                  type="button"
+                  onClick={handleResetPositions}
+                  className="h-7 px-2.5 rounded-lg bg-white hover:bg-slate-100 text-slate-600 border border-slate-300 text-xs font-bold transition flex items-center justify-center gap-1 shadow-2xs cursor-pointer ml-1"
+                  title="Przywróć domyślne pozycje na boisku"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-amber-600" />
+                  <span className="hidden sm:inline">Reset</span>
+                </button>
               </div>
 
               {/* 4 Kolory & Cofnij */}
@@ -2246,7 +3012,7 @@ function TacticsContent() {
                   type="text"
                   value={tacticTitle}
                   onChange={(e) => setTacticTitle(e.target.value)}
-                  placeholder="Nazwa schematu (np. Atak ze skrzydła)..."
+                  placeholder="Nazwa schematu..."
                   className="bg-white border border-slate-300 rounded-xl px-2.5 py-1 text-xs text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-sky-500 shadow-2xs max-w-[200px]"
                 />
 
@@ -2480,10 +3246,10 @@ function TacticsContent() {
             {showOpponents && opponentPositions.map(opp => {
               const isSelected = selectedPlayerId === opp.id;
               const isDragging = draggingId === opp.id;
-              const cleanOppName = opp.name.replace(/\s*\([^)]*\)/, '');
               return (
                 <div
                   key={opp.id}
+                  title={`${opp.name} (${opp.roleCode})`}
                   onMouseDown={e => {
                     if (activeTool === 'move' && isEffectiveEditor) {
                       e.stopPropagation();
@@ -2520,9 +3286,6 @@ function TacticsContent() {
                   >
                     {opp.roleCode}
                   </div>
-                  <div className="mt-0.5 px-1 py-0 rounded backdrop-blur-sm border text-[8px] font-bold whitespace-nowrap shadow bg-white border-rose-300 text-rose-700 shadow-sm">
-                    {cleanOppName}
-                  </div>
                 </div>
               );
             })}
@@ -2532,10 +3295,10 @@ function TacticsContent() {
               const isSelected = selectedPlayerId === player.id;
               const isDragging = draggingId === player.id;
               const isLibero = player.roleCode === 'L';
-              const cleanPlayerName = player.name.replace(/\s*\([^)]*\)/, '');
               return (
                 <div
                   key={player.id}
+                  title={`${player.name} • Strefa ${player.zone}${player.task ? `: ${player.task}` : ''}`}
                   onMouseDown={e => {
                     if (activeTool === 'move' && isEffectiveEditor) {
                       e.stopPropagation();
@@ -2574,9 +3337,6 @@ function TacticsContent() {
                   >
                     {player.number ? `#${player.number}` : player.roleCode}
                   </div>
-                  <div className="mt-1 px-1.5 py-0.2 rounded-full backdrop-blur-sm border text-[8.5px] font-bold tracking-tight whitespace-nowrap shadow bg-white border-slate-300 text-slate-800 shadow-sm">
-                    {cleanPlayerName}
-                  </div>
                 </div>
               );
             })}
@@ -2596,320 +3356,754 @@ function TacticsContent() {
             />
           </div>
 
-        <div className="text-[11px] text-slate-400 text-center select-none pt-1">
-          💡 Przeciągaj zawodników i piłkę myszką lub dotykiem • Kliknij gracza na boisku lub na karcie poniżej, aby przypisać zadanie
-        </div>
       </div>
 
-      {/* 2-KOLUMNOWY OBSZAR POD BOISKIEM: ZADANIA ZAWODNIKÓW & ODPRAWA TRENERA */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        
-        {/* Lewa kolumna (7 cols): 6 Pozycji na Boisku w rotacji {rotation} */}
-        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold text-xs border border-sky-200">
-                <Users className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-sm font-black uppercase text-slate-900 tracking-wider">
-                  Zadania Graczy • {rotation} ({phase})
-                </h3>
-                <p className="text-[11px] text-slate-500">
-                  Ustawienie 6 zawodników na boisku. Kliknij kartę gracza, aby edytować zadanie.
+
+
+      </>
+      )}
+
+      {/* SEKCJA 2: TRENINGI (KONSPEKTY & ĆWICZENIA Z ROZRYSOWANIEM NA BOISKU) */}
+      {tacticsSection === 'trainings' && (
+        <div className="space-y-4 animate-in fade-in duration-200">
+          <TrainingPlannerContent mode="TRAININGS" defaultTab="EXERCISES" hideHeader={true} />
+        </div>
+      )}
+
+      {/* SEKCJA 3: ROZPISKI MECZOWE / SPARINGI / TURNIEJE (POSTY & TIMELINE TAKTYCZNY MECZU) */}
+      {tacticsSection !== 'board' && tacticsSection !== 'trainings' && (
+        <div className="space-y-5 animate-in fade-in duration-200">
+          
+          {/* 1. PASEK NAWIGACJI MECZU & NAGŁÓWEK SPOTKANIA */}
+          <div className={`bg-white border border-slate-300 rounded-3xl p-4 sm:p-5 shadow-md space-y-4 ${
+            tacticsSection === 'sparingi'
+              ? 'border-t-4 border-t-amber-500'
+              : tacticsSection === 'turnieje'
+              ? 'border-t-4 border-t-purple-600'
+              : 'border-t-4 border-t-sky-600'
+          }`}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              {sectionTargetOptions.length > 0 ? (
+                <div className="flex items-center gap-1.5 flex-1 max-w-2xl">
+                  <button
+                    type="button"
+                    onClick={handlePrevTarget}
+                    disabled={currentSectionTargetIndex <= 0}
+                    className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0"
+                    title="Poprzedni mecz"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+
+                  <select
+                    value={selectedContextKey}
+                    onChange={e => setSelectedContextKey(e.target.value)}
+                    className="flex-1 bg-slate-50 hover:bg-white border border-slate-300 text-slate-900 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold focus:outline-none focus:border-sky-500 shadow-2xs min-w-0 truncate"
+                  >
+                    {sectionTargetOptions.map((opt) => (
+                      <option key={opt.key} value={opt.key}>
+                        {new Date(opt.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} — {opt.title} ({opt.location})
+                      </option>
+                    ))}
+                  </select>
+
+                  <button
+                    type="button"
+                    onClick={handleNextTarget}
+                    disabled={currentSectionTargetIndex >= sectionTargetOptions.length - 1}
+                    className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0"
+                    title="Następny mecz"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500">
+                  Brak zaplanowanych spotkań w tej kategorii.
                 </p>
-              </div>
+              )}
+
+              {/* Informacja o spotkaniu */}
+              {(activeTargetEvent || activeTargetMatch) && (
+                <div className="flex items-center gap-2 text-xs text-slate-700 bg-slate-100/80 px-3 py-1.5 rounded-xl border border-slate-200 self-start sm:self-auto font-medium">
+                  <Calendar className="w-3.5 h-3.5 text-sky-600" />
+                  <span className="font-bold">
+                    {new Date(activeTargetEvent?.date || activeTargetMatch?.date || '').toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'long' })}
+                  </span>
+                  <span>•</span>
+                  <span>{activeTargetEvent?.location || activeTargetMatch?.location || 'Hala OSiR, Luboń'}</span>
+                </div>
+              )}
             </div>
-            <span className="px-2.5 py-1 rounded-xl bg-slate-100 text-slate-700 font-mono text-xs font-bold border border-slate-200">
-              6 na boisku
-            </span>
+
+            {/* 2. PASEK SZYBKICH AKCJI: DODAJ DO TEGO MECZU (UPORZĄDKOWANY I RESPONSYWNY NA TELEFONACH) */}
+            {canEdit && (
+              <div className="bg-slate-50/90 border border-slate-200/90 rounded-2xl p-2.5 sm:p-3 space-y-2">
+                <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-500 px-0.5">
+                  <span className="flex items-center gap-1.5">
+                    <span>⚡ Narzędzia i materiały do meczu</span>
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-semibold hidden sm:inline">
+                    Wybierz format rozpiski
+                  </span>
+                </div>
+
+                {/* Poziom 1: Główne akcje tablicy (Na mobile: 2 równe przyciski 50/50 w czytelnym układzie) */}
+                <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
+                  <button
+                    type="button"
+                    onClick={() => setTacticsSection('board')}
+                    className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-black text-xs transition flex items-center justify-center gap-2 shadow-xs"
+                    title="Otwórz pełną tablicę taktyczną dla tego meczu"
+                  >
+                    <Compass className="w-4 h-4 text-amber-300 shrink-0" />
+                    <span>Rozrysuj na tablicy</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleOpenQuickDrawModal}
+                    className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-white hover:bg-sky-50 text-sky-900 border border-sky-300 font-black text-xs transition flex items-center justify-center gap-1.5 shadow-2xs"
+                    title="Szybki szkic pisakiem na boisku bez przełączania zakładek"
+                  >
+                    <Pencil className="w-4 h-4 text-sky-600 shrink-0" />
+                    <span>Szybki szkic</span>
+                  </button>
+                </div>
+
+                {/* Poziom 2: Dodatkowe załączniki (Na mobile: płynny pojedynczy poziomy pasek zamiast łamania na 3 chaotyczne rzędy) */}
+                <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pt-1 border-t border-slate-200/80 pb-0.5">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 shrink-0 mr-0.5">
+                    Załącz:
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowAddNoteModal(true)}
+                    className="shrink-0 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
+                    title="Dodaj notatkę lub wytyczne dla drużyny"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-slate-600" />
+                    <span>Notatka</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleOpenAddMaterialForCurrentTarget('VIDEO')}
+                    className="shrink-0 px-3 py-1.5 rounded-xl bg-white hover:bg-rose-50 text-rose-800 border border-rose-300 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
+                    title="Dodaj wideo rywala z YouTube lub plik"
+                  >
+                    <Play className="w-3 h-3 text-rose-600 fill-rose-600" />
+                    <span>Wideo rywala</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleOpenAddMaterialForCurrentTarget('IMAGE')}
+                    className="shrink-0 px-3 py-1.5 rounded-xl bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
+                    title="Dodaj zdjęcie tablicy z szatni lub grafikę"
+                  >
+                    <ImageIcon className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Zdjęcie</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleOpenAddMaterialForCurrentTarget('PDF')}
+                    className="shrink-0 px-3 py-1.5 rounded-xl bg-white hover:bg-purple-50 text-purple-800 border border-purple-300 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
+                    title="Wgraj raport skautingowy lub playbook PDF"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-purple-600" />
+                    <span>PDF</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ANKIETA OBECNOŚCI W STYLU MESSENGERA (ZBALANSOWANY PASEK + AWATARY ZAMIAST ŚCIANY ZIELONYCH KAFELKÓW) */}
+            {activeTargetEvent && (() => {
+              const attendees = activeTargetEvent.attendees || [];
+              const confirmedList = attendees.filter(a => a.status === 'BEDE');
+              const uncertainList = attendees.filter(a => a.status === 'NIEPEWNE');
+              const declinedList = attendees.filter(a => a.status === 'NIE_BEDE');
+              const totalSquad = Math.max(allSquadMembers.length, attendees.length, 1);
+              const confirmedPercent = Math.min(100, Math.round((confirmedList.length / totalSquad) * 100));
+
+              const myVote = user ? attendees.find(a => a.userId === user.id || a.userName.toLowerCase() === user.name.toLowerCase())?.status : null;
+
+              return (
+                <div className="pt-3 border-t border-slate-100 space-y-2.5">
+                  {/* Górny nagłówek ankiety */}
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="font-black text-slate-800 uppercase tracking-wider text-[11px]">
+                        Ankieta obecności na mecz
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-mono text-[11px] font-black border border-emerald-200">
+                        {confirmedList.length} będzie
+                      </span>
+                    </div>
+
+                    <Link
+                      href={`/events?eventId=${activeTargetEvent.id}`}
+                      className="text-[11px] font-bold text-sky-600 hover:text-sky-800 flex items-center gap-1 hover:underline"
+                      title="Przejdź do pełnej ankiety w Terminarzu"
+                    >
+                      <span>Szczegóły w Terminarzu</span>
+                      <span>&rarr;</span>
+                    </Link>
+                  </div>
+
+                  {/* Karta opcji ankiety w stylu Messengera (wygrywająca opcja 'Będę' z paskiem postępu i stosem awatarów) */}
+                  <div className="rounded-2xl border border-emerald-200/90 bg-emerald-50/30 overflow-hidden shadow-2xs">
+                    <div
+                      onClick={() => handleVoteAttendance('BEDE')}
+                      className={`relative p-3 flex items-center justify-between gap-3 cursor-pointer transition select-none ${
+                        myVote === 'BEDE' ? 'bg-emerald-50/70 ring-1 ring-emerald-400' : 'hover:bg-emerald-50/50'
+                      }`}
+                      title="Kliknij, aby zagłosować / potwierdzić obecność"
+                    >
+                      {/* Pasek postępu w tle jak w ankietach Messengera */}
+                      <div
+                        className="absolute inset-y-0 left-0 bg-emerald-100/70 transition-all duration-500 pointer-events-none rounded-r-xl"
+                        style={{ width: `${Math.max(12, confirmedPercent)}%` }}
+                      />
+
+                      {/* Lewa strona: Checkmark + Tytuł opcji + Licznik */}
+                      <div className="relative flex items-center gap-2.5 z-10">
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-black shrink-0 transition ${
+                          myVote === 'BEDE'
+                            ? 'bg-emerald-600 text-white shadow-xs'
+                            : 'bg-emerald-500/20 text-emerald-700 border border-emerald-400'
+                        }`}>
+                          ✓
+                        </div>
+                        <span className="text-xs font-black text-slate-800">
+                          Będę na meczu
+                        </span>
+                        <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                          {confirmedList.length}
+                        </span>
+                      </div>
+
+                      {/* Prawa strona: Stos nakładających się okrągłych awatarów (Avatar Facepile jak w Messengerze) */}
+                      <div className="relative flex items-center -space-x-1.5 z-10 shrink-0">
+                        {confirmedList.slice(0, 10).map((att) => {
+                          const playerInfo = allSquadMembers.find(m => m.id === att.userId || m.name.toLowerCase() === att.userName.toLowerCase());
+                          return (
+                            <div
+                              key={att.userId}
+                              title={`${att.userName} ${playerInfo?.number ? `(#${playerInfo.number})` : ''} — Potwierdzona obecność`}
+                              className="w-7 h-7 rounded-full border-2 border-white bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center text-[10px] font-black shadow-xs shrink-0 select-none cursor-default"
+                            >
+                              {getPlayerInitials(att.userName)}
+                            </div>
+                          );
+                        })}
+                        {confirmedList.length > 10 && (
+                          <div
+                            className="w-7 h-7 rounded-full border-2 border-white bg-slate-800 text-white flex items-center justify-center text-[10px] font-black shadow-xs shrink-0 select-none"
+                            title={`I jeszcze ${confirmedList.length - 10} innych zawodników`}
+                          >
+                            +{confirmedList.length - 10}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Subtelna lista imion w stylu Messengera (zamiast jaskrawych zielonych klocków) */}
+                    {confirmedList.length > 0 && (
+                      <div className="px-3.5 py-2 bg-white/70 border-t border-emerald-100 text-[11px] text-slate-600 flex flex-wrap items-center gap-1 leading-relaxed">
+                        <span className="font-bold text-slate-700 mr-1">Zagłosowali:</span>
+                        {confirmedList.map((att, idx) => {
+                          const playerInfo = allSquadMembers.find(m => m.id === att.userId || m.name.toLowerCase() === att.userName.toLowerCase());
+                          return (
+                            <span key={att.userId} className="inline-flex items-center text-slate-700">
+                              <span className="font-semibold hover:text-emerald-700">{att.userName}</span>
+                              {playerInfo?.number && (
+                                <span className="font-mono text-[10px] text-slate-400 font-bold ml-0.5">
+                                  #{playerInfo.number}
+                                </span>
+                              )}
+                              {idx < confirmedList.length - 1 && <span className="text-slate-300 mr-1">,</span>}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Pomocnicze opcje w jednym dyskretnym rzędzie: Niepewne & Nie będę */}
+                  <div className="flex items-center gap-2 flex-wrap text-xs pt-0.5">
+                    <button
+                      type="button"
+                      onClick={() => handleVoteAttendance('NIEPEWNE')}
+                      className={`px-3 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border ${
+                        myVote === 'NIEPEWNE'
+                          ? 'bg-amber-100 text-amber-900 border-amber-300 shadow-xs'
+                          : 'bg-slate-50 hover:bg-white text-slate-600 border-slate-200'
+                      }`}
+                    >
+                      <span>❓ Niepewne</span>
+                      <span className="font-mono text-[11px] font-bold text-amber-800">
+                        ({uncertainList.length})
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleVoteAttendance('NIE_BEDE')}
+                      className={`px-3 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border ${
+                        myVote === 'NIE_BEDE'
+                          ? 'bg-rose-100 text-rose-900 border-rose-300 shadow-xs'
+                          : 'bg-slate-50 hover:bg-white text-slate-600 border-slate-200'
+                      }`}
+                    >
+                      <span>✕ Nie będę</span>
+                      <span className="font-mono text-[11px] font-bold text-rose-800">
+                        ({declinedList.length})
+                      </span>
+                    </button>
+
+                    {uncertainList.length > 0 && (
+                      <span className="text-[11px] text-amber-700 ml-1">
+                        Niepewni: {uncertainList.map(a => a.userName.split(' ')[0]).join(', ')}
+                      </span>
+                    )}
+
+                    {declinedList.length > 0 && (
+                      <span className="text-[11px] text-slate-400 ml-1">
+                        Nieobecni: {declinedList.map(a => a.userName.split(' ')[0]).join(', ')}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
-            {positions.map(p => {
-              const isLibero = p.roleCode === 'L';
-              const isSelected = selectedPlayerId === p.id;
+          {/* 4. FEED POSTÓW & ROZPISKA TAKTYCZNA DLA TEGO MECZU */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between px-1">
+              <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                <span>📋 Rozpiska & Posty Meczowe</span>
+                <span className="px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 font-mono text-xs font-black">
+                  {currentUnitTactics.length + currentUnitMaterials.length + (tacticComment.trim() ? 1 : 0)}
+                </span>
+              </h3>
+              <span className="text-xs text-slate-500 hidden sm:inline">
+                Wszystkie schematy z tablicy, wideo rywala, zdjęcia i wytyczne przypisane do tego meczu.
+              </span>
+            </div>
+
+            {/* STAN PUSTY: GDY BRAK JESZCZE POSTÓW DLA TEGO MECZU */}
+            {currentUnitTactics.length === 0 && currentUnitMaterials.length === 0 && !tacticComment.trim() && (
+              <div className="bg-white border border-dashed border-slate-300 rounded-3xl p-8 sm:p-10 text-center space-y-4 shadow-sm">
+                <div className="w-14 h-14 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto border border-sky-200 shadow-xs">
+                  <Compass className="w-7 h-7" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-base font-black text-slate-900">
+                    Brak rozpisanych materiałów dla meczu vs {activeTargetEvent?.opponent || activeTargetMatch?.opponent || 'Rywal'}
+                  </h4>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                    Rozrysuj pierwszy schemat ustawienia na tablicy, dodaj wideo analizy rywala lub zapisz wytyczne taktyczne dla zespołu.
+                  </p>
+                </div>
+                {canEdit && (
+                  <div className="flex items-center justify-center gap-2 flex-wrap pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setTacticsSection('board')}
+                      className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition"
+                    >
+                      <Compass className="w-4 h-4 text-amber-300" />
+                      <span>Rozrysuj na tablicy</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowAddNoteModal(true)}
+                      className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition"
+                    >
+                      <FileText className="w-4 h-4 text-slate-600" />
+                      <span>Dodaj notatkę</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenAddMaterialForCurrentTarget('VIDEO')}
+                      className="px-4 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition"
+                    >
+                      <Play className="w-3.5 h-3.5 fill-rose-600" />
+                      <span>Dodaj wideo</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* GŁÓWNA NOTATKA / WYTYCZNE TRENERA (JEŚLI ISTNIEJĄ) */}
+            {tacticComment.trim() && (
+              <div className="bg-white border border-slate-300 rounded-3xl p-5 shadow-md space-y-3 border-t-4 border-t-amber-500">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-bold border border-amber-300 shadow-2xs">
+                      📝
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-black uppercase tracking-wider text-slate-900">
+                        Założenia taktyczne i odprawa na mecz
+                      </h4>
+                      <span className="text-[10px] text-slate-500 font-medium">
+                        Wpis sztabu szkoleniowego Angels ZTP
+                      </span>
+                    </div>
+                  </div>
+                  {canEdit && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAddNoteModal(true)}
+                      className="text-xs font-bold text-sky-600 hover:text-sky-800 flex items-center gap-1 hover:underline"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                      <span>Edytuj</span>
+                    </button>
+                  )}
+                </div>
+                <div className="text-xs text-slate-800 leading-relaxed whitespace-pre-line bg-slate-50/90 p-4 rounded-2xl border border-slate-200/90 font-medium">
+                  {tacticComment}
+                </div>
+              </div>
+            )}
+
+            {/* LISTA POSTÓW: SCHEMATY Z TABLICY TAKTYCZNEJ */}
+            {currentUnitTactics.map(tac => {
               return (
                 <div
-                  key={p.id}
-                  onClick={() => setSelectedPlayerId(isSelected ? null : p.id)}
-                  className={`p-3 rounded-2xl border text-xs cursor-pointer transition ${
-                    isSelected
-                      ? 'bg-sky-50 border-sky-400 text-slate-900 shadow-sm ring-2 ring-sky-300'
-                      : 'bg-slate-50/70 border-slate-200 text-slate-700 hover:bg-slate-100'
+                  key={tac.id}
+                  className={`bg-white border border-slate-300 rounded-3xl p-4 sm:p-6 shadow-md hover:shadow-lg transition space-y-4 animate-in fade-in duration-200 ${
+                    tacticsSection === 'sparingi'
+                      ? 'border-t-4 border-t-amber-500'
+                      : tacticsSection === 'turnieje'
+                      ? 'border-t-4 border-t-purple-600'
+                      : 'border-t-4 border-t-sky-600'
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-1 pb-1.5 border-b border-slate-200/60">
-                    <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs ${
-                      isLibero ? 'bg-amber-400 text-slate-950 font-bold' : 'bg-sky-600 text-white font-bold'
-                    }`}>
-                      {p.number ? `#${p.number}` : p.roleCode}
-                    </span>
-                    <span className="text-[10px] font-mono font-bold text-slate-500 bg-white px-1.5 py-0.5 rounded border border-slate-200">
-                      Strefa {p.zone}
-                    </span>
+                  {/* Nagłówek posta ze schematem */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-600 text-white flex items-center justify-center font-bold text-base shadow-sm shrink-0">
+                        🎨
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="font-black text-sm text-slate-900">
+                            {tac.title}
+                          </h4>
+                          <span className="px-2 py-0.5 rounded-lg text-[10px] font-black uppercase bg-sky-100 text-sky-800 font-mono">
+                            Rotacja: {tac.rotation || 'P1'}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-lg text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 font-mono">
+                            {tac.phase || 'PRZYJĘCIE'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-0.5">
+                          Dodano przez: <strong className="text-slate-700">{tac.createdByName || 'Trener Hubert Rutkowski'}</strong> • {new Date(tac.createdAt).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 self-start sm:self-center shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleLoadTacticToBoard(tac)}
+                        className="px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
+                        title="Załaduj ten schemat na główną tablicę taktyczną"
+                      >
+                        <Compass className="w-3.5 h-3.5 text-sky-600" />
+                        <span>Otwórz na tablicy &rarr;</span>
+                      </button>
+
+                      {canEdit && (
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteTactic(tac.id)}
+                          className="p-1.5 rounded-xl hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition"
+                          title="Usuń ten wpis taktyczny"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <p className="font-black text-slate-900 text-xs truncate mt-1.5">
-                    {p.name.replace(/\s*\([^)]*\)/, '')}
-                  </p>
-                  <p className="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-snug">
-                    {p.task || 'Podstawowe zadanie w strefie'}
-                  </p>
+
+                  {/* UKŁAD Z RYSUNKIEM Z BOKU (DOKŁADNIE JAK W TRENINGACH / NA WZORZE) */}
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-start pt-1">
+                    
+                    {/* LEWA STRONA (md:col-span-7): Opis, wytyczne i punkty kluczowe */}
+                    <div className="md:col-span-7 space-y-3">
+                      {tac.description && (
+                        <p className="text-xs text-slate-800 leading-relaxed bg-slate-50/90 p-3.5 rounded-2xl border border-slate-200/90 font-medium">
+                          {tac.description}
+                        </p>
+                      )}
+
+                      {/* Punkty kluczowe / Wytyczne trenera */}
+                      {(tac.tacticalNotes || (tac.directives && tac.directives.length > 0)) && (
+                        <div className="p-4 bg-amber-50/90 rounded-2xl border-l-4 border-l-amber-500 border border-amber-300/80 text-xs text-slate-900 leading-relaxed space-y-2.5 shadow-2xs">
+                          <div className="flex items-center gap-1.5 text-amber-950 font-black text-[11px] uppercase tracking-wider">
+                            <span>💡 Punkty kluczowe dla trenera / wykonania:</span>
+                          </div>
+                          {tac.directives && tac.directives.length > 0 ? (
+                            <ul className="list-disc list-inside space-y-1.5 text-slate-900 text-xs pl-1 font-medium">
+                              {tac.directives.map((dir, dIdx) => (
+                                <li key={dIdx} className="leading-snug">{dir}</li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-slate-900 text-xs font-medium">{tac.tacticalNotes}</p>
+                          )}
+                          {tac.directives && tac.directives.length > 0 && tac.tacticalNotes && (
+                            <p className="text-slate-900 text-xs pt-2 border-t border-amber-200/80 font-medium">{tac.tacticalNotes}</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* PRAWA STRONA (md:col-span-5): Boisko siatkarskie z pozycjami i nałożonym rysunkiem */}
+                    <div className="md:col-span-5 flex flex-col gap-2">
+                      <div className="relative bg-slate-950 rounded-2xl border-2 border-slate-800 overflow-hidden group/draw shadow-md h-52 sm:h-56 w-full flex items-center justify-center p-2">
+                        {/* Właściwe boisko siatkarskie (Wymiary zgodne z tablicą pionową) */}
+                        <div className="relative h-full aspect-[9/13] bg-[#1e40af] border-2 border-white rounded-sm overflow-hidden shadow-md">
+                          {/* Połowa Rywali (Góra: 0 - 50%) */}
+                          <div className="absolute top-0 left-0 right-0 bottom-1/2 bg-gradient-to-b from-[#1e3a8a] to-[#1e40af]" />
+
+                          {/* Linia 3m rywali */}
+                          <div className="absolute top-[33.3%] left-0 right-0 border-b border-dashed border-rose-300/60 pointer-events-none" />
+
+                          {/* Siatka na środku (50%) */}
+                          <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-2 bg-white border-y border-slate-300 shadow-sm z-10 flex items-center justify-between pointer-events-none">
+                            <div className="w-1.5 h-3 bg-slate-400 rounded-r border border-slate-600 -translate-x-0.5" />
+                            <div className="w-1.5 h-3 bg-slate-400 rounded-l border border-slate-600 translate-x-0.5" />
+                          </div>
+
+                          {/* Linia 3m Angels ZTP (66.7%) */}
+                          <div className="absolute top-[66.7%] left-0 right-0 border-b border-dashed border-sky-200/80 pointer-events-none z-5" />
+
+                          {/* Subtelne oznaczenia stref */}
+                          <div className="absolute top-[52%] left-1.5 text-[8px] font-black text-white/20 select-none pointer-events-none">IV</div>
+                          <div className="absolute top-[52%] left-1/2 -translate-x-1/2 text-[8px] font-black text-white/20 select-none pointer-events-none">III</div>
+                          <div className="absolute top-[52%] right-1.5 text-[8px] font-black text-white/20 select-none pointer-events-none">II</div>
+                          <div className="absolute bottom-2 left-1.5 text-[8px] font-black text-white/20 select-none pointer-events-none">V</div>
+                          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[8px] font-black text-white/20 select-none pointer-events-none">VI</div>
+                          <div className="absolute bottom-2 right-1.5 text-[8px] font-black text-white/20 select-none pointer-events-none">I</div>
+
+                          {/* Pozycje zawodników na boisku (Kółka ze skrótami ról) */}
+                          {(tac.courtPositions && tac.courtPositions.length > 0 ? tac.courtPositions : (ROTATION_DEFAULTS[tac.rotation || 'P1']?.[tac.phase || 'PRZYJECIE'] || [])).map(p => (
+                            <div
+                              key={p.id || p.roleCode}
+                              style={{ left: `${p.x}%`, top: `${p.y}%` }}
+                              className="absolute -translate-x-1/2 -translate-y-1/2 z-15 pointer-events-none"
+                              title={`${p.name || p.roleCode}${p.number ? ` #${p.number}` : ''}${p.task ? `: ${p.task}` : ''}`}
+                            >
+                              <div className={`w-5 h-5 rounded-full border border-white flex items-center justify-center text-[9px] font-black shadow-md ${
+                                p.roleCode === 'L'
+                                  ? 'bg-amber-400 text-slate-950 font-black'
+                                  : p.roleCode === 'R'
+                                  ? 'bg-sky-400 text-slate-950 font-black'
+                                  : 'bg-white text-slate-950 font-black'
+                              }`}>
+                                {p.roleCode}
+                              </div>
+                            </div>
+                          ))}
+
+                          {/* Warstwa odręcznego rysunku / szkicu (jeśli istnieje) */}
+                          {tac.drawingData && (
+                            <img
+                              src={tac.drawingData}
+                              alt={tac.title}
+                              className="absolute inset-0 w-full h-full object-contain pointer-events-none z-20"
+                            />
+                          )}
+                        </div>
+
+                        {/* Oznaczenie: Schemat & Rysunek */}
+                        <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/75 backdrop-blur-xs text-[10px] text-sky-400 font-bold border border-sky-400/30 flex items-center gap-1 z-30">
+                          <span>🎨 Boisko & Rysunek</span>
+                        </div>
+
+                        {/* Przycisk otwarcia na pełnej tablicy taktycznej */}
+                        <button
+                          type="button"
+                          onClick={() => handleLoadTacticToBoard(tac)}
+                          className="absolute bottom-2 right-2 px-2.5 py-1 rounded-xl bg-slate-900/90 hover:bg-sky-600 text-white text-[10px] font-bold border border-slate-700 hover:border-sky-400 shadow-sm transition z-30 flex items-center gap-1"
+                          title="Otwórz i edytuj na tablicy"
+                        >
+                          <span>Edytuj na tablicy &rarr;</span>
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* LISTA POSTÓW: MATERIAŁY, WIDEO, ZDJĘCIA & DOKUMENTY PDF */}
+            {currentUnitMaterials.map(mat => {
+              const isVideo = mat.type === 'VIDEO' || mat.fileUrl.includes('youtube') || mat.fileUrl.includes('youtu.be') || mat.fileUrl.endsWith('.mp4');
+              const ytId = getYoutubeId(mat.fileUrl);
+
+              return (
+                <div
+                  key={mat.id}
+                  className={`bg-white border border-slate-300 rounded-3xl p-4 sm:p-6 shadow-md hover:shadow-lg transition space-y-4 animate-in fade-in duration-200 ${
+                    isVideo ? 'border-t-4 border-t-rose-500' : mat.type === 'IMAGE' ? 'border-t-4 border-t-sky-500' : 'border-t-4 border-t-emerald-500'
+                  }`}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-base shadow-sm shrink-0 ${
+                        isVideo ? 'bg-rose-50 text-rose-600 border border-rose-200' : mat.type === 'IMAGE' ? 'bg-sky-50 text-sky-600 border border-sky-200' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                      }`}>
+                        {isVideo ? '🎬' : mat.type === 'IMAGE' ? '📸' : '📄'}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="font-black text-sm text-slate-900">
+                            {mat.title}
+                          </h4>
+                          <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black uppercase font-mono ${
+                            isVideo ? 'bg-rose-100 text-rose-800' : mat.type === 'IMAGE' ? 'bg-sky-100 text-sky-800' : 'bg-emerald-100 text-emerald-800'
+                          }`}>
+                            {isVideo ? 'Wideo' : mat.type === 'IMAGE' ? 'Zdjęcie' : 'Plik PDF'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-0.5">
+                          Dodano przez: <strong className="text-slate-700">{mat.uploadedByName || 'Sztab'}</strong> • {new Date(mat.uploadedAt).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 self-start sm:self-center shrink-0">
+                      {isVideo ? (
+                        <button
+                          type="button"
+                          onClick={() => setPreviewMedia(mat)}
+                          className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-300 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
+                        >
+                          <Play className="w-3.5 h-3.5 fill-rose-600" />
+                          <span>Odtwórz wideo</span>
+                        </button>
+                      ) : mat.type === 'IMAGE' ? (
+                        <button
+                          type="button"
+                          onClick={() => setPreviewMedia(mat)}
+                          className="px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
+                        >
+                          <Eye className="w-3.5 h-3.5 text-sky-600" />
+                          <span>Powiększ</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (mat.fileUrl.startsWith('data:application/pdf') || mat.fileUrl.endsWith('.pdf')) {
+                              setSelectedPdfViewer(mat);
+                            } else {
+                              window.open(mat.fileUrl, '_blank');
+                            }
+                          }}
+                          className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
+                        >
+                          <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Otwórz PDF</span>
+                        </button>
+                      )}
+
+                      {canEdit && (
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteMaterial(mat.id)}
+                          className="p-1.5 rounded-xl hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition"
+                          title="Usuń materiał"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Podgląd wideo lub zdjęcia */}
+                  {isVideo ? (
+                    ytId ? (
+                      <div className="aspect-video w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-900">
+                        <iframe
+                          src={`https://www.youtube.com/embed/${ytId}`}
+                          title={mat.title}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        onClick={() => setPreviewMedia(mat)}
+                        className="h-48 bg-slate-900 rounded-2xl relative cursor-pointer group flex items-center justify-center overflow-hidden"
+                      >
+                        <div className="w-12 h-12 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition">
+                          <Play className="w-6 h-6 fill-white ml-0.5" />
+                        </div>
+                      </div>
+                    )
+                  ) : mat.type === 'IMAGE' ? (
+                    <div
+                      onClick={() => setPreviewMedia(mat)}
+                      className="rounded-2xl overflow-hidden border border-slate-200 max-h-72 bg-slate-100 flex items-center justify-center cursor-pointer group"
+                    >
+                      <img
+                        src={mat.fileUrl}
+                        alt={mat.title}
+                        className="max-h-72 w-full object-contain group-hover:scale-102 transition duration-300"
+                      />
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-emerald-50/60 rounded-2xl border border-emerald-200/70 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <FileText className="w-8 h-8 text-emerald-600 shrink-0" />
+                        <div>
+                          <p className="font-bold text-xs text-slate-900">{mat.fileName || mat.title}</p>
+                          {mat.fileSize && <p className="text-[10px] text-slate-500 font-mono">{mat.fileSize}</p>}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (mat.fileUrl.startsWith('data:application/pdf') || mat.fileUrl.endsWith('.pdf')) {
+                            setSelectedPdfViewer(mat);
+                          } else {
+                            window.open(mat.fileUrl, '_blank');
+                          }
+                        }}
+                        className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow-xs"
+                      >
+                        Pobierz / Wyświetl
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Opis materiału */}
+                  {mat.description && (
+                    <p className="text-xs text-slate-700 bg-slate-50 p-3 rounded-2xl border border-slate-200/60 leading-relaxed">
+                      {mat.description}
+                    </p>
+                  )}
                 </div>
               );
             })}
           </div>
-        </div>
 
-        {/* Prawa kolumna (5 cols): Odprawa & Notatka Taktyczna */}
-        <div className="lg:col-span-5 bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-xs border border-amber-200">
-                  <FileText className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-black uppercase text-slate-900 tracking-wider">
-                    Założenia & Odprawa
-                  </h3>
-                  <p className="text-[11px] text-slate-500">
-                    Notatka taktyczna dla zespołu do tego schematu
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <textarea
-              ref={noteTextareaRef}
-              rows={8}
-              value={tacticComment}
-              onChange={e => setTacticComment(e.target.value)}
-              placeholder="Wpisz wytyczne zagrywki, kierunki ataku, asekurację bloku lub cele na dany set..."
-              className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-sky-500 text-slate-900 placeholder:text-slate-400 rounded-2xl p-3.5 text-xs font-medium leading-relaxed focus:outline-none transition shadow-2xs resize-none"
-            />
-          </div>
-
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
-            <span className="text-[11px] text-slate-400 font-mono">
-              Znaki: {tacticComment.length}
-            </span>
-
-            {canEdit && (
-              <button
-                type="button"
-                onClick={handleSaveTactic}
-                disabled={saving}
-                className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider transition shadow-sm hover:shadow flex items-center gap-1.5 cursor-pointer active:scale-95"
-              >
-                <Save className="w-3.5 h-3.5" />
-                <span>{saving ? 'Zapisywanie...' : 'Zapisz Schemat'}</span>
-              </button>
-            )}
-          </div>
-        </div>
-
-      </div>
-
-        {/* SEKCJA: SUGESTIE I WNIOSKI ZAWODNIKÓW & DYSKUSJA TAKTYCZNA */}
-        {selectedTactic && (
-          <div className="p-5 sm:p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 shrink-0">
-                  <MessageSquare className="w-5 h-5 stroke-[2.5]" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-sm sm:text-base font-black uppercase text-slate-900 tracking-tight font-athletic">
-                      Sugestie & Prośby o Edycję Zawodników
-                    </h4>
-                    {((selectedTactic.posts || []).filter(p => p.status === 'OCZEKUJE').length > 0) && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300 animate-pulse">
-                        {(selectedTactic.posts || []).filter(p => p.status === 'OCZEKUJE').length} oczekujące
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-[11px] text-slate-500">
-                    Wnioski taktyczne od zespołu, uwagi do ustawień oraz prośby o dostęp do edycji tablicy.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 flex-wrap">
-                {/* Filter buttons */}
-                <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200 text-[11px] font-bold">
-                  <button
-                    type="button"
-                    onClick={() => setPostFilter('ALL')}
-                    className={`px-2.5 py-1 rounded-lg transition ${postFilter === 'ALL' ? 'bg-white text-slate-900 shadow-2xs font-black' : 'text-slate-500 hover:text-slate-900'}`}
-                  >
-                    Wszystkie ({(selectedTactic.posts || []).length})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPostFilter('PENDING')}
-                    className={`px-2.5 py-1 rounded-lg transition ${postFilter === 'PENDING' ? 'bg-white text-amber-800 shadow-2xs font-black' : 'text-slate-500 hover:text-slate-900'}`}
-                  >
-                    Oczekujące ({(selectedTactic.posts || []).filter(p => p.status === 'OCZEKUJE').length})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPostFilter('ACCEPTED')}
-                    className={`px-2.5 py-1 rounded-lg transition ${postFilter === 'ACCEPTED' ? 'bg-white text-emerald-800 shadow-2xs font-black' : 'text-slate-500 hover:text-slate-900'}`}
-                  >
-                    Zaakceptowane ({(selectedTactic.posts || []).filter(p => p.status === 'ZAAKCEPTOWANY').length})
-                  </button>
-                </div>
-
-                {/* Add button for players */}
-                <button
-                  type="button"
-                  onClick={() => setShowRequestEditModal(true)}
-                  className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition flex items-center gap-1.5 shadow-2xs"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>+ Zgłoś uwagę / Prośbę</span>
-                </button>
-              </div>
-            </div>
-
-            {/* List of posts / suggestions */}
-            {(!selectedTactic.posts || selectedTactic.posts.length === 0) ? (
-              <div className="py-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-1.5">
-                <MessageSquare className="w-8 h-8 text-slate-400 mx-auto" />
-                <p className="text-xs font-bold text-slate-700">Brak zgłoszeń dla tej taktyki</p>
-                <p className="text-[11px] text-slate-400 max-w-sm mx-auto">
-                  Zawodnicy mogą przesyłać swoje propozycje rotacji, asekuracji kiwek lub prosić trenera o uprawnienia edycji.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-2.5">
-                {selectedTactic.posts
-                  .filter(p => {
-                    if (postFilter === 'PENDING') return p.status === 'OCZEKUJE';
-                    if (postFilter === 'ACCEPTED') return p.status === 'ZAAKCEPTOWANY';
-                    return true;
-                  })
-                  .map(post => {
-                    const isPending = post.status === 'OCZEKUJE';
-                    const isAccepted = post.status === 'ZAAKCEPTOWANY';
-                    const isEditRequest = post.content.includes('PROŚBA O UPRAWNIENIA EDYCJI');
-
-                    return (
-                      <div
-                        key={post.id}
-                        className={`p-4 rounded-2xl border transition-all ${
-                          isPending
-                            ? 'bg-amber-50/60 border-amber-200 shadow-2xs'
-                            : isAccepted
-                            ? 'bg-emerald-50/30 border-emerald-200'
-                            : 'bg-slate-50 border-slate-200'
-                        }`}
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-200/60">
-                          <div className="flex items-center gap-2">
-                            <span className="w-7 h-7 rounded-lg bg-sky-100 text-sky-800 font-mono font-black text-xs flex items-center justify-center border border-sky-200 shrink-0">
-                              #{post.authorNumber || '•'}
-                            </span>
-                            <div>
-                              <span className="text-xs font-black text-slate-900">{post.authorName}</span>
-                              <span className="text-[10px] text-slate-400 ml-2">
-                                {new Date(post.createdAt).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider border ${
-                              isPending
-                                ? 'bg-amber-100 text-amber-900 border-amber-300'
-                                : isAccepted
-                                ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
-                                : 'bg-rose-100 text-rose-900 border-rose-300'
-                            }`}>
-                              {isPending ? '🟡 Oczekuje na decyzję trenera' : isAccepted ? '🟢 Zaakceptowana' : '🔴 Odrzucona'}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Content text */}
-                        <div className="py-2 text-xs text-slate-800 font-medium whitespace-pre-wrap leading-relaxed">
-                          {post.content}
-                        </div>
-
-                        {/* Coach reply feedback if present */}
-                        {post.coachComment && (
-                          <div className="mt-2 p-2.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-700 flex items-start gap-2 shadow-2xs">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                            <div>
-                              <span className="font-bold text-slate-900 block text-[11px]">Odpowiedź Trenera / Sztabu:</span>
-                              <span className="text-[11.5px] italic text-slate-600">{post.coachComment}</span>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Actions for Coach / Manager */}
-                        {canEdit && (
-                          <div className="mt-3 pt-2.5 border-t border-slate-200/60 flex flex-wrap items-center justify-end gap-2">
-                            {isEditRequest && post.authorId && (
-                              <button
-                                type="button"
-                                onClick={() => handleGrantTacticEdit(post.authorId, post.id)}
-                                className="px-3 py-1 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
-                                title="Nadaj temu zawodnikowi uprawnienia edycji tablicy taktycznej"
-                              >
-                                <Crown className="w-3.5 h-3.5" />
-                                <span>🔑 Odblokuj edycję dla gracza</span>
-                              </button>
-                            )}
-
-                            {isPending && (
-                              <>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const comment = prompt('Dodaj komentarz trenera do akceptacji (opcjonalnie):', 'Świetna uwaga, wdrożone do założeń!');
-                                    if (comment !== null) {
-                                      handleUpdatePostStatus(post.id, 'ZAAKCEPTOWANY', comment);
-                                    }
-                                  }}
-                                  className="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1 shadow-2xs"
-                                >
-                                  <CheckCircle2 className="w-3.5 h-3.5" />
-                                  <span>Zaakceptuj</span>
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const comment = prompt('Podaj powód odrzucenia (opcjonalnie):', 'Zostajemy przy obecnym wariancie.');
-                                    if (comment !== null) {
-                                      handleUpdatePostStatus(post.id, 'ODRZUCONY', comment);
-                                    }
-                                  }}
-                                  className="px-3 py-1 rounded-xl bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-300 font-bold text-xs transition flex items-center gap-1"
-                                >
-                                  <X className="w-3.5 h-3.5" />
-                                  <span>Odrzuć</span>
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-              </div>
-            )}
-          </div>
-        )}
-      </>
-      )}
-
-      {/* SEKCJA 2: MECZE, SPARINGI & TURNIEJE Z TERMINARZA */}
-      {tacticsSection === 'matches' && (
-        <div className="space-y-4 animate-in fade-in duration-200">
-          <TrainingPlannerContent mode="MATCHES" defaultTab="EXERCISES" hideHeader={true} />
         </div>
       )}
 
@@ -2993,44 +4187,117 @@ function TacticsContent() {
             </div>
 
             <form onSubmit={handleSaveMaterial} className="space-y-4">
-              {/* Wybór pliku */}
+              {/* Typ materiału: Zdjęcie / Wideo / PDF */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  Wybierz plik z komputera / telefonu (PDF lub Grafika) *
-                </label>
-                <label className="flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-dashed border-slate-300 hover:border-rose-400 bg-slate-50 cursor-pointer transition group mb-2 text-center">
-                  <Upload className="w-7 h-7 text-slate-400 group-hover:text-rose-500 transition mb-1" />
-                  <span className="text-xs font-bold text-slate-700 group-hover:text-slate-900">
-                    {materialFileName
-                      ? `✓ ${materialFileName} (${materialType})`
-                      : 'Wybierz plik PDF, PNG, JPG lub WEBP'}
-                  </span>
-                  <span className="text-[10px] text-slate-500 mt-0.5">
-                    Playbooki PDF, raporty skautingowe lub zrzuty tablicy
-                  </span>
-                  <input
-                    type="file"
-                    accept=".pdf, image/*"
-                    className="hidden"
-                    onChange={handleMaterialFileUpload}
-                  />
-                </label>
-
-                <input
-                  type="text"
-                  placeholder="LUB wklej bezpośredni link URL..."
-                  value={materialFileUrl.startsWith('data:') ? `[Wczytano plik: ${materialFileName}]` : materialFileUrl}
-                  onChange={e => {
-                    if (!e.target.value.startsWith('[')) {
-                      setMaterialFileUrl(e.target.value);
-                      if (e.target.value.toLowerCase().includes('.pdf')) {
-                        setMaterialType('PDF');
-                      }
-                    }
-                  }}
-                  className="w-full bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl p-2.5 text-xs focus:outline-none focus:border-rose-400 shadow-2xs"
-                />
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">Typ załącznika</label>
+                <div className="grid grid-cols-3 gap-2 p-1 bg-slate-100 rounded-2xl border border-slate-200">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMaterialType('IMAGE');
+                      setMaterialFileUrl('');
+                      setMaterialFileName('');
+                    }}
+                    className={`py-2 px-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                      materialType === 'IMAGE'
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    <span>Zdjęcie</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMaterialType('VIDEO');
+                      setMaterialFileUrl('');
+                      setMaterialFileName('');
+                    }}
+                    className={`py-2 px-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                      materialType === 'VIDEO'
+                        ? 'bg-rose-600 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <Play className="w-3.5 h-3.5 fill-current" />
+                    <span>Wideo</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMaterialType('PDF');
+                      setMaterialFileUrl('');
+                      setMaterialFileName('');
+                    }}
+                    className={`py-2 px-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                      materialType === 'PDF'
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>PDF</span>
+                  </button>
+                </div>
               </div>
+
+              {/* Input for Video Link or File Upload */}
+              {materialType === 'VIDEO' ? (
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Link do wideo (YouTube / Vimeo / bezpośredni MP4) *
+                  </label>
+                  <input
+                    type="url"
+                    required
+                    placeholder="https://www.youtube.com/watch?v=... lub link MP4"
+                    value={materialFileUrl}
+                    onChange={e => setMaterialFileUrl(e.target.value)}
+                    className="w-full bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl p-2.5 text-xs focus:outline-none focus:border-rose-400 shadow-2xs font-mono"
+                  />
+                  <p className="text-[10px] text-slate-500 mt-1">
+                    Wideo z meczu ligowego, odprawy lub analizy zagrywki rywali.
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    {materialType === 'IMAGE' ? 'Wybierz zdjęcie / grafikę z dysku *' : 'Wybierz dokument PDF z dysku *'}
+                  </label>
+                  <label className="flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-dashed border-slate-300 hover:border-sky-400 bg-slate-50 cursor-pointer transition group mb-2 text-center">
+                    <Upload className="w-7 h-7 text-slate-400 group-hover:text-sky-500 transition mb-1" />
+                    <span className="text-xs font-bold text-slate-700 group-hover:text-slate-900">
+                      {materialFileName
+                        ? `✓ ${materialFileName}`
+                        : materialType === 'IMAGE'
+                        ? 'Kliknij, aby wybrać zdjęcie (PNG, JPG, WEBP)'
+                        : 'Kliknij, aby wybrać plik PDF'}
+                    </span>
+                    <span className="text-[10px] text-slate-500 mt-0.5">
+                      {materialType === 'IMAGE' ? 'Zrzuty tablicy z szatni, infografiki taktyczne' : 'Playbooki taktyczne, oficjalne protokoły i raporty'}
+                    </span>
+                    <input
+                      type="file"
+                      accept={materialType === 'IMAGE' ? 'image/*' : '.pdf'}
+                      className="hidden"
+                      onChange={handleMaterialFileUpload}
+                    />
+                  </label>
+
+                  <input
+                    type="text"
+                    placeholder="LUB wklej bezpośredni link URL..."
+                    value={materialFileUrl.startsWith('data:') ? `[Wczytano plik z dysku: ${materialFileName}]` : materialFileUrl}
+                    onChange={e => {
+                      if (!e.target.value.startsWith('[')) {
+                        setMaterialFileUrl(e.target.value);
+                      }
+                    }}
+                    className="w-full bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl p-2.5 text-xs focus:outline-none focus:border-sky-400 shadow-2xs"
+                  />
+                </div>
+              )}
 
               {/* Tytuł materiału */}
               <div>
@@ -3108,6 +4375,236 @@ function TacticsContent() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Szybkie Rysowanie Schematu Boiska dla Meczu */}
+      {showQuickDrawModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 w-full max-w-3xl shadow-xl space-y-4 my-auto animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <div className="flex items-center gap-2">
+                <Pencil className="w-5 h-5 text-sky-600" />
+                <div>
+                  <h3 className="text-base font-black uppercase text-slate-900">
+                    Rozrysuj Schemat Boiska na Mecz
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    {activeTargetEvent?.title || (activeTargetMatch ? `Mecz vs ${activeTargetMatch.opponent}` : 'Mecz')}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowQuickDrawModal(false)}
+                className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-2">
+                  <label className="block text-[11px] font-black uppercase text-slate-600 mb-1">
+                    Nazwa schematu taktycznego *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={quickDrawTitle}
+                    onChange={e => setQuickDrawTitle(e.target.value)}
+                    placeholder="np. Obrona ciasnego skosu w P1 i asekuracja"
+                    className="w-full bg-slate-100 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold focus:outline-none focus:border-sky-500 text-xs"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[11px] font-black uppercase text-slate-600 mb-1">
+                      Faza
+                    </label>
+                    <select
+                      value={quickDrawPhase}
+                      onChange={e => setQuickDrawPhase(e.target.value as any)}
+                      className="w-full bg-slate-100 border border-slate-300 rounded-xl px-2.5 py-2 text-slate-900 font-bold focus:outline-none text-xs"
+                    >
+                      <option value="PRZYJECIE">Przyjęcie</option>
+                      <option value="OBRONA">Obrona</option>
+                      <option value="ATAK">Atak</option>
+                      <option value="ZAGRYWKA">Zagrywka</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-black uppercase text-slate-600 mb-1">
+                      Rotacja
+                    </label>
+                    <select
+                      value={quickDrawRotation}
+                      onChange={e => setQuickDrawRotation(e.target.value as any)}
+                      className="w-full bg-slate-100 border border-slate-300 rounded-xl px-2.5 py-2 text-slate-900 font-bold focus:outline-none text-xs font-mono"
+                    >
+                      {(['P1', 'P2', 'P3', 'P4', 'P5', 'P6'] as RotationCode[]).map(r => (
+                        <option key={r} value={r}>{r}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Drawing Toolbar */}
+              <div className="flex items-center justify-between gap-2 flex-wrap pt-1 border-t border-slate-100">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-bold text-slate-500">Kolor pisaka:</span>
+                  {['#00e5ff', '#facc15', '#f8fafc', '#ef4444', '#10b981'].map(c => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setQuickDrawColor(c)}
+                      style={{ backgroundColor: c }}
+                      className={`w-6 h-6 rounded-full border-2 transition ${
+                        quickDrawColor === c ? 'border-white scale-110 shadow-md ring-2 ring-slate-400' : 'border-transparent'
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleUndoQuickDraw}
+                    className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs flex items-center gap-1 font-bold"
+                    title="Cofnij ostatnią linię"
+                  >
+                    <Undo2 className="w-3.5 h-3.5" />
+                    <span>Cofnij</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleClearQuickDraw}
+                    className="px-2.5 py-1 rounded-lg bg-slate-100 text-rose-500 hover:bg-rose-50 text-xs font-bold"
+                  >
+                    Wyczyść tablicę
+                  </button>
+                </div>
+              </div>
+
+              {/* Interactive Canvas */}
+              <div className="relative mx-auto rounded-2xl overflow-hidden border border-slate-300 bg-slate-950 flex justify-center shadow-inner">
+                <canvas
+                  ref={quickDrawCanvasRef}
+                  width={600}
+                  height={340}
+                  onMouseDown={startQuickDraw}
+                  onMouseMove={drawQuickDraw}
+                  onMouseUp={stopQuickDraw}
+                  onMouseLeave={stopQuickDraw}
+                  onTouchStart={startQuickDraw}
+                  onTouchMove={drawQuickDraw}
+                  onTouchEnd={stopQuickDraw}
+                  className="cursor-crosshair max-w-full touch-none"
+                />
+              </div>
+              <p className="text-[10px] text-slate-500 text-center">
+                Rysuj trajektorię piłki, ustawienie graczy i strefy. Schemat zostanie trwale zapisany do tego meczu.
+              </p>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setShowQuickDrawModal(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-800"
+                >
+                  Anuluj
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveQuickDrawTactic}
+                  disabled={saving || !quickDrawTitle.trim()}
+                  className="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider shadow-sm transition disabled:opacity-50"
+                >
+                  {saving ? 'Zapisywanie...' : 'Zapisz Schemat do Meczu'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Pełnoekranowy Podgląd Mediów (Lightbox dla Wideo i Zdjęć) */}
+      {previewMedia && (
+        <div
+          onClick={() => setPreviewMedia(null)}
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in"
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-6 w-full max-w-4xl shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto text-white"
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div>
+                <h4 className="text-base font-black text-white">{previewMedia.title}</h4>
+                {previewMedia.description && (
+                  <p className="text-xs text-slate-400 mt-0.5">{previewMedia.description}</p>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreviewMedia(null)}
+                className="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="flex items-center justify-center min-h-[300px]">
+              {previewMedia.type === 'VIDEO' || previewMedia.fileUrl.includes('youtube') || previewMedia.fileUrl.includes('youtu.be') ? (() => {
+                const ytId = getYoutubeId(previewMedia.fileUrl);
+                if (ytId) {
+                  return (
+                    <div className="w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-lg">
+                      <iframe
+                        src={`https://www.youtube.com/embed/${ytId}?autoplay=1`}
+                        title={previewMedia.title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="w-full h-full border-0"
+                      />
+                    </div>
+                  );
+                }
+                return (
+                  <video
+                    src={previewMedia.fileUrl}
+                    controls
+                    autoPlay
+                    className="max-h-[70vh] w-auto max-w-full rounded-2xl bg-black"
+                  />
+                );
+              })() : (
+                <img
+                  src={previewMedia.fileUrl}
+                  alt={previewMedia.title}
+                  className="max-h-[75vh] w-auto max-w-full object-contain rounded-2xl shadow-lg"
+                />
+              )}
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-slate-800 text-xs text-slate-400">
+              <span>Dodano: {new Date(previewMedia.uploadedAt).toLocaleDateString('pl-PL')} przez {previewMedia.uploadedByName}</span>
+              <a
+                href={previewMedia.fileUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sky-400 hover:underline flex items-center gap-1 font-bold"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span>Otwórz w nowej karcie</span>
+              </a>
+            </div>
           </div>
         </div>
       )}
@@ -3505,6 +5002,74 @@ function TacticsContent() {
           </div>
         </div>
       )}
+      {/* Modal: Dodaj notatkę / wytyczne do meczu */}
+      {showAddNoteModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-lg shadow-xl space-y-4 text-slate-800">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-sky-600" />
+                <h3 className="text-base font-black uppercase text-slate-900">
+                  Dodaj notatkę / wytyczne do meczu
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowAddNoteModal(false)}
+                className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveNotePost} className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Tytuł notatki (opcjonalnie)
+                </label>
+                <input
+                  type="text"
+                  value={notePostTitle}
+                  onChange={e => setNotePostTitle(e.target.value)}
+                  placeholder={`np. Założenia taktyczne na zagrywkę vs ${activeTargetEvent?.opponent || activeTargetMatch?.opponent || 'Rywal'}`}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-sky-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Treść wytycznych taktycznych *
+                </label>
+                <textarea
+                  required
+                  rows={6}
+                  value={notePostContent}
+                  onChange={e => setNotePostContent(e.target.value)}
+                  placeholder="Wpisz wytyczne taktyczne dla drużyny, założenia na blok-obronę, strefy serwisu..."
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:border-sky-500 leading-relaxed"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowAddNoteModal(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs"
+                >
+                  Anuluj
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingNote}
+                  className="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider shadow-sm transition"
+                >
+                  {savingNote ? 'Zapisuję...' : 'Zapisz post do meczu'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

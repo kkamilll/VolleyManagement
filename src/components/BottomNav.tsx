@@ -50,7 +50,7 @@ export default function BottomNav() {
       isActive: pathname.startsWith('/rozgrywki')
     },
     {
-      label: 'Taktyka & Trening',
+      label: 'Taktyka',
       href: '/taktyka',
       icon: Target,
       isActive: pathname.startsWith('/taktyka') || pathname.startsWith('/trening') || pathname.startsWith('/coach')

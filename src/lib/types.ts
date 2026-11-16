@@ -412,7 +412,7 @@ export interface LeaguePhoto {
 export interface TacticalMaterial {
   id: string;
   title: string;
-  type: 'PDF' | 'IMAGE';
+  type: 'PDF' | 'IMAGE' | 'VIDEO';
   fileUrl: string;
   fileName?: string;
   fileSize?: string;

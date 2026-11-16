@@ -27,6 +27,7 @@ import {
   Trophy,
   ArrowRight,
   Sparkles,
+  ChevronLeft,
   ChevronRight,
   Volleyball,
   ChevronDown,
@@ -52,11 +53,15 @@ import {
 export function TrainingPlannerContent({ 
   defaultTab, 
   hideHeader,
-  mode = 'ALL'
+  mode = 'ALL',
+  fixedEventType,
+  hideTypeFilter = false
 }: { 
   defaultTab?: 'EXERCISES' | 'CONCLUSIONS' | 'COMMENTS' | 'MATERIALS'; 
   hideHeader?: boolean;
   mode?: 'ALL' | 'MATCHES' | 'TRAININGS';
+  fixedEventType?: 'ALL' | 'TRENING' | 'SPARING' | 'MECZ' | 'TURNIEJ';
+  hideTypeFilter?: boolean;
 } = {}) {
   const { user } = useAuth();
   const searchParams = useSearchParams();
@@ -84,6 +89,7 @@ export function TrainingPlannerContent({
   // Materials & Event Type Filter: Mecz, Sparing, Turniej, Trening, Wszystkie
   const [materials, setMaterials] = useState<TacticalMaterial[]>([]);
   const [eventTypeFilter, setEventTypeFilter] = useState<'ALL' | 'TRENING' | 'SPARING' | 'MECZ' | 'TURNIEJ'>(() => {
+    if (fixedEventType) return fixedEventType;
     if (queryType) {
       const up = queryType.toUpperCase();
       if (up === 'SPARING') return 'SPARING';
@@ -93,6 +99,12 @@ export function TrainingPlannerContent({
     }
     return 'ALL';
   });
+
+  useEffect(() => {
+    if (fixedEventType) {
+      setEventTypeFilter(fixedEventType);
+    }
+  }, [fixedEventType]);
 
   useEffect(() => {
     if (queryType) {
@@ -206,21 +218,31 @@ export function TrainingPlannerContent({
 
       let targetEventId = queryEventId;
       if (!targetEventId && allEvents.length > 0) {
-        const candidateEvents = mode === 'MATCHES'
+        const candidateEvents = fixedEventType
+          ? allEvents.filter(e => {
+              if (fixedEventType === 'TRENING') return e.type === 'TRENING';
+              if (fixedEventType === 'SPARING') return e.type === 'SPARING';
+              if (fixedEventType === 'TURNIEJ') return e.type === 'TURNIEJ';
+              if (fixedEventType === 'MECZ') return e.type === 'MECZ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals'));
+              return true;
+            })
+          : mode === 'MATCHES'
           ? allEvents.filter(e => e.type === 'MECZ' || e.type === 'SPARING' || e.type === 'TURNIEJ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals')))
           : mode === 'TRAININGS'
           ? allEvents.filter(e => e.type === 'TRENING')
           : allEvents;
 
-        const upcoming = candidateEvents.find((e: EventItem) => new Date(e.date).getTime() >= Date.now() - 3600000 * 24);
-        targetEventId = (upcoming || candidateEvents[0] || allEvents[0]).id;
+        // Wybierz najbliższe nadchodzące wydarzenie (w kolejności chronologicznej)
+        const futureEvents = [...candidateEvents]
+          .filter((e: EventItem) => new Date(e.date).getTime() >= Date.now() - 3600000 * 24)
+          .sort((a: EventItem, b: EventItem) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        targetEventId = (futureEvents[0] || candidateEvents[0] || allEvents[0])?.id;
       }
 
       if (targetEventId) {
         setSelectedEventId(targetEventId);
         const match = pList.find((p: TrainingPlan) => p.eventId === targetEventId || p.id === targetEventId);
-        if (match) setSelectedPlan(match);
-        else if (pList.length > 0) setSelectedPlan(pList[0]);
+        setSelectedPlan(match || null);
 
         // Auto-synchronizuj filtr z typem jednostki, jeśli przyszliśmy z Terminarza
         if (queryEventId) {
@@ -234,10 +256,9 @@ export function TrainingPlannerContent({
         }
       } else if (queryPlanId) {
         const match = pList.find((p: TrainingPlan) => p.id === queryPlanId);
-        if (match) setSelectedPlan(match);
-        else if (pList.length > 0) setSelectedPlan(pList[0]);
-      } else if (pList.length > 0 && !activePlan) {
-        setSelectedPlan(pList[0]);
+        setSelectedPlan(match || null);
+      } else {
+        setSelectedPlan(null);
       }
 
       if (tacRes.ok) {
@@ -740,27 +761,35 @@ export function TrainingPlannerContent({
 
   // Filtered list of events from Terminarz (Treningi, Sparingi, Mecze)
   const filteredEvents: EventItem[] = useMemo(() => {
+    const filter = fixedEventType || eventTypeFilter;
     return events.filter(e => {
+      if (fixedEventType) {
+        if (fixedEventType === 'TRENING') return e.type === 'TRENING';
+        if (fixedEventType === 'SPARING') return e.type === 'SPARING';
+        if (fixedEventType === 'TURNIEJ') return e.type === 'TURNIEJ';
+        if (fixedEventType === 'MECZ') return e.type === 'MECZ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals'));
+        return true;
+      }
       if (mode === 'TRAININGS') {
         return e.type === 'TRENING';
       }
       if (mode === 'MATCHES') {
         const isMatch = e.type === 'SPARING' || e.type === 'MECZ' || e.type === 'TURNIEJ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals'));
         if (!isMatch) return false;
-        if (eventTypeFilter === 'ALL' || eventTypeFilter === 'TRENING') return true;
-        if (eventTypeFilter === 'SPARING') return e.type === 'SPARING';
-        if (eventTypeFilter === 'MECZ') return e.type === 'MECZ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals'));
-        if (eventTypeFilter === 'TURNIEJ') return e.type === 'TURNIEJ';
+        if (filter === 'ALL' || filter === 'TRENING') return true;
+        if (filter === 'SPARING') return e.type === 'SPARING';
+        if (filter === 'MECZ') return e.type === 'MECZ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals'));
+        if (filter === 'TURNIEJ') return e.type === 'TURNIEJ';
         return true;
       }
-      if (eventTypeFilter === 'ALL') return true;
-      if (eventTypeFilter === 'TRENING') return e.type === 'TRENING';
-      if (eventTypeFilter === 'SPARING') return e.type === 'SPARING';
-      if (eventTypeFilter === 'MECZ') return e.type === 'MECZ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals'));
-      if (eventTypeFilter === 'TURNIEJ') return e.type === 'TURNIEJ';
+      if (filter === 'ALL') return true;
+      if (filter === 'TRENING') return e.type === 'TRENING';
+      if (filter === 'SPARING') return e.type === 'SPARING';
+      if (filter === 'MECZ') return e.type === 'MECZ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals'));
+      if (filter === 'TURNIEJ') return e.type === 'TURNIEJ';
       return true;
     });
-  }, [events, eventTypeFilter, mode]);
+  }, [events, eventTypeFilter, fixedEventType, mode]);
 
   const trainingsCount = useMemo(() => events.filter(e => e.type === 'TRENING').length, [events]);
   const sparringsCount = useMemo(() => events.filter(e => e.type === 'SPARING').length, [events]);
@@ -770,16 +799,34 @@ export function TrainingPlannerContent({
   // Currently active event from Terminarz
   const activeEvent: EventItem | null = filteredEvents.find(e => e.id === selectedEventId) || filteredEvents[0] || null;
 
-  // Active plan associated with this event (or fallback to selectedPlan)
+  // Active plan associated strictly with this active event
   const activePlan: TrainingPlan | null = activeEvent
     ? (plans.find(p => p.eventId === activeEvent.id || p.id === activeEvent.id) || null)
-    : (selectedPlan || plans[0] || null);
+    : (selectedPlan && events.some(e => e.id === selectedPlan.eventId) ? selectedPlan : null);
 
   // Materials linked to this active event
   const eventMaterials: TacticalMaterial[] = useMemo(() => {
     if (!activeEvent) return materials;
     return materials.filter(m => m.eventId === activeEvent.id || !m.eventId);
   }, [materials, activeEvent]);
+
+  const currentEventIndex = filteredEvents.findIndex(e => e.id === activeEvent?.id);
+  const handlePrevEvent = () => {
+    if (currentEventIndex > 0) {
+      const prevEv = filteredEvents[currentEventIndex - 1];
+      setSelectedEventId(prevEv.id);
+      const p = plans.find(planItem => planItem.eventId === prevEv.id || planItem.id === prevEv.id);
+      setSelectedPlan(p || null);
+    }
+  };
+  const handleNextEvent = () => {
+    if (currentEventIndex < filteredEvents.length - 1) {
+      const nextEv = filteredEvents[currentEventIndex + 1];
+      setSelectedEventId(nextEv.id);
+      const p = plans.find(planItem => planItem.eventId === nextEv.id || planItem.id === nextEv.id);
+      setSelectedPlan(p || null);
+    }
+  };
 
   return (
     <div className={hideHeader ? "w-full space-y-4" : "w-full max-w-[2000px] mx-auto px-2 sm:px-6 lg:px-10 xl:px-12 pt-4 sm:pt-6 pb-24 md:pb-12 space-y-4"}>
@@ -822,257 +869,316 @@ export function TrainingPlannerContent({
         </div>
       )}
 
-      {/* Main Layout Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* Left Column: Events Selector List (Treningi, Sparingi, Mecze) */}
-        <div className="lg:col-span-5 xl:col-span-4 space-y-3">
-          <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-sm space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-              <div>
-                <span className="text-xs font-black uppercase text-slate-900 tracking-wider flex items-center gap-1.5">
-                  <Calendar className="w-4 h-4 text-sky-600" />
-                  Wydarzenia ({filteredEvents.length})
-                </span>
-                <p className="text-[10px] text-slate-500">Wybierz jednostkę z Terminarza</p>
+      {/* Main Layout - Jedno pod drugim (Full width stacked layout) */}
+      <div className="flex flex-col gap-6 w-full">
+        {/* Górna sekcja: Kompaktowy selektor wydarzenia (Pasek wyboru + Szybkie pigułki) */}
+        <div className="w-full space-y-3">
+          <div className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-sm space-y-3.5">
+            {/* Główny pasek: Tytuł, Dropdown ze strzałkami, Szczegóły aktywnej jednostki & Przycisk Terminarza */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold shadow-xs ${
+                  mode === 'TRAININGS' || fixedEventType === 'TRENING'
+                    ? 'bg-gradient-to-br from-emerald-500 to-teal-700 text-white'
+                    : fixedEventType === 'SPARING'
+                    ? 'bg-gradient-to-br from-amber-500 to-amber-600 text-slate-950 font-black'
+                    : fixedEventType === 'TURNIEJ'
+                    ? 'bg-gradient-to-br from-purple-500 to-indigo-700 text-white'
+                    : 'bg-gradient-to-br from-sky-500 to-indigo-600 text-white'
+                }`}>
+                  {mode === 'TRAININGS' || fixedEventType === 'TRENING' ? <Volleyball className="w-5 h-5" /> : <Calendar className="w-5 h-5" />}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs sm:text-sm font-black uppercase text-slate-900 tracking-wider">
+                      {mode === 'TRAININGS' || fixedEventType === 'TRENING'
+                        ? 'Treningi z Terminarza'
+                        : fixedEventType === 'MECZ'
+                        ? 'Mecze Ligowe'
+                        : fixedEventType === 'SPARING'
+                        ? 'Sparingi'
+                        : fixedEventType === 'TURNIEJ'
+                        ? 'Turnieje'
+                        : 'Wydarzenia'}
+                    </span>
+                    <span className={`px-2 py-0.5 rounded-full font-mono text-[11px] font-black border ${
+                      mode === 'TRAININGS' || fixedEventType === 'TRENING'
+                        ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                        : fixedEventType === 'SPARING'
+                        ? 'bg-amber-100 text-amber-900 border-amber-300'
+                        : fixedEventType === 'TURNIEJ'
+                        ? 'bg-purple-100 text-purple-900 border-purple-300'
+                        : 'bg-sky-100 text-sky-800 border-sky-300'
+                    }`}>
+                      {filteredEvents.length}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500">
+                    {mode === 'TRAININGS' || fixedEventType === 'TRENING'
+                      ? 'Wybierz trening klubowy, aby edytować konspekt ćwiczeń'
+                      : fixedEventType === 'MECZ'
+                      ? 'Wybierz mecz ligowy z terminarza'
+                      : fixedEventType === 'SPARING'
+                      ? 'Wybierz sparing kontrolny'
+                      : fixedEventType === 'TURNIEJ'
+                      ? 'Wybierz turniej siatkarski'
+                      : 'Wybierz jednostkę z terminarza'}
+                  </p>
+                </div>
               </div>
+
+              {/* Selektor ze strzałkami Poprzedni / Następny */}
+              {filteredEvents.length > 0 ? (
+                <div className="flex items-center gap-1.5 flex-1 max-w-xl">
+                  <button
+                    type="button"
+                    onClick={handlePrevEvent}
+                    disabled={currentEventIndex <= 0}
+                    className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0"
+                    title="Poprzednia jednostka"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+
+                  <select
+                    value={activeEvent?.id || ''}
+                    onChange={e => {
+                      const ev = filteredEvents.find(evItem => evItem.id === e.target.value);
+                      if (ev) {
+                        setSelectedEventId(ev.id);
+                        const p = plans.find(planItem => planItem.eventId === ev.id || planItem.id === ev.id);
+                        setSelectedPlan(p || null);
+                      }
+                    }}
+                    className="flex-1 bg-slate-50 hover:bg-white border border-slate-300 text-slate-900 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold focus:outline-none focus:border-emerald-500 shadow-2xs min-w-0 truncate"
+                  >
+                    {filteredEvents.map(ev => {
+                      const p = plans.find(planItem => planItem.eventId === ev.id || planItem.id === ev.id);
+                      const exCount = p?.exercises?.length || 0;
+                      const evDate = new Date(ev.date);
+                      const statusLabel = exCount > 0 ? `✓ Rozpisany (${exCount} ćw.)` : '⏳ Do rozpisania';
+                      return (
+                        <option key={ev.id} value={ev.id}>
+                          {evDate.toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' })} ({evDate.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}) — {ev.title} • {statusLabel}
+                        </option>
+                      );
+                    })}
+                  </select>
+
+                  <button
+                    type="button"
+                    onClick={handleNextEvent}
+                    disabled={currentEventIndex >= filteredEvents.length - 1}
+                    className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0"
+                    title="Następna jednostka"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : null}
+
+              {/* Przycisk do Terminarza */}
               <Link
                 href="/events"
-                className="text-[11px] font-bold text-sky-700 hover:text-sky-900 flex items-center gap-1 bg-sky-50 hover:bg-sky-100 px-2.5 py-1 rounded-xl border border-sky-200 transition shadow-sm"
+                className="text-xs font-bold text-slate-700 hover:text-slate-900 flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-xl border border-slate-300 transition shadow-2xs shrink-0 self-start lg:self-auto"
                 title="Przejdź do Terminarza"
               >
-                <Plus className="w-3.5 h-3.5" />
+                <Plus className="w-3.5 h-3.5 text-slate-500" />
                 <span>Terminarz</span>
               </Link>
             </div>
 
-            {/* Filter Pills based on Mode */}
-            {mode === 'MATCHES' ? (
-              <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto scrollbar-none">
-                <button
-                  type="button"
-                  onClick={() => setEventTypeFilter('ALL')}
-                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                    eventTypeFilter === 'ALL' || eventTypeFilter === 'TRENING'
-                      ? 'bg-sky-600 text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                  }`}
-                >
-                  Wszystkie ({sparringsCount + matchesCount + tournamentsCount})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEventTypeFilter('MECZ')}
-                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                    eventTypeFilter === 'MECZ'
-                      ? 'bg-sky-600 text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                  }`}
-                >
-                  🏐 Mecze LALS ({matchesCount})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEventTypeFilter('SPARING')}
-                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                    eventTypeFilter === 'SPARING'
-                      ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                  }`}
-                >
-                  ⚔️ Sparingi ({sparringsCount})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEventTypeFilter('TURNIEJ')}
-                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                    eventTypeFilter === 'TURNIEJ'
-                      ? 'bg-purple-600 text-white font-black shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                  }`}
-                >
-                  🏆 Turnieje ({tournamentsCount})
-                </button>
-              </div>
-            ) : mode === 'TRAININGS' ? (
-              <div className="px-3 py-1.5 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center justify-between">
-                <span className="flex items-center gap-1.5">
-                  <Volleyball className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Treningi z Terminarza</span>
-                </span>
-                <span className="font-mono bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded-full text-[11px] font-black">{trainingsCount}</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto scrollbar-none">
-                <button
-                  type="button"
-                  onClick={() => setEventTypeFilter('ALL')}
-                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                    eventTypeFilter === 'ALL'
-                      ? 'bg-sky-600 text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                  }`}
-                >
-                  Wszystkie ({events.length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEventTypeFilter('TRENING')}
-                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                    eventTypeFilter === 'TRENING'
-                      ? 'bg-sky-600 text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                  }`}
-                >
-                  🏋️ Treningi ({trainingsCount})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEventTypeFilter('SPARING')}
-                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                    eventTypeFilter === 'SPARING'
-                      ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                  }`}
-                >
-                  ⚔️ Sparingi ({sparringsCount})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEventTypeFilter('MECZ')}
-                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                    eventTypeFilter === 'MECZ'
-                      ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                  }`}
-                >
-                  🏐 Mecze ({matchesCount})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEventTypeFilter('TURNIEJ')}
-                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                    eventTypeFilter === 'TURNIEJ'
-                      ? 'bg-purple-600 text-white font-black shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                  }`}
-                >
-                  🏆 Turnieje ({tournamentsCount})
-                </button>
-              </div>
+            {/* Filter Pills based on Mode (ukryte gdy widok nadrzędny już filtruje bez powtarzania przycisków) */}
+            {!hideTypeFilter && (
+              mode === 'MATCHES' ? (
+                <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto scrollbar-none">
+                  <button
+                    type="button"
+                    onClick={() => setEventTypeFilter('ALL')}
+                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                      eventTypeFilter === 'ALL' || eventTypeFilter === 'TRENING'
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    Wszystkie ({sparringsCount + matchesCount + tournamentsCount})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEventTypeFilter('MECZ')}
+                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                      eventTypeFilter === 'MECZ'
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    🏐 Mecze LALS ({matchesCount})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEventTypeFilter('SPARING')}
+                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                      eventTypeFilter === 'SPARING'
+                        ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    ⚔️ Sparingi ({sparringsCount})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEventTypeFilter('TURNIEJ')}
+                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                      eventTypeFilter === 'TURNIEJ'
+                        ? 'bg-purple-600 text-white font-black shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    🏆 Turnieje ({tournamentsCount})
+                  </button>
+                </div>
+              ) : mode === 'TRAININGS' ? null : (
+                <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto scrollbar-none">
+                  <button
+                    type="button"
+                    onClick={() => setEventTypeFilter('ALL')}
+                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                      eventTypeFilter === 'ALL'
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    Wszystkie ({events.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEventTypeFilter('TRENING')}
+                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                      eventTypeFilter === 'TRENING'
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    🏋️ Treningi ({trainingsCount})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEventTypeFilter('SPARING')}
+                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                      eventTypeFilter === 'SPARING'
+                        ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    ⚔️ Sparingi ({sparringsCount})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEventTypeFilter('MECZ')}
+                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                      eventTypeFilter === 'MECZ'
+                        ? 'bg-indigo-600 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    🏐 Mecze ({matchesCount})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEventTypeFilter('TURNIEJ')}
+                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                      eventTypeFilter === 'TURNIEJ'
+                        ? 'bg-purple-600 text-white font-black shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    🏆 Turnieje ({tournamentsCount})
+                  </button>
+                </div>
+              )
             )}
 
+            {/* Szybkie pigułki wyboru (Pills) - natychmiastowe 1-klikowe przełączanie bez wielkich pustych kafelków */}
             {filteredEvents.length === 0 ? (
-              <div className="text-center py-8 px-3 bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-2">
-                <Volleyball className="w-8 h-8 text-sky-500 mx-auto" />
+              <div className="text-center py-6 px-3 bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-2">
+                <Volleyball className="w-8 h-8 text-emerald-500 mx-auto" />
                 <p className="text-xs font-bold text-slate-700">Brak wydarzeń w tej kategorii.</p>
-                <p className="text-[11px] text-slate-500">Dodaj jednostkę w Terminarzu klubu, aby rozpisać dla niej założenia taktyczne.</p>
+                <p className="text-[11px] text-slate-500">Dodaj jednostkę w Terminarzu klubu, aby rozpisać dla niej konspekt ćwiczeń.</p>
                 <Link
                   href="/events"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-black shadow-sm transition mt-1"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black shadow-sm transition mt-1"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Przejdź do Terminarza</span>
                 </Link>
               </div>
             ) : (
-              <div className="space-y-2 max-h-[calc(100vh-280px)] overflow-y-auto pr-1 scrollbar-thin">
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none pt-0.5">
+                <span className="text-[11px] font-black uppercase text-slate-400 tracking-wider shrink-0 mr-1 hidden sm:inline">
+                  Jednostki:
+                </span>
                 {filteredEvents.map(ev => {
                   const isSelected = activeEvent?.id === ev.id;
-                  const plan = plans.find(p => p.eventId === ev.id || p.id === ev.id);
-                  const exCount = plan?.exercises?.length || 0;
+                  const p = plans.find(planItem => planItem.eventId === ev.id || planItem.id === ev.id);
+                  const exCount = p?.exercises?.length || 0;
                   const attendeesCount = ev.attendees?.filter(a => a.status === 'BEDE').length || 0;
                   const evDate = new Date(ev.date);
+                  const isHighlightedFromUrl = queryEventId === ev.id;
+                  const isTraining = mode === 'TRAININGS' || fixedEventType === 'TRENING' || ev.type === 'TRENING';
                   const isSparing = ev.type === 'SPARING';
                   const isTournament = ev.type === 'TURNIEJ';
-                  const isMatch = ev.type === 'MECZ' || Boolean(ev.opponent && ev.title.toLowerCase().includes('lals'));
-
-                  // Ekstrakcja rundy oraz nazwy rywala
-                  const roundMatch = ev.title.match(/R(\d+)/i) || ev.title.match(/Runda\s*(\d+)/i);
-                  const roundLabel = roundMatch ? `R${roundMatch[1]}` : (isMatch ? 'LALS' : isSparing ? 'Sparing' : isTournament ? 'Turniej' : 'Trening');
-                  
-                  let cleanOpponent = ev.opponent || '';
-                  if (!cleanOpponent && ev.title.includes(' vs ')) {
-                    const parts = ev.title.split(' vs ');
-                    cleanOpponent = parts[0].includes('Angels') ? parts[1].trim() : parts[0].replace(/.*:\s*/, '').trim();
-                  }
-
-                  const isHighlightedFromUrl = queryEventId === ev.id;
 
                   return (
-                    <div
+                    <button
                       key={ev.id}
                       id={`planner-event-${ev.id}`}
+                      type="button"
                       onClick={() => {
                         setSelectedEventId(ev.id);
-                        if (plan) setSelectedPlan(plan);
+                        if (p) setSelectedPlan(p);
                         else setSelectedPlan(null);
                       }}
-                      className={`p-3.5 rounded-2xl border transition cursor-pointer text-left space-y-2 relative ${
+                      className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2.5 shrink-0 border text-left ${
+                        isSelected
+                          ? isTraining
+                            ? 'bg-emerald-600 text-white border-emerald-700 shadow-sm ring-2 ring-emerald-500/25'
+                            : isSparing
+                            ? 'bg-amber-500 text-slate-950 font-black border-amber-600 shadow-sm ring-2 ring-amber-400/25'
+                            : isTournament
+                            ? 'bg-purple-600 text-white border-purple-700 shadow-sm ring-2 ring-purple-500/25'
+                            : 'bg-sky-600 text-white border-sky-700 shadow-sm ring-2 ring-sky-500/25'
+                          : 'bg-slate-50 hover:bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:border-slate-300'
+                      } ${isHighlightedFromUrl ? 'ring-2 ring-offset-1 ring-sky-400' : ''}`}
+                    >
+                      <div className="flex items-center gap-1.5 font-mono">
+                        <Calendar className={`w-3.5 h-3.5 shrink-0 ${isSelected ? (isSparing ? 'text-slate-950' : 'text-white/80') : (isTraining ? 'text-emerald-600' : 'text-sky-600')}`} />
+                        <span>{evDate.toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
+                        <span className={isSelected ? (isSparing ? 'text-slate-800' : 'text-white/60') : 'text-slate-300'}>•</span>
+                        <Clock className={`w-3 h-3 shrink-0 ${isSelected ? (isSparing ? 'text-slate-950' : 'text-white/80') : 'text-slate-400'}`} />
+                        <span>{evDate.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+
+                      <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider ${
                         isSelected
                           ? isSparing
-                            ? 'bg-amber-50/80 border-amber-400 ring-2 ring-amber-400 text-slate-900 shadow-md'
-                            : isTournament
-                            ? 'bg-purple-50/80 border-purple-400 ring-2 ring-purple-400 text-slate-900 shadow-md'
-                            : isMatch
-                            ? 'bg-sky-50/90 border-sky-400 ring-2 ring-sky-400 text-slate-900 shadow-md'
-                            : 'bg-emerald-50/80 border-emerald-400 ring-2 ring-emerald-400 text-slate-900 shadow-md'
-                          : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700'
-                      } ${isHighlightedFromUrl ? 'ring-2 ring-offset-2 ring-sky-500' : ''}`}
-                    >
-                      {isHighlightedFromUrl && (
-                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-sky-100 text-sky-800 text-[10px] font-black uppercase tracking-wider border border-sky-300 w-fit">
-                          <span className="w-1.5 h-1.5 rounded-full bg-sky-600 animate-ping" />
-                          <span>📍 Wybrana z Terminarza</span>
-                        </div>
-                      )}
-                      <div className="flex items-center justify-between text-[11px]">
-                        <span className="font-mono font-bold text-slate-600 flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5 text-sky-600" />
-                          {evDate.toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' })} • {evDate.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
-                        </span>
+                            ? 'bg-slate-950/15 text-slate-950 font-black'
+                            : 'bg-white/20 text-white'
+                          : exCount > 0
+                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                          : 'bg-amber-100 text-amber-800 border border-amber-200'
+                      }`}>
+                        {exCount > 0 ? `✓ Rozpisany (${exCount})` : '⏳ Do rozpisania'}
+                      </span>
 
-                        <div className="flex items-center gap-1.5">
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase font-mono bg-slate-100 text-slate-800 border border-slate-200">
-                            {roundLabel}
-                          </span>
-                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${
-                            plan ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-600 border border-slate-200'
-                          }`}>
-                            {plan ? `✓ Rozpisany (${exCount})` : 'Do rozpisania'}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Czytelny Tytuł / Rywal */}
-                      <div>
-                        {cleanOpponent ? (
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">VS</span>
-                            <h4 className="font-black text-sm text-slate-900 uppercase font-athletic tracking-tight truncate">
-                              {cleanOpponent}
-                            </h4>
-                          </div>
-                        ) : (
-                          <h4 className="font-black text-sm text-slate-900 tracking-tight line-clamp-1">
-                            {ev.title}
-                          </h4>
-                        )}
-                        <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                          <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
-                          <span className="truncate">{ev.location}</span>
-                        </p>
-                      </div>
-
-                      <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1.5 border-t border-slate-100">
-                        <span className="text-emerald-700 font-bold flex items-center gap-1">
+                      {attendeesCount > 0 && (
+                        <span className={`text-[11px] flex items-center gap-1 font-mono ${
+                          isSelected ? (isSparing ? 'text-slate-950' : 'text-white/80') : 'text-slate-500'
+                        }`}>
                           <Users className="w-3 h-3" />
-                          {attendeesCount} obecnych (Terminarz)
+                          <span>{attendeesCount}</span>
                         </span>
-                        <span className="text-sky-600 font-bold group-hover:underline">
-                          Wybierz &rarr;
-                        </span>
-                      </div>
-                    </div>
+                      )}
+                    </button>
                   );
                 })}
               </div>
@@ -1080,8 +1186,8 @@ export function TrainingPlannerContent({
           </div>
         </div>
 
-        {/* Right Column: Selected Training Plan Workspace */}
-        <div className="lg:col-span-7 xl:col-span-8 space-y-4">
+        {/* Dolna sekcja: Wybrany Plan i Konspekt (Full width) */}
+        <div className="w-full space-y-4">
           {!activePlan ? (
             activeEvent ? (() => {
               const roundMatch = activeEvent.title.match(/R(\d+)/i) || activeEvent.title.match(/Runda\s*(\d+)/i);
@@ -1120,49 +1226,76 @@ export function TrainingPlannerContent({
                     </div>
                   </div>
 
-                  {/* Duel Scoreboard Card */}
-                  <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-50 via-white to-slate-50 border border-slate-200 shadow-2xs">
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left">
-                      {/* Gospodarz */}
-                      <div className="flex items-center gap-3.5">
-                        <div className="w-12 h-12 rounded-2xl bg-sky-600 text-white flex items-center justify-center font-black text-xl shadow-sm shrink-0 border border-sky-400">
-                          👼
+                  {/* Duel Scoreboard Card for Match/Sparing OR Training Banner */}
+                  {activeEvent.type === 'TRENING' ? (
+                    <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-white to-emerald-50 border border-emerald-200 shadow-2xs">
+                      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+                        <div className="flex items-center gap-3.5">
+                          <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-black text-xl shadow-sm shrink-0 border border-emerald-400">
+                            🏐
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-mono font-bold uppercase text-emerald-700 block">Jednostka Treningowa</span>
+                            <h4 className="text-xl font-black text-slate-900 uppercase font-athletic tracking-tight">{activeEvent.title}</h4>
+                          </div>
                         </div>
-                        <div>
-                          <span className="text-[10px] font-mono font-bold uppercase text-sky-700 block">Gospodarz</span>
-                          <h4 className="text-xl font-black text-slate-900 uppercase font-athletic tracking-tight">Angels ZTP</h4>
-                        </div>
-                      </div>
 
-                      {/* VS & Szczegóły Miejsca */}
-                      <div className="flex flex-col items-center justify-center px-4 py-1">
-                        <div className="w-9 h-9 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-xs font-black text-slate-700 font-mono">
-                          VS
-                        </div>
-                        <span className="text-xs font-mono font-bold text-slate-800 flex items-center gap-1 mt-1.5">
-                          <Clock className="w-3.5 h-3.5 text-sky-600" />
-                          {new Date(activeEvent.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                        <span className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
-                          <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
-                          <span>{activeEvent.location || 'Hala OSiR, Luboń'}</span>
-                        </span>
-                      </div>
-
-                      {/* Gość */}
-                      <div className="flex items-center sm:flex-row-reverse gap-3.5 text-center sm:text-right">
-                        <div className="w-12 h-12 rounded-2xl bg-slate-800 text-white flex items-center justify-center font-black text-xl shadow-sm shrink-0 border border-slate-700">
-                          🏐
-                        </div>
-                        <div>
-                          <span className="text-[10px] font-mono font-bold uppercase text-amber-600 block">Przeciwnik</span>
-                          <h4 className="text-xl font-black text-slate-900 uppercase font-athletic tracking-tight">
-                            {oppName || 'Rywal Ligowy'}
-                          </h4>
+                        <div className="flex flex-col items-center sm:items-end justify-center px-4 py-1">
+                          <span className="text-xs font-mono font-bold text-slate-800 flex items-center gap-1">
+                            <Clock className="w-3.5 h-3.5 text-emerald-600" />
+                            {new Date(activeEvent.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                          <span className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                            <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                            <span>{activeEvent.location || 'Hala POSiR'}</span>
+                          </span>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-50 via-white to-slate-50 border border-slate-200 shadow-2xs">
+                      <div className="flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left">
+                        {/* Gospodarz */}
+                        <div className="flex items-center gap-3.5">
+                          <div className="w-12 h-12 rounded-2xl bg-sky-600 text-white flex items-center justify-center font-black text-xl shadow-sm shrink-0 border border-sky-400">
+                            👼
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-mono font-bold uppercase text-sky-700 block">Gospodarz</span>
+                            <h4 className="text-xl font-black text-slate-900 uppercase font-athletic tracking-tight">Angels ZTP</h4>
+                          </div>
+                        </div>
+
+                        {/* VS & Szczegóły Miejsca */}
+                        <div className="flex flex-col items-center justify-center px-4 py-1">
+                          <div className="w-9 h-9 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-xs font-black text-slate-700 font-mono">
+                            VS
+                          </div>
+                          <span className="text-xs font-mono font-bold text-slate-800 flex items-center gap-1 mt-1.5">
+                            <Clock className="w-3.5 h-3.5 text-sky-600" />
+                            {new Date(activeEvent.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                          <span className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                            <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                            <span>{activeEvent.location || 'Hala OSiR, Luboń'}</span>
+                          </span>
+                        </div>
+
+                        {/* Gość */}
+                        <div className="flex items-center sm:flex-row-reverse gap-3.5 text-center sm:text-right">
+                          <div className="w-12 h-12 rounded-2xl bg-slate-800 text-white flex items-center justify-center font-black text-xl shadow-sm shrink-0 border border-slate-700">
+                            🏐
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-mono font-bold uppercase text-amber-600 block">Przeciwnik</span>
+                            <h4 className="text-xl font-black text-slate-900 uppercase font-athletic tracking-tight">
+                              {oppName || 'Rywal Ligowy'}
+                            </h4>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* 2 Kafelki Przygotowania Taktycznego */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -1170,14 +1303,16 @@ export function TrainingPlannerContent({
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                           <Target className="w-4 h-4 text-sky-600" />
-                          Założenia Meczowe
+                          {activeEvent.type === 'TRENING' ? 'Konspekt & Ćwiczenia' : 'Założenia Meczowe'}
                         </span>
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
                           Do rozpisania
                         </span>
                       </div>
                       <p className="text-xs text-slate-500 leading-relaxed">
-                        Zdefiniuj cele meczowe, taktykę zagrywki, kierunki ataku i asekurację bloku.
+                        {activeEvent.type === 'TRENING'
+                          ? 'Wprowadź cele jednostki, rozgrzewkę, ćwiczenia techniczne, zadaniowe i grę kontrolną.'
+                          : 'Zdefiniuj cele meczowe, taktykę zagrywki, kierunki ataku i asekurację bloku.'}
                       </p>
                     </div>
 
@@ -1185,14 +1320,16 @@ export function TrainingPlannerContent({
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                           <Compass className="w-4 h-4 text-amber-600" />
-                          Ustawienie Wyjściowe (P1–P6)
+                          {activeEvent.type === 'TRENING' ? 'Rozrysowanie na Boisku (Pisak)' : 'Ustawienie Wyjściowe (P1–P6)'}
                         </span>
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-300">
                           Tablica
                         </span>
                       </div>
                       <p className="text-xs text-slate-500 leading-relaxed">
-                        Rozrysuj schemat rotacji, strefy przyjęcia libero i pozycje obrony na tablicy taktycznej.
+                        {activeEvent.type === 'TRENING'
+                          ? 'Każde ćwiczenie możesz rozrysować bezpośrednio na boisku (trajektorie piłek, strefy, obieg graczy).'
+                          : 'Rozrysuj schemat rotacji, strefy przyjęcia libero i pozycje obrony na tablicy taktycznej.'}
                       </p>
                     </div>
                   </div>
@@ -1203,10 +1340,20 @@ export function TrainingPlannerContent({
                       <button
                         onClick={() => handleQuickCreatePlanForEvent(activeEvent)}
                         disabled={creating}
-                        className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider transition shadow-sm hover:shadow flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                        className={`flex-1 sm:flex-initial px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition shadow-sm hover:shadow flex items-center justify-center gap-2 cursor-pointer active:scale-95 ${
+                          activeEvent.type === 'TRENING'
+                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                            : 'bg-sky-600 hover:bg-sky-500 text-white'
+                        }`}
                       >
                         <Plus className="w-4 h-4" />
-                        <span>{creating ? 'Tworzenie rozpiski...' : 'Rozpisz taktykę na ten mecz'}</span>
+                        <span>
+                          {creating
+                            ? 'Tworzenie...'
+                            : activeEvent.type === 'TRENING'
+                            ? 'Rozpocznij konspekt / Dodaj ćwiczenia'
+                            : 'Rozpisz taktykę na ten mecz'}
+                        </span>
                       </button>
                     )}
 
@@ -1326,10 +1473,10 @@ export function TrainingPlannerContent({
               </div>
 
               {/* Sub-tabs: Ćwiczenia / Materiały & Załączniki / Wnioski / Dyskusja */}
-              <div className="flex items-center gap-2 border-b border-slate-200 pb-2 flex-wrap">
+              <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto scrollbar-none flex-nowrap">
                 <button
                   onClick={() => setActiveTab('EXERCISES')}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                  className={`shrink-0 whitespace-nowrap flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                     activeTab === 'EXERCISES'
                       ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/20'
                       : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
@@ -1340,7 +1487,7 @@ export function TrainingPlannerContent({
 
                 <button
                   onClick={() => setActiveTab('MATERIALS')}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                  className={`shrink-0 whitespace-nowrap flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                     activeTab === 'MATERIALS'
                       ? 'bg-rose-600 text-white shadow-sm'
                       : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
@@ -1352,7 +1499,7 @@ export function TrainingPlannerContent({
 
                 <button
                   onClick={() => setActiveTab('CONCLUSIONS')}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                  className={`shrink-0 whitespace-nowrap flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                     activeTab === 'CONCLUSIONS'
                       ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
                       : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
@@ -1363,7 +1510,7 @@ export function TrainingPlannerContent({
 
                 <button
                   onClick={() => setActiveTab('COMMENTS')}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                  className={`shrink-0 whitespace-nowrap flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                     activeTab === 'COMMENTS'
                       ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
                       : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
@@ -1396,7 +1543,12 @@ export function TrainingPlannerContent({
                       {activePlan.exercises.map((ex, idx) => (
                         <div
                           key={ex.id}
-                          className="p-4 sm:p-5 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3 hover:border-slate-300 transition"
+                          className={`p-4 sm:p-5 rounded-3xl bg-white border border-slate-300 shadow-md hover:shadow-lg space-y-3 transition ${
+                            ex.category === 'ROZGRZEWKA' ? 'border-t-4 border-t-amber-500' :
+                            ex.category === 'TAKTYKA' ? 'border-t-4 border-t-sky-500' :
+                            ex.category === 'GRA' ? 'border-t-4 border-t-purple-500' :
+                            'border-t-4 border-t-emerald-500'
+                          }`}
                         >
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-200">
                             <div className="flex items-center gap-2.5 flex-wrap">
