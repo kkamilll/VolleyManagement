@@ -2079,403 +2079,236 @@ function TacticsContent() {
             );
           })()}
 
-          {/* Specialized Unit Command Box (Tylko gdy wybrano konkretny mecz / trening) */}
-          {(activeTargetEvent || activeTargetMatch) && (
-            <div className={`p-3.5 sm:p-4 rounded-2xl border text-xs space-y-3 animate-fadeIn ${
-              activeTargetEvent?.type === 'TRENING'
-                ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
-                : activeTargetEvent?.type === 'SPARING'
-                ? 'bg-amber-50/70 border-amber-200 text-amber-950'
-                : activeTargetEvent?.type === 'TURNIEJ'
-                ? 'bg-purple-50/70 border-purple-200 text-purple-950'
-                : 'bg-sky-50/70 border-sky-200 text-sky-950'
-            }`}>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-200">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-bold text-slate-900 text-xs">
-                    {activeTargetEvent?.type === 'TRENING'
-                      ? 'Plan Treningowy & Zestawienie Pozycji'
-                      : activeTargetEvent?.type === 'SPARING'
-                      ? `Założenia Sparingowe vs ${activeTargetEvent.opponent || 'Rywal'}`
-                      : activeTargetEvent?.type === 'TURNIEJ'
-                      ? 'Taktyka Turniejowa & Zmiany Zmęczeniowe'
-                      : `Odprawa Meczowa LALS vs ${activeTargetEvent?.opponent || activeTargetMatch?.opponent || 'Rywal'}`}
-                  </span>
-
-                  {activeTargetEvent && (
-                    <span className="text-[11px] font-mono text-slate-500">
-                      • {new Date(activeTargetEvent.date).toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' })} • {activeTargetEvent.location}
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  {activeTargetEvent && (
-                    <span className="text-[11px] font-mono font-bold text-slate-700 px-2 py-0.5 rounded bg-white border border-slate-200 shadow-2xs">
-                      ✓ {(activeTargetEvent.attendees || []).filter(a => a.status === 'BEDE').length} obecnych z ankiety
-                    </span>
-                  )}
-
-                  {canEdit && (activeTargetEvent || activeTargetMatch) && (
-                    <button
-                      onClick={handleQuickSaveForUnit}
-                      disabled={saving}
-                      className="px-2.5 py-1 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] transition flex items-center gap-1 shadow-sm"
-                      title="Zapisz aktualne rozrysowanie bezpośrednio do tej jednostki"
-                    >
-                      <Save className="w-3.5 h-3.5" />
-                      <span>{saving ? 'Zapisywanie...' : 'Zapisz dla tej jednostki'}</span>
-                    </button>
-                  )}
-
-                  {canEdit && activeTargetEvent && (
-                    <button
-                      onClick={handlePopulateConfirmedPlayers}
-                      className="px-2.5 py-1 rounded-xl bg-white hover:bg-sky-50 text-sky-700 border border-sky-200 text-[11px] font-bold transition flex items-center gap-1 shadow-2xs"
-                      title="Automatycznie przypisz potwierdzonych graczy z ankiety do ich nominalnych pozycji (R, P1, P2, Ś1, Ś2, A, L)"
-                    >
-                      <UserCheck className="w-3.5 h-3.5 text-sky-600" />
-                      <span>Wstaw obecnych na boisko</span>
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Tactical Directives / Action Points */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-800">
-                    Wytyczne Taktyczne & Zadania dla Drużyny:
-                  </span>
-                  {canEdit && (
-                    <button
-                      onClick={() => setShowDirectiveEditor(!showDirectiveEditor)}
-                      className="text-[10px] text-sky-700 hover:text-sky-900 underline font-bold"
-                    >
-                      {showDirectiveEditor ? 'Zwiń edytor' : '+ Edytuj wytyczne'}
-                    </button>
-                  )}
-                </div>
-
-                <div className="flex flex-wrap gap-1.5">
-                  {unitDirectives.map((dir, idx) => (
-                    <span
-                      key={idx}
-                      className="px-2.5 py-1 rounded-xl bg-white border border-slate-200 text-[11px] text-slate-800 font-medium flex items-center gap-1.5 shadow-2xs"
-                    >
-                      <span>{dir}</span>
-                      {canEdit && showDirectiveEditor && (
-                        <button
-                          onClick={() => setUnitDirectives(unitDirectives.filter((_, i) => i !== idx))}
-                          className="text-slate-400 hover:text-rose-600 ml-1 font-bold"
-                          title="Usuń wytyczną"
-                        >
-                          ×
-                        </button>
-                      )}
-                    </span>
-                  ))}
-                </div>
-
-                {canEdit && showDirectiveEditor && (
-                  <div className="flex items-center gap-2 pt-1 animate-fadeIn">
-                    <input
-                      type="text"
-                      value={newDirectiveInput}
-                      onChange={e => setNewDirectiveInput(e.target.value)}
-                      placeholder="Wpisz nowe zadanie lub wytyczną..."
-                      className="flex-1 bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 rounded-xl px-2.5 py-1 text-xs focus:outline-none focus:border-amber-500 shadow-2xs"
-                      onKeyDown={e => {
-                        if (e.key === 'Enter' && newDirectiveInput.trim()) {
-                          e.preventDefault();
-                          setUnitDirectives([...unitDirectives, newDirectiveInput.trim()]);
-                          setNewDirectiveInput('');
-                        }
-                      }}
-                    />
-                    <button
-                      onClick={() => {
-                        if (newDirectiveInput.trim()) {
-                          setUnitDirectives([...unitDirectives, newDirectiveInput.trim()]);
-                          setNewDirectiveInput('');
-                        }
-                      }}
-                      className="px-3 py-1 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition"
-                    >
-                      Dodaj
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
       {/* SEKCJA 1: TABLICA TAKTYCZNA (BOISKO I KONSOLA ROZGRYWANIA) */}
       <div className="bg-white border border-slate-200 rounded-3xl p-3 sm:p-5 shadow-sm space-y-4">
           
-          {/* UNIFIED COMPACT TACTICAL CONSOLE */}
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-2.5 sm:p-3 shadow-sm space-y-2">
-            {/* Row 1: Custom Plan Name & Orientation */}
-            <div className="flex flex-wrap items-center justify-between gap-2.5">
-              {/* Custom tactic title input - freely named by user */}
-              <div className="flex items-center gap-2 flex-1 min-w-[260px]">
-                <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider hidden sm:inline shrink-0">
-                  Nazwa taktyki:
+          {/* NOWOCZESNA KONSOLA TAKTYCZNA (ROTACJE, FAZY GRY I NARZĘDZIA) */}
+          <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-3 sm:p-4 shadow-sm space-y-3">
+            {/* Pasek 1: Wybór Rotacji (P1-P6) oraz Fazy Gry */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+              
+              {/* Rotacje P1 - P6 */}
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 font-mono shrink-0">
+                  Rotacja:
                 </span>
+                <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                  {(['P1', 'P2', 'P3', 'P4', 'P5', 'P6'] as RotationCode[]).map(rot => (
+                    <button
+                      key={rot}
+                      type="button"
+                      onClick={() => applyPreset(rot, phase)}
+                      className={`min-w-[34px] h-7 px-2 rounded-lg text-xs font-black transition flex items-center justify-center font-mono cursor-pointer active:scale-95 ${
+                        rotation === rot
+                          ? 'bg-sky-600 text-white shadow-sm ring-1 ring-sky-500'
+                          : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+                      }`}
+                      title={`Ustaw rotację ${rot}`}
+                    >
+                      {rot}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Fazy Gry: Przyjęcie, Atak, Obrona, Zagrywka */}
+              <div className="flex flex-wrap items-center gap-1.5">
+                {[
+                  { id: 'PRZYJECIE', label: 'Przyjęcie', icon: '🛡️' },
+                  { id: 'ATAK', label: 'Atak', icon: '⚔️' },
+                  { id: 'OBRONA', label: 'Obrona / Blok', icon: '🧱' },
+                  { id: 'ZAGRYWKA', label: 'Zagrywka', icon: '🎯' }
+                ].map(ph => (
+                  <button
+                    key={ph.id}
+                    type="button"
+                    onClick={() => applyPreset(rotation, ph.id as TacticalPhase)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border cursor-pointer active:scale-95 ${
+                      phase === ph.id
+                        ? 'bg-amber-400 text-slate-950 border-amber-500 shadow-sm font-black'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900 shadow-2xs'
+                    }`}
+                  >
+                    <span>{ph.icon}</span>
+                    <span>{ph.label}</span>
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={handleResetPositions}
+                  className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 text-xs font-bold transition flex items-center gap-1 shadow-2xs ml-auto lg:ml-2 cursor-pointer"
+                  title="Przywróć domyślne pozycje dla tej rotacji"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-amber-600" />
+                  <span className="hidden sm:inline">Reset</span>
+                </button>
+              </div>
+
+            </div>
+
+            {/* Pasek 2: Narzędzia Rysowania, Kolory, Elementy Boiska i Widok */}
+            <div className="flex flex-wrap items-center justify-between gap-2.5">
+              
+              {/* Narzędzia (Przesuń, Pisak, Strzałka, Gumka) */}
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setActiveTool('move')}
+                  className={`h-7 px-2.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition border cursor-pointer ${
+                    activeTool === 'move'
+                      ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
+                      : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 shadow-2xs'
+                  }`}
+                  title="Przesuwaj: chwyć i przeciągaj zawodników i piłkę"
+                >
+                  <Move className="w-3.5 h-3.5" />
+                  <span>Przesuń</span>
+                </button>
+
+                <button
+                  onClick={() => { setActiveTool('pen'); setLineWidth(3); }}
+                  className={`h-7 px-2.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition border cursor-pointer ${
+                    activeTool === 'pen'
+                      ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
+                      : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 shadow-2xs'
+                  }`}
+                  title="Pisak: rysuj linie i strefy"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                  <span>Pisak</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTool('arrow')}
+                  className={`h-7 px-2.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition border cursor-pointer ${
+                    activeTool === 'arrow'
+                      ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
+                      : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 shadow-2xs'
+                  }`}
+                  title="Strzałka: trajektoria ataku lub zbiegu"
+                >
+                  <ArrowRight className="w-3.5 h-3.5" />
+                  <span>Strzałka</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTool('eraser')}
+                  className={`h-7 px-2 rounded-lg text-xs font-bold flex items-center gap-1 transition border cursor-pointer ${
+                    activeTool === 'eraser'
+                      ? 'bg-rose-600 text-white border-rose-600 shadow-sm'
+                      : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 shadow-2xs'
+                  }`}
+                  title="Gumka"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* 4 Kolory & Cofnij */}
+              <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-slate-200">
+                  {[
+                    { hex: '#facc15', label: 'Żółty' },
+                    { hex: '#0284c7', label: 'Błękitny' },
+                    { hex: '#e11d48', label: 'Czerwony' },
+                    { hex: '#0f172a', label: 'Ciemny' }
+                  ].map(c => (
+                    <button
+                      key={c.hex}
+                      onClick={() => {
+                        setDrawColor(c.hex);
+                        if (activeTool === 'move') setActiveTool('pen');
+                      }}
+                      className={`w-4 h-4 rounded-full border transition cursor-pointer ${
+                        drawColor === c.hex ? 'border-sky-500 scale-110 ring-2 ring-sky-300' : 'border-slate-300 opacity-80 hover:opacity-100'
+                      }`}
+                      style={{ backgroundColor: c.hex }}
+                      title={c.label}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  onClick={handleUndo}
+                  className="p-1.5 rounded-xl bg-white text-slate-700 hover:text-slate-900 border border-slate-200 hover:bg-slate-100 shadow-2xs transition cursor-pointer"
+                  title="Cofnij rysunek"
+                >
+                  <Undo2 className="w-3.5 h-3.5" />
+                </button>
+
+                <button
+                  onClick={handleClearDrawing}
+                  className="p-1.5 rounded-xl bg-white text-rose-600 hover:text-rose-700 border border-slate-200 hover:bg-rose-50 shadow-2xs transition cursor-pointer"
+                  title="Wyczyść rysunki"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Nazwa Taktyki, Rywale, Piłka, Orientacja */}
+              <div className="flex items-center gap-2 flex-wrap">
                 <input
                   type="text"
                   value={tacticTitle}
                   onChange={(e) => setTacticTitle(e.target.value)}
-                  placeholder="Wpisz własną nazwę planu / taktyki (np. Kontra ze skrzydła, Zagrywka na strefę 1)..."
-                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-xs text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-amber-500 shadow-2xs"
+                  placeholder="Nazwa schematu (np. Atak ze skrzydła)..."
+                  className="bg-white border border-slate-300 rounded-xl px-2.5 py-1 text-xs text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-sky-500 shadow-2xs max-w-[200px]"
                 />
-              </div>
 
-              {/* Orientation Selector: Pionowo / Poziomo */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider hidden xs:inline">
-                  Widok:
-                </span>
-                <div className="inline-flex items-center p-0.5 bg-slate-100 rounded-xl border border-slate-300">
+                <button
+                  onClick={() => setShowOpponents(!showOpponents)}
+                  className={`px-2.5 py-1 rounded-xl border text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
+                    showOpponents
+                      ? 'bg-rose-50 text-rose-800 border-rose-300'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                  }`}
+                  title="Pokaż/ukryj blok i obronę przeciwnika"
+                >
+                  <Users className="w-3.5 h-3.5" />
+                  <span>Rywale</span>
+                </button>
+
+                <button
+                  onClick={() => setShowBall(!showBall)}
+                  className={`px-2.5 py-1 rounded-xl border text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
+                    showBall
+                      ? 'bg-amber-50 text-amber-800 border-amber-300'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                  }`}
+                  title="Pokaż/ukryj piłkę"
+                >
+                  <Volleyball className="w-3.5 h-3.5" />
+                  <span>Piłka</span>
+                </button>
+
+                <div className="inline-flex items-center p-0.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
                   <button
                     type="button"
                     onClick={() => handleToggleOrientation('vertical')}
-                    className={`h-8 px-2 sm:px-2.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                    className={`h-7 px-2 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
                       boardOrientation === 'vertical'
-                        ? 'bg-sky-600 text-white shadow-2xs font-black'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                        ? 'bg-slate-900 text-white font-black'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
-                    title="Widok pionowy (od linii końcowej)"
+                    title="Widok pionowy"
                   >
                     <Smartphone className="w-3.5 h-3.5" />
-                    <span>Pionowo</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => handleToggleOrientation('horizontal')}
-                    className={`h-8 px-2 sm:px-2.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                    className={`h-7 px-2 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
                       boardOrientation === 'horizontal'
-                        ? 'bg-sky-600 text-white shadow-2xs font-black'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                        ? 'bg-slate-900 text-white font-black'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
-                    title="Widok poziomy (od linii bocznej)"
+                    title="Widok poziomy"
                   >
                     <Maximize2 className="w-3.5 h-3.5" />
-                    <span>Poziomo</span>
                   </button>
                 </div>
               </div>
-            </div>
 
-            {/* Row 2: Drawing Tools & Palettes OR Player Read-Only Toolbar */}
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200">
-              {!canEdit && !isSandboxMode ? (
-                <div className="w-full flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-1 rounded-xl bg-slate-100 border border-slate-300 text-slate-700 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
-                      <Lock className="w-3.5 h-3.5 text-amber-500" />
-                      <span>Widok Zawodnika (Tylko odczyt)</span>
-                    </span>
-                    <span className="text-[11px] text-slate-500 hidden lg:inline">
-                      Tablica w trybie podglądu założeń trenera. Kliknij zawodnika, aby sprawdzić jego zadania na boisku.
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowRequestEditModal(true)}
-                      className="px-3 py-1 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black flex items-center gap-1.5 transition shadow-sm"
-                      title="Wyślij trenerowi sugestię taktyczną lub poproś o uprawnienia edycji"
-                    >
-                      <MessageSquare className="w-3.5 h-3.5" />
-                      <span>Poproś o edycję / Zgłoś uwagę</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setIsSandboxMode(true)}
-                      className="px-2.5 py-1 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-bold flex items-center gap-1.5 transition shadow-2xs"
-                      title="Włącz brudnopis do lokalnych testów i rysunków bez zmian w taktyce trenera"
-                    >
-                      <FlaskConical className="w-3.5 h-3.5 text-amber-500" />
-                      <span>Włącz brudnopis</span>
-                    </button>
-
-                    {/* Opponents & Ball Toggles for player exploration */}
-                    <button
-                      onClick={() => setShowOpponents(!showOpponents)}
-                      className={`px-2 py-1 rounded-lg border text-[11px] font-bold transition flex items-center gap-1 ${
-                        showOpponents
-                          ? 'bg-rose-100 text-rose-800 border-rose-300'
-                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
-                      }`}
-                      title="Pokaż/ukryj blok i obronę przeciwnika"
-                    >
-                      <Users className="w-3 h-3" />
-                      <span className="hidden sm:inline">Rywale</span>
-                    </button>
-
-                    <button
-                      onClick={() => setShowBall(!showBall)}
-                      className={`px-2 py-1 rounded-lg border text-[11px] font-bold transition flex items-center gap-1 ${
-                        showBall
-                          ? 'bg-amber-100 text-amber-800 border-amber-300'
-                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
-                      }`}
-                      title="Pokaż/ukryj piłkę"
-                    >
-                      <Volleyball className="w-3 h-3" />
-                      <span className="hidden sm:inline">Piłka</span>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  {!canEdit && isSandboxMode && (
-                    <div className="w-full mb-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-center justify-between gap-2 shadow-2xs">
-                      <span className="flex items-center gap-1.5 font-bold">
-                        <FlaskConical className="w-4 h-4 text-amber-600" />
-                        <span>Tryb Brudnopisu: Rysujesz i testujesz lokalnie (Twoje zmiany nie nadpisują założeń trenera)</span>
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setIsSandboxMode(false)}
-                        className="px-2.5 py-0.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold border border-slate-300 transition"
-                      >
-                        ✕ Wyłącz brudnopis
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Tool Modes */}
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => setActiveTool('move')}
-                      className={`h-7 px-2.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition border ${
-                        activeTool === 'move'
-                          ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 border-amber-400 shadow-sm'
-                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 shadow-2xs'
-                      }`}
-                      title="Przesuwaj: chwyć i przeciągaj zawodników i piłkę"
-                    >
-                      <Move className="w-3.5 h-3.5 stroke-[2.5]" />
-                      <span>Przesuń</span>
-                    </button>
-
-                    <button
-                      onClick={() => { setActiveTool('pen'); setLineWidth(3); }}
-                      className={`h-7 px-2 rounded-lg text-xs font-bold flex items-center gap-1 transition border ${
-                        activeTool === 'pen'
-                          ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
-                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 shadow-2xs'
-                      }`}
-                      title="Pisak: rysowanie linii i notatek"
-                    >
-                      <Pencil className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Pisak</span>
-                    </button>
-
-                    <button
-                      onClick={() => setActiveTool('arrow')}
-                      className={`h-7 px-2 rounded-lg text-xs font-bold flex items-center gap-1 transition border ${
-                        activeTool === 'arrow'
-                          ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
-                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 shadow-2xs'
-                      }`}
-                      title="Strzałka: trajektoria ataku lub przemieszczenia"
-                    >
-                      <ArrowRight className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Strzałka</span>
-                    </button>
-
-                    <button
-                      onClick={() => setActiveTool('eraser')}
-                      className={`h-7 px-2 rounded-lg text-xs font-bold flex items-center gap-1 transition border ${
-                        activeTool === 'eraser'
-                          ? 'bg-rose-600 text-white border-rose-600 shadow-sm'
-                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 shadow-2xs'
-                      }`}
-                      title="Gumka"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Gumka</span>
-                    </button>
-                  </div>
-
-                  {/* Colors & Board Actions */}
-                  <div className="flex items-center gap-1.5">
-                    {/* 4 colors */}
-                    <div className="flex items-center gap-1 px-1">
-                      {[
-                        { hex: '#facc15', label: 'Żółty' },
-                        { hex: '#0284c7', label: 'Błękitny' },
-                        { hex: '#e11d48', label: 'Czerwony' },
-                        { hex: '#0f172a', label: 'Ciemny' }
-                      ].map(c => (
-                        <button
-                          key={c.hex}
-                          onClick={() => {
-                            setDrawColor(c.hex);
-                            if (activeTool === 'move') setActiveTool('pen');
-                          }}
-                          className={`w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full border transition ${
-                            drawColor === c.hex ? 'border-sky-500 scale-110 ring-2 ring-sky-300' : 'border-slate-300 opacity-80 hover:opacity-100'
-                          }`}
-                          style={{ backgroundColor: c.hex }}
-                          title={c.label}
-                        />
-                      ))}
-                    </div>
-
-                    <div className="h-4 w-px bg-slate-300 mx-0.5" />
-
-                    {/* Undo & Clear */}
-                    <button
-                      onClick={handleUndo}
-                      className="p-1 rounded-lg bg-white text-slate-700 hover:text-slate-900 border border-slate-300 hover:bg-slate-100 shadow-2xs transition"
-                      title="Cofnij rysunek"
-                    >
-                      <Undo2 className="w-3.5 h-3.5" />
-                    </button>
-
-                    <button
-                      onClick={handleClearDrawing}
-                      className="p-1 rounded-lg bg-white text-rose-600 hover:text-rose-700 border border-slate-300 hover:bg-rose-50 shadow-2xs transition"
-                      title="Wyczyść rysunki"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-
-                    {/* Opponents & Ball Toggles */}
-                    <button
-                      onClick={() => setShowOpponents(!showOpponents)}
-                      className={`px-2 py-1 rounded-lg border text-[11px] font-bold transition flex items-center gap-1 ${
-                        showOpponents
-                          ? 'bg-rose-100 text-rose-800 border-rose-300'
-                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
-                      }`}
-                      title="Pokaż/ukryj blok i obronę przeciwnika"
-                    >
-                      <Users className="w-3 h-3" />
-                      <span className="hidden sm:inline">Rywale</span>
-                    </button>
-
-                    <button
-                      onClick={() => setShowBall(!showBall)}
-                      className={`px-2 py-1 rounded-lg border text-[11px] font-bold transition flex items-center gap-1 ${
-                        showBall
-                          ? 'bg-amber-100 text-amber-800 border-amber-300'
-                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
-                      }`}
-                      title="Pokaż/ukryj piłkę"
-                    >
-                      <Volleyball className="w-3 h-3" />
-                      <span className="hidden sm:inline">Piłka</span>
-                    </button>
-                  </div>
-                </>
-              )}
             </div>
           </div>
 
@@ -2773,140 +2606,114 @@ function TacticsContent() {
         </div>
       </div>
 
-      {/* SEKCJA 2: ODPRAWA & OGÓLNA NOTATKA TAKTYCZNA (Z OZNACZANIEM ZAWODNIKÓW @) */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200">
-              <FileText className="w-5 h-5" />
+      {/* 2-KOLUMNOWY OBSZAR POD BOISKIEM: ZADANIA ZAWODNIKÓW & ODPRAWA TRENERA */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        
+        {/* Lewa kolumna (7 cols): 6 Pozycji na Boisku w rotacji {rotation} */}
+        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold text-xs border border-sky-200">
+                <Users className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-black uppercase text-slate-900 tracking-wider">
+                  Zadania Graczy • {rotation} ({phase})
+                </h3>
+                <p className="text-[11px] text-slate-500">
+                  Ustawienie 6 zawodników na boisku. Kliknij kartę gracza, aby edytować zadanie.
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-base font-black uppercase text-slate-900 tracking-wide flex items-center gap-2">
-                Odprawa & Założenia Taktyczne {tacticTitle ? `• ${tacticTitle}` : ''}
-              </h3>
-              <p className="text-xs text-slate-500">
-                Ogólna notatka taktyczna dla całej drużyny. Wpisz założenia meczowe i oznaczaj dowolnych zawodników z kadry (@).
-              </p>
-            </div>
+            <span className="px-2.5 py-1 rounded-xl bg-slate-100 text-slate-700 font-mono text-xs font-bold border border-slate-200">
+              6 na boisku
+            </span>
           </div>
 
-          {canEdit && (
-            <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
-              {selectedTactic && (
-                <button
-                  type="button"
-                  onClick={handleQuickUpdateCurrentTactic}
-                  disabled={saving}
-                  className="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-sm"
-                  title="Zapisz zmiany w aktualnie otwartej taktyce"
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+            {positions.map(p => {
+              const isLibero = p.roleCode === 'L';
+              const isSelected = selectedPlayerId === p.id;
+              return (
+                <div
+                  key={p.id}
+                  onClick={() => setSelectedPlayerId(isSelected ? null : p.id)}
+                  className={`p-3 rounded-2xl border text-xs cursor-pointer transition ${
+                    isSelected
+                      ? 'bg-sky-50 border-sky-400 text-slate-900 shadow-sm ring-2 ring-sky-300'
+                      : 'bg-slate-50/70 border-slate-200 text-slate-700 hover:bg-slate-100'
+                  }`}
                 >
-                  <Save className="w-3.5 h-3.5" />
-                  <span>{saving ? 'Zapisywanie...' : 'Zaktualizuj taktykę'}</span>
-                </button>
-              )}
+                  <div className="flex items-center justify-between gap-1 pb-1.5 border-b border-slate-200/60">
+                    <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs ${
+                      isLibero ? 'bg-amber-400 text-slate-950 font-bold' : 'bg-sky-600 text-white font-bold'
+                    }`}>
+                      {p.number ? `#${p.number}` : p.roleCode}
+                    </span>
+                    <span className="text-[10px] font-mono font-bold text-slate-500 bg-white px-1.5 py-0.5 rounded border border-slate-200">
+                      Strefa {p.zone}
+                    </span>
+                  </div>
+                  <p className="font-black text-slate-900 text-xs truncate mt-1.5">
+                    {p.name.replace(/\s*\([^)]*\)/, '')}
+                  </p>
+                  <p className="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-snug">
+                    {p.task || 'Podstawowe zadanie w strefie'}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Prawa kolumna (5 cols): Odprawa & Notatka Taktyczna */}
+        <div className="lg:col-span-5 bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-xs border border-amber-200">
+                  <FileText className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black uppercase text-slate-900 tracking-wider">
+                    Założenia & Odprawa
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Notatka taktyczna dla zespołu do tego schematu
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <textarea
+              ref={noteTextareaRef}
+              rows={8}
+              value={tacticComment}
+              onChange={e => setTacticComment(e.target.value)}
+              placeholder="Wpisz wytyczne zagrywki, kierunki ataku, asekurację bloku lub cele na dany set..."
+              className="w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:border-sky-500 text-slate-900 placeholder:text-slate-400 rounded-2xl p-3.5 text-xs font-medium leading-relaxed focus:outline-none transition shadow-2xs resize-none"
+            />
+          </div>
+
+          <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
+            <span className="text-[11px] text-slate-400 font-mono">
+              Znaki: {tacticComment.length}
+            </span>
+
+            {canEdit && (
               <button
                 type="button"
                 onClick={handleSaveTactic}
                 disabled={saving}
-                className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition flex items-center gap-1.5 shadow-md shadow-amber-500/20"
-                title="Zapisz ten zrzut tablicy i notatkę jako nową taktykę"
+                className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider transition shadow-sm hover:shadow flex items-center gap-1.5 cursor-pointer active:scale-95"
               >
                 <Save className="w-3.5 h-3.5" />
-                <span>{saving ? 'Zapisywanie...' : 'Zapisz ten zrzut'}</span>
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* GŁÓWNY EDYTOR NOTATKI TAKTYCZNEJ */}
-        <div className="space-y-2">
-          <div className="relative">
-            <textarea
-              ref={noteTextareaRef}
-              rows={5}
-              value={tacticComment}
-              onChange={e => setTacticComment(e.target.value)}
-              placeholder={`Wpisz ogólne założenia taktyczne i zadania dla drużyny, np.:
-- Zagrywka: celujemy w strefę 1 i 5 rywala, aby odrzucić rozgrywającego od siatki.
-- Środek: zamykamy krótką, a skrzydłowi asekurują skos.
-- Atak: wysokie piłki na pojedynczy blok.
-- Zmiany zadaniowe w końcówkach setów.`}
-              className="w-full bg-slate-50/50 hover:bg-white focus:bg-white border-2 border-slate-200 focus:border-amber-400 text-slate-900 placeholder:text-slate-400 rounded-2xl p-4 text-xs sm:text-sm font-medium leading-relaxed focus:outline-none shadow-inner transition"
-            />
-          </div>
-
-          <div className="flex items-center justify-between text-xs text-slate-400 px-1">
-            <div className="flex items-center gap-2">
-              <span>Znaki: <strong className="text-slate-600">{tacticComment.length}</strong></span>
-              {tacticComment.includes('@') && (
-                <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[10px] font-bold">
-                  Zawiera wzmianki o zawodnikach (@)
-                </span>
-              )}
-            </div>
-            {tacticComment && (
-              <button
-                type="button"
-                onClick={() => setTacticComment('')}
-                className="text-[11px] text-slate-400 hover:text-rose-600 transition"
-              >
-                Wyczyść notatkę
+                <span>{saving ? 'Zapisywanie...' : 'Zapisz Schemat'}</span>
               </button>
             )}
           </div>
         </div>
 
-        {/* 4. OPCJONALNY PODGLĄD POZYCJI 6 GRACZY NA BOISKU */}
-        <div className="pt-2 border-t border-slate-100">
-          <button
-            type="button"
-            onClick={() => setShowCourtPositions(!showCourtPositions)}
-            className="w-full py-2.5 px-4 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 flex items-center justify-between transition"
-          >
-            <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-sky-600" />
-              <span>Pozycje nominalne 6 graczy na boisku (opcjonalny podgląd stref)</span>
-            </div>
-            <span className="text-[11px] text-slate-500 font-bold">
-              {showCourtPositions ? 'Zwiń ▲' : 'Rozwiń ▼'}
-            </span>
-          </button>
-
-          {showCourtPositions && (
-            <div className="mt-3 pt-3 border-t border-slate-100 space-y-3 animate-fadeIn">
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-                {positions.map(p => {
-                  const isLibero = p.roleCode === 'L';
-                  return (
-                    <div
-                      key={p.id}
-                      onClick={() => setSelectedPlayerId(selectedPlayerId === p.id ? null : p.id)}
-                      className={`p-2.5 rounded-xl border text-xs cursor-pointer transition ${
-                        selectedPlayerId === p.id
-                          ? 'bg-sky-50 border-sky-300 text-slate-900 shadow-sm ring-1 ring-sky-300'
-                          : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-1 pb-1 border-b border-slate-100">
-                        <span className={`w-5 h-5 rounded flex items-center justify-center font-black text-[10px] ${
-                          isLibero ? 'bg-amber-500 text-slate-950' : 'bg-sky-500 text-white'
-                        }`}>
-                          {p.number ? `#${p.number}` : p.roleCode}
-                        </span>
-                        <span className="text-[10px] font-mono font-bold text-slate-500">Strefa {p.zone}</span>
-                      </div>
-                      <p className="font-bold text-slate-900 text-[11px] truncate mt-1">
-                        {p.name.replace(/\s*\([^)]*\)/, '')}
-                      </p>
-                      {p.task && <p className="text-[10px] text-slate-500 line-clamp-2 mt-0.5">{p.task}</p>}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
       </div>
 
         {/* SEKCJA: SUGESTIE I WNIOSKI ZAWODNIKÓW & DYSKUSJA TAKTYCZNA */}
