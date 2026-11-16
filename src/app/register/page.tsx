@@ -48,42 +48,55 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-8 relative">
-      <div className="max-w-lg w-full angel-card rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden z-10 border border-steel-700/60 bg-dark-900/95 backdrop-blur-xl">
-        <div className="text-center mb-6">
-          <div className="relative w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-2">
+    <div className="min-h-screen w-full flex items-center justify-center px-4 py-8 bg-gradient-to-br from-slate-950 via-slate-900 to-sky-950 relative overflow-hidden select-none">
+      {/* Ambient glowing atmosphere */}
+      <div className="absolute top-1/4 -right-20 w-96 h-96 bg-sky-500/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="max-w-lg w-full bg-slate-900/90 backdrop-blur-2xl border border-sky-500/30 rounded-3xl p-6 sm:p-9 shadow-2xl relative z-10 text-white space-y-6">
+        
+        {/* Athletic Crest & Brand Header */}
+        <div className="text-center space-y-2">
+          <div className="relative w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-2 p-1 rounded-2xl bg-gradient-to-br from-sky-400 via-blue-500 to-amber-400 shadow-xl shadow-sky-500/20">
             <img
               src="/logo.jpg"
               alt="Angels ZTP"
-              className="w-full h-full object-contain drop-shadow-xl rounded-2xl border border-steel-700/70"
+              className="w-full h-full object-contain rounded-xl bg-slate-950"
             />
           </div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-steel-800/80 border border-steel-600/50 text-steel-200 text-[10px] font-athletic tracking-widest uppercase mb-1">
-            Nowy Członek Drużyny
+
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-400/30 text-sky-300 text-[10px] font-athletic tracking-widest uppercase">
+            <Volleyball className="w-3 h-3 text-sky-400" />
+            <span>Nowy Członek Drużyny</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-athletic text-bone-100 tracking-wider uppercase">
+
+          <h1 className="text-xl sm:text-2xl font-black font-athletic tracking-wider uppercase text-white">
             Dołącz do Angels ZTP
           </h1>
-          <p className="text-[11px] text-steel-400">Utwórz profil zawodnika lub sztabu</p>
+          <p className="text-xs text-slate-400">Utwórz profil zawodnika lub sztabu trenerskiego</p>
         </div>
 
         {error && (
-          <div className="mb-4 p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs text-center font-semibold">
+          <div className="p-3 rounded-2xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs text-center font-bold animate-fadeIn">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-3.5">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          
+          {/* Rola w drużynie */}
           <div>
-            <label className="block text-[11px] font-bold text-steel-300 mb-1.5">Rola w drużynie *</label>
+            <label className="block text-[11px] font-black uppercase tracking-wider text-slate-300 mb-2 font-mono">
+              Rola w zespole *
+            </label>
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => setRole('ZAWODNIK')}
-                className={`py-2 px-2.5 rounded-xl text-xs font-athletic border transition flex items-center justify-center gap-1.5 ${
+                className={`py-2 px-2.5 rounded-xl text-xs font-black border transition flex items-center justify-center gap-1.5 cursor-pointer ${
                   role === 'ZAWODNIK'
-                    ? 'bg-steel-700 text-bone-100 border-steel-500 shadow'
-                    : 'bg-dark-950/80 border-steel-800 text-steel-400 hover:text-white'
+                    ? 'bg-sky-500 text-slate-950 border-sky-400 shadow-md font-athletic'
+                    : 'bg-slate-950/60 border-slate-700/80 text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
               >
                 <Volleyball className="w-3.5 h-3.5" /> Zawodnik
@@ -91,10 +104,10 @@ export default function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setRole('TRENER')}
-                className={`py-2 px-2.5 rounded-xl text-xs font-athletic border transition flex items-center justify-center gap-1.5 ${
+                className={`py-2 px-2.5 rounded-xl text-xs font-black border transition flex items-center justify-center gap-1.5 cursor-pointer ${
                   role === 'TRENER'
-                    ? 'bg-sky-900/60 text-sky-200 border-sky-500 shadow'
-                    : 'bg-dark-950/80 border-steel-800 text-steel-400 hover:text-white'
+                    ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-md font-athletic'
+                    : 'bg-slate-950/60 border-slate-700/80 text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
               >
                 <ClipboardList className="w-3.5 h-3.5" /> Trener
@@ -102,10 +115,10 @@ export default function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setRole('KIEROWNIK')}
-                className={`py-2 px-2.5 rounded-xl text-xs font-athletic border transition flex items-center justify-center gap-1.5 ${
+                className={`py-2 px-2.5 rounded-xl text-xs font-black border transition flex items-center justify-center gap-1.5 cursor-pointer ${
                   role === 'KIEROWNIK'
-                    ? 'bg-amber-900/50 text-amber-200 border-amber-500 shadow'
-                    : 'bg-dark-950/80 border-steel-800 text-steel-400 hover:text-white'
+                    ? 'bg-purple-400 text-slate-950 border-purple-300 shadow-md font-athletic'
+                    : 'bg-slate-950/60 border-slate-700/80 text-slate-400 hover:text-white hover:bg-slate-800/60'
                 }`}
               >
                 <Crown className="w-3.5 h-3.5" /> Kierownik
@@ -113,75 +126,84 @@ export default function RegisterPage() {
             </div>
           </div>
 
+          {/* Imię i Nazwisko oraz Email */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-[11px] font-bold text-steel-300 mb-1">Imię i Nazwisko *</label>
+              <label className="block text-[11px] font-black uppercase tracking-wider text-slate-300 mb-1.5 font-mono">
+                Imię i Nazwisko *
+              </label>
               <div className="relative">
-                <User className="w-4 h-4 text-steel-500 absolute left-3 top-2.5" />
+                <User className="w-4 h-4 text-sky-400 absolute left-3.5 top-3" />
                 <input
                   type="text"
                   required
                   placeholder="np. Karol Ordon"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-dark-950/80 border border-steel-700/80 rounded-xl pl-9 pr-3 py-2 text-xs sm:text-sm text-bone-100 placeholder-steel-600 focus:outline-none focus:border-steel-400 transition"
+                  className="w-full bg-slate-950/70 border border-slate-700/80 rounded-xl pl-10 pr-3.5 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-500/20 transition"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-steel-300 mb-1">Adres e-mail *</label>
+              <label className="block text-[11px] font-black uppercase tracking-wider text-slate-300 mb-1.5 font-mono">
+                Adres e-mail *
+              </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-steel-500 absolute left-3 top-2.5" />
+                <Mail className="w-4 h-4 text-sky-400 absolute left-3.5 top-3" />
                 <input
                   type="email"
                   required
-                  placeholder="twoj@email.pl"
+                  placeholder="twoj@angelsztp.pl"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-dark-950/80 border border-steel-700/80 rounded-xl pl-9 pr-3 py-2 text-xs sm:text-sm text-bone-100 placeholder-steel-600 focus:outline-none focus:border-steel-400 transition"
+                  className="w-full bg-slate-950/70 border border-slate-700/80 rounded-xl pl-10 pr-3.5 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-500/20 transition"
                 />
               </div>
             </div>
           </div>
 
+          {/* Hasło */}
           <div>
-            <label className="block text-[11px] font-bold text-steel-300 mb-1">Hasło *</label>
+            <label className="block text-[11px] font-black uppercase tracking-wider text-slate-300 mb-1.5 font-mono">
+              Hasło *
+            </label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-steel-500 absolute left-3 top-2.5" />
+              <Lock className="w-4 h-4 text-sky-400 absolute left-3.5 top-3" />
               <input
                 type="password"
                 required
                 placeholder="Minimum 6 znaków"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-dark-950/80 border border-steel-700/80 rounded-xl pl-9 pr-3 py-2 text-xs sm:text-sm text-bone-100 placeholder-steel-600 focus:outline-none focus:border-steel-400 transition"
+                className="w-full bg-slate-950/70 border border-slate-700/80 rounded-xl pl-10 pr-3.5 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-500/20 transition"
               />
             </div>
           </div>
 
+          {/* Parametry boiskowe dla zawodnika */}
           {role === 'ZAWODNIK' && (
-            <div className="p-3.5 rounded-2xl bg-dark-950/80 border border-steel-800 space-y-3">
-              <span className="text-[10px] font-athletic text-steel-300 uppercase tracking-wider block">
+            <div className="p-4 rounded-2xl bg-slate-950/50 border border-slate-800 space-y-3">
+              <span className="text-[10px] font-black font-athletic text-sky-300 uppercase tracking-widest block">
                 Parametry Boiskowe
               </span>
-              <div className="grid grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-semibold text-steel-400 mb-1">Numer koszulki</label>
+                  <label className="block text-[10px] font-bold text-slate-400 mb-1">Numer koszulki</label>
                   <input
                     type="number"
                     placeholder="np. 17"
                     value={number}
                     onChange={(e) => setNumber(e.target.value)}
-                    className="w-full bg-dark-900 border border-steel-700/80 rounded-xl px-3 py-1.5 text-xs text-bone-100 focus:outline-none focus:border-steel-400"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-400"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-semibold text-steel-400 mb-1">Pozycja</label>
+                  <label className="block text-[10px] font-bold text-slate-400 mb-1">Pozycja</label>
                   <select
                     value={position}
                     onChange={(e) => setPosition(e.target.value as PlayerPosition)}
-                    className="w-full bg-dark-900 border border-steel-700/80 rounded-xl px-2.5 py-1.5 text-xs text-bone-100 focus:outline-none focus:border-steel-400"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-400"
                   >
                     <option value="Przyjmujący">Przyjmujący</option>
                     <option value="Atakujący">Atakujący</option>
@@ -192,27 +214,27 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-semibold text-steel-400 mb-1">Wzrost (cm)</label>
+                  <label className="block text-[10px] font-bold text-slate-400 mb-1">Wzrost (cm)</label>
                   <input
                     type="number"
                     placeholder="np. 194"
                     value={height}
                     onChange={(e) => setHeight(e.target.value)}
-                    className="w-full bg-dark-900 border border-steel-700/80 rounded-xl px-3 py-1.5 text-xs text-bone-100 focus:outline-none focus:border-steel-400"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-400"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-semibold text-steel-400 mb-1">Telefon</label>
+                  <label className="block text-[10px] font-bold text-slate-400 mb-1">Telefon</label>
                   <div className="relative">
-                    <Phone className="w-3.5 h-3.5 text-steel-500 absolute left-3 top-2" />
+                    <Phone className="w-3.5 h-3.5 text-sky-400 absolute left-3 top-2.5" />
                     <input
                       type="tel"
                       placeholder="500 123 456"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full bg-dark-900 border border-steel-700/80 rounded-xl pl-8 pr-3 py-1.5 text-xs text-bone-100 focus:outline-none focus:border-steel-400"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-8 pr-3 py-2 text-xs text-white focus:outline-none focus:border-sky-400"
                     />
                   </div>
                 </div>
@@ -223,19 +245,20 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 rounded-xl font-athletic tracking-wider text-xs sm:text-sm bg-gradient-to-r from-steel-700 via-steel-600 to-steel-500 hover:from-steel-600 hover:to-steel-400 text-white shadow-lg transition flex items-center justify-center gap-2 disabled:opacity-50 mt-3"
+            className="w-full py-3 rounded-xl font-athletic tracking-wider text-xs sm:text-sm bg-gradient-to-r from-sky-400 via-sky-500 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-slate-950 font-black shadow-lg shadow-sky-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-2 cursor-pointer active:scale-[0.98]"
           >
-            {loading ? 'Rejestrowanie...' : 'Zarejestruj konto'}
+            {loading ? 'Rejestrowanie profilu...' : 'Zarejestruj profil w Angels ZTP'}
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
-        <div className="mt-5 pt-4 border-t border-steel-800 text-center text-xs text-steel-400">
-          Masz już konto w Angels ZTP?{' '}
-          <Link href="/login" className="text-bone-100 font-bold hover:text-white underline underline-offset-4 ml-1">
+        <div className="pt-4 border-t border-slate-800 text-center text-xs text-slate-400">
+          Masz już konto w zespole?{' '}
+          <Link href="/login" className="text-sky-300 hover:text-white font-bold underline underline-offset-4 ml-1 transition">
             Zaloguj się
           </Link>
         </div>
+
       </div>
     </div>
   );

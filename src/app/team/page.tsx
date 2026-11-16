@@ -283,35 +283,35 @@ export default function TeamPage() {
           {staff.map(member => (
             <div
               key={member.id}
-              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm relative flex items-start justify-between group hover:border-amber-400 hover:shadow-md transition-all duration-200"
+              className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-sm relative flex items-start justify-between group hover:border-amber-400 hover:shadow-md transition-all duration-200"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3.5">
                 {member.avatar ? (
                   <img
                     src={member.avatar}
                     alt={member.name}
-                    className="w-12 h-12 rounded-2xl object-cover border border-slate-200 shadow-sm shrink-0"
+                    className="w-14 h-14 rounded-2xl object-cover border border-slate-200 shadow-sm shrink-0"
                   />
                 ) : (
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg text-white shadow-sm shrink-0 ${
-                    member.role === 'KIEROWNIK' ? 'bg-amber-600 border border-amber-400' : 'bg-sky-600 border border-sky-400'
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl text-white shadow-md shrink-0 border transition-transform group-hover:scale-105 ${
+                    member.role === 'KIEROWNIK' ? 'bg-gradient-to-br from-amber-500 to-amber-700 border-amber-300 shadow-amber-500/20' : 'bg-gradient-to-br from-sky-500 to-blue-700 border-sky-300 shadow-sky-500/20'
                   }`}>
                     {member.name.charAt(0)}
                   </div>
                 )}
-                <div>
-                  <h3 className="text-sm font-black text-slate-900">{member.name}</h3>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black uppercase border ${
+                <div className="space-y-0.5">
+                  <h3 className="text-base font-black text-slate-900 tracking-tight">{member.name}</h3>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className={`px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider border font-mono ${
                       member.role === 'KIEROWNIK' ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-sky-50 text-sky-700 border-sky-200'
                     }`}>
                       {member.role === 'KIEROWNIK' ? '👑 Kapitan & Kierownik' : 'Trener'}
                     </span>
-                    <span className="text-xs text-slate-500">· {member.position || 'Sztab'}</span>
+                    <span className="text-xs text-slate-500 font-medium">· {member.position || 'Sztab'}</span>
                   </div>
                   {member.phone && (
-                    <div className="text-xs text-slate-500 flex items-center gap-1 mt-2 font-mono">
-                      <Phone className="w-3 h-3 text-slate-400" />
+                    <div className="text-xs text-slate-600 flex items-center gap-1.5 pt-1 font-mono font-medium">
+                      <Phone className="w-3.5 h-3.5 text-slate-400" />
                       <span>{member.phone}</span>
                     </div>
                   )}
@@ -321,7 +321,7 @@ export default function TeamPage() {
               {!isArchiveMode && (currentUser?.role === 'KIEROWNIK' || currentUser?.isCaptain || currentUser?.id === member.id) && (
                 <button
                   onClick={() => startEdit(member)}
-                  className="p-2 text-slate-400 hover:text-slate-800 rounded-xl hover:bg-slate-100 transition"
+                  className="p-2 text-slate-400 hover:text-slate-800 rounded-xl hover:bg-slate-100 transition cursor-pointer"
                   title="Edytuj profil"
                 >
                   <Edit2 className="w-4 h-4" />
@@ -427,49 +427,51 @@ export default function TeamPage() {
             return (
               <div
                 key={player.id}
-                className={`rounded-3xl p-5 shadow-sm transition-all duration-200 flex flex-col justify-between group hover:shadow-md ${
+                className={`rounded-3xl p-5 sm:p-6 shadow-sm transition-all duration-200 flex flex-col justify-between group hover:shadow-lg hover:-translate-y-1 ${
                   isLukaszCaptain
-                    ? 'bg-amber-50/40 border border-amber-300 hover:border-amber-400'
-                    : 'bg-white border border-slate-200 hover:border-sky-300'
+                    ? 'bg-gradient-to-b from-amber-50/50 via-white to-white border-2 border-amber-300 hover:border-amber-400'
+                    : 'bg-white border border-slate-200/90 hover:border-sky-400'
                 }`}
               >
                 <div>
                   {/* Top Bar with Number & Position */}
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3.5">
                       {player.avatar ? (
-                        <div className="relative w-12 h-12 rounded-2xl overflow-hidden border border-slate-200 shadow-sm shrink-0">
+                        <div className="relative w-14 h-14 rounded-2xl overflow-hidden border border-slate-200 shadow-md shrink-0">
                           <img
                             src={player.avatar}
                             alt={player.name}
                             className="w-full h-full object-cover"
                           />
                           {player.number && (
-                            <span className="absolute bottom-0 right-0 bg-slate-900/80 text-white font-mono font-black text-[9px] px-1 rounded-tl-md">
+                            <span className="absolute bottom-0 right-0 bg-slate-950/90 text-white font-mono font-black text-[10px] px-1.5 py-0.5 rounded-tl-lg shadow">
                               #{player.number}
                             </span>
                           )}
                         </div>
                       ) : (
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-mono font-black text-xl shadow-sm shrink-0 ${
+                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-mono font-black text-2xl shadow-md shrink-0 border transition-transform group-hover:scale-105 ${
                           isLukaszCaptain
-                            ? 'bg-amber-100 border border-amber-300 text-amber-800'
-                            : 'bg-sky-50 border border-sky-200 text-sky-700'
+                            ? 'bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-amber-300 text-slate-950 shadow-amber-500/20'
+                            : player.position === 'Libero'
+                            ? 'bg-gradient-to-br from-yellow-400 via-amber-400 to-amber-500 border-yellow-300 text-slate-950 shadow-amber-500/20'
+                            : 'bg-gradient-to-br from-sky-500 via-sky-600 to-blue-700 border-sky-400/50 text-white shadow-sky-500/20'
                         }`}>
                           {player.number ? `#${player.number}` : '-'}
                         </div>
                       )}
                       <div>
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <h3 className="text-base font-black text-slate-900 tracking-wide">{player.name}</h3>
+                          <h3 className="text-base font-black text-slate-900 tracking-tight">{player.name}</h3>
                           {player.isCaptain && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-black uppercase bg-amber-50 text-amber-800 border border-amber-300">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-black uppercase bg-amber-50 text-amber-800 border border-amber-300 shadow-2xs font-mono">
                               <Crown className="w-3 h-3 text-amber-600" />
                               {player.role === 'KIEROWNIK' ? 'Kapitan & Kierownik' : 'Kapitan'}
                             </span>
                           )}
                         </div>
-                        <span className={`inline-block px-2 py-0.5 rounded-lg text-[10px] font-black border mt-1 ${getPositionColor(player.position)}`}>
+                        <span className={`inline-block px-2.5 py-0.5 rounded-lg text-[10px] font-black border mt-1 shadow-2xs ${getPositionColor(player.position)}`}>
                           {player.position || 'Zawodnik'}
                         </span>
                       </div>
