@@ -49,7 +49,7 @@ export async function PUT(request: Request) {
     if (position) targetUser.position = position as PlayerPosition;
     if (height !== undefined) targetUser.height = height ? Number(height) : undefined;
     if (phone !== undefined) targetUser.phone = phone.trim();
-    if (status) targetUser.status = status;
+    if (status && isStaff) targetUser.status = status;
     if (avatar !== undefined) {
       targetUser.avatar = avatar ? String(avatar).trim() : undefined;
     }

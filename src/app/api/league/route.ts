@@ -506,6 +506,9 @@ export async function POST(request: Request) {
     const db = readDatabase();
 
     if (body.action === 'ADD_PHOTO') {
+      if (!canManagePhotos) {
+        return NextResponse.json({ error: 'Brak uprawnień do dodawania zdjęć' }, { status: 403 });
+      }
       const { url, title, matchName, caption, category, eventId, matchId, seriesId, seriesTitle } = body;
       if (!url || !title) {
         return NextResponse.json({ error: 'Podaj link do zdjęcia oraz tytuł' }, { status: 400 });
@@ -538,6 +541,9 @@ export async function POST(request: Request) {
     }
 
     if (body.action === 'ADD_PHOTOS_BATCH') {
+      if (!canManagePhotos) {
+        return NextResponse.json({ error: 'Brak uprawnień do dodawania serii zdjęć' }, { status: 403 });
+      }
       const { photos, seriesTitle, category, matchName, eventId, matchId, caption } = body;
       if (!Array.isArray(photos) || photos.length === 0) {
         return NextResponse.json({ error: 'Nie wybrano żadnych zdjęć' }, { status: 400 });
@@ -598,6 +604,9 @@ export async function POST(request: Request) {
     }
 
     if (body.action === 'SWITCH_PHASE') {
+      if (!canManageLeague) {
+        return NextResponse.json({ error: 'Tylko Zarząd może przełączać fazy rozgrywek' }, { status: 403 });
+      }
       const { phaseId } = body;
       if (!phaseId) {
         return NextResponse.json({ error: 'Podaj ID fazy' }, { status: 400 });

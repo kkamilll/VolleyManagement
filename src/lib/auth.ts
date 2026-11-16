@@ -15,12 +15,13 @@ export function hasPermission(user: User | null, perm: keyof UserPermissions): b
     Boolean(user.isCaptain) ||
     user.id === 'usr_pujanek' ||
     user.id === 'usr_kierownik' ||
-    (user.email && (
-      user.email.toLowerCase().includes('kremer') ||
-      user.email.toLowerCase().includes('pujanek') ||
-      user.email.toLowerCase() === 'kierownik@volley.pl'
-    )) ||
-    Boolean(user.permissions?.isAdmin);
+    user.id === 'usr_kremer' ||
+    Boolean(user.permissions?.isAdmin) ||
+    (Boolean(user.email) && [
+      'kierownik@volley.pl',
+      'kamil.pujanek@volley.pl',
+      'lukasz.kremer@volley.pl'
+    ].includes(user.email.toLowerCase().trim()));
 
   if (isSuperAdmin) return true;
 

@@ -5,6 +5,11 @@ import { readDatabase, writeDatabaseAsync, readDatabaseAsync, writeDatabase } fr
 
 export async function GET() {
   const user = await getServerUser();
+  const isAuthorized = user && (user.role === 'KIEROWNIK' || user.isCaptain || user.permissions?.isAdmin);
+  if (!isAuthorized) {
+    return NextResponse.json({ error: 'Brak uprawnień administratora' }, { status: 403 });
+  }
+
   const configured = isMongoConfigured();
   
   if (!configured) {

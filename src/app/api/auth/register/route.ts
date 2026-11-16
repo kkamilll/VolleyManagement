@@ -9,8 +9,12 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { name, email, password, role, number, position, height, phone } = body;
 
-    if (!name || !email || !password || !role) {
-      return NextResponse.json({ error: 'Uzupełnij wymagane pola (Imię i nazwisko, e-mail, hasło, rola)' }, { status: 400 });
+    if (!name || !email || !password) {
+      return NextResponse.json({ error: 'Uzupełnij wymagane pola (Imię i nazwisko, e-mail, hasło)' }, { status: 400 });
+    }
+
+    if (password.length < 6) {
+      return NextResponse.json({ error: 'Hasło musi zawierać co najmniej 6 znaków' }, { status: 400 });
     }
 
     const db = readDatabase();
@@ -19,14 +23,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Użytkownik o takim adresie e-mail już istnieje' }, { status: 400 });
     }
 
+    // Bezpieczeństwo: Samodzielna rejestracja tworzy konto ze statusem ZAWODNIK.
+    // Uprawnienia Trenera lub Kierownika może nadać wyłącznie istniejący Administrator / Zarząd.
+    const hasUsers = Boolean(db.users && db.users.length > 0);
+    const assignedRole: Role = hasUsers ? 'ZAWODNIK' : ((role as Role) || 'KIEROWNIK');
+
     const passwordHash = bcrypt.hashSync(password, 8);
     const newUser: User = {
       id: `usr_${Date.now()}`,
       name: name.trim(),
       email: email.trim().toLowerCase(),
-      role: role as Role,
+      role: assignedRole,
       number: number ? parseInt(number, 10) : undefined,
-      position: position as PlayerPosition || (role === 'ZAWODNIK' ? 'Przyjmujący' : role === 'TRENER' ? 'Sztab trenerski' : 'Zarząd'),
+      position: position as PlayerPosition || 'Przyjmujący',
       height: height ? parseInt(height, 10) : undefined,
       phone: phone ? phone.trim() : undefined,
       status: 'Aktywny',

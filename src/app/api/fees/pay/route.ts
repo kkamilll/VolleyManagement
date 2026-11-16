@@ -52,8 +52,17 @@ export async function POST(request: Request) {
       transactionId = `GOT-${Math.floor(1000 + Math.random() * 9000)}`;
     }
 
-    const originalFeeAmount = payment.amount;
-    const finalAmount = customAmount && Number(customAmount) > 0 ? Number(customAmount) : originalFeeAmount;
+    const originalFeeAmount = payment.baseAmount || payment.amount;
+    const requestedAmount = customAmount !== undefined && Number(customAmount) > 0 ? Number(customAmount) : originalFeeAmount;
+
+    // Bezpieczeństwo: Zwykły zawodnik nie może samowolnie zaniżyć kwoty składki
+    if (!canManage && requestedAmount < originalFeeAmount) {
+      return NextResponse.json({ 
+        error: `Kwota wpłaty (${requestedAmount} zł) nie może być niższa niż wymagana składka (${originalFeeAmount} zł). Skontaktuj się ze sztabem w celu indywidualnego rozliczenia.` 
+      }, { status: 400 });
+    }
+
+    const finalAmount = requestedAmount;
     
     payment.baseAmount = originalFeeAmount;
     payment.amount = finalAmount;

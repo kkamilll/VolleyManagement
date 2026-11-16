@@ -974,7 +974,8 @@ export function listDatabaseBackups(): Array<{ filename: string; size: number; c
 
 export function restoreBackupFile(filename: string): boolean {
   ensureDataDir();
-  const filePath = path.join(BACKUPS_DIR, filename);
+  const safeFilename = path.basename(filename);
+  const filePath = path.join(BACKUPS_DIR, safeFilename);
   if (!fs.existsSync(filePath)) return false;
 
   try {

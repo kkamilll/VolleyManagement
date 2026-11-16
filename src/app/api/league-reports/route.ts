@@ -67,6 +67,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Musisz być zalogowany' }, { status: 401 });
     }
 
+    const canManage = hasPermission(user, 'canManageMatches');
+    if (!canManage) {
+      return NextResponse.json({ error: 'Brak uprawnień do importowania raportów ligowych' }, { status: 403 });
+    }
+
     const body = await request.json();
     const { rawText, matchTitle, date, autoCreateMatch, linkedMatchId, mode, leaguePhaseId, leaguePhaseName } = body;
 

@@ -88,22 +88,36 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Użytkownik nie istnieje' }, { status: 404 });
     }
 
+    const isSuperUser = currentUser.role === 'KIEROWNIK' || hasPermission(currentUser, 'isAdmin');
+
     // Update role if provided
     if (role && ['KIEROWNIK', 'TRENER', 'ZAWODNIK'].includes(role)) {
+      if (role === 'KIEROWNIK' && !isSuperUser) {
+        return NextResponse.json({ error: 'Tylko Kierownik drużyny może nadawać rolę Kierownika' }, { status: 403 });
+      }
       targetUser.role = role as Role;
     }
 
     // Update permissions
     if (permissions && typeof permissions === 'object') {
+      const currentAdminPerm = Boolean(targetUser.permissions?.isAdmin);
+      const newAdminPerm = Boolean(permissions.isAdmin);
+      const currentFeePerm = Boolean(targetUser.permissions?.canManageFees);
+      const newFeePerm = Boolean(permissions.canManageFees);
+
+      if ((newAdminPerm !== currentAdminPerm || newFeePerm !== currentFeePerm) && !isSuperUser) {
+        return NextResponse.json({ error: 'Tylko Kierownik drużyny może zarządzać uprawnieniami administratora i kasy' }, { status: 403 });
+      }
+
       targetUser.permissions = {
         canManageMatches: Boolean(permissions.canManageMatches),
         canManageEvents: Boolean(permissions.canManageEvents),
         canManageStats: Boolean(permissions.canManageStats),
         canManageTactics: Boolean(permissions.canManageTactics),
-        canManageFees: Boolean(permissions.canManageFees),
+        canManageFees: isSuperUser ? newFeePerm : currentFeePerm,
         canPostAnnouncements: Boolean(permissions.canPostAnnouncements),
         canCreatePolls: Boolean(permissions.canCreatePolls),
-        isAdmin: Boolean(permissions.isAdmin)
+        isAdmin: isSuperUser ? newAdminPerm : currentAdminPerm
       };
     }
 
