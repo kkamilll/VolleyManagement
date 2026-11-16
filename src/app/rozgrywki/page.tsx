@@ -2233,10 +2233,10 @@ function RozgrywkiContent() {
   const [tournamentsPage, setTournamentsPage] = useState(1);
   const [leagueMatchesPage, setLeagueMatchesPage] = useState(1);
   const [photosPage, setPhotosPage] = useState(1);
-  const SPARRINGS_PER_PAGE = 3;
-  const TOURNAMENTS_PER_PAGE = 3;
-  const LEAGUE_MATCHES_PER_PAGE = 5;
-  const PHOTOS_PER_PAGE = 6;
+  const SPARRINGS_PER_PAGE = 10;
+  const TOURNAMENTS_PER_PAGE = 10;
+  const LEAGUE_MATCHES_PER_PAGE = 15;
+  const PHOTOS_PER_PAGE = 12;
 
   useEffect(() => {
     setSparringsPage(1);

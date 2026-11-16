@@ -403,17 +403,17 @@ function EventsAttendanceContent() {
 
   // Pagination for Events
   const [eventsPage, setEventsPage] = useState(1);
-  const EVENTS_PER_PAGE = 5;
+  const [eventsPerPage, setEventsPerPage] = useState(20);
 
   useEffect(() => {
     setEventsPage(1);
-  }, [filterType, filterTime, searchQuery]);
+  }, [filterType, filterTime, searchQuery, eventsPerPage]);
 
-  const totalEventsPages = Math.ceil(filteredEvents.length / EVENTS_PER_PAGE) || 1;
+  const totalEventsPages = Math.ceil(filteredEvents.length / eventsPerPage) || 1;
   const paginatedEvents = useMemo(() => {
-    const start = (eventsPage - 1) * EVENTS_PER_PAGE;
-    return filteredEvents.slice(start, start + EVENTS_PER_PAGE);
-  }, [filteredEvents, eventsPage]);
+    const start = (eventsPage - 1) * eventsPerPage;
+    return filteredEvents.slice(start, start + eventsPerPage);
+  }, [filteredEvents, eventsPage, eventsPerPage]);
 
   // 1. Declare attendance (for everyone: players, coach, manager)
   const handleAttendance = async (eventId: string, status: AttendanceStatus, note?: string) => {
@@ -2479,44 +2479,69 @@ function EventsAttendanceContent() {
           )}
 
           {/* Pagination Controls for Events */}
-          {totalEventsPages > 1 && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm text-slate-800">
-              <div className="text-xs text-slate-500">
-                Wyświetlanie <strong className="text-slate-900">{(eventsPage - 1) * EVENTS_PER_PAGE + 1}–{Math.min(eventsPage * EVENTS_PER_PAGE, filteredEvents.length)}</strong> z <strong className="text-slate-900">{filteredEvents.length}</strong> jednostek
-              </div>
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => setEventsPage(p => Math.max(1, p - 1))}
-                  disabled={eventsPage === 1}
-                  className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1 text-xs font-bold"
-                >
-                  <ChevronLeft className="w-3.5 h-3.5" />
-                  <span>Poprzednia</span>
-                </button>
-                <div className="flex items-center gap-1 px-1">
-                  {Array.from({ length: totalEventsPages }, (_, i) => i + 1).map(p => (
+          {filteredEvents.length > 0 && (
+            <div className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-3 shadow-sm text-slate-800">
+              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                <span>
+                  Wyświetlanie <strong className="text-slate-900">{(eventsPage - 1) * eventsPerPage + 1}–{Math.min(eventsPage * eventsPerPage, filteredEvents.length)}</strong> z <strong className="text-slate-900">{filteredEvents.length}</strong> jednostek
+                </span>
+                <div className="flex items-center gap-1 pl-2 border-l border-slate-200">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">Na stronę:</span>
+                  {[10, 20, 50, 100].map(size => (
                     <button
-                      key={p}
-                      onClick={() => setEventsPage(p)}
-                      className={`w-7 h-7 rounded-xl text-xs font-bold transition border ${
-                        eventsPage === p
-                          ? 'bg-sky-600 text-white border-sky-600 font-black shadow-sm'
-                          : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                      key={size}
+                      type="button"
+                      onClick={() => {
+                        setEventsPerPage(size);
+                        setEventsPage(1);
+                      }}
+                      className={`px-2 py-0.5 rounded-lg text-xs font-bold transition ${
+                        eventsPerPage === size
+                          ? 'bg-sky-600 text-white shadow-2xs font-black'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                       }`}
                     >
-                      {p}
+                      {size}
                     </button>
                   ))}
                 </div>
-                <button
-                  onClick={() => setEventsPage(p => Math.min(totalEventsPages, p + 1))}
-                  disabled={eventsPage === totalEventsPages}
-                  className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1 text-xs font-bold"
-                >
-                  <span>Następna</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
               </div>
+
+              {totalEventsPages > 1 && (
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => setEventsPage(p => Math.max(1, p - 1))}
+                    disabled={eventsPage === 1}
+                    className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1 text-xs font-bold"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                    <span>Poprzednia</span>
+                  </button>
+                  <div className="flex items-center gap-1 px-1">
+                    {Array.from({ length: totalEventsPages }, (_, i) => i + 1).map(p => (
+                      <button
+                        key={p}
+                        onClick={() => setEventsPage(p)}
+                        className={`w-7 h-7 rounded-xl text-xs font-bold transition border ${
+                          eventsPage === p
+                            ? 'bg-sky-600 text-white border-sky-600 font-black shadow-sm'
+                            : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        {p}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => setEventsPage(p => Math.min(totalEventsPages, p + 1))}
+                    disabled={eventsPage === totalEventsPages}
+                    className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1 text-xs font-bold"
+                  >
+                    <span>Następna</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
             </div>
           )}
           </>
