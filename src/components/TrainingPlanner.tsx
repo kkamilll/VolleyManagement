@@ -62,6 +62,7 @@ export function TrainingPlannerContent({
   const searchParams = useSearchParams();
   const queryPlanId = searchParams.get('id');
   const queryEventId = searchParams.get('eventId');
+  const queryType = searchParams.get('type');
 
   const canManage = Boolean(
     user?.role === 'KIEROWNIK' ||
@@ -80,9 +81,41 @@ export function TrainingPlannerContent({
   // Active sub-tab inside the selected plan
   const [activeTab, setActiveTab] = useState<'EXERCISES' | 'MATERIALS' | 'CONCLUSIONS' | 'COMMENTS'>(defaultTab || 'EXERCISES');
 
-  // Materials & Event Type Filter
+  // Materials & Event Type Filter: Mecz, Sparing, Turniej, Trening, Wszystkie
   const [materials, setMaterials] = useState<TacticalMaterial[]>([]);
-  const [eventTypeFilter, setEventTypeFilter] = useState<'ALL' | 'TRENING' | 'SPARING' | 'MECZ'>('ALL');
+  const [eventTypeFilter, setEventTypeFilter] = useState<'ALL' | 'TRENING' | 'SPARING' | 'MECZ' | 'TURNIEJ'>(() => {
+    if (queryType) {
+      const up = queryType.toUpperCase();
+      if (up === 'SPARING') return 'SPARING';
+      if (up === 'TURNIEJ' || up === 'TOURNAMENT') return 'TURNIEJ';
+      if (up === 'MECZ' || up === 'MECZ_LIGOWY') return 'MECZ';
+      if (up === 'TRENING') return 'TRENING';
+    }
+    return 'ALL';
+  });
+
+  useEffect(() => {
+    if (queryType) {
+      const up = queryType.toUpperCase();
+      if (up === 'SPARING') setEventTypeFilter('SPARING');
+      else if (up === 'TURNIEJ' || up === 'TOURNAMENT') setEventTypeFilter('TURNIEJ');
+      else if (up === 'MECZ' || up === 'MECZ_LIGOWY') setEventTypeFilter('MECZ');
+      else if (up === 'TRENING') setEventTypeFilter('TRENING');
+    }
+  }, [queryType]);
+
+  useEffect(() => {
+    if (queryEventId) {
+      setSelectedEventId(queryEventId);
+      const timer = setTimeout(() => {
+        const el = document.getElementById(`planner-event-${queryEventId}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [queryEventId]);
   const [showAddMaterialModal, setShowAddMaterialModal] = useState(false);
   const [matTitle, setMatTitle] = useState('');
   const [matType, setMatType] = useState<'PDF' | 'IMAGE'>('PDF');
@@ -188,6 +221,17 @@ export function TrainingPlannerContent({
         const match = pList.find((p: TrainingPlan) => p.eventId === targetEventId || p.id === targetEventId);
         if (match) setSelectedPlan(match);
         else if (pList.length > 0) setSelectedPlan(pList[0]);
+
+        // Auto-synchronizuj filtr z typem jednostki, jeśli przyszliśmy z Terminarza
+        if (queryEventId) {
+          const matchedEv = allEvents.find(e => e.id === targetEventId);
+          if (matchedEv) {
+            if (matchedEv.type === 'SPARING') setEventTypeFilter('SPARING');
+            else if (matchedEv.type === 'TURNIEJ') setEventTypeFilter('TURNIEJ');
+            else if (matchedEv.type === 'MECZ' || Boolean(matchedEv.opponent)) setEventTypeFilter('MECZ');
+            else if (matchedEv.type === 'TRENING') setEventTypeFilter('TRENING');
+          }
+        }
       } else if (queryPlanId) {
         const match = pList.find((p: TrainingPlan) => p.id === queryPlanId);
         if (match) setSelectedPlan(match);
@@ -706,12 +750,14 @@ export function TrainingPlannerContent({
         if (eventTypeFilter === 'ALL' || eventTypeFilter === 'TRENING') return true;
         if (eventTypeFilter === 'SPARING') return e.type === 'SPARING';
         if (eventTypeFilter === 'MECZ') return e.type === 'MECZ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals'));
+        if (eventTypeFilter === 'TURNIEJ') return e.type === 'TURNIEJ';
         return true;
       }
       if (eventTypeFilter === 'ALL') return true;
       if (eventTypeFilter === 'TRENING') return e.type === 'TRENING';
       if (eventTypeFilter === 'SPARING') return e.type === 'SPARING';
       if (eventTypeFilter === 'MECZ') return e.type === 'MECZ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals'));
+      if (eventTypeFilter === 'TURNIEJ') return e.type === 'TURNIEJ';
       return true;
     });
   }, [events, eventTypeFilter, mode]);
@@ -719,6 +765,7 @@ export function TrainingPlannerContent({
   const trainingsCount = useMemo(() => events.filter(e => e.type === 'TRENING').length, [events]);
   const sparringsCount = useMemo(() => events.filter(e => e.type === 'SPARING').length, [events]);
   const matchesCount = useMemo(() => events.filter(e => e.type === 'MECZ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals'))).length, [events]);
+  const tournamentsCount = useMemo(() => events.filter(e => e.type === 'TURNIEJ').length, [events]);
 
   // Currently active event from Terminarz
   const activeEvent: EventItem | null = filteredEvents.find(e => e.id === selectedEventId) || filteredEvents[0] || null;
@@ -810,7 +857,7 @@ export function TrainingPlannerContent({
                       : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                   }`}
                 >
-                  Wszystkie ({sparringsCount + matchesCount})
+                  Wszystkie ({sparringsCount + matchesCount + tournamentsCount})
                 </button>
                 <button
                   type="button"
@@ -833,6 +880,17 @@ export function TrainingPlannerContent({
                   }`}
                 >
                   ⚔️ Sparingi ({sparringsCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEventTypeFilter('TURNIEJ')}
+                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                    eventTypeFilter === 'TURNIEJ'
+                      ? 'bg-purple-600 text-white font-black shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                  }`}
+                >
+                  🏆 Turnieje ({tournamentsCount})
                 </button>
               </div>
             ) : mode === 'TRAININGS' ? (
@@ -889,6 +947,17 @@ export function TrainingPlannerContent({
                 >
                   🏐 Mecze ({matchesCount})
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setEventTypeFilter('TURNIEJ')}
+                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                    eventTypeFilter === 'TURNIEJ'
+                      ? 'bg-purple-600 text-white font-black shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                  }`}
+                >
+                  🏆 Turnieje ({tournamentsCount})
+                </button>
               </div>
             )}
 
@@ -914,11 +983,12 @@ export function TrainingPlannerContent({
                   const attendeesCount = ev.attendees?.filter(a => a.status === 'BEDE').length || 0;
                   const evDate = new Date(ev.date);
                   const isSparing = ev.type === 'SPARING';
+                  const isTournament = ev.type === 'TURNIEJ';
                   const isMatch = ev.type === 'MECZ' || Boolean(ev.opponent && ev.title.toLowerCase().includes('lals'));
 
                   // Ekstrakcja rundy oraz nazwy rywala
                   const roundMatch = ev.title.match(/R(\d+)/i) || ev.title.match(/Runda\s*(\d+)/i);
-                  const roundLabel = roundMatch ? `R${roundMatch[1]}` : (isMatch ? 'LALS' : isSparing ? 'Sparing' : 'Trening');
+                  const roundLabel = roundMatch ? `R${roundMatch[1]}` : (isMatch ? 'LALS' : isSparing ? 'Sparing' : isTournament ? 'Turniej' : 'Trening');
                   
                   let cleanOpponent = ev.opponent || '';
                   if (!cleanOpponent && ev.title.includes(' vs ')) {
@@ -926,24 +996,35 @@ export function TrainingPlannerContent({
                     cleanOpponent = parts[0].includes('Angels') ? parts[1].trim() : parts[0].replace(/.*:\s*/, '').trim();
                   }
 
+                  const isHighlightedFromUrl = queryEventId === ev.id;
+
                   return (
                     <div
                       key={ev.id}
+                      id={`planner-event-${ev.id}`}
                       onClick={() => {
                         setSelectedEventId(ev.id);
                         if (plan) setSelectedPlan(plan);
                         else setSelectedPlan(null);
                       }}
-                      className={`p-3.5 rounded-2xl border transition cursor-pointer text-left space-y-2 ${
+                      className={`p-3.5 rounded-2xl border transition cursor-pointer text-left space-y-2 relative ${
                         isSelected
                           ? isSparing
-                            ? 'bg-amber-50/60 border-amber-400 ring-2 ring-amber-300 text-slate-900 shadow-sm'
+                            ? 'bg-amber-50/80 border-amber-400 ring-2 ring-amber-400 text-slate-900 shadow-md'
+                            : isTournament
+                            ? 'bg-purple-50/80 border-purple-400 ring-2 ring-purple-400 text-slate-900 shadow-md'
                             : isMatch
-                            ? 'bg-sky-50/70 border-sky-400 ring-2 ring-sky-300 text-slate-900 shadow-sm'
-                            : 'bg-emerald-50/60 border-emerald-400 ring-2 ring-emerald-300 text-slate-900 shadow-sm'
+                            ? 'bg-sky-50/90 border-sky-400 ring-2 ring-sky-400 text-slate-900 shadow-md'
+                            : 'bg-emerald-50/80 border-emerald-400 ring-2 ring-emerald-400 text-slate-900 shadow-md'
                           : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700'
-                      }`}
+                      } ${isHighlightedFromUrl ? 'ring-2 ring-offset-2 ring-sky-500' : ''}`}
                     >
+                      {isHighlightedFromUrl && (
+                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-sky-100 text-sky-800 text-[10px] font-black uppercase tracking-wider border border-sky-300 w-fit">
+                          <span className="w-1.5 h-1.5 rounded-full bg-sky-600 animate-ping" />
+                          <span>📍 Wybrana z Terminarza</span>
+                        </div>
+                      )}
                       <div className="flex items-center justify-between text-[11px]">
                         <span className="font-mono font-bold text-slate-600 flex items-center gap-1">
                           <Clock className="w-3.5 h-3.5 text-sky-600" />

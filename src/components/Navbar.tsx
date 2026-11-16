@@ -316,18 +316,18 @@ export default function Navbar() {
               Kadra
             </Link>
 
-            {/* Taktyka & Trening with dropdown */}
+            {/* Taktyka with dropdown */}
             <div className="relative group shrink-0">
               <Link
                 href="/taktyka"
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
-                  pathname.startsWith('/taktyka') || pathname.startsWith('/trening') || pathname.startsWith('/coach')
+                  pathname.startsWith('/taktyka') || pathname.startsWith('/coach')
                     ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
                 <Target className="w-4 h-4 text-sky-600" />
-                <span>Taktyka & Trening</span>
+                <span>Taktyka</span>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition" />
               </Link>
 
@@ -346,18 +346,31 @@ export default function Navbar() {
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-amber-700 hover:bg-amber-50 transition"
                   >
                     <Trophy className="w-4 h-4 text-amber-500" />
-                    <span>Rozpiski & Mecze LALS</span>
+                    <span>Rozpiski Meczowe (LALS / Sparingi)</span>
                   </Link>
                   <Link
-                    href="/taktyka?tab=trainings"
+                    href="/trening"
                     className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 transition"
                   >
                     <Volleyball className="w-4 h-4 text-emerald-500" />
-                    <span>Konspekty Treningowe</span>
+                    <span>Przejdź do Treningów &rarr;</span>
                   </Link>
                 </div>
               </div>
             </div>
+
+            {/* Treningi - osobna podstrona */}
+            <Link
+              href="/trening"
+              className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
+                pathname.startsWith('/trening')
+                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <Volleyball className="w-4 h-4 text-emerald-600" />
+              <span>Treningi</span>
+            </Link>
 
             <Link
               href="/galeria"
@@ -848,15 +861,15 @@ export default function Navbar() {
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-700 transition"
             >
               <Trophy className="w-4 h-4 text-amber-600" />
-              <span>Rozpiski & Mecze LALS</span>
+              <span>Rozpiski Meczowe (Mecze / Sparingi)</span>
             </Link>
             <Link
-              href="/taktyka?tab=trainings"
+              href="/trening"
               onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition"
             >
               <Volleyball className="w-4 h-4 text-emerald-600" />
-              <span>Konspekty Treningowe</span>
+              <span>Konspekty Treningowe (/trening)</span>
             </Link>
           </div>
 

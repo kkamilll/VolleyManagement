@@ -96,6 +96,10 @@ export interface MatchResult {
   createdByName: string;
   createdAt: string;
   reportId?: string; // ID of the linked VolleyStation report
+  round?: number;
+  matchNumber?: number;
+  url?: string;
+  eventId?: string;
   leaguePhaseId?: string; // ID fazy ligowej (np. 'faza_1' lub 'faza_2')
   leaguePhaseName?: string; // Nazwa fazy ligowej (np. 'Faza I: Grupa Eliminacyjna' lub 'Faza II: Grupa Finałowa')
 }
@@ -213,6 +217,7 @@ export interface MatchSetScore {
   setNumber: number;
   homeScore: number;
   awayScore: number;
+  duration?: string;
 }
 
 export interface VolleyStationMvp {

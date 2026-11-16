@@ -188,23 +188,23 @@ export default function BottomNav() {
 
               {user?.role === 'TRENER' && (
                 <Link
-                  href="/taktyka?tab=trainings"
+                  href="/trening"
                   onClick={() => setShowMoreMenu(false)}
                   className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${
-                    pathname.startsWith('/taktyka')
-                      ? 'bg-sky-50 border-sky-300 text-sky-800 shadow-sm'
-                      : 'bg-slate-50/80 border-slate-200 text-slate-700 hover:bg-sky-50/50 hover:border-sky-200'
+                    pathname.startsWith('/trening')
+                      ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-sm'
+                      : 'bg-slate-50/80 border-slate-200 text-slate-700 hover:bg-emerald-50/50 hover:border-emerald-200'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <div className="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
                       <Flame className="w-4 h-4" />
                     </div>
                     <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
                   </div>
                   <div>
-                    <div className="text-xs font-black uppercase text-slate-900">Warsztat Trenera</div>
-                    <div className="text-[10px] text-slate-500">Taktyka i treningi</div>
+                    <div className="text-xs font-black uppercase text-slate-900">Treningi & Konspekty</div>
+                    <div className="text-[10px] text-slate-500">Warsztat trenera i ćwiczenia</div>
                   </div>
                 </Link>
               )}

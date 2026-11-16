@@ -310,7 +310,7 @@ function TacticsContent() {
   useEffect(() => {
     const tab = searchParams.get('tab');
     if (tab === 'training' || tab === 'trening' || tab === 'treningi' || tab === 'trainings') {
-      setTacticsSection('trainings');
+      window.location.href = '/trening';
     } else if (tab === 'matches' || tab === 'mecze' || tab === 'sparingi' || tab === 'turnieje' || tab === 'playbook' || tab === 'debrief' || tab === 'odprawa') {
       setTacticsSection('matches');
     } else if (tab === 'board' || tab === 'taktyka' || tab === 'tablica') {
@@ -1848,7 +1848,7 @@ function TacticsContent() {
 
       {/* GŁÓWNY PODZIAŁ MODUŁU TAKTYKI - 3 ZAKŁADKI & KONSOLA AKCJI */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 p-1.5 rounded-2xl bg-slate-100 border border-slate-200 shadow-sm">
-        {/* 3 Zakładki */}
+        {/* 2 Główne Zakładki Taktyki + Przejście do Treningów */}
         <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none w-full lg:w-auto">
           <button
             type="button"
@@ -1873,21 +1873,16 @@ function TacticsContent() {
             }`}
           >
             <Trophy className={`w-4 h-4 ${tacticsSection === 'matches' ? 'text-amber-300' : 'text-amber-500'}`} />
-            <span>Rozpiski & Mecze LALS</span>
+            <span>Rozpiski Meczowe (Mecze / Sparingi / Turnieje)</span>
           </button>
 
-          <button
-            type="button"
-            onClick={() => setTacticsSection('trainings')}
-            className={`flex-1 lg:flex-initial flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
-              tacticsSection === 'trainings'
-                ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
-                : 'bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-50'
-            }`}
+          <Link
+            href="/trening"
+            className="flex-1 lg:flex-initial flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap bg-white text-slate-700 hover:text-emerald-700 hover:border-emerald-300 hover:bg-emerald-50/50 shadow-2xs"
           >
-            <Volleyball className={`w-4 h-4 ${tacticsSection === 'trainings' ? 'text-amber-300' : 'text-emerald-500'}`} />
-            <span>Konspekty Treningowe</span>
-          </button>
+            <Volleyball className="w-4 h-4 text-emerald-600" />
+            <span>Plany Treningowe &rarr;</span>
+          </Link>
         </div>
 
         {/* Prawa strona w trybie Tablicy: Kontekst i szybkie przyciski */}
@@ -2915,13 +2910,6 @@ function TacticsContent() {
       {tacticsSection === 'matches' && (
         <div className="space-y-4 animate-in fade-in duration-200">
           <TrainingPlannerContent mode="MATCHES" defaultTab="EXERCISES" hideHeader={true} />
-        </div>
-      )}
-
-      {/* SEKCJA 3: ROZPISKI TRENINGOWE (ĆWICZENIA ZE ZRZUTAMI BOISKA) */}
-      {tacticsSection === 'trainings' && (
-        <div className="space-y-4 animate-in fade-in duration-200">
-          <TrainingPlannerContent mode="TRAININGS" defaultTab="EXERCISES" hideHeader={true} />
         </div>
       )}
 
