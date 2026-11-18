@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useSeasonArchive } from '@/lib/season-archive-context';
 import { TrainingPlannerContent } from '@/components/TrainingPlanner';
+import { drawVolleyballCourt, CourtViewMode } from '@/lib/court';
 import {
   Target,
   Pencil,
@@ -402,6 +403,7 @@ function TacticsContent() {
   const [quickDrawHistory, setQuickDrawHistory] = useState<ImageData[]>([]);
   const [isQuickDrawing, setIsQuickDrawing] = useState(false);
   const quickDrawCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [quickDrawCourtView, setQuickDrawCourtView] = useState<CourtViewMode>('FULL');
   const [previewMedia, setPreviewMedia] = useState<TacticalMaterial | null>(null);
   const [selectedPdfViewer, setSelectedPdfViewer] = useState<TacticalMaterial | null>(null);
   const [selectedImagePreview, setSelectedImagePreview] = useState<TacticalMaterial | null>(null);
@@ -471,7 +473,7 @@ function TacticsContent() {
       { id: 'usr_kremer', name: 'Łukasz Kremer', number: 17, role: 'KIEROWNIK', isCaptain: true },
       { id: 'usr_rutkowski', name: 'Hubert Rutkowski', number: null, role: 'TRENER', isCoach: true },
       { id: 'usr_obara', name: 'Hubert Obara', number: 12, role: 'ZAWODNIK' },
-      { id: 'usr_pujanek', name: 'Kamil Pujanek', number: 4, role: 'KIEROWNIK', isCaptain: true },
+      { id: 'usr_pujanek', name: 'Kamil Pujanek', number: 4, role: 'KIEROWNIK', isCaptain: false },
       { id: 'usr_smigiel', name: 'Michał Śmigiel', number: 8, role: 'ZAWODNIK' },
       { id: 'usr_augustynek', name: 'Bartosz Augustynek', number: 97, role: 'ZAWODNIK' },
       { id: 'usr_graczyk', name: 'Piotr Graczyk', number: 7, role: 'ZAWODNIK' },
@@ -810,34 +812,23 @@ function TacticsContent() {
     setQuickDrawHistory(prev => prev.slice(0, -1));
   };
 
+  const handleToggleQuickDrawCourtView = (mode: CourtViewMode) => {
+    setQuickDrawCourtView(mode);
+    setQuickDrawHistory([]);
+    const canvas = quickDrawCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    drawVolleyballCourt(ctx, canvas.width, canvas.height, mode);
+  };
+
   const handleClearQuickDraw = () => {
     setQuickDrawHistory([]);
     const canvas = quickDrawCanvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
-    ctx.fillStyle = '#0f172a';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 2.5;
-    ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
-
-    ctx.strokeStyle = '#94a3b8';
-    ctx.setLineDash([6, 6]);
-    ctx.beginPath();
-    ctx.moveTo(20, (canvas.height - 40) * 0.35 + 20);
-    ctx.lineTo(canvas.width - 20, (canvas.height - 40) * 0.35 + 20);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(15, 20);
-    ctx.lineTo(canvas.width - 15, 20);
-    ctx.stroke();
+    drawVolleyballCourt(ctx, canvas.width, canvas.height, quickDrawCourtView);
   };
 
   // Quick draw canvas background initializer
@@ -846,34 +837,9 @@ function TacticsContent() {
       const canvas = quickDrawCanvasRef.current;
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
-
-      // Dark background
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Volleyball lines
-      ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = 2.5;
-      ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
-
-      // Attack line (3m)
-      ctx.strokeStyle = '#94a3b8';
-      ctx.setLineDash([6, 6]);
-      ctx.beginPath();
-      ctx.moveTo(20, (canvas.height - 40) * 0.35 + 20);
-      ctx.lineTo(canvas.width - 20, (canvas.height - 40) * 0.35 + 20);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Net
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.moveTo(15, 20);
-      ctx.lineTo(canvas.width - 15, 20);
-      ctx.stroke();
+      drawVolleyballCourt(ctx, canvas.width, canvas.height, quickDrawCourtView);
     }
-  }, [showQuickDrawModal]);
+  }, [showQuickDrawModal, quickDrawCourtView]);
 
   const handleSaveQuickDrawTactic = async () => {
     if (!quickDrawCanvasRef.current || !quickDrawTitle.trim()) return;
@@ -4262,9 +4228,36 @@ function TacticsContent() {
               </div>
 
               {/* Drawing Toolbar */}
-              <div className="flex items-center justify-between gap-2 flex-wrap pt-1 border-t border-slate-100">
+              <div className="flex items-center justify-between gap-2.5 flex-wrap pt-2 border-t border-slate-200">
+                {/* Wybór widoku boiska: Całe boisko vs Połowa */}
+                <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-xl border border-slate-200">
+                  <button
+                    type="button"
+                    onClick={() => handleToggleQuickDrawCourtView('FULL')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-black transition flex items-center gap-1.5 ${
+                      quickDrawCourtView === 'FULL'
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    <Volleyball className="w-3.5 h-3.5" />
+                    <span>Całe boisko (18×9m)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleToggleQuickDrawCourtView('HALF')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-black transition flex items-center gap-1.5 ${
+                      quickDrawCourtView === 'HALF'
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    <span>Połowa boiska (9×9m)</span>
+                  </button>
+                </div>
+
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-bold text-slate-500">Kolor pisaka:</span>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Kolor:</span>
                   {['#00e5ff', '#facc15', '#f8fafc', '#ef4444', '#10b981'].map(c => (
                     <button
                       key={c}
@@ -4272,17 +4265,18 @@ function TacticsContent() {
                       onClick={() => setQuickDrawColor(c)}
                       style={{ backgroundColor: c }}
                       className={`w-6 h-6 rounded-full border-2 transition ${
-                        quickDrawColor === c ? 'border-white scale-110 shadow-md ring-2 ring-slate-400' : 'border-transparent'
+                        quickDrawColor === c ? 'border-white scale-125 shadow-md ring-2 ring-sky-500' : 'border-transparent hover:scale-110'
                       }`}
+                      title={`Zmień kolor: ${c}`}
                     />
                   ))}
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <button
                     type="button"
                     onClick={handleUndoQuickDraw}
-                    className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs flex items-center gap-1 font-bold"
+                    className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs flex items-center gap-1 font-bold transition border border-slate-200"
                     title="Cofnij ostatnią linię"
                   >
                     <Undo2 className="w-3.5 h-3.5" />
@@ -4292,9 +4286,10 @@ function TacticsContent() {
                   <button
                     type="button"
                     onClick={handleClearQuickDraw}
-                    className="px-2.5 py-1 rounded-lg bg-slate-100 text-rose-500 hover:bg-rose-50 text-xs font-bold"
+                    className="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition border border-rose-200"
+                    title="Wyczyść rysunki z boiska"
                   >
-                    Wyczyść tablicę
+                    Wyczyść
                   </button>
                 </div>
               </div>

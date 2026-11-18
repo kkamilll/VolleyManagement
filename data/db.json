@@ -68,7 +68,7 @@
       "number": 4,
       "position": "Rozgrywający",
       "role": "KIEROWNIK",
-      "isCaptain": true,
+      "isCaptain": false,
       "email": "kamil.pujanek@angelsztp.pl",
       "phone": "",
       "status": "Aktywny",

@@ -305,7 +305,7 @@ export default function TeamPage() {
                     <span className={`px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider border font-mono ${
                       member.role === 'KIEROWNIK' ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-sky-50 text-sky-700 border-sky-200'
                     }`}>
-                      {member.role === 'KIEROWNIK' ? '👑 Kapitan & Kierownik' : 'Trener'}
+                      {member.role === 'KIEROWNIK' ? (member.isCaptain ? '👑 Kapitan & Kierownik' : '👔 Zarząd / Kierownik') : 'Trener'}
                     </span>
                     <span className="text-xs text-slate-500 font-medium">· {member.position || 'Sztab'}</span>
                   </div>
@@ -421,14 +421,14 @@ export default function TeamPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
           {paginatedPlayers.map(player => {
             const stats = player.stats || {};
-            const isLukaszCaptain = player.isCaptain || player.role === 'KIEROWNIK';
+            const isPlayerCaptain = Boolean(player.isCaptain);
             const totalMatches = (stats.matchesPlayed || 0) + (stats.sparringsPlayed || 0);
 
             return (
               <div
                 key={player.id}
                 className={`rounded-3xl p-4 sm:p-5 shadow-sm transition-all duration-200 flex flex-col justify-between group hover:shadow-lg hover:-translate-y-1 ${
-                  isLukaszCaptain
+                  isPlayerCaptain
                     ? 'bg-gradient-to-b from-amber-50/50 via-white to-white border-2 border-amber-300 hover:border-amber-400'
                     : 'bg-white border border-slate-200/90 hover:border-sky-400'
                 }`}
@@ -452,7 +452,7 @@ export default function TeamPage() {
                         </div>
                       ) : (
                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-mono font-black text-2xl shadow-md shrink-0 border transition-transform group-hover:scale-105 ${
-                          isLukaszCaptain
+                          isPlayerCaptain
                             ? 'bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-amber-300 text-slate-950 shadow-amber-500/20'
                             : player.position === 'Libero'
                             ? 'bg-gradient-to-br from-yellow-400 via-amber-400 to-amber-500 border-yellow-300 text-slate-950 shadow-amber-500/20'
@@ -543,7 +543,7 @@ export default function TeamPage() {
                 <button
                   onClick={() => openProfile(player)}
                   className={`mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider transition-all duration-200 shadow-sm ${
-                    isLukaszCaptain
+                    isPlayerCaptain
                       ? 'bg-amber-100 hover:bg-amber-500 text-amber-900 hover:text-white border border-amber-300'
                       : 'bg-slate-50 hover:bg-sky-600 text-slate-700 hover:text-white border border-slate-200 hover:border-sky-600'
                   }`}
@@ -601,8 +601,8 @@ export default function TeamPage() {
 
       {/* Uproszczony profil i podstawowe statystyki zawodnika */}
       {profileUser && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-7 w-full max-w-2xl shadow-2xl relative max-h-[90vh] flex flex-col text-slate-800">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-7 w-full max-w-2xl shadow-2xl relative max-h-[92vh] sm:max-h-[88vh] flex flex-col text-slate-800 my-auto">
             <button
               onClick={() => setProfileUser(null)}
               className="absolute top-4 right-4 z-10 p-2 text-slate-400 hover:text-slate-800 rounded-xl hover:bg-slate-100 transition cursor-pointer"
@@ -655,7 +655,7 @@ export default function TeamPage() {
             </div>
 
             {/* Scrollable Modal Body */}
-            <div className="overflow-y-auto flex-1 pt-4 pr-1 space-y-5">
+            <div className="overflow-y-auto min-h-0 flex-1 pt-4 pr-1 space-y-5 overscroll-contain">
 
             {/* Podstawowe Statystyki */}
             {!isEditingStats ? (

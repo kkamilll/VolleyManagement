@@ -51,6 +51,7 @@ import {
   EventItem,
   TacticalMaterial
 } from '@/lib/types';
+import { drawVolleyballCourt, CourtViewMode } from '@/lib/court';
 
 export function TrainingPlannerContent({ 
   defaultTab, 
@@ -184,6 +185,7 @@ export function TrainingPlannerContent({
   const [drawColor, setDrawColor] = useState('#00e5ff'); // Electric cyan
   const [lineWidth, setLineWidth] = useState(3);
   const [history, setHistory] = useState<ImageData[]>([]);
+  const [courtView, setCourtView] = useState<CourtViewMode>('FULL');
 
   // Conclusion Form state
   const [conclType, setConclType] = useState<TrainingConclusion['type']>('PLUS');
@@ -375,38 +377,14 @@ export function TrainingPlannerContent({
     fetchPlans();
   }, []);
 
-  // Sync canvas background whenever entering drawing mode or changing exercise
+  // Sync canvas background whenever entering drawing mode, changing courtView, or changing exercise
   useEffect(() => {
     if (isDrawingMode && canvasRef.current) {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      // Draw volleyball half/full court background
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Volleyball lines
-      ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
-
-      // Attack line (3m)
-      ctx.strokeStyle = '#94a3b8';
-      ctx.setLineDash([5, 5]);
-      ctx.beginPath();
-      ctx.moveTo(20, (canvas.height - 40) * 0.35 + 20);
-      ctx.lineTo(canvas.width - 20, (canvas.height - 40) * 0.35 + 20);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Net line
-      ctx.strokeStyle = '#f8fafc';
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.moveTo(15, 20);
-      ctx.lineTo(canvas.width - 15, 20);
-      ctx.stroke();
+      drawVolleyballCourt(ctx, canvas.width, canvas.height, courtView);
 
       // If existing drawingData exists, render it on top
       if (exDrawingData) {
@@ -417,7 +395,25 @@ export function TrainingPlannerContent({
         img.src = exDrawingData;
       }
     }
-  }, [isDrawingMode, exDrawingData]);
+  }, [isDrawingMode, courtView, exDrawingData]);
+
+  const handleToggleCourtView = (view: 'FULL' | 'HALF') => {
+    setCourtView(view);
+    if (canvasRef.current) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        drawVolleyballCourt(ctx, canvas.width, canvas.height, view);
+        if (exDrawingData) {
+          const img = new Image();
+          img.onload = () => {
+            ctx.drawImage(img, 0, 0);
+          };
+          img.src = exDrawingData;
+        }
+      }
+    }
+  };
 
   // Drawing handlers
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
@@ -493,12 +489,7 @@ export function TrainingPlannerContent({
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        ctx.fillStyle = '#0f172a';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        // redraw court
-        ctx.strokeStyle = '#38bdf8';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+        drawVolleyballCourt(ctx, canvas.width, canvas.height, courtView);
       }
     }
   };
@@ -2371,30 +2362,65 @@ export function TrainingPlannerContent({
               </div>
 
               {/* INTERACTIVE DRAWING CANVAS ACCORDION */}
-              <div className="border border-slate-200 rounded-2xl p-3 bg-slate-50 space-y-2">
-                <div className="flex items-center justify-between">
+              <div className="border border-slate-200 rounded-2xl p-3.5 bg-slate-50 space-y-3">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
                   <div className="flex items-center gap-2">
-                    <Pencil className="w-4 h-4 text-sky-400" />
-                    <span className="font-bold text-slate-900 text-xs">
-                      Tablica Siatkarska dla tego Ćwiczenia (Rysowanie pisakiem)
-                    </span>
+                    <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                      <Pencil className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="font-bold text-slate-900 text-xs block">
+                        Tablica Siatkarska dla tego Ćwiczenia (Rysowanie pisakiem)
+                      </span>
+                      <span className="text-[10px] text-slate-500">
+                        Wybierz całe boisko (18×9m) lub połówkę (9×9m) i rozrysuj schemat
+                      </span>
+                    </div>
                   </div>
 
                   <button
                     type="button"
                     onClick={() => setIsDrawingMode(!isDrawingMode)}
-                    className="px-3 py-1 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 font-bold text-xs transition"
+                    className="px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
                   >
-                    {isDrawingMode ? 'Ukryj tablicę' : exDrawingData ? 'Zmień rysunek boiska' : 'Rozrysuj na boisku'}
+                    {isDrawingMode ? 'Ukryj tablicę' : exDrawingData ? 'Edytuj rysunek boiska' : 'Rozrysuj na boisku'}
                   </button>
                 </div>
 
                 {isDrawingMode && (
-                  <div className="space-y-2 pt-2 border-t border-slate-200">
-                    {/* Drawing Toolbar */}
-                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="space-y-3 pt-2.5 border-t border-slate-200">
+                    {/* Drawing Toolbar: Court Switcher + Color Picker + Tools */}
+                    <div className="flex flex-wrap items-center justify-between gap-2.5 bg-white p-2 rounded-2xl border border-slate-200 shadow-2xs">
+                      {/* Wybór widoku boiska: Całe boisko vs Połowa */}
+                      <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-xl border border-slate-200">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleCourtView('FULL')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-black transition flex items-center gap-1.5 ${
+                            courtView === 'FULL'
+                              ? 'bg-emerald-600 text-white shadow-xs'
+                              : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                          }`}
+                        >
+                          <Volleyball className="w-3.5 h-3.5" />
+                          <span>Całe boisko (18×9m)</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleCourtView('HALF')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-black transition flex items-center gap-1.5 ${
+                            courtView === 'HALF'
+                              ? 'bg-emerald-600 text-white shadow-xs'
+                              : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                          }`}
+                        >
+                          <span>Połowa boiska (9×9m)</span>
+                        </button>
+                      </div>
+
+                      {/* Kolory pisaka */}
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] font-bold text-slate-500">Kolor:</span>
+                        <span className="text-[10px] font-black uppercase text-slate-400">Kolor:</span>
                         {['#00e5ff', '#facc15', '#f8fafc', '#ef4444', '#10b981'].map(c => (
                           <button
                             key={c}
@@ -2402,17 +2428,19 @@ export function TrainingPlannerContent({
                             onClick={() => setDrawColor(c)}
                             style={{ backgroundColor: c }}
                             className={`w-6 h-6 rounded-full border-2 transition ${
-                              drawColor === c ? 'border-white scale-110 shadow-md' : 'border-transparent'
+                              drawColor === c ? 'border-white scale-125 shadow-md ring-2 ring-emerald-500' : 'border-transparent hover:scale-110'
                             }`}
+                            title={`Zmień kolor: ${c}`}
                           />
                         ))}
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      {/* Akcje Cofnij / Wyczyść */}
+                      <div className="flex items-center gap-1.5">
                         <button
                           type="button"
                           onClick={handleUndoDrawing}
-                          className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 hover:text-slate-900 text-xs flex items-center gap-1 font-bold"
+                          className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs flex items-center gap-1 font-bold transition border border-slate-200"
                           title="Cofnij ostatnią linię"
                         >
                           <Undo2 className="w-3.5 h-3.5" />
@@ -2422,9 +2450,10 @@ export function TrainingPlannerContent({
                         <button
                           type="button"
                           onClick={handleClearDrawing}
-                          className="px-2.5 py-1 rounded-lg bg-slate-100 text-rose-400 hover:bg-rose-500/20 text-xs font-bold"
+                          className="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition border border-rose-200"
+                          title="Wyczyść rysunki z boiska"
                         >
-                          Wyczyść tablicę
+                          Wyczyść
                         </button>
                       </div>
                     </div>
