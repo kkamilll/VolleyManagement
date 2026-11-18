@@ -2688,9 +2688,9 @@ function TacticsContent() {
                       activeTargetEvent || activeTargetMatch ? (
                         <>
                           <span className="hidden sm:inline">Zapisz do meczu: {activeTargetEvent?.opponent || activeTargetMatch?.opponent || 'LALS'}</span>
-                          <span className="sm:hidden">Zapisz do meczu</span>
+                          <span className="sm:hidden">Zapisz</span>
                         </>
-                      ) : 'Zapisz schemat'
+                      ) : 'Zapisz'
                     )}
                   </span>
                 </button>
@@ -2701,7 +2701,7 @@ function TacticsContent() {
                   title="Więcej opcji zapisu (baza ogólna, własny tytuł)"
                 >
                   <Save className="w-3.5 h-3.5 text-sky-600" />
-                  <span>Więcej...</span>
+                  <span className="hidden sm:inline">Więcej...</span>
                 </button>
               </div>
             )}
@@ -2828,11 +2828,11 @@ function TacticsContent() {
       <div className="bg-white border border-slate-300 rounded-3xl p-3 sm:p-5 shadow-md space-y-4 border-t-4 border-t-sky-600">
           
           {/* KONSOLA TAKTYCZNA (NARZĘDZIA RYSOWANIA, KOLORY I WIDOK) */}
-          <div className="bg-slate-50 border border-slate-300/80 rounded-2xl p-2.5 sm:p-3.5 shadow-2xs space-y-2.5">
-            {/* Rząd 1: Narzędzia rysowania + Kolory + Cofnij/Usuń (poziomy płynny pasek na telefonie) */}
-            <div className="flex items-center justify-between gap-2 overflow-x-auto scrollbar-none pb-1">
+          <div className="bg-slate-50 border border-slate-300/80 rounded-2xl p-2 sm:p-3.5 shadow-2xs space-y-2">
+            {/* Rząd 1: Główne akcje (na telefonie tylko najpotrzebniejsze: Przesuń, Reset, Piłka, Rywale) */}
+            <div className="flex items-center justify-between gap-1.5 sm:gap-2 flex-wrap sm:flex-nowrap">
               
-              {/* Narzędzia (Przesuń, Pisak, Strzałka, Gumka, Reset) */}
+              {/* Narzędzia główne */}
               <div className="flex items-center gap-1 shrink-0">
                 <button
                   onClick={() => setActiveTool('move')}
@@ -2847,9 +2847,10 @@ function TacticsContent() {
                   <span>Przesuń</span>
                 </button>
 
+                {/* Narzędzia rysowania (ukryte na małych ekranach telefonów dla maksymalnej przejrzystości i ergonomii dotyku) */}
                 <button
                   onClick={() => { setActiveTool('pen'); setLineWidth(3); }}
-                  className={`h-7 px-2.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition border cursor-pointer ${
+                  className={`hidden sm:inline-flex h-7 px-2.5 rounded-lg text-xs font-bold items-center gap-1.5 transition border cursor-pointer ${
                     activeTool === 'pen'
                       ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
                       : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 shadow-2xs'
@@ -2862,7 +2863,7 @@ function TacticsContent() {
 
                 <button
                   onClick={() => setActiveTool('arrow')}
-                  className={`h-7 px-2.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition border cursor-pointer ${
+                  className={`hidden sm:inline-flex h-7 px-2.5 rounded-lg text-xs font-bold items-center gap-1.5 transition border cursor-pointer ${
                     activeTool === 'arrow'
                       ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
                       : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 shadow-2xs'
@@ -2875,7 +2876,7 @@ function TacticsContent() {
 
                 <button
                   onClick={() => setActiveTool('eraser')}
-                  className={`h-7 px-2 rounded-lg text-xs font-bold flex items-center gap-1 transition border cursor-pointer ${
+                  className={`hidden sm:inline-flex h-7 px-2 rounded-lg text-xs font-bold items-center gap-1 transition border cursor-pointer ${
                     activeTool === 'eraser'
                       ? 'bg-rose-600 text-white border-rose-600 shadow-sm'
                       : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100 shadow-2xs'
@@ -2888,16 +2889,45 @@ function TacticsContent() {
                 <button
                   type="button"
                   onClick={handleResetPositions}
-                  className="h-7 px-2.5 rounded-lg bg-white hover:bg-slate-100 text-slate-600 border border-slate-300 text-xs font-bold transition flex items-center justify-center gap-1 shadow-2xs cursor-pointer ml-1"
+                  className="h-7 px-2 sm:px-2.5 rounded-lg bg-white hover:bg-slate-100 text-slate-600 border border-slate-300 text-xs font-bold transition flex items-center justify-center gap-1 shadow-2xs cursor-pointer"
                   title="Przywróć domyślne pozycje na boisku"
                 >
                   <RotateCcw className="w-3.5 h-3.5 text-amber-600" />
                   <span className="hidden sm:inline">Reset</span>
                 </button>
+
+                {/* Na telefonie: Piłka i Rywale w jednym rzędzie z Przesuń i Reset */}
+                <div className="flex sm:hidden items-center gap-1">
+                  <button
+                    onClick={() => setShowBall(!showBall)}
+                    className={`h-7 px-2 rounded-lg border text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
+                      showBall
+                        ? 'bg-amber-50 text-amber-800 border-amber-300'
+                        : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
+                    }`}
+                    title="Pokaż/ukryj piłkę"
+                  >
+                    <Volleyball className="w-3.5 h-3.5" />
+                    <span>Piłka</span>
+                  </button>
+
+                  <button
+                    onClick={() => setShowOpponents(!showOpponents)}
+                    className={`h-7 px-2 rounded-lg border text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
+                      showOpponents
+                        ? 'bg-rose-50 text-rose-800 border-rose-300'
+                        : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
+                    }`}
+                    title="Pokaż/ukryj rywali"
+                  >
+                    <Users className="w-3.5 h-3.5" />
+                    <span>Rywale</span>
+                  </button>
+                </div>
               </div>
 
-              {/* 4 Kolory & Cofnij */}
-              <div className="flex items-center gap-1.5 shrink-0">
+              {/* 4 Kolory & Cofnij (Tylko na tabletach/desktopie gdzie używa się rysowania) */}
+              <div className="hidden sm:flex items-center gap-1.5 shrink-0">
                 <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-slate-300">
                   {[
                     { hex: '#facc15', label: 'Żółty' },
@@ -2938,17 +2968,17 @@ function TacticsContent() {
               </div>
             </div>
 
-            {/* Rząd 2: Nazwa Taktyki, Rywale, Piłka, Orientacja */}
-            <div className="flex items-center justify-between gap-2 flex-wrap pt-2 border-t border-slate-200/80">
+            {/* Rząd 2: Nazwa Taktyki, Rywale, Piłka, Orientacja (na desktopie pełny zestaw) */}
+            <div className="flex items-center justify-between gap-2 pt-1.5 sm:pt-2 border-t border-slate-200/80">
               <input
                 type="text"
                 value={tacticTitle}
                 onChange={(e) => setTacticTitle(e.target.value)}
                 placeholder="Nazwa schematu..."
-                className="flex-1 min-w-[140px] bg-white border border-slate-300 rounded-xl px-2.5 py-1 text-xs text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-sky-500 shadow-2xs"
+                className="flex-1 min-w-[120px] bg-white border border-slate-300 rounded-xl px-2.5 py-1 text-xs text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-sky-500 shadow-2xs"
               />
 
-              <div className="flex items-center gap-1.5 shrink-0">
+              <div className="hidden sm:flex items-center gap-1.5 shrink-0">
                 <button
                   onClick={() => setShowOpponents(!showOpponents)}
                   className={`px-2.5 py-1 rounded-xl border text-xs font-bold transition flex items-center gap-1 cursor-pointer ${

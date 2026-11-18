@@ -2993,13 +2993,13 @@ function RozgrywkiContent() {
                         {/* Prawa strona: Taktyka, Frekwencja, Chevron */}
                         <div 
                           onClick={e => e.stopPropagation()} 
-                          className="flex items-center gap-2 shrink-0 ml-auto"
+                          className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto"
                         >
-                          {/* Przycisk Taktyki – podświetlony gdy jest taktyka, wyszarzony gdy jej brak */}
+                          {/* Przycisk Taktyki – podświetlony gdy jest taktyka */}
                           {hasTactic ? (
                             <Link
                               href={`/taktyka?eventId=${event.id}&type=SPARING`}
-                              className="px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-2xs hover:shadow-xs transition"
+                              className="px-2 sm:px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-black text-xs uppercase tracking-wider flex items-center gap-1 sm:gap-1.5 shadow-2xs hover:shadow-xs transition"
                               title={`Założenia taktyczne sparingu (${sparingTactics.length})`}
                             >
                               <Target className="w-3.5 h-3.5 text-sky-600" />
@@ -3008,24 +3008,16 @@ function RozgrywkiContent() {
                           ) : canManage ? (
                             <Link
                               href={`/taktyka?eventId=${event.id}&type=SPARING`}
-                              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 border border-slate-200 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition opacity-60 hover:opacity-100"
+                              className="px-2 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 border border-slate-200 font-bold text-xs uppercase tracking-wider flex items-center gap-1 sm:gap-1.5 transition opacity-60 hover:opacity-100"
                               title="Brak taktyki – kliknij, aby utworzyć założenia dla tego sparingu"
                             >
                               <Target className="w-3.5 h-3.5 text-slate-400" />
-                              <span>Taktyka</span>
+                              <span className="hidden xs:inline">Taktyka</span>
                             </Link>
-                          ) : (
-                            <div
-                              className="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-400 border border-slate-200 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 opacity-40 cursor-not-allowed select-none"
-                              title="Brak taktyki dla tego sparingu"
-                            >
-                              <Target className="w-3.5 h-3.5 text-slate-400" />
-                              <span>Taktyka</span>
-                            </div>
-                          )}
+                          ) : null}
 
                           {/* Licznik obecności */}
-                          <span className="px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center gap-1.5 shadow-2xs">
+                          <span className="px-2 sm:px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 flex items-center gap-1 sm:gap-1.5 shadow-2xs">
                             <Users className="w-3.5 h-3.5 text-amber-600" />
                             <span>{yesCount}</span>
                             <span className="hidden sm:inline">obecnych</span>
@@ -3141,18 +3133,19 @@ function RozgrywkiContent() {
                       <div className="p-6 sm:p-7 border-t border-slate-200 space-y-6 animate-fadeIn bg-white">
                         {/* Coach & Captain Management Controls */}
                         {canManage && (
-                          <div className="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-200">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-4 border-b border-slate-200">
                             <span className="text-xs font-black uppercase text-slate-500 tracking-wider">
                               Zarządzanie Sparingiem:
                             </span>
-                            <div className="flex flex-wrap items-center gap-2">
+                            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                              {/* Główny przycisk: Wynik */}
                               <button
-                                onClick={() => setShareModalEvent(event)}
-                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 transition flex items-center gap-1.5 shadow-xs"
-                                title="Wygeneruj i skopiuj gotowy raport na WhatsApp / Messenger"
+                                onClick={() => openResultModal(event)}
+                                className="px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-600 text-slate-950 transition flex items-center gap-1.5 shadow-xs"
+                                title="Wpisz wynik po sparingu"
                               >
-                                <Share2 className="w-3.5 h-3.5 text-emerald-600" />
-                                <span>Na Czat</span>
+                                <Trophy className="w-3.5 h-3.5" />
+                                <span>{isFinished ? 'Edytuj wynik' : 'Wpisz wynik'}</span>
                               </button>
 
                               <button
@@ -3165,12 +3158,21 @@ function RozgrywkiContent() {
                               </button>
 
                               <button
+                                onClick={() => setShareModalEvent(event)}
+                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 transition flex items-center gap-1.5 shadow-xs"
+                                title="Wygeneruj i skopiuj gotowy raport na WhatsApp / Messenger"
+                              >
+                                <Share2 className="w-3.5 h-3.5 text-emerald-600" />
+                                <span>Na Czat</span>
+                              </button>
+
+                              <button
                                 onClick={() => handleOpenLiveScorekeeper(event)}
                                 className="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 transition flex items-center gap-1.5 shadow-xs"
-                                title="Opcjonalnie: klikaj punkt po punkcie na żywo w trakcie sparingu"
+                                title="Protokół na żywo punkt po punkcie"
                               >
                                 <Radio className="w-3.5 h-3.5 text-rose-600 animate-pulse" />
-                                <span>Live Score (opcjonalnie)</span>
+                                <span>Live Score</span>
                               </button>
 
                               {isFinished && (
@@ -3185,21 +3187,12 @@ function RozgrywkiContent() {
                               )}
 
                               <button
-                                onClick={() => openResultModal(event)}
-                                className="px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-600 text-slate-950 transition flex items-center gap-1.5 shadow-xs"
-                                title="Wpisz wynik po sparingu (bez klikania każdego punktu)"
-                              >
-                                <Trophy className="w-3.5 h-3.5" />
-                                {isFinished ? 'Edytuj wynik' : 'Wpisz wynik po sparingu'}
-                              </button>
-
-                              <button
                                 onClick={() => handleDeleteEvent(event)}
-                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition flex items-center gap-1.5 shadow-xs"
+                                className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition flex items-center gap-1.5 shadow-xs"
                                 title="Usuń sparing"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
-                                <span>Usuń Sparing</span>
+                                <span className="hidden sm:inline">Usuń Sparing</span>
                               </button>
                             </div>
                           </div>
@@ -7990,13 +7983,13 @@ Punkty
                 Wybierz gotowy wynik lub wpisz własny:
               </label>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 {[
-                  '🥇 1. Miejsce / Złoty Puchar',
-                  '🥈 2. Miejsce / Finał',
-                  '🥉 3. Miejsce / Brąz',
-                  '4. Miejsce / Półfinał',
-                  'Ćwierćfinał (1/4 Finału)',
+                  '🥇 1. Miejsce',
+                  '🥈 2. Miejsce',
+                  '🥉 3. Miejsce',
+                  '4. Miejsce',
+                  '1/4 Finału',
                   'Faza Grupowa'
                 ].map(rank => (
                   <button
@@ -8006,7 +7999,7 @@ Punkty
                       handleQuickSetTournamentRank(showTournamentRankModal, rank);
                       setShowTournamentRankModal(null);
                     }}
-                    className={`p-3 rounded-2xl border text-xs font-bold text-left transition ${
+                    className={`p-2.5 rounded-xl border text-xs font-bold text-center transition ${
                       showTournamentRankModal.result?.tournamentRank === rank
                         ? 'bg-purple-50 text-purple-900 border-purple-300 ring-2 ring-purple-200'
                         : 'bg-slate-50 hover:bg-purple-50 hover:text-purple-900 hover:border-purple-200 border-slate-200 text-slate-800'

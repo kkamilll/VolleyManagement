@@ -1213,63 +1213,58 @@ function EventsAttendanceContent() {
                               )}
                             </div>
 
-                            <div className="flex flex-wrap items-center gap-2 self-start">
-                              {isCalLeagueMatch ? (
-                                <Link
-                                  href="/rozgrywki?tab=liga"
-                                  className="px-2.5 py-1 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-xs transition"
-                                  title="Przejdź do oficjalnego meczu i tabeli LALS"
-                                >
-                                  <img src="/lals_logo.png" alt="LALS" className="w-3.5 h-3.5 rounded-full bg-white p-0.5 object-contain" />
-                                  <span>Liga LALS</span>
-                                </Link>
-                              ) : event.type === 'SPARING' ? (
-                                <Link
-                                  href="/rozgrywki?tab=sparingi"
-                                  className="px-2.5 py-1 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-xs transition"
-                                  title="Przejdź do protokołu i sparingów w rozgrywkach"
-                                >
-                                  <Swords className="w-3.5 h-3.5 text-slate-950" />
-                                  <span>Sparing</span>
-                                </Link>
-                              ) : event.type === 'TRENING' ? (
+                            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 self-start">
+                              {event.type === 'TRENING' ? (
                                 <Link
                                   href={`/trening?eventId=${event.id}`}
                                   className="px-2.5 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-xs transition"
-                                  title="Otwórz rozpiskę treningu"
+                                  title="Otwórz konspekt i ćwiczenia treningu"
                                 >
                                   <Volleyball className="w-3.5 h-3.5" />
                                   <span>Trening</span>
                                 </Link>
                               ) : (
-                                <Link
-                                  href="/rozgrywki?tab=turnieje"
-                                  className="px-2.5 py-1 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-xs transition"
-                                  title="Przejdź do turnieju i drabinki"
-                                >
-                                  <Trophy className="w-3.5 h-3.5" />
-                                  <span>Turniej</span>
-                                </Link>
-                              )}
+                                <>
+                                  {isCalLeagueMatch ? (
+                                    <Link
+                                      href="/rozgrywki?tab=liga"
+                                      className="px-2.5 py-1 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-xs transition"
+                                      title="Przejdź do oficjalnego meczu i tabeli LALS"
+                                    >
+                                      <img src="/lals_logo.png" alt="LALS" className="w-3.5 h-3.5 rounded-full bg-white p-0.5 object-contain" />
+                                      <span>Liga LALS</span>
+                                    </Link>
+                                  ) : event.type === 'SPARING' ? (
+                                    <Link
+                                      href="/rozgrywki?tab=sparingi"
+                                      className="px-2.5 py-1 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-xs transition"
+                                      title="Przejdź do protokołu i sparingów w rozgrywkach"
+                                    >
+                                      <Swords className="w-3.5 h-3.5 text-slate-950" />
+                                      <span>Sparing</span>
+                                    </Link>
+                                  ) : (
+                                    <Link
+                                      href="/rozgrywki?tab=turnieje"
+                                      className="px-2.5 py-1 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-xs transition"
+                                      title="Przejdź do turnieju i drabinki"
+                                    >
+                                      <Trophy className="w-3.5 h-3.5" />
+                                      <span>Turniej</span>
+                                    </Link>
+                                  )}
 
-                              {hasCalTactic ? (
-                                <Link
-                                  href={event.type === 'TRENING' ? `/trening?eventId=${event.id}` : event.type === 'SPARING' ? `/taktyka?tab=sparingi&eventId=${event.id}&type=SPARING` : event.type === 'TURNIEJ' ? `/taktyka?tab=turnieje&eventId=${event.id}&type=TURNIEJ` : `/taktyka?tab=matches&eventId=${event.id}&type=MECZ`}
-                                  className="px-2.5 py-1 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-xs transition"
-                                  title={`Założenia taktyczne (${calTactics.length})`}
-                                >
-                                  <Target className="w-3.5 h-3.5 text-sky-600" />
-                                  <span>{event.type === 'TRENING' ? 'Trening' : 'Taktyka'}</span>
-                                </Link>
-                              ) : (
-                                <Link
-                                  href={event.type === 'TRENING' ? `/trening?eventId=${event.id}` : event.type === 'SPARING' ? `/taktyka?tab=sparingi&eventId=${event.id}&type=SPARING` : event.type === 'TURNIEJ' ? `/taktyka?tab=turnieje&eventId=${event.id}&type=TURNIEJ` : `/taktyka?tab=matches&eventId=${event.id}&type=MECZ`}
-                                  className="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-300 font-bold text-xs uppercase tracking-wider flex items-center gap-1 transition shadow-2xs"
-                                  title="Otwórz taktykę dla tej jednostki"
-                                >
-                                  <Target className="w-3.5 h-3.5 text-sky-600" />
-                                  <span>{event.type === 'TRENING' ? 'Trening' : 'Taktyka'}</span>
-                                </Link>
+                                  {hasCalTactic && (
+                                    <Link
+                                      href={event.type === 'SPARING' ? `/taktyka?tab=sparingi&eventId=${event.id}&type=SPARING` : event.type === 'TURNIEJ' ? `/taktyka?tab=turnieje&eventId=${event.id}&type=TURNIEJ` : `/taktyka?tab=matches&eventId=${event.id}&type=MECZ`}
+                                      className="px-2.5 py-1 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-xs transition"
+                                      title={`Założenia taktyczne (${calTactics.length})`}
+                                    >
+                                      <Target className="w-3.5 h-3.5 text-sky-600" />
+                                      <span>Taktyka</span>
+                                    </Link>
+                                  )}
+                                </>
                               )}
 
                               <span className="px-2.5 py-1 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 shadow-xs">
@@ -1606,23 +1601,24 @@ function EventsAttendanceContent() {
                       </div>
 
                       {/* Prawa strona nagłówka: Uporządkowane, równe przyciski akcji */}
-                      <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 justify-end flex-wrap sm:flex-nowrap">
+                      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 justify-end flex-wrap sm:flex-nowrap">
                         {/* 1. Szybki link do Ligi / Sparingów / Treningu */}
                         {isLeagueMatch ? (
                           <Link
                             href="/rozgrywki?tab=liga"
                             onClick={e => e.stopPropagation()}
-                            className="h-8.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs transition shrink-0"
+                            className="h-8.5 px-2.5 sm:px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs transition shrink-0"
                             title="Przejdź do oficjalnego meczu i tabeli LALS"
                           >
                             <img src="/lals_logo.png" alt="LALS" className="w-3.5 h-3.5 rounded-full bg-white p-0.5 object-contain shrink-0" />
-                            <span>Liga LALS</span>
+                            <span className="hidden xs:inline">Liga </span>
+                            <span>LALS</span>
                           </Link>
                         ) : event.type === 'SPARING' ? (
                           <Link
                             href="/rozgrywki?tab=sparingi"
                             onClick={e => e.stopPropagation()}
-                            className="h-8.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs transition shrink-0"
+                            className="h-8.5 px-2.5 sm:px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs transition shrink-0"
                             title="Przejdź do sparingów"
                           >
                             <Swords className="w-3.5 h-3.5 text-slate-950 shrink-0" />
@@ -1632,7 +1628,7 @@ function EventsAttendanceContent() {
                           <Link
                             href={`/trening?eventId=${event.id}`}
                             onClick={e => e.stopPropagation()}
-                            className="h-8.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs transition shrink-0"
+                            className="h-8.5 px-2.5 sm:px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs transition shrink-0"
                             title="Otwórz rozpiskę treningu"
                           >
                             <Volleyball className="w-3.5 h-3.5 shrink-0" />
@@ -1642,19 +1638,27 @@ function EventsAttendanceContent() {
 
                         {/* 2. Przycisk Taktyki – dla meczów, sparingów i turniejów */}
                         {event.type !== 'TRENING' && (
-                          <Link
-                            href={event.type === 'SPARING' ? `/taktyka?tab=sparingi&eventId=${event.id}&type=SPARING` : event.type === 'TURNIEJ' ? `/taktyka?tab=turnieje&eventId=${event.id}&type=TURNIEJ` : `/taktyka?tab=matches&eventId=${event.id}&type=MECZ`}
-                            onClick={e => e.stopPropagation()}
-                            className={`h-8.5 px-3 rounded-xl border font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-2xs transition shrink-0 ${
-                              hasTactic
-                                ? 'bg-sky-50 hover:bg-sky-100 text-sky-900 border-sky-300 font-black'
-                                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
-                            }`}
-                            title={hasTactic ? `Założenia taktyczne (${eventTactics.length})` : 'Otwórz taktykę dla tej jednostki'}
-                          >
-                            <Target className={`w-3.5 h-3.5 shrink-0 ${hasTactic ? 'text-sky-600' : 'text-slate-500'}`} />
-                            <span>Taktyka</span>
-                          </Link>
+                          hasTactic ? (
+                            <Link
+                              href={event.type === 'SPARING' ? `/taktyka?tab=sparingi&eventId=${event.id}&type=SPARING` : event.type === 'TURNIEJ' ? `/taktyka?tab=turnieje&eventId=${event.id}&type=TURNIEJ` : `/taktyka?tab=matches&eventId=${event.id}&type=MECZ`}
+                              onClick={e => e.stopPropagation()}
+                              className="h-8.5 px-2.5 sm:px-3 rounded-xl border font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-2xs transition shrink-0 bg-sky-50 hover:bg-sky-100 text-sky-900 border-sky-300"
+                              title={`Założenia taktyczne (${eventTactics.length})`}
+                            >
+                              <Target className="w-3.5 h-3.5 shrink-0 text-sky-600" />
+                              <span className="hidden xs:inline">Taktyka</span>
+                            </Link>
+                          ) : canManage ? (
+                            <Link
+                              href={event.type === 'SPARING' ? `/taktyka?tab=sparingi&eventId=${event.id}&type=SPARING` : event.type === 'TURNIEJ' ? `/taktyka?tab=turnieje&eventId=${event.id}&type=TURNIEJ` : `/taktyka?tab=matches&eventId=${event.id}&type=MECZ`}
+                              onClick={e => e.stopPropagation()}
+                              className="h-8.5 px-2 sm:px-2.5 rounded-xl border font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1 shadow-2xs transition shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-300 opacity-70 hover:opacity-100"
+                              title="Dodaj taktykę"
+                            >
+                              <Target className="w-3.5 h-3.5 shrink-0 text-slate-500" />
+                              <span className="hidden sm:inline">Taktyka</span>
+                            </Link>
+                          ) : null
                         )}
 
                         {/* 3. Przycisk obecności – TYLKO dla nadchodzących wydarzeń */}
