@@ -39,7 +39,9 @@ import {
   Download,
   Upload,
   Swords,
-  Target
+  Target,
+  Filter,
+  Search
 } from 'lucide-react';
 import {
   TrainingPlan,
@@ -99,6 +101,10 @@ export function TrainingPlannerContent({
     }
     return 'ALL';
   });
+
+  // Filtry statusu rozpisania i czasu dla treningów klubowych
+  const [trainingStatusFilter, setTrainingStatusFilter] = useState<'ALL' | 'PLANNED' | 'UNPLANNED'>('ALL');
+  const [trainingTimeFilter, setTrainingTimeFilter] = useState<'UPCOMING' | 'ALL' | 'PAST'>('UPCOMING');
 
   useEffect(() => {
     if (fixedEventType) {
@@ -424,8 +430,10 @@ export function TrainingPlannerContent({
     const rect = canvas.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
 
     ctx.strokeStyle = drawColor;
     ctx.lineWidth = lineWidth;
@@ -445,8 +453,10 @@ export function TrainingPlannerContent({
     const rect = canvas.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
 
     ctx.lineTo(x, y);
     ctx.stroke();
@@ -759,8 +769,8 @@ export function TrainingPlannerContent({
     }
   };
 
-  // Filtered list of events from Terminarz (Treningi, Sparingi, Mecze)
-  const filteredEvents: EventItem[] = useMemo(() => {
+  // Bazowa lista wydarzeń (filtrowana według trybu i typu)
+  const baseTypeEvents: EventItem[] = useMemo(() => {
     const filter = fixedEventType || eventTypeFilter;
     return events.filter(e => {
       if (fixedEventType) {
@@ -791,6 +801,51 @@ export function TrainingPlannerContent({
     });
   }, [events, eventTypeFilter, fixedEventType, mode]);
 
+  // Liczniki statusu rozpisania dla treningów klubowych
+  const allTrainingsCount = useMemo(() => baseTypeEvents.length, [baseTypeEvents]);
+  const plannedTrainingsCount = useMemo(() => {
+    return baseTypeEvents.filter(e => {
+      const p = plans.find(planItem => planItem.eventId === e.id || planItem.id === e.id);
+      return (p?.exercises?.length || 0) > 0;
+    }).length;
+  }, [baseTypeEvents, plans]);
+  const unplannedTrainingsCount = Math.max(0, allTrainingsCount - plannedTrainingsCount);
+
+  // Końcowa przefiltrowana lista wydarzeń (z filtrami statusu rozpisania i czasu)
+  const filteredEvents: EventItem[] = useMemo(() => {
+    let list = baseTypeEvents;
+
+    if (mode === 'TRAININGS' || fixedEventType === 'TRENING') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // Zakres czasowy
+      if (trainingTimeFilter === 'UPCOMING') {
+        const upcoming = list.filter(e => new Date(e.date).getTime() >= today.getTime());
+        if (upcoming.length > 0) {
+          list = upcoming;
+        }
+      } else if (trainingTimeFilter === 'PAST') {
+        list = list.filter(e => new Date(e.date).getTime() < today.getTime());
+      }
+
+      // Status rozpisania konspektu
+      if (trainingStatusFilter === 'PLANNED') {
+        list = list.filter(e => {
+          const p = plans.find(planItem => planItem.eventId === e.id || planItem.id === e.id);
+          return (p?.exercises?.length || 0) > 0;
+        });
+      } else if (trainingStatusFilter === 'UNPLANNED') {
+        list = list.filter(e => {
+          const p = plans.find(planItem => planItem.eventId === e.id || planItem.id === e.id);
+          return (p?.exercises?.length || 0) === 0;
+        });
+      }
+    }
+
+    return list;
+  }, [baseTypeEvents, mode, fixedEventType, trainingTimeFilter, trainingStatusFilter, plans]);
+
   const trainingsCount = useMemo(() => events.filter(e => e.type === 'TRENING').length, [events]);
   const sparringsCount = useMemo(() => events.filter(e => e.type === 'SPARING').length, [events]);
   const matchesCount = useMemo(() => events.filter(e => e.type === 'MECZ' || Boolean(e.opponent && e.title.toLowerCase().includes('lals'))).length, [events]);
@@ -798,6 +853,18 @@ export function TrainingPlannerContent({
 
   // Currently active event from Terminarz
   const activeEvent: EventItem | null = filteredEvents.find(e => e.id === selectedEventId) || filteredEvents[0] || null;
+
+  // Automatyczny wybór pierwszego wydarzenia z przefiltrowanej listy, gdy filtr wyklucza poprzednie
+  useEffect(() => {
+    if (filteredEvents.length > 0) {
+      const exists = filteredEvents.some(e => e.id === selectedEventId);
+      if (!exists) {
+        setSelectedEventId(filteredEvents[0].id);
+        const p = plans.find(planItem => planItem.eventId === filteredEvents[0].id || planItem.id === filteredEvents[0].id);
+        setSelectedPlan(p || null);
+      }
+    }
+  }, [filteredEvents, selectedEventId, plans]);
 
   // Active plan associated strictly with this active event
   const activePlan: TrainingPlan | null = activeEvent
@@ -975,7 +1042,11 @@ export function TrainingPlannerContent({
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
-              ) : null}
+              ) : (
+                <div className="flex-1 max-w-xl text-xs text-slate-500 bg-slate-50 px-3 py-2 rounded-xl border border-dashed border-slate-200">
+                  Brak jednostek w wybranym filtrze.
+                </div>
+              )}
 
               {/* Przycisk do Terminarza */}
               <Link
@@ -988,14 +1059,14 @@ export function TrainingPlannerContent({
               </Link>
             </div>
 
-            {/* Filter Pills based on Mode (ukryte gdy widok nadrzędny już filtruje bez powtarzania przycisków) */}
+            {/* Pasek Filtrów i Zakresu: dla Treningów (status rozpisania & czas) lub dla Meczów (typ wydarzenia) */}
             {!hideTypeFilter && (
               mode === 'MATCHES' ? (
-                <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto scrollbar-none">
+                <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto scrollbar-none">
                   <button
                     type="button"
                     onClick={() => setEventTypeFilter('ALL')}
-                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 ${
                       eventTypeFilter === 'ALL' || eventTypeFilter === 'TRENING'
                         ? 'bg-sky-600 text-white shadow-xs'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
@@ -1006,181 +1077,147 @@ export function TrainingPlannerContent({
                   <button
                     type="button"
                     onClick={() => setEventTypeFilter('MECZ')}
-                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
                       eventTypeFilter === 'MECZ'
                         ? 'bg-sky-600 text-white shadow-xs'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                     }`}
                   >
-                    🏐 Mecze LALS ({matchesCount})
+                    <Volleyball className="w-3.5 h-3.5" />
+                    <span>Mecze LALS ({matchesCount})</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setEventTypeFilter('SPARING')}
-                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
                       eventTypeFilter === 'SPARING'
                         ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                     }`}
                   >
-                    ⚔️ Sparingi ({sparringsCount})
+                    <Swords className="w-3.5 h-3.5" />
+                    <span>Sparingi ({sparringsCount})</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setEventTypeFilter('TURNIEJ')}
-                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
                       eventTypeFilter === 'TURNIEJ'
                         ? 'bg-purple-600 text-white font-black shadow-xs'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                     }`}
                   >
-                    🏆 Turnieje ({tournamentsCount})
+                    <Trophy className="w-3.5 h-3.5" />
+                    <span>Turnieje ({tournamentsCount})</span>
                   </button>
                 </div>
-              ) : mode === 'TRAININGS' ? null : (
-                <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto scrollbar-none">
-                  <button
-                    type="button"
-                    onClick={() => setEventTypeFilter('ALL')}
-                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                      eventTypeFilter === 'ALL'
-                        ? 'bg-sky-600 text-white shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                    }`}
-                  >
-                    Wszystkie ({events.length})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEventTypeFilter('TRENING')}
-                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                      eventTypeFilter === 'TRENING'
-                        ? 'bg-sky-600 text-white shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                    }`}
-                  >
-                    🏋️ Treningi ({trainingsCount})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEventTypeFilter('SPARING')}
-                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                      eventTypeFilter === 'SPARING'
-                        ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                    }`}
-                  >
-                    ⚔️ Sparingi ({sparringsCount})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEventTypeFilter('MECZ')}
-                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                      eventTypeFilter === 'MECZ'
-                        ? 'bg-indigo-600 text-white shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                    }`}
-                  >
-                    🏐 Mecze ({matchesCount})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEventTypeFilter('TURNIEJ')}
-                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                      eventTypeFilter === 'TURNIEJ'
-                        ? 'bg-purple-600 text-white font-black shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                    }`}
-                  >
-                    🏆 Turnieje ({tournamentsCount})
-                  </button>
+              ) : (mode === 'TRAININGS' || fixedEventType === 'TRENING') ? (
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                  {/* Filtry statusu rozpisania konspektu */}
+                  <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto scrollbar-none w-full sm:w-auto">
+                    <button
+                      type="button"
+                      onClick={() => setTrainingStatusFilter('ALL')}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
+                        trainingStatusFilter === 'ALL'
+                          ? 'bg-emerald-600 text-white shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                      }`}
+                    >
+                      <span>Wszystkie treningi</span>
+                      <span className="font-mono text-[10px] opacity-80 font-black">({allTrainingsCount})</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTrainingStatusFilter('UNPLANNED')}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
+                        trainingStatusFilter === 'UNPLANNED'
+                          ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                      }`}
+                    >
+                      <span>⏳ Do rozpisania</span>
+                      <span className="font-mono text-[10px] opacity-80 font-black">({unplannedTrainingsCount})</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTrainingStatusFilter('PLANNED')}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
+                        trainingStatusFilter === 'PLANNED'
+                          ? 'bg-emerald-700 text-white shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                      }`}
+                    >
+                      <span>✓ Rozpisane konspekty</span>
+                      <span className="font-mono text-[10px] opacity-80 font-black">({plannedTrainingsCount})</span>
+                    </button>
+                  </div>
+
+                  {/* Filtr horyzontu czasowego (Nadchodzące / Wszystkie / Przeszłe) */}
+                  <div className="flex items-center gap-1.5 text-xs self-start sm:self-auto shrink-0">
+                    <span className="text-[11px] font-black uppercase text-slate-400 tracking-wider">Zakres:</span>
+                    <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-xl border border-slate-200">
+                      <button
+                        type="button"
+                        onClick={() => setTrainingTimeFilter('UPCOMING')}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
+                          trainingTimeFilter === 'UPCOMING'
+                            ? 'bg-white text-slate-900 shadow-2xs'
+                            : 'text-slate-500 hover:text-slate-900'
+                        }`}
+                      >
+                        Nadchodzące
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setTrainingTimeFilter('ALL')}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
+                          trainingTimeFilter === 'ALL'
+                            ? 'bg-white text-slate-900 shadow-2xs'
+                            : 'text-slate-500 hover:text-slate-900'
+                        }`}
+                      >
+                        Wszystkie
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setTrainingTimeFilter('PAST')}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
+                          trainingTimeFilter === 'PAST'
+                            ? 'bg-white text-slate-900 shadow-2xs'
+                            : 'text-slate-500 hover:text-slate-900'
+                        }`}
+                      >
+                        Przeszłe
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              )
+              ) : null
             )}
 
-            {/* Szybkie pigułki wyboru (Pills) - natychmiastowe 1-klikowe przełączanie bez wielkich pustych kafelków */}
-            {filteredEvents.length === 0 ? (
-              <div className="text-center py-6 px-3 bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-2">
-                <Volleyball className="w-8 h-8 text-emerald-500 mx-auto" />
-                <p className="text-xs font-bold text-slate-700">Brak wydarzeń w tej kategorii.</p>
-                <p className="text-[11px] text-slate-500">Dodaj jednostkę w Terminarzu klubu, aby rozpisać dla niej konspekt ćwiczeń.</p>
-                <Link
-                  href="/events"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black shadow-sm transition mt-1"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Przejdź do Terminarza</span>
-                </Link>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none pt-0.5">
-                <span className="text-[11px] font-black uppercase text-slate-400 tracking-wider shrink-0 mr-1 hidden sm:inline">
-                  Jednostki:
-                </span>
-                {filteredEvents.map(ev => {
-                  const isSelected = activeEvent?.id === ev.id;
-                  const p = plans.find(planItem => planItem.eventId === ev.id || planItem.id === ev.id);
-                  const exCount = p?.exercises?.length || 0;
-                  const attendeesCount = ev.attendees?.filter(a => a.status === 'BEDE').length || 0;
-                  const evDate = new Date(ev.date);
-                  const isHighlightedFromUrl = queryEventId === ev.id;
-                  const isTraining = mode === 'TRAININGS' || fixedEventType === 'TRENING' || ev.type === 'TRENING';
-                  const isSparing = ev.type === 'SPARING';
-                  const isTournament = ev.type === 'TURNIEJ';
-
-                  return (
-                    <button
-                      key={ev.id}
-                      id={`planner-event-${ev.id}`}
-                      type="button"
-                      onClick={() => {
-                        setSelectedEventId(ev.id);
-                        if (p) setSelectedPlan(p);
-                        else setSelectedPlan(null);
-                      }}
-                      className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2.5 shrink-0 border text-left ${
-                        isSelected
-                          ? isTraining
-                            ? 'bg-emerald-600 text-white border-emerald-700 shadow-sm ring-2 ring-emerald-500/25'
-                            : isSparing
-                            ? 'bg-amber-500 text-slate-950 font-black border-amber-600 shadow-sm ring-2 ring-amber-400/25'
-                            : isTournament
-                            ? 'bg-purple-600 text-white border-purple-700 shadow-sm ring-2 ring-purple-500/25'
-                            : 'bg-sky-600 text-white border-sky-700 shadow-sm ring-2 ring-sky-500/25'
-                          : 'bg-slate-50 hover:bg-white text-slate-700 hover:text-slate-900 border-slate-200 hover:border-slate-300'
-                      } ${isHighlightedFromUrl ? 'ring-2 ring-offset-1 ring-sky-400' : ''}`}
-                    >
-                      <div className="flex items-center gap-1.5 font-mono">
-                        <Calendar className={`w-3.5 h-3.5 shrink-0 ${isSelected ? (isSparing ? 'text-slate-950' : 'text-white/80') : (isTraining ? 'text-emerald-600' : 'text-sky-600')}`} />
-                        <span>{evDate.toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
-                        <span className={isSelected ? (isSparing ? 'text-slate-800' : 'text-white/60') : 'text-slate-300'}>•</span>
-                        <Clock className={`w-3 h-3 shrink-0 ${isSelected ? (isSparing ? 'text-slate-950' : 'text-white/80') : 'text-slate-400'}`} />
-                        <span>{evDate.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}</span>
-                      </div>
-
-                      <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider ${
-                        isSelected
-                          ? isSparing
-                            ? 'bg-slate-950/15 text-slate-950 font-black'
-                            : 'bg-white/20 text-white'
-                          : exCount > 0
-                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                          : 'bg-amber-100 text-amber-800 border border-amber-200'
-                      }`}>
-                        {exCount > 0 ? `✓ Rozpisany (${exCount})` : '⏳ Do rozpisania'}
-                      </span>
-
-                      {attendeesCount > 0 && (
-                        <span className={`text-[11px] flex items-center gap-1 font-mono ${
-                          isSelected ? (isSparing ? 'text-slate-950' : 'text-white/80') : 'text-slate-500'
-                        }`}>
-                          <Users className="w-3 h-3" />
-                          <span>{attendeesCount}</span>
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
+            {/* Informacja, gdy lista jest pusta */}
+            {filteredEvents.length === 0 && (
+              <div className="text-center py-6 px-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-2 mt-2">
+                <Volleyball className="w-8 h-8 text-emerald-500 mx-auto opacity-75" />
+                <p className="text-xs font-bold text-slate-800">Brak jednostek w wybranym filtrze.</p>
+                <p className="text-[11px] text-slate-500">Zmień filtry statusu/czasu lub przejdź do Terminarza, aby dodać nowy trening.</p>
+                <div className="flex items-center justify-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => { setTrainingStatusFilter('ALL'); setTrainingTimeFilter('ALL'); }}
+                    className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 text-xs font-bold transition shadow-2xs"
+                  >
+                    Resetuj filtry
+                  </button>
+                  <Link
+                    href="/events"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black shadow-sm transition"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Terminarz</span>
+                  </Link>
+                </div>
               </div>
             )}
           </div>
@@ -1476,47 +1513,50 @@ export function TrainingPlannerContent({
               <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto scrollbar-none flex-nowrap">
                 <button
                   onClick={() => setActiveTab('EXERCISES')}
-                  className={`shrink-0 whitespace-nowrap flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                  className={`shrink-0 whitespace-nowrap flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                     activeTab === 'EXERCISES'
-                      ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/20'
+                      ? 'bg-sky-600 text-white shadow-sm'
                       : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
                   }`}
                 >
-                  <span>📋 Ćwiczenia & Rozpiska ({activePlan.exercises?.length || 0})</span>
+                  <Target className="w-3.5 h-3.5" />
+                  <span>Ćwiczenia & Rozpiska ({activePlan.exercises?.length || 0})</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTab('MATERIALS')}
-                  className={`shrink-0 whitespace-nowrap flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                  className={`shrink-0 whitespace-nowrap flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                     activeTab === 'MATERIALS'
-                      ? 'bg-rose-600 text-white shadow-sm'
+                      ? 'bg-sky-600 text-white shadow-sm'
                       : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
                   }`}
                 >
                   <FileText className="w-3.5 h-3.5" />
-                  <span>📁 Materiały & Załączniki ({eventMaterials.length})</span>
+                  <span>Materiały & Załączniki ({eventMaterials.length})</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTab('CONCLUSIONS')}
-                  className={`shrink-0 whitespace-nowrap flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                  className={`shrink-0 whitespace-nowrap flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                     activeTab === 'CONCLUSIONS'
-                      ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                      ? 'bg-sky-600 text-white shadow-sm'
                       : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
                   }`}
                 >
-                  <span>📝 Wnioski & Ocena Trenera ({activePlan.conclusions?.length || 0})</span>
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Wnioski & Ocena Trenera ({activePlan.conclusions?.length || 0})</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTab('COMMENTS')}
-                  className={`shrink-0 whitespace-nowrap flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                  className={`shrink-0 whitespace-nowrap flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                     activeTab === 'COMMENTS'
-                      ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                      ? 'bg-sky-600 text-white shadow-sm'
                       : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
                   }`}
                 >
-                  <span>💬 Dyskusja Drużyny ({activePlan.comments?.length || 0})</span>
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  <span>Dyskusja Drużyny ({activePlan.comments?.length || 0})</span>
                 </button>
               </div>
 
@@ -1639,7 +1679,7 @@ export function TrainingPlannerContent({
                                     className="w-full h-44 object-contain rounded-xl"
                                   />
                                   <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/60 backdrop-blur text-[10px] text-sky-400 font-bold border border-sky-400/30">
-                                    🎨 Rysunek na boisku
+                                    Rysunek na boisku
                                   </div>
                                 </div>
                               ) : ex.imageUrl ? (
@@ -2144,24 +2184,26 @@ export function TrainingPlannerContent({
                   <button
                     type="button"
                     onClick={() => setMatType('PDF')}
-                    className={`py-2 px-3 rounded-xl font-bold text-xs border text-center transition ${
+                    className={`py-2 px-3 rounded-xl font-bold text-xs border text-center transition flex items-center justify-center gap-1.5 ${
                       matType === 'PDF'
                         ? 'bg-rose-50 border-rose-300 text-rose-700'
                         : 'bg-slate-50 border-slate-200 text-slate-600'
                     }`}
                   >
-                    📄 Dokument PDF
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Dokument PDF</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setMatType('IMAGE')}
-                    className={`py-2 px-3 rounded-xl font-bold text-xs border text-center transition ${
+                    className={`py-2 px-3 rounded-xl font-bold text-xs border text-center transition flex items-center justify-center gap-1.5 ${
                       matType === 'IMAGE'
                         ? 'bg-rose-50 border-rose-300 text-rose-700'
                         : 'bg-slate-50 border-slate-200 text-slate-600'
                     }`}
                   >
-                    🖼️ Grafika / Obraz
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    <span>Grafika / Obraz</span>
                   </button>
                 </div>
               </div>
@@ -2353,7 +2395,7 @@ export function TrainingPlannerContent({
                     onClick={() => setIsDrawingMode(!isDrawingMode)}
                     className="px-3 py-1 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 font-bold text-xs transition"
                   >
-                    {isDrawingMode ? 'Ukryj tablicę' : exDrawingData ? '🎨 Zmień rysunek boiska' : '🎨 Rozrysuj na boisku'}
+                    {isDrawingMode ? 'Ukryj tablicę' : exDrawingData ? 'Zmień rysunek boiska' : 'Rozrysuj na boisku'}
                   </button>
                 </div>
 

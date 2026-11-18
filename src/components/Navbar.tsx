@@ -896,21 +896,6 @@ export default function Navbar() {
               <span>Centrum Administracji</span>
             </Link>
           )}
-
-          {/* PWA Install Button in Mobile Menu */}
-          <button
-            onClick={() => {
-              setIsMobileMenuOpen(false);
-              window.dispatchEvent(new CustomEvent('open-pwa-install'));
-            }}
-            className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold bg-sky-50 border border-sky-200 text-sky-800 hover:bg-sky-100 transition mt-2"
-          >
-            <span className="flex items-center gap-2">
-              <Smartphone className="w-4 h-4 text-sky-600" />
-              <span>Zainstaluj aplikację na telefonie</span>
-            </span>
-            <Download className="w-3.5 h-3.5 text-sky-600" />
-          </button>
         </div>
       )}
 

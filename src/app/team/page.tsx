@@ -601,24 +601,24 @@ export default function TeamPage() {
 
       {/* Uproszczony profil i podstawowe statystyki zawodnika */}
       {profileUser && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-2xl shadow-2xl relative my-8 space-y-6 text-slate-800">
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-7 w-full max-w-2xl shadow-2xl relative max-h-[90vh] flex flex-col text-slate-800">
             <button
               onClick={() => setProfileUser(null)}
-              className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-800 rounded-xl hover:bg-slate-100 transition"
+              className="absolute top-4 right-4 z-10 p-2 text-slate-400 hover:text-slate-800 rounded-xl hover:bg-slate-100 transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
 
-            {/* Profile Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-sky-50 border-2 border-sky-300 flex items-center justify-center font-mono font-black text-2xl text-sky-700 shadow-sm">
+            {/* Profile Header (Fixed at top) */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 shrink-0 pr-8">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-sky-50 border-2 border-sky-300 flex items-center justify-center font-mono font-black text-xl sm:text-2xl text-sky-700 shadow-sm shrink-0">
                   {profileUser.number ? `#${profileUser.number}` : '-'}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight">
+                    <h2 className="text-lg sm:text-2xl font-black text-slate-900 uppercase tracking-tight">
                       {profileUser.name}
                     </h2>
                     {profileUser.isCaptain && (
@@ -647,12 +647,15 @@ export default function TeamPage() {
               {isManagerOrCoach && (
                 <button
                   onClick={() => setIsEditingStats(!isEditingStats)}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition self-start sm:self-auto shadow-sm"
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition self-start sm:self-auto shadow-sm cursor-pointer"
                 >
                   {isEditingStats ? 'Podgląd' : 'Edytuj statystyki'}
                 </button>
               )}
             </div>
+
+            {/* Scrollable Modal Body */}
+            <div className="overflow-y-auto flex-1 pt-4 pr-1 space-y-5">
 
             {/* Podstawowe Statystyki */}
             {!isEditingStats ? (
@@ -877,14 +880,15 @@ export default function TeamPage() {
                 </div>
               </form>
             )}
+            </div>
           </div>
         </div>
       )}
 
       {/* Edit Basic Info Modal */}
       {editingUser && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-md shadow-2xl text-slate-800">
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl text-slate-800 max-h-[90vh] overflow-y-auto">
             <h3 className="text-base font-black uppercase text-slate-900 mb-4">
               Edytuj Profil: {editingUser.name}
             </h3>

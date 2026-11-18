@@ -1174,8 +1174,7 @@ function EventsAttendanceContent() {
                       const calTactics = tactics.filter(
                         t => t.eventId === event.id || 
                              t.matchId === event.id ||
-                             (isCalLeagueMatch && (t.eventId === event.id || t.scope === 'MECZ_LIGOWY')) ||
-                             (calCleanOpponent && t.targetOpponent && t.targetOpponent.toLowerCase().includes(calCleanOpponent.toLowerCase()))
+                             Boolean(calCleanOpponent && t.targetOpponent && t.targetOpponent.toLowerCase().includes(calCleanOpponent.toLowerCase()))
                       );
                       const hasCalTactic = calTactics.length > 0;
 
@@ -1260,7 +1259,7 @@ function EventsAttendanceContent() {
                                   title={`Założenia taktyczne (${calTactics.length})`}
                                 >
                                   <Target className="w-3.5 h-3.5 text-sky-600" />
-                                  <span>{event.type === 'TRENING' ? 'Trening 📋' : 'Taktyka 🎯'}</span>
+                                  <span>{event.type === 'TRENING' ? 'Trening' : 'Taktyka'}</span>
                                 </Link>
                               ) : (
                                 <Link
@@ -1511,8 +1510,7 @@ function EventsAttendanceContent() {
                 const eventTactics = tactics.filter(
                   t => t.eventId === event.id || 
                        t.matchId === event.id ||
-                       (isLeagueMatch && (t.eventId === event.id || t.scope === 'MECZ_LIGOWY')) ||
-                       (cleanOpponent && t.targetOpponent && t.targetOpponent.toLowerCase().includes(cleanOpponent.toLowerCase()))
+                       Boolean(cleanOpponent && t.targetOpponent && t.targetOpponent.toLowerCase().includes(cleanOpponent.toLowerCase()))
                 );
                 const hasTactic = eventTactics.length > 0;
                 const matchInfo = getEventMatchInfo(event);
@@ -1642,20 +1640,22 @@ function EventsAttendanceContent() {
                           </Link>
                         ) : null}
 
-                        {/* 2. Przycisk Taktyki – zawsze aktywny */}
-                        <Link
-                          href={event.type === 'TRENING' ? `/trening?eventId=${event.id}` : event.type === 'SPARING' ? `/taktyka?tab=sparingi&eventId=${event.id}&type=SPARING` : event.type === 'TURNIEJ' ? `/taktyka?tab=turnieje&eventId=${event.id}&type=TURNIEJ` : `/taktyka?tab=matches&eventId=${event.id}&type=MECZ`}
-                          onClick={e => e.stopPropagation()}
-                          className={`h-8.5 px-3 rounded-xl border font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-2xs transition shrink-0 ${
-                            hasTactic
-                              ? 'bg-sky-50 hover:bg-sky-100 text-sky-900 border-sky-300 font-black'
-                              : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
-                          }`}
-                          title={hasTactic ? `Założenia taktyczne (${eventTactics.length})` : 'Otwórz taktykę dla tej jednostki'}
-                        >
-                          <Target className={`w-3.5 h-3.5 shrink-0 ${hasTactic ? 'text-sky-600' : 'text-slate-500'}`} />
-                          <span>{event.type === 'TRENING' ? 'Trening' : (hasTactic ? `Taktyka (${eventTactics.length})` : 'Taktyka')}</span>
-                        </Link>
+                        {/* 2. Przycisk Taktyki – dla meczów, sparingów i turniejów */}
+                        {event.type !== 'TRENING' && (
+                          <Link
+                            href={event.type === 'SPARING' ? `/taktyka?tab=sparingi&eventId=${event.id}&type=SPARING` : event.type === 'TURNIEJ' ? `/taktyka?tab=turnieje&eventId=${event.id}&type=TURNIEJ` : `/taktyka?tab=matches&eventId=${event.id}&type=MECZ`}
+                            onClick={e => e.stopPropagation()}
+                            className={`h-8.5 px-3 rounded-xl border font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-2xs transition shrink-0 ${
+                              hasTactic
+                                ? 'bg-sky-50 hover:bg-sky-100 text-sky-900 border-sky-300 font-black'
+                                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
+                            }`}
+                            title={hasTactic ? `Założenia taktyczne (${eventTactics.length})` : 'Otwórz taktykę dla tej jednostki'}
+                          >
+                            <Target className={`w-3.5 h-3.5 shrink-0 ${hasTactic ? 'text-sky-600' : 'text-slate-500'}`} />
+                            <span>Taktyka</span>
+                          </Link>
+                        )}
 
                         {/* 3. Przycisk obecności – TYLKO dla nadchodzących wydarzeń */}
                         {!isEventPast && !isFinished && matchInfo.ourSetsWon === undefined && (
@@ -2594,13 +2594,15 @@ function EventsAttendanceContent() {
                               {/* Saved Linked Tactics to this Event */}
                               {(() => {
                                 const linkedTactics = tactics.filter(
-                                  t => t.eventId === event.id || (isLeagueMatch && (t.eventId === event.id || t.scope === 'MECZ_LIGOWY'))
+                                  t => t.eventId === event.id || 
+                                       t.matchId === event.id ||
+                                       Boolean(cleanOpponent && t.targetOpponent && t.targetOpponent.toLowerCase().includes(cleanOpponent.toLowerCase()))
                                 );
                                 if (linkedTactics.length === 0) return null;
                                 return (
                                   <div className="space-y-2 pt-1 pb-2">
                                     <div className="text-[10px] font-black uppercase tracking-wider text-amber-800 flex items-center justify-between">
-                                      <span>📸 Zapisane Zrzuty Taktyczne do tej Jednostki ({linkedTactics.length}):</span>
+                                      <span>Zapisane Zrzuty Taktyczne do tej Jednostki ({linkedTactics.length}):</span>
                                       <Link
                                         href={`/taktyka?eventId=${event.id}&type=${isLeagueMatch ? 'MECZ_LIGOWY' : event.type}`}
                                         className="text-[11px] text-sky-600 hover:underline font-bold flex items-center gap-1"

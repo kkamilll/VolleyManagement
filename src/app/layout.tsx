@@ -6,9 +6,9 @@ import ArchiveModeBanner from '@/components/ArchiveModeBanner';
 import Navbar from '@/components/Navbar';
 import BottomNav from '@/components/BottomNav';
 import Footer from '@/components/Footer';
-import PwaInstallPrompt from '@/components/PwaInstallPrompt';
 import UnreadAnnouncementPopup from '@/components/UnreadAnnouncementPopup';
 import AuthGuard from '@/components/AuthGuard';
+import { ToastProvider } from '@/components/ToastProvider';
 
 export const metadata: Metadata = {
   title: 'Angels ZTP Volleyball Team',
@@ -61,21 +61,22 @@ export default function RootLayout({
         <div className="court-lines-overlay" />
 
         <div className="relative z-10 flex flex-col min-h-screen">
-          <AuthProvider>
-            <AuthGuard>
-              <SeasonArchiveProvider>
-                <ArchiveModeBanner />
-                <UnreadAnnouncementPopup />
-                <Navbar />
-                <main className="flex-1 pb-24 md:pb-16">
-                  {children}
-                </main>
-                <Footer />
-                <BottomNav />
-                <PwaInstallPrompt />
-              </SeasonArchiveProvider>
-            </AuthGuard>
-          </AuthProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <AuthGuard>
+                <SeasonArchiveProvider>
+                  <ArchiveModeBanner />
+                  <UnreadAnnouncementPopup />
+                  <Navbar />
+                  <main className="flex-1 pb-24 md:pb-16">
+                    {children}
+                  </main>
+                  <Footer />
+                  <BottomNav />
+                </SeasonArchiveProvider>
+              </AuthGuard>
+            </AuthProvider>
+          </ToastProvider>
         </div>
       </body>
     </html>

@@ -103,11 +103,10 @@ export default function BottomNav() {
               <Link
                 href="/fees"
                 onClick={() => setShowMoreMenu(false)}
-                className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${
-                  pathname === '/fees'
+                className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${pathname === '/fees'
                     ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-sm'
                     : 'bg-slate-50/80 border-slate-200 text-slate-700 hover:bg-emerald-50/50 hover:border-emerald-200'
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
@@ -124,11 +123,10 @@ export default function BottomNav() {
               <Link
                 href="/team"
                 onClick={() => setShowMoreMenu(false)}
-                className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${
-                  pathname === '/team'
+                className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${pathname === '/team'
                     ? 'bg-sky-50 border-sky-300 text-sky-800 shadow-sm'
                     : 'bg-slate-50/80 border-slate-200 text-slate-700 hover:bg-sky-50/50 hover:border-sky-200'
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center">
@@ -145,11 +143,10 @@ export default function BottomNav() {
               <Link
                 href="/galeria"
                 onClick={() => setShowMoreMenu(false)}
-                className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${
-                  pathname === '/galeria'
+                className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${pathname === '/galeria'
                     ? 'bg-purple-50 border-purple-300 text-purple-800 shadow-sm'
                     : 'bg-slate-50/80 border-slate-200 text-slate-700 hover:bg-purple-50/50 hover:border-purple-200'
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
@@ -167,11 +164,10 @@ export default function BottomNav() {
                 <Link
                   href="/admin"
                   onClick={() => setShowMoreMenu(false)}
-                  className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${
-                    pathname === '/admin'
+                  className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${pathname === '/admin'
                       ? 'bg-amber-50 border-amber-300 text-amber-800 shadow-sm'
                       : 'bg-slate-50/80 border-slate-200 text-slate-700 hover:bg-amber-50/50 hover:border-amber-200'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
@@ -190,11 +186,10 @@ export default function BottomNav() {
                 <Link
                   href="/trening"
                   onClick={() => setShowMoreMenu(false)}
-                  className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${
-                    pathname.startsWith('/trening')
+                  className={`p-3.5 rounded-2xl border transition flex flex-col justify-between ${pathname.startsWith('/trening')
                       ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-sm'
                       : 'bg-slate-50/80 border-slate-200 text-slate-700 hover:bg-emerald-50/50 hover:border-emerald-200'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
@@ -209,26 +204,6 @@ export default function BottomNav() {
                 </Link>
               )}
             </div>
-
-            {/* PWA Install Button */}
-            <button
-              onClick={() => {
-                setShowMoreMenu(false);
-                window.dispatchEvent(new CustomEvent('open-pwa-install'));
-              }}
-              className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-sky-800 hover:bg-sky-100 transition text-xs font-bold"
-            >
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
-                  <Smartphone className="w-4 h-4" />
-                </div>
-                <div className="text-left">
-                  <div className="font-black text-slate-900 uppercase text-xs">Zainstaluj na telefonie</div>
-                  <div className="text-[10px] text-sky-700">Dodaj do ekranu głównego (PWA)</div>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-sky-600" />
-            </button>
           </div>
         </div>
       )}
@@ -249,18 +224,15 @@ export default function BottomNav() {
                   key={item.label}
                   type="button"
                   onClick={() => setShowMoreMenu(!showMoreMenu)}
-                  className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition group relative ${
-                    active ? 'text-sky-600' : 'text-slate-500 hover:text-slate-900'
-                  }`}
+                  className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition group relative ${active ? 'text-sky-600' : 'text-slate-500 hover:text-slate-900'
+                    }`}
                 >
-                  <div className={`p-1.5 rounded-xl transition ${
-                    active ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm' : 'group-hover:bg-slate-100'
-                  }`}>
+                  <div className={`p-1.5 rounded-xl transition ${active ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm' : 'group-hover:bg-slate-100'
+                    }`}>
                     <Icon className="w-5 h-5" />
                   </div>
-                  <span className={`text-[10px] tracking-tight mt-0.5 ${
-                    active ? 'font-black text-sky-700' : 'font-semibold'
-                  }`}>
+                  <span className={`text-[10px] tracking-tight mt-0.5 ${active ? 'font-black text-sky-700' : 'font-semibold'
+                    }`}>
                     {item.label}
                   </span>
                   {active && (
@@ -274,18 +246,15 @@ export default function BottomNav() {
               <Link
                 key={item.label}
                 href={item.href}
-                className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition group relative ${
-                  active ? 'text-sky-600' : 'text-slate-500 hover:text-slate-900'
-                }`}
+                className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition group relative ${active ? 'text-sky-600' : 'text-slate-500 hover:text-slate-900'
+                  }`}
               >
-                <div className={`p-1.5 rounded-xl transition ${
-                  active ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm' : 'group-hover:bg-slate-100'
-                }`}>
+                <div className={`p-1.5 rounded-xl transition ${active ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm' : 'group-hover:bg-slate-100'
+                  }`}>
                   <Icon className="w-5 h-5" />
                 </div>
-                <span className={`text-[10px] tracking-tight mt-0.5 ${
-                  active ? 'font-black text-sky-700' : 'font-semibold'
-                }`}>
+                <span className={`text-[10px] tracking-tight mt-0.5 ${active ? 'font-black text-sky-700' : 'font-semibold'
+                  }`}>
                   {item.label}
                 </span>
                 {active && (

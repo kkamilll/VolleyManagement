@@ -3003,7 +3003,7 @@ function RozgrywkiContent() {
                               title={`Założenia taktyczne sparingu (${sparingTactics.length})`}
                             >
                               <Target className="w-3.5 h-3.5 text-sky-600" />
-                              <span>Taktyka 🎯</span>
+                              <span>Taktyka</span>
                             </Link>
                           ) : canManage ? (
                             <Link
@@ -3416,7 +3416,7 @@ function RozgrywkiContent() {
                             <div className="flex items-center gap-2">
                               <Compass className="w-4 h-4 text-sky-600" />
                               <h4 className="text-xs font-black uppercase text-sky-900 tracking-wider">
-                                📸 Zrzuty Taktyczne & Wytyczne Trenera na ten Mecz ({linkedTactics.length})
+                                Zrzuty Taktyczne & Wytyczne Trenera na ten Mecz ({linkedTactics.length})
                               </h4>
                             </div>
                             <a
@@ -3555,10 +3555,10 @@ function RozgrywkiContent() {
           {/* Liga Subtabs (Tabela, Wyniki, Statystyki) & Dedicated Actions Bar */}
           <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 pb-3 border-b border-slate-200">
             {/* 3 Główne Zakładki Ligi - stały, pojedynczy rząd */}
-            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200 overflow-x-auto scrollbar-none shrink-0 w-full sm:w-auto">
+            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-300 overflow-x-auto scrollbar-none shrink-0 w-full sm:w-auto">
               <button
                 onClick={() => setLigaSubTab('tabela')}
-                className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition whitespace-nowrap ${
+                className={`shrink-0 flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition whitespace-nowrap ${
                   ligaSubTab === 'tabela'
                     ? 'bg-sky-600 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
@@ -3569,7 +3569,7 @@ function RozgrywkiContent() {
               </button>
               <button
                 onClick={() => setLigaSubTab('wyniki')}
-                className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition whitespace-nowrap ${
+                className={`shrink-0 flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition whitespace-nowrap ${
                   ligaSubTab === 'wyniki'
                     ? 'bg-sky-600 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
@@ -3580,7 +3580,7 @@ function RozgrywkiContent() {
               </button>
               <button
                 onClick={() => setLigaSubTab('statystyki')}
-                className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider shrink-0 transition whitespace-nowrap ${
+                className={`shrink-0 flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition whitespace-nowrap ${
                   ligaSubTab === 'statystyki'
                     ? 'bg-sky-600 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
@@ -3628,10 +3628,10 @@ function RozgrywkiContent() {
                     href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
                   >
                     <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
-                    <span>VolleyStation ↗</span>
+                    <span>VolleyStation</span>
                   </a>
                 </>
               )}
@@ -3661,10 +3661,10 @@ function RozgrywkiContent() {
                     href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
                   >
                     <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
-                    <span>VolleyStation ↗</span>
+                    <span>VolleyStation</span>
                   </a>
                 </>
               )}
@@ -3979,12 +3979,12 @@ function RozgrywkiContent() {
                           : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      <span>👼 Tylko Angels ZTP</span>
+                      <span>Tylko Angels ZTP</span>
                       <span className="font-mono text-[11px]">({unifiedLeagueSchedule.filter(m => m.isAngels).length})</span>
                     </button>
                   </div>
 
-                  <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-2xl border border-slate-200 text-xs overflow-x-auto scrollbar-none shrink-0">
+                  <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-2xl border border-slate-300 text-xs overflow-x-auto scrollbar-none shrink-0">
                     <button
                       type="button"
                       onClick={() => setLeagueScheduleStatus('ALL')}
@@ -4001,7 +4001,7 @@ function RozgrywkiContent() {
                         leagueScheduleStatus === 'UPCOMING' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      <span>📅 Terminarz</span>
+                      <span>Terminarz</span>
                       <span className="text-[10px] opacity-75 font-mono">({unifiedLeagueSchedule.filter(m => !m.isFinished && (leagueScheduleScope === 'ALL' || m.isAngels)).length})</span>
                     </button>
                     <button
@@ -4011,7 +4011,7 @@ function RozgrywkiContent() {
                         leagueScheduleStatus === 'FINISHED' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      <span>🏆 Wyniki</span>
+                      <span>Wyniki</span>
                       <span className="text-[10px] opacity-75 font-mono">({unifiedLeagueSchedule.filter(m => m.isFinished && (leagueScheduleScope === 'ALL' || m.isAngels)).length})</span>
                     </button>
                   </div>
@@ -4266,7 +4266,7 @@ function RozgrywkiContent() {
                                       className="text-xs font-bold text-sky-700 hover:text-sky-900 hover:underline flex items-center gap-1.5"
                                     >
                                       <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
-                                      <span>Otwórz oficjalny protokół na VolleyStation ↗</span>
+                                      <span>Otwórz oficjalny protokół na VolleyStation</span>
                                     </a>
                                   ) : (
                                     <span className="text-[11px] text-slate-600">Oficjalny terminarz rozgrywek ligowych LALS</span>
@@ -4274,7 +4274,7 @@ function RozgrywkiContent() {
 
                                   {isAngels && (
                                     <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-300">
-                                      👼 Mecz z udziałem Angels ZTP
+                                      Mecz z udziałem Angels ZTP
                                     </span>
                                   )}
                                 </div>
@@ -4321,7 +4321,7 @@ function RozgrywkiContent() {
                     className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
                   >
                     <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
-                    <span>Terminarz LALS (VolleyStation) ↗</span>
+                    <span>Terminarz LALS (VolleyStation)</span>
                   </a>
                 </div>
               </div>
@@ -4857,7 +4857,7 @@ function RozgrywkiContent() {
                               title={`Założenia taktyczne turnieju (${tournamentTactics.length})`}
                             >
                               <Target className="w-4 h-4 text-sky-600" />
-                              <span>Taktyka 🎯</span>
+                              <span>Taktyka</span>
                             </Link>
                           ) : canManage ? (
                             <Link
@@ -5262,7 +5262,7 @@ function RozgrywkiContent() {
                               <div className="flex items-center justify-between">
                                 <span className="text-xs font-black uppercase text-sky-800 flex items-center gap-1.5">
                                   <Compass className="w-3.5 h-3.5 text-sky-600" />
-                                  <span>📸 Zrzut Taktyczny na Turniej: {linked[0].title}</span>
+                                  <span>Zrzut Taktyczny na Turniej: {linked[0].title}</span>
                                 </span>
                                 <Link href={`/taktyka?eventId=${event.id}&tacticId=${linked[0].id}`} className="text-xs text-sky-700 font-bold hover:underline">
                                   Otwórz w Tablicy →
@@ -5353,7 +5353,7 @@ function RozgrywkiContent() {
       {/* Modal: Wprowadzanie / Edycja Wyniku */}
       {resultModalEvent && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-lg shadow-2xl space-y-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-lg shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center pb-3 border-b border-slate-100">
               <h3 className="text-base font-black uppercase text-slate-900 flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-amber-500" />
@@ -5539,7 +5539,7 @@ function RozgrywkiContent() {
       {/* Modal: Dodaj Wydarzenie (Sparing / Turniej) */}
       {showAddEventModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-lg shadow-2xl space-y-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 w-full max-w-lg shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
                 <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
@@ -6863,7 +6863,7 @@ function RozgrywkiContent() {
                   className="px-3 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-300 text-xs font-bold flex items-center gap-1.5 transition shadow-xs"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
-                  <span>Otwórz: panel.volleystation.com/schedule ↗</span>
+                  <span>Otwórz panel.volleystation.com/schedule</span>
                 </a>
               </div>
 
@@ -7243,7 +7243,7 @@ function RozgrywkiContent() {
       {/* MODAL TWORZENIA NOWEJ TABELI / FAZY LIGOWEJ */}
       {showCreatePhaseModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-lg shadow-2xl text-slate-800 space-y-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-lg shadow-2xl text-slate-800 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200">
@@ -7773,7 +7773,7 @@ Punkty
       {/* MODAL DODAWANIA / EDYCJI MECZU TURNIEJOWEGO */}
       {showAddTournamentMatchModal && selectedTournamentForMatch && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-lg shadow-2xl text-slate-800 space-y-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-lg shadow-2xl text-slate-800 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
                 <h3 className="text-base font-black text-slate-900 uppercase tracking-tight">
@@ -7967,7 +7967,7 @@ Punkty
       {/* MODAL SZYBKIEGO WYBORU MIEJSCA KOŃCOWEGO TURNIEJU */}
       {showTournamentRankModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-md shadow-2xl text-slate-800 space-y-4">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 w-full max-w-md shadow-2xl text-slate-800 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
                 <h3 className="text-base font-black text-slate-900 uppercase">

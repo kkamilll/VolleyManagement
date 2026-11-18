@@ -459,9 +459,7 @@ function TacticsContent() {
 
   // Player Read-Only & Sandbox State
   const [isSandboxMode, setIsSandboxMode] = useState(false);
-  const [showRequestEditModal, setShowRequestEditModal] = useState(false);
-  const [requestEditType, setRequestEditType] = useState<'UWAGA_ROTACJA' | 'UWAGA_BLOK' | 'PROSBA_DOSTEP' | 'INNE'>('UWAGA_ROTACJA');
-  const [requestEditText, setRequestEditText] = useState('');
+
   const [submittingRequest, setSubmittingRequest] = useState(false);
 
   // Board Orientation: 'vertical' (pionowo) vs 'horizontal' (poziomo)
@@ -681,47 +679,7 @@ function TacticsContent() {
     });
   }, [tactics, activeTargetEvent, activeTargetMatch]);
 
-  // Głosowanie w ankiecie obecności (Messenger style)
-  const handleVoteAttendance = async (status: 'BEDE' | 'NIEPEWNE' | 'NIE_BEDE') => {
-    if (!user) {
-      alert('Zaloguj się, aby zagłosować w ankiecie');
-      return;
-    }
-    if (!activeTargetEvent) return;
 
-    try {
-      const res = await fetch(`/api/events/${activeTargetEvent.id}/attendance`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status })
-      });
-      if (res.ok) {
-        const updated: AttendanceRecord = {
-          userId: user.id,
-          userName: user.name,
-          userRole: user.role,
-          status,
-          updatedAt: new Date().toISOString()
-        };
-        setEvents(prev => prev.map(e => {
-          if (e.id !== activeTargetEvent.id) return e;
-          const remaining = (e.attendees || []).filter(a => a.userId !== user.id && a.userName.toLowerCase() !== user.name.toLowerCase());
-          return {
-            ...e,
-            attendees: [...remaining, updated]
-          };
-        }));
-      }
-    } catch (err) {
-      console.error('Error voting attendance:', err);
-    }
-  };
-
-  const getPlayerInitials = (name: string) => {
-    const parts = name.trim().split(/\s+/);
-    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-    return name.slice(0, 2).toUpperCase();
-  };
 
   // Załaduj zapisany schemat z listy meczu bezpośrednio na główną tablicę taktyczną
   const handleLoadTacticToBoard = (tac: TacticalPlay) => {
@@ -804,8 +762,10 @@ function TacticsContent() {
     const rect = canvas.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
 
     ctx.strokeStyle = quickDrawColor;
     ctx.lineWidth = 3;
@@ -825,8 +785,10 @@ function TacticsContent() {
     const rect = canvas.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
 
     ctx.lineTo(x, y);
     ctx.stroke();
@@ -1402,8 +1364,10 @@ function TacticsContent() {
     if (!canvas) return;
     saveCanvasState();
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
     setIsDrawing(true);
     startPos.current = { x, y };
 
@@ -1429,8 +1393,10 @@ function TacticsContent() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -1450,8 +1416,10 @@ function TacticsContent() {
 
     if (activeTool === 'arrow') {
       const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const x = (e.clientX - rect.left) * scaleX;
+      const y = (e.clientY - rect.top) * scaleY;
       drawArrow(ctx, startPos.current.x, startPos.current.y, x, y, drawColor, lineWidth);
     }
     startPos.current = null;
@@ -1466,8 +1434,10 @@ function TacticsContent() {
     saveCanvasState();
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (touch.clientX - rect.left) * scaleX;
+    const y = (touch.clientY - rect.top) * scaleY;
     setIsDrawing(true);
     startPos.current = { x, y };
 
@@ -1494,8 +1464,10 @@ function TacticsContent() {
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (touch.clientX - rect.left) * scaleX;
+    const y = (touch.clientY - rect.top) * scaleY;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -1516,8 +1488,10 @@ function TacticsContent() {
     if (activeTool === 'arrow' && e.changedTouches.length > 0) {
       const rect = canvas.getBoundingClientRect();
       const touch = e.changedTouches[0];
-      const x = touch.clientX - rect.left;
-      const y = touch.clientY - rect.top;
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const x = (touch.clientX - rect.left) * scaleX;
+      const y = (touch.clientY - rect.top) * scaleY;
       drawArrow(ctx, startPos.current.x, startPos.current.y, x, y, drawColor, lineWidth);
     }
     startPos.current = null;
@@ -1677,7 +1651,7 @@ function TacticsContent() {
             phase,
             rotation,
             courtPositions: positions,
-            directives: positions.map(p => `${p.name}: ${p.task || 'Pozycja w strefie'}`),
+            directives: selectedTactic.directives?.filter(d => !/^[A-Za-zżźćńółęąśŻŹĆĄŚĘŁÓŃ\s]+\s*\([A-Z0-9ŚśŁł]+\)\s*:/i.test(d)) || [],
             drawingData,
             tacticalNotes: tacticComment || selectedTactic.tacticalNotes || '',
             description: tacticComment || selectedTactic.description || ''
@@ -1727,7 +1701,7 @@ function TacticsContent() {
             matchId: linkedMatchId || undefined,
             description: tacticComment,
             courtPositions: positions,
-            directives: positions.map(p => `${p.name}: ${p.task || 'Pozycja w strefie'}`),
+            directives: [],
             drawingData,
             tacticalNotes: tacticComment
           }
@@ -1870,7 +1844,7 @@ function TacticsContent() {
             targetOpponent: opp,
             description: desc,
             courtPositions: positions,
-            directives: positions.map(p => `${p.name}: ${p.task || 'Pozycja w strefie'}`),
+            directives: [],
             drawingData,
             tacticalNotes: desc
           }
@@ -2010,7 +1984,7 @@ function TacticsContent() {
             matchId,
             description: desc,
             courtPositions: positions,
-            directives: unitDirectives.length > 0 ? unitDirectives : positions.map(p => `${p.name}: ${p.task || 'Pozycja'}`),
+            directives: unitDirectives.filter(d => !/^[A-Za-zżźćńółęąśŻŹĆĄŚĘŁÓŃ\s]+\s*\([A-Z0-9ŚśŁł]+\)\s*:/i.test(d)),
             drawingData,
             tacticalNotes: desc
           }
@@ -2077,51 +2051,7 @@ function TacticsContent() {
     }
   };
 
-  // Send a player edit request or tactical feedback to the coach
-  const handleSendEditRequest = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!requestEditText.trim()) return;
-    setSubmittingRequest(true);
-    try {
-      const typePrefix =
-        requestEditType === 'PROSBA_DOSTEP'
-          ? '✋ PROŚBA O UPRAWNIENIA EDYCJI: '
-          : requestEditType === 'UWAGA_ROTACJA'
-          ? '🎯 SUGESTIA DO ROTACJI: '
-          : requestEditType === 'UWAGA_BLOK'
-          ? '🛡️ SUGESTIA DO BLOKU/ASEKURACJI: '
-          : '💬 UWAGA TAKTYCZNA: ';
 
-      const tacticId = selectedTactic ? selectedTactic.id : tactics.length > 0 ? tactics[0].id : undefined;
-
-      const res = await fetch('/api/tactics', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'ADD_POST',
-          tacticId,
-          content: `${typePrefix}${requestEditText}`
-        })
-      });
-      const d = await res.json();
-      if (res.ok) {
-        setShowRequestEditModal(false);
-        setRequestEditText('');
-        await fetchData();
-        if (selectedTactic && d.post) {
-          const updatedPosts = [d.post, ...(selectedTactic.posts || [])];
-          setSelectedTactic({ ...selectedTactic, posts: updatedPosts });
-        }
-        alert('Twoja prośba / uwaga została pomyślnie przekazana trenerowi!');
-      } else {
-        alert(d.error || 'Błąd wysyłania prośby');
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setSubmittingRequest(false);
-    }
-  };
 
   // Update post status (Accept / Reject / Comment)
   const handleUpdatePostStatus = async (
@@ -2562,20 +2492,11 @@ function TacticsContent() {
           </div>
         </div>
 
-        {!canEdit && (
+        {isArchiveMode && (
           <div className="flex items-center gap-2 shrink-0">
-            {isArchiveMode ? (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 text-xs font-bold shadow-sm">
-                <span>🔒 Archiwum</span>
-              </div>
-            ) : (
-              <button
-                onClick={() => setShowRequestEditModal(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm bg-amber-500 hover:bg-amber-400 text-slate-950"
-              >
-                <span>Zgłoś uwagę</span>
-              </button>
-            )}
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 text-xs font-bold shadow-sm">
+              <span>🔒 Archiwum</span>
+            </div>
           </div>
         )}
       </div>
@@ -2742,7 +2663,7 @@ function TacticsContent() {
                     title="Wczytaj zapisany schemat z bazy"
                   >
                     <FolderArchive className="w-3.5 h-3.5 text-sky-600" />
-                    <span>Wczytaj ({tactics.length})</span>
+                    <span>Wczytaj</span>
                   </button>
                 )}
 
@@ -2762,7 +2683,16 @@ function TacticsContent() {
                   title="Zapisz ten schemat bezpośrednio jako post do wybranego meczu"
                 >
                   <Save className="w-3.5 h-3.5 text-amber-300" />
-                  <span>{saving ? 'Zapisuję...' : (activeTargetEvent || activeTargetMatch ? `Zapisz do meczu: ${activeTargetEvent?.opponent || activeTargetMatch?.opponent || 'LALS'}` : 'Zapisz schemat')}</span>
+                  <span>
+                    {saving ? 'Zapisuję...' : (
+                      activeTargetEvent || activeTargetMatch ? (
+                        <>
+                          <span className="hidden sm:inline">Zapisz do meczu: {activeTargetEvent?.opponent || activeTargetMatch?.opponent || 'LALS'}</span>
+                          <span className="sm:hidden">Zapisz do meczu</span>
+                        </>
+                      ) : 'Zapisz schemat'
+                    )}
+                  </span>
                 </button>
 
                 <button
@@ -2783,10 +2713,10 @@ function TacticsContent() {
         <>
           {/* PASEK OSTATNIO DODANEGO SCHEMATU (Znika po kliknięciu Nowy szkic / dodaniu nowego / zamknięciu) */}
           {lastAddedTactic && (
-            <div className="p-3 sm:p-3.5 rounded-2xl bg-sky-50 border border-sky-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs animate-in slide-in-from-top duration-200 mb-3">
+            <div className="p-3 sm:p-3.5 rounded-2xl bg-sky-50 border border-sky-300 border-l-4 border-l-sky-500 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs animate-in slide-in-from-top duration-200 mb-3">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-8 h-8 rounded-xl bg-sky-600 text-white flex items-center justify-center text-sm shrink-0 font-bold shadow-xs">
-                  🎯
+                  <Compass className="w-4 h-4 text-amber-300" />
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -2842,10 +2772,10 @@ function TacticsContent() {
           {selectedTactic && (() => {
             const target = getTacticTargetInfo(selectedTactic);
             return (
-              <div className="p-3 sm:p-3.5 rounded-2xl bg-amber-50 border border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs mb-3">
+              <div className="p-3 sm:p-3.5 rounded-2xl bg-amber-50 border border-amber-300 border-l-4 border-l-amber-500 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs mb-3">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="w-8 h-8 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center text-sm shrink-0 font-bold shadow-xs">
-                    ✏️
+                    <Pencil className="w-4 h-4 text-slate-950" />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -2895,14 +2825,15 @@ function TacticsContent() {
           })()}
 
       {/* SEKCJA 1: TABLICA TAKTYCZNA (BOISKO I KONSOLA ROZGRYWANIA) */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-3 sm:p-5 shadow-sm space-y-4">
+      <div className="bg-white border border-slate-300 rounded-3xl p-3 sm:p-5 shadow-md space-y-4 border-t-4 border-t-sky-600">
           
           {/* KONSOLA TAKTYCZNA (NARZĘDZIA RYSOWANIA, KOLORY I WIDOK) */}
-          <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-3 sm:p-4 shadow-sm">
-            <div className="flex flex-wrap items-center justify-between gap-2.5">
+          <div className="bg-slate-50 border border-slate-300/80 rounded-2xl p-2.5 sm:p-3.5 shadow-2xs space-y-2.5">
+            {/* Rząd 1: Narzędzia rysowania + Kolory + Cofnij/Usuń (poziomy płynny pasek na telefonie) */}
+            <div className="flex items-center justify-between gap-2 overflow-x-auto scrollbar-none pb-1">
               
               {/* Narzędzia (Przesuń, Pisak, Strzałka, Gumka, Reset) */}
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 shrink-0">
                 <button
                   onClick={() => setActiveTool('move')}
                   className={`h-7 px-2.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition border cursor-pointer ${
@@ -2966,8 +2897,8 @@ function TacticsContent() {
               </div>
 
               {/* 4 Kolory & Cofnij */}
-              <div className="flex items-center gap-1.5">
-                <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-slate-200">
+              <div className="flex items-center gap-1.5 shrink-0">
+                <div className="flex items-center gap-1 p-1 bg-white rounded-xl border border-slate-300">
                   {[
                     { hex: '#facc15', label: 'Żółty' },
                     { hex: '#0284c7', label: 'Błękitny' },
@@ -2991,7 +2922,7 @@ function TacticsContent() {
 
                 <button
                   onClick={handleUndo}
-                  className="p-1.5 rounded-xl bg-white text-slate-700 hover:text-slate-900 border border-slate-200 hover:bg-slate-100 shadow-2xs transition cursor-pointer"
+                  className="p-1.5 rounded-xl bg-white text-slate-700 hover:text-slate-900 border border-slate-300 hover:bg-slate-100 shadow-2xs transition cursor-pointer"
                   title="Cofnij rysunek"
                 >
                   <Undo2 className="w-3.5 h-3.5" />
@@ -2999,29 +2930,31 @@ function TacticsContent() {
 
                 <button
                   onClick={handleClearDrawing}
-                  className="p-1.5 rounded-xl bg-white text-rose-600 hover:text-rose-700 border border-slate-200 hover:bg-rose-50 shadow-2xs transition cursor-pointer"
+                  className="p-1.5 rounded-xl bg-white text-rose-600 hover:text-rose-700 border border-slate-300 hover:bg-rose-50 shadow-2xs transition cursor-pointer"
                   title="Wyczyść rysunki"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
+            </div>
 
-              {/* Nazwa Taktyki, Rywale, Piłka, Orientacja */}
-              <div className="flex items-center gap-2 flex-wrap">
-                <input
-                  type="text"
-                  value={tacticTitle}
-                  onChange={(e) => setTacticTitle(e.target.value)}
-                  placeholder="Nazwa schematu..."
-                  className="bg-white border border-slate-300 rounded-xl px-2.5 py-1 text-xs text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-sky-500 shadow-2xs max-w-[200px]"
-                />
+            {/* Rząd 2: Nazwa Taktyki, Rywale, Piłka, Orientacja */}
+            <div className="flex items-center justify-between gap-2 flex-wrap pt-2 border-t border-slate-200/80">
+              <input
+                type="text"
+                value={tacticTitle}
+                onChange={(e) => setTacticTitle(e.target.value)}
+                placeholder="Nazwa schematu..."
+                className="flex-1 min-w-[140px] bg-white border border-slate-300 rounded-xl px-2.5 py-1 text-xs text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-sky-500 shadow-2xs"
+              />
 
+              <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   onClick={() => setShowOpponents(!showOpponents)}
                   className={`px-2.5 py-1 rounded-xl border text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
                     showOpponents
                       ? 'bg-rose-50 text-rose-800 border-rose-300'
-                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                      : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
                   }`}
                   title="Pokaż/ukryj blok i obronę przeciwnika"
                 >
@@ -3034,7 +2967,7 @@ function TacticsContent() {
                   className={`px-2.5 py-1 rounded-xl border text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
                     showBall
                       ? 'bg-amber-50 text-amber-800 border-amber-300'
-                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                      : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
                   }`}
                   title="Pokaż/ukryj piłkę"
                 >
@@ -3042,7 +2975,7 @@ function TacticsContent() {
                   <span>Piłka</span>
                 </button>
 
-                <div className="inline-flex items-center p-0.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <div className="hidden sm:inline-flex items-center p-0.5 bg-white rounded-xl border border-slate-300 shadow-2xs">
                   <button
                     type="button"
                     onClick={() => handleToggleOrientation('vertical')}
@@ -3069,7 +3002,6 @@ function TacticsContent() {
                   </button>
                 </div>
               </div>
-
             </div>
           </div>
 
@@ -3231,7 +3163,7 @@ function TacticsContent() {
                   top: boardOrientation === 'horizontal' ? `${100 - ballPos.x}%` : `${ballPos.y}%`,
                   transform: 'translate(-50%, -50%)'
                 }}
-                className={`absolute z-25 flex flex-col items-center select-none transition-transform ${
+                className={`absolute z-25 flex flex-col items-center select-none transition-transform touch-none p-2 -m-2 ${
                   activeTool === 'move' && isEffectiveEditor ? 'cursor-grab active:cursor-grabbing hover:scale-125' : 'pointer-events-none'
                 } ${draggingId === 'ball' ? 'scale-125 z-30' : ''}`}
                 title="Piłka siatkarska"
@@ -3273,7 +3205,7 @@ function TacticsContent() {
                     top: boardOrientation === 'horizontal' ? `${100 - opp.x}%` : `${opp.y}%`,
                     transform: 'translate(-50%, -50%)'
                   }}
-                  className={`absolute z-20 flex flex-col items-center select-none transition-transform ${
+                  className={`absolute z-20 flex flex-col items-center select-none transition-transform touch-none p-2 -m-2 ${
                     activeTool === 'move' && isEffectiveEditor ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'
                   } ${isDragging ? 'scale-120 z-30 opacity-90' : isSelected ? 'scale-110 z-25' : 'hover:scale-105'}`}
                 >
@@ -3322,7 +3254,7 @@ function TacticsContent() {
                     top: boardOrientation === 'horizontal' ? `${100 - player.x}%` : `${player.y}%`,
                     transform: 'translate(-50%, -50%)'
                   }}
-                  className={`absolute z-20 flex flex-col items-center select-none transition-transform ${
+                  className={`absolute z-20 flex flex-col items-center select-none transition-transform touch-none p-2 -m-2 ${
                     activeTool === 'move' && isEffectiveEditor ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'
                   } ${isDragging ? 'scale-120 z-30 opacity-90' : isSelected ? 'scale-110 z-25' : 'hover:scale-105'}`}
                 >
@@ -3425,13 +3357,25 @@ function TacticsContent() {
 
               {/* Informacja o spotkaniu */}
               {(activeTargetEvent || activeTargetMatch) && (
-                <div className="flex items-center gap-2 text-xs text-slate-700 bg-slate-100/80 px-3 py-1.5 rounded-xl border border-slate-200 self-start sm:self-auto font-medium">
-                  <Calendar className="w-3.5 h-3.5 text-sky-600" />
+                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-700 bg-slate-100/80 px-3 py-1.5 rounded-xl border border-slate-200 self-start sm:self-auto font-medium">
+                  <Calendar className="w-3.5 h-3.5 text-sky-600 shrink-0" />
                   <span className="font-bold">
                     {new Date(activeTargetEvent?.date || activeTargetMatch?.date || '').toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'long' })}
                   </span>
                   <span>•</span>
                   <span>{activeTargetEvent?.location || activeTargetMatch?.location || 'Hala OSiR, Luboń'}</span>
+                  {activeTargetEvent && (activeTargetEvent.attendees || []).filter(a => a.status === 'BEDE').length > 0 && (
+                    <>
+                      <span>•</span>
+                      <Link
+                        href={`/events?eventId=${activeTargetEvent.id}`}
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 hover:bg-emerald-100 transition"
+                        title="Zobacz frekwencję w Terminarzu"
+                      >
+                        <span>✓ {(activeTargetEvent.attendees || []).filter(a => a.status === 'BEDE').length} obecnych</span>
+                      </Link>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -3448,12 +3392,12 @@ function TacticsContent() {
                   </span>
                 </div>
 
-                {/* Poziom 1: Główne akcje tablicy (Na mobile: 2 równe przyciski 50/50 w czytelnym układzie) */}
-                <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
+                {/* Poziom 1: Główne akcje tablicy */}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setTacticsSection('board')}
-                    className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-black text-xs transition flex items-center justify-center gap-2 shadow-xs"
+                    className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-black text-xs transition flex items-center justify-center gap-2 shadow-xs"
                     title="Otwórz pełną tablicę taktyczną dla tego meczu"
                   >
                     <Compass className="w-4 h-4 text-amber-300 shrink-0" />
@@ -3463,7 +3407,7 @@ function TacticsContent() {
                   <button
                     type="button"
                     onClick={handleOpenQuickDrawModal}
-                    className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-white hover:bg-sky-50 text-sky-900 border border-sky-300 font-black text-xs transition flex items-center justify-center gap-1.5 shadow-2xs"
+                    className="hidden sm:inline-flex px-3.5 py-2.5 rounded-xl bg-white hover:bg-sky-50 text-sky-900 border border-sky-300 font-black text-xs transition items-center justify-center gap-1.5 shadow-2xs"
                     title="Szybki szkic pisakiem na boisku bez przełączania zakładek"
                   >
                     <Pencil className="w-4 h-4 text-sky-600 shrink-0" />
@@ -3520,167 +3464,6 @@ function TacticsContent() {
               </div>
             )}
 
-            {/* ANKIETA OBECNOŚCI W STYLU MESSENGERA (ZBALANSOWANY PASEK + AWATARY ZAMIAST ŚCIANY ZIELONYCH KAFELKÓW) */}
-            {activeTargetEvent && (() => {
-              const attendees = activeTargetEvent.attendees || [];
-              const confirmedList = attendees.filter(a => a.status === 'BEDE');
-              const uncertainList = attendees.filter(a => a.status === 'NIEPEWNE');
-              const declinedList = attendees.filter(a => a.status === 'NIE_BEDE');
-              const totalSquad = Math.max(allSquadMembers.length, attendees.length, 1);
-              const confirmedPercent = Math.min(100, Math.round((confirmedList.length / totalSquad) * 100));
-
-              const myVote = user ? attendees.find(a => a.userId === user.id || a.userName.toLowerCase() === user.name.toLowerCase())?.status : null;
-
-              return (
-                <div className="pt-3 border-t border-slate-100 space-y-2.5">
-                  {/* Górny nagłówek ankiety */}
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="font-black text-slate-800 uppercase tracking-wider text-[11px]">
-                        Ankieta obecności na mecz
-                      </span>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-mono text-[11px] font-black border border-emerald-200">
-                        {confirmedList.length} będzie
-                      </span>
-                    </div>
-
-                    <Link
-                      href={`/events?eventId=${activeTargetEvent.id}`}
-                      className="text-[11px] font-bold text-sky-600 hover:text-sky-800 flex items-center gap-1 hover:underline"
-                      title="Przejdź do pełnej ankiety w Terminarzu"
-                    >
-                      <span>Szczegóły w Terminarzu</span>
-                      <span>&rarr;</span>
-                    </Link>
-                  </div>
-
-                  {/* Karta opcji ankiety w stylu Messengera (wygrywająca opcja 'Będę' z paskiem postępu i stosem awatarów) */}
-                  <div className="rounded-2xl border border-emerald-200/90 bg-emerald-50/30 overflow-hidden shadow-2xs">
-                    <div
-                      onClick={() => handleVoteAttendance('BEDE')}
-                      className={`relative p-3 flex items-center justify-between gap-3 cursor-pointer transition select-none ${
-                        myVote === 'BEDE' ? 'bg-emerald-50/70 ring-1 ring-emerald-400' : 'hover:bg-emerald-50/50'
-                      }`}
-                      title="Kliknij, aby zagłosować / potwierdzić obecność"
-                    >
-                      {/* Pasek postępu w tle jak w ankietach Messengera */}
-                      <div
-                        className="absolute inset-y-0 left-0 bg-emerald-100/70 transition-all duration-500 pointer-events-none rounded-r-xl"
-                        style={{ width: `${Math.max(12, confirmedPercent)}%` }}
-                      />
-
-                      {/* Lewa strona: Checkmark + Tytuł opcji + Licznik */}
-                      <div className="relative flex items-center gap-2.5 z-10">
-                        <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-black shrink-0 transition ${
-                          myVote === 'BEDE'
-                            ? 'bg-emerald-600 text-white shadow-xs'
-                            : 'bg-emerald-500/20 text-emerald-700 border border-emerald-400'
-                        }`}>
-                          ✓
-                        </div>
-                        <span className="text-xs font-black text-slate-800">
-                          Będę na meczu
-                        </span>
-                        <span className="text-xs font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
-                          {confirmedList.length}
-                        </span>
-                      </div>
-
-                      {/* Prawa strona: Stos nakładających się okrągłych awatarów (Avatar Facepile jak w Messengerze) */}
-                      <div className="relative flex items-center -space-x-1.5 z-10 shrink-0">
-                        {confirmedList.slice(0, 10).map((att) => {
-                          const playerInfo = allSquadMembers.find(m => m.id === att.userId || m.name.toLowerCase() === att.userName.toLowerCase());
-                          return (
-                            <div
-                              key={att.userId}
-                              title={`${att.userName} ${playerInfo?.number ? `(#${playerInfo.number})` : ''} — Potwierdzona obecność`}
-                              className="w-7 h-7 rounded-full border-2 border-white bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center text-[10px] font-black shadow-xs shrink-0 select-none cursor-default"
-                            >
-                              {getPlayerInitials(att.userName)}
-                            </div>
-                          );
-                        })}
-                        {confirmedList.length > 10 && (
-                          <div
-                            className="w-7 h-7 rounded-full border-2 border-white bg-slate-800 text-white flex items-center justify-center text-[10px] font-black shadow-xs shrink-0 select-none"
-                            title={`I jeszcze ${confirmedList.length - 10} innych zawodników`}
-                          >
-                            +{confirmedList.length - 10}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Subtelna lista imion w stylu Messengera (zamiast jaskrawych zielonych klocków) */}
-                    {confirmedList.length > 0 && (
-                      <div className="px-3.5 py-2 bg-white/70 border-t border-emerald-100 text-[11px] text-slate-600 flex flex-wrap items-center gap-1 leading-relaxed">
-                        <span className="font-bold text-slate-700 mr-1">Zagłosowali:</span>
-                        {confirmedList.map((att, idx) => {
-                          const playerInfo = allSquadMembers.find(m => m.id === att.userId || m.name.toLowerCase() === att.userName.toLowerCase());
-                          return (
-                            <span key={att.userId} className="inline-flex items-center text-slate-700">
-                              <span className="font-semibold hover:text-emerald-700">{att.userName}</span>
-                              {playerInfo?.number && (
-                                <span className="font-mono text-[10px] text-slate-400 font-bold ml-0.5">
-                                  #{playerInfo.number}
-                                </span>
-                              )}
-                              {idx < confirmedList.length - 1 && <span className="text-slate-300 mr-1">,</span>}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Pomocnicze opcje w jednym dyskretnym rzędzie: Niepewne & Nie będę */}
-                  <div className="flex items-center gap-2 flex-wrap text-xs pt-0.5">
-                    <button
-                      type="button"
-                      onClick={() => handleVoteAttendance('NIEPEWNE')}
-                      className={`px-3 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border ${
-                        myVote === 'NIEPEWNE'
-                          ? 'bg-amber-100 text-amber-900 border-amber-300 shadow-xs'
-                          : 'bg-slate-50 hover:bg-white text-slate-600 border-slate-200'
-                      }`}
-                    >
-                      <span>❓ Niepewne</span>
-                      <span className="font-mono text-[11px] font-bold text-amber-800">
-                        ({uncertainList.length})
-                      </span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleVoteAttendance('NIE_BEDE')}
-                      className={`px-3 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border ${
-                        myVote === 'NIE_BEDE'
-                          ? 'bg-rose-100 text-rose-900 border-rose-300 shadow-xs'
-                          : 'bg-slate-50 hover:bg-white text-slate-600 border-slate-200'
-                      }`}
-                    >
-                      <span>✕ Nie będę</span>
-                      <span className="font-mono text-[11px] font-bold text-rose-800">
-                        ({declinedList.length})
-                      </span>
-                    </button>
-
-                    {uncertainList.length > 0 && (
-                      <span className="text-[11px] text-amber-700 ml-1">
-                        Niepewni: {uncertainList.map(a => a.userName.split(' ')[0]).join(', ')}
-                      </span>
-                    )}
-
-                    {declinedList.length > 0 && (
-                      <span className="text-[11px] text-slate-400 ml-1">
-                        Nieobecni: {declinedList.map(a => a.userName.split(' ')[0]).join(', ')}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })()}
           </div>
 
           {/* 4. FEED POSTÓW & ROZPISKA TAKTYCZNA DLA TEGO MECZU */}
@@ -3712,32 +3495,9 @@ function TacticsContent() {
                   </p>
                 </div>
                 {canEdit && (
-                  <div className="flex items-center justify-center gap-2 flex-wrap pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setTacticsSection('board')}
-                      className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition"
-                    >
-                      <Compass className="w-4 h-4 text-amber-300" />
-                      <span>Rozrysuj na tablicy</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowAddNoteModal(true)}
-                      className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition"
-                    >
-                      <FileText className="w-4 h-4 text-slate-600" />
-                      <span>Dodaj notatkę</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleOpenAddMaterialForCurrentTarget('VIDEO')}
-                      className="px-4 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition"
-                    >
-                      <Play className="w-3.5 h-3.5 fill-rose-600" />
-                      <span>Dodaj wideo</span>
-                    </button>
-                  </div>
+                  <p className="text-xs text-slate-500 font-medium pt-1">
+                    Wybierz narzędzie z paska powyżej, aby rozrysować taktykę, dodać wideo lub notatkę do tego meczu.
+                  </p>
                 )}
               </div>
             )}
@@ -3748,7 +3508,7 @@ function TacticsContent() {
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-bold border border-amber-300 shadow-2xs">
-                      📝
+                      <FileText className="w-4 h-4 text-amber-700" />
                     </div>
                     <div>
                       <h4 className="text-xs font-black uppercase tracking-wider text-slate-900">
@@ -3793,7 +3553,7 @@ function TacticsContent() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-600 text-white flex items-center justify-center font-bold text-base shadow-sm shrink-0">
-                        🎨
+                        <Compass className="w-5 h-5 text-amber-300" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
@@ -3838,40 +3598,48 @@ function TacticsContent() {
                   </div>
 
                   {/* UKŁAD Z RYSUNKIEM Z BOKU (DOKŁADNIE JAK W TRENINGACH / NA WZORZE) */}
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-start pt-1">
-                    
-                    {/* LEWA STRONA (md:col-span-7): Opis, wytyczne i punkty kluczowe */}
-                    <div className="md:col-span-7 space-y-3">
-                      {tac.description && (
-                        <p className="text-xs text-slate-800 leading-relaxed bg-slate-50/90 p-3.5 rounded-2xl border border-slate-200/90 font-medium">
-                          {tac.description}
-                        </p>
-                      )}
+                  {(() => {
+                    const coachDirectives = (tac.directives || []).filter(
+                      dir => !/^[A-Za-zżźćńółęąśŻŹĆĄŚĘŁÓŃ\s]+\s*\([A-Z0-9ŚśŁł]+\)\s*:/i.test(dir)
+                    );
+                    const hasNotes = Boolean(tac.tacticalNotes && tac.tacticalNotes.trim());
+                    const hasLeftContent = Boolean(tac.description || coachDirectives.length > 0 || hasNotes);
 
-                      {/* Punkty kluczowe / Wytyczne trenera */}
-                      {(tac.tacticalNotes || (tac.directives && tac.directives.length > 0)) && (
-                        <div className="p-4 bg-amber-50/90 rounded-2xl border-l-4 border-l-amber-500 border border-amber-300/80 text-xs text-slate-900 leading-relaxed space-y-2.5 shadow-2xs">
-                          <div className="flex items-center gap-1.5 text-amber-950 font-black text-[11px] uppercase tracking-wider">
-                            <span>💡 Punkty kluczowe dla trenera / wykonania:</span>
+                    return (
+                      <div className={`grid grid-cols-1 ${hasLeftContent ? 'md:grid-cols-12' : 'max-w-xl mx-auto'} gap-5 items-start pt-1`}>
+                        {/* LEWA STRONA: Opis, wytyczne i punkty kluczowe */}
+                        {hasLeftContent && (
+                          <div className="md:col-span-7 space-y-3">
+                            {tac.description && (
+                              <p className="text-xs text-slate-800 leading-relaxed bg-slate-50/90 p-3.5 rounded-2xl border border-slate-200/90 font-medium">
+                                {tac.description}
+                              </p>
+                            )}
+
+                            {(coachDirectives.length > 0 || hasNotes) && (
+                              <div className="p-4 bg-amber-50/90 rounded-2xl border-l-4 border-l-amber-500 border border-amber-300/80 text-xs text-slate-900 leading-relaxed space-y-2.5 shadow-2xs">
+                                <div className="flex items-center gap-1.5 text-amber-950 font-black text-[11px] uppercase tracking-wider">
+                                  <span>💡 Punkty kluczowe dla trenera / wykonania:</span>
+                                </div>
+                                {coachDirectives.length > 0 && (
+                                  <ul className="list-disc list-inside space-y-1.5 text-slate-900 text-xs pl-1 font-medium">
+                                    {coachDirectives.map((dir, dIdx) => (
+                                      <li key={dIdx} className="leading-snug">{dir}</li>
+                                    ))}
+                                  </ul>
+                                )}
+                                {hasNotes && (
+                                  <p className={`text-slate-900 text-xs font-medium ${coachDirectives.length > 0 ? 'pt-2 border-t border-amber-200/80' : ''}`}>
+                                    {tac.tacticalNotes}
+                                  </p>
+                                )}
+                              </div>
+                            )}
                           </div>
-                          {tac.directives && tac.directives.length > 0 ? (
-                            <ul className="list-disc list-inside space-y-1.5 text-slate-900 text-xs pl-1 font-medium">
-                              {tac.directives.map((dir, dIdx) => (
-                                <li key={dIdx} className="leading-snug">{dir}</li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="text-slate-900 text-xs font-medium">{tac.tacticalNotes}</p>
-                          )}
-                          {tac.directives && tac.directives.length > 0 && tac.tacticalNotes && (
-                            <p className="text-slate-900 text-xs pt-2 border-t border-amber-200/80 font-medium">{tac.tacticalNotes}</p>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                        )}
 
-                    {/* PRAWA STRONA (md:col-span-5): Boisko siatkarskie z pozycjami i nałożonym rysunkiem */}
-                    <div className="md:col-span-5 flex flex-col gap-2">
+                        {/* PRAWA STRONA: Boisko siatkarskie z pozycjami i nałożonym rysunkiem */}
+                        <div className={`${hasLeftContent ? 'md:col-span-5' : 'w-full'} flex flex-col gap-2`}>
                       <div className="relative bg-slate-950 rounded-2xl border-2 border-slate-800 overflow-hidden group/draw shadow-md h-52 sm:h-56 w-full flex items-center justify-center p-2">
                         {/* Właściwe boisko siatkarskie (Wymiary zgodne z tablicą pionową) */}
                         <div className="relative h-full aspect-[9/13] bg-[#1e40af] border-2 border-white rounded-sm overflow-hidden shadow-md">
@@ -3930,7 +3698,8 @@ function TacticsContent() {
 
                         {/* Oznaczenie: Schemat & Rysunek */}
                         <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/75 backdrop-blur-xs text-[10px] text-sky-400 font-bold border border-sky-400/30 flex items-center gap-1 z-30">
-                          <span>🎨 Boisko & Rysunek</span>
+                          <Compass className="w-3 h-3 text-sky-400" />
+                          <span>Boisko & Rysunek</span>
                         </div>
 
                         {/* Przycisk otwarcia na pełnej tablicy taktycznej */}
@@ -3946,6 +3715,8 @@ function TacticsContent() {
                     </div>
 
                   </div>
+                    );
+                  })()}
                 </div>
               );
             })}
@@ -3967,7 +3738,13 @@ function TacticsContent() {
                       <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-base shadow-sm shrink-0 ${
                         isVideo ? 'bg-rose-50 text-rose-600 border border-rose-200' : mat.type === 'IMAGE' ? 'bg-sky-50 text-sky-600 border border-sky-200' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'
                       }`}>
-                        {isVideo ? '🎬' : mat.type === 'IMAGE' ? '📸' : '📄'}
+                        {isVideo ? (
+                          <Play className="w-5 h-5 text-rose-600 fill-rose-600" />
+                        ) : mat.type === 'IMAGE' ? (
+                          <ImageIcon className="w-5 h-5 text-sky-600" />
+                        ) : (
+                          <FileText className="w-5 h-5 text-emerald-600" />
+                        )}
                       </div>
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
@@ -4115,7 +3892,7 @@ function TacticsContent() {
               <div className="flex items-center gap-2">
                 <FolderArchive className="w-5 h-5 text-sky-600" />
                 <h3 className="text-base font-black uppercase text-slate-900">
-                  Wczytaj zapisany schemat ({tactics.length})
+                  Wczytaj zapisany schemat
                 </h3>
               </div>
               <button
@@ -4904,104 +4681,7 @@ function TacticsContent() {
         </div>
       )}
 
-      {/* Modal: Player Request Edit / Tactical Feedback to Coach */}
-      {showRequestEditModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg p-5 sm:p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200 text-slate-800">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">
-                  <MessageSquare className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black text-slate-900 uppercase tracking-tight font-athletic">
-                    Zgłoś Uwagę / Poproś o Edycję
-                  </h3>
-                  <p className="text-[11px] text-slate-500">
-                    Wyślij informację bezpośrednio do trenera prowadzącego taktykę.
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowRequestEditModal(false)}
-                className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
 
-            <form onSubmit={handleSendEditRequest} className="space-y-4">
-              <div>
-                <label className="block text-xs font-black uppercase text-slate-700 mb-2">
-                  Czego dotyczy Twoja wiadomość?
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { id: 'UWAGA_ROTACJA', label: '🎯 Sugestia do rotacji' },
-                    { id: 'UWAGA_BLOK', label: '🛡️ Sugestia do bloku' },
-                    { id: 'PROSBA_DOSTEP', label: '✋ Prośba o edycję' },
-                    { id: 'INNE', label: '💬 Inna uwaga' }
-                  ].map(cat => (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => setRequestEditType(cat.id as any)}
-                      className={`p-2.5 rounded-xl text-xs font-bold border text-left transition ${
-                        requestEditType === cat.id
-                          ? 'bg-amber-50 text-amber-900 border-amber-300 shadow-2xs font-black'
-                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                      }`}
-                    >
-                      {cat.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-black uppercase text-slate-700 mb-1">
-                  Treść uwagi lub prośby
-                </label>
-                <textarea
-                  rows={4}
-                  required
-                  value={requestEditText}
-                  onChange={e => setRequestEditText(e.target.value)}
-                  placeholder={
-                    requestEditType === 'PROSBA_DOSTEP'
-                      ? 'np. Trenerze, chciałbym rozpisać wariant asekuracji kiwki za blokiem, czy mogę dostać uprawnienia do edycji tej tablicy?'
-                      : requestEditType === 'UWAGA_ROTACJA'
-                      ? 'np. W ustawieniu P3 przy rotacji z mocną zagrywką przeciwnika lepiej, gdybym schodził głębiej do linii 7. metra...'
-                      : 'Wpisz treść swojej uwagi lub propozycji...'
-                  }
-                  className="w-full bg-white border border-slate-300 text-slate-900 rounded-xl p-3 text-xs placeholder:text-slate-400 focus:outline-none focus:border-amber-500 shadow-2xs"
-                />
-                <p className="text-[10px] text-slate-500 mt-1">
-                  💡 Wiadomość zostanie dodana do oficjalnego panelu dyskusji taktycznej tego spotkania.
-                </p>
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
-                <button
-                  type="button"
-                  onClick={() => setShowRequestEditModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-800"
-                >
-                  Anuluj
-                </button>
-                <button
-                  type="submit"
-                  disabled={submittingRequest || !requestEditText.trim()}
-                  className="px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm disabled:opacity-50"
-                >
-                  {submittingRequest ? 'Wysyłanie...' : 'Wyślij do Trenera'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
       {/* Modal: Dodaj notatkę / wytyczne do meczu */}
       {showAddNoteModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
