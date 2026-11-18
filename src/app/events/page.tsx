@@ -429,7 +429,34 @@ function EventsAttendanceContent() {
       }
 
       return true;
-    }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }).sort((a, b) => {
+      const timeA = new Date(a.date).getTime();
+      const timeB = new Date(b.date).getTime();
+      const now = Date.now() - 3600000 * 2; // 2 hour buffer for events in progress
+
+      if (filterTime === 'UPCOMING') {
+        // Nearest upcoming first
+        return timeA - timeB;
+      }
+      if (filterTime === 'PAST') {
+        // Most recent past first
+        return timeB - timeA;
+      }
+
+      // Default filterTime === 'ALL':
+      // Group upcoming events first in chronological order (nearest first),
+      // followed by past events in reverse chronological order (most recent first)
+      const isUpcomingA = timeA >= now;
+      const isUpcomingB = timeB >= now;
+
+      if (isUpcomingA && !isUpcomingB) return -1;
+      if (!isUpcomingA && isUpcomingB) return 1;
+
+      if (isUpcomingA && isUpcomingB) {
+        return timeA - timeB;
+      }
+      return timeB - timeA;
+    });
   }, [events, filterType, filterTime, searchQuery]);
 
   // Completed events for attendance stats
@@ -1202,9 +1229,23 @@ function EventsAttendanceContent() {
                                   {event.date.slice(11, 16)}
                                 </span>
                               </div>
-                              <h4 className="text-base font-black text-slate-900">
-                                {event.title} {event.opponent ? `• rywal: ${event.opponent}` : ''}
-                              </h4>
+                              {event.type === 'TRENING' ? (
+                                <Link
+                                  href={`/trening?eventId=${event.id}`}
+                                  className="group inline-flex items-center gap-1.5"
+                                  title="Otwórz konspekt i ćwiczenia treningu"
+                                >
+                                  <h4 className="text-base font-black text-slate-900 group-hover:text-emerald-700 transition flex items-center gap-1.5 underline decoration-emerald-400">
+                                    <Volleyball className="w-4 h-4 text-emerald-600 shrink-0" />
+                                    <span>{event.title}</span>
+                                    <ArrowRight className="w-3.5 h-3.5 text-emerald-600 group-hover:translate-x-0.5 transition" />
+                                  </h4>
+                                </Link>
+                              ) : (
+                                <h4 className="text-base font-black text-slate-900">
+                                  {event.title} {event.opponent ? `• rywal: ${event.opponent}` : ''}
+                                </h4>
+                              )}
                               {event.location && (
                                 <p className="text-xs text-slate-500 flex items-center gap-1.5">
                                   <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
@@ -1217,11 +1258,11 @@ function EventsAttendanceContent() {
                               {event.type === 'TRENING' ? (
                                 <Link
                                   href={`/trening?eventId=${event.id}`}
-                                  className="px-2.5 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-xs transition"
+                                  className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition"
                                   title="Otwórz konspekt i ćwiczenia treningu"
                                 >
                                   <Volleyball className="w-3.5 h-3.5" />
-                                  <span>Trening</span>
+                                  <span>Rozpiska treningu &rarr;</span>
                                 </Link>
                               ) : (
                                 <>
@@ -1587,9 +1628,24 @@ function EventsAttendanceContent() {
                             )}
                           </div>
 
-                          <h3 className={`text-base sm:text-lg font-black text-slate-900 ${theme.titleHover} transition truncate`}>
-                            {displayTitle}
-                          </h3>
+                          {event.type === 'TRENING' ? (
+                            <Link
+                              href={`/trening?eventId=${event.id}`}
+                              onClick={e => e.stopPropagation()}
+                              className="group/tlink inline-flex items-center gap-1.5 min-w-0 max-w-full"
+                              title="Kliknij, aby otworzyć konspekt ćwiczeń tego treningu"
+                            >
+                              <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover/tlink:text-emerald-700 transition truncate underline decoration-emerald-400 decoration-2 underline-offset-2 flex items-center gap-1.5">
+                                <Volleyball className="w-4 h-4 text-emerald-600 shrink-0" />
+                                <span className="truncate">{displayTitle}</span>
+                                <ArrowRight className="w-3.5 h-3.5 text-emerald-600 opacity-0 group-hover/tlink:opacity-100 group-hover/tlink:translate-x-0.5 transition shrink-0" />
+                              </h3>
+                            </Link>
+                          ) : (
+                            <h3 className={`text-base sm:text-lg font-black text-slate-900 ${theme.titleHover} transition truncate`}>
+                              {displayTitle}
+                            </h3>
+                          )}
 
                           <div className="flex items-center gap-3 text-xs text-slate-500 truncate">
                             <span className="flex items-center gap-1 truncate">
@@ -1628,11 +1684,11 @@ function EventsAttendanceContent() {
                           <Link
                             href={`/trening?eventId=${event.id}`}
                             onClick={e => e.stopPropagation()}
-                            className="h-8.5 px-2.5 sm:px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs transition shrink-0"
-                            title="Otwórz rozpiskę treningu"
+                            className="h-8.5 px-3 sm:px-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs hover:shadow transition shrink-0 cursor-pointer"
+                            title="Otwórz konspekt i ćwiczenia treningu"
                           >
                             <Volleyball className="w-3.5 h-3.5 shrink-0" />
-                            <span>Trening</span>
+                            <span>Rozpiska treningu &rarr;</span>
                           </Link>
                         ) : null}
 
@@ -1740,6 +1796,35 @@ function EventsAttendanceContent() {
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             </div>
+                          </div>
+                        )}
+
+                        {/* PROMINENT BANNER DLA TRENINGU: BEZPOŚREDNIE PRZEJŚCIE DO ROZPISKI */}
+                        {event.type === 'TRENING' && (
+                          <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-emerald-500/10 border border-emerald-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                                <Volleyball className="w-5 h-5" />
+                              </div>
+                              <div>
+                                <h4 className="text-xs font-black uppercase text-emerald-950 tracking-wider flex items-center gap-2">
+                                  <span>Konspekt Ćwiczeń & Warsztat Trenera</span>
+                                  <span className="px-2 py-0.2 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                    Rozpiska
+                                  </span>
+                                </h4>
+                                <p className="text-xs text-slate-600 mt-0.5">
+                                  Zobacz rozpisane ćwiczenia, rysunki na boisku, materiały PDF i wideo oraz cele tej jednostki.
+                                </p>
+                              </div>
+                            </div>
+                            <Link
+                              href={`/trening?eventId=${event.id}`}
+                              className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm hover:shadow transition shrink-0"
+                            >
+                              <span>Otwórz konspekt treningu</span>
+                              <ArrowRight className="w-4 h-4" />
+                            </Link>
                           </div>
                         )}
 

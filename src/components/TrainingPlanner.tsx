@@ -104,7 +104,7 @@ export function TrainingPlannerContent({
 
   // Filtry statusu rozpisania i czasu dla treningów klubowych
   const [trainingStatusFilter, setTrainingStatusFilter] = useState<'ALL' | 'PLANNED' | 'UNPLANNED'>('ALL');
-  const [trainingTimeFilter, setTrainingTimeFilter] = useState<'UPCOMING' | 'ALL' | 'PAST'>('UPCOMING');
+  const [trainingTimeFilter, setTrainingTimeFilter] = useState<'UPCOMING' | 'ALL' | 'PAST'>('ALL');
 
   useEffect(() => {
     if (fixedEventType) {
@@ -125,6 +125,8 @@ export function TrainingPlannerContent({
   useEffect(() => {
     if (queryEventId) {
       setSelectedEventId(queryEventId);
+      setTrainingTimeFilter('ALL');
+      setTrainingStatusFilter('ALL');
       const timer = setTimeout(() => {
         const el = document.getElementById(`planner-event-${queryEventId}`);
         if (el) {
@@ -843,7 +845,22 @@ export function TrainingPlannerContent({
       }
     }
 
-    return list;
+    return [...list].sort((a, b) => {
+      const timeA = new Date(a.date).getTime();
+      const timeB = new Date(b.date).getTime();
+      const todayTime = new Date().setHours(0, 0, 0, 0);
+
+      const isUpcomingA = timeA >= todayTime;
+      const isUpcomingB = timeB >= todayTime;
+
+      if (isUpcomingA && !isUpcomingB) return -1;
+      if (!isUpcomingA && isUpcomingB) return 1;
+
+      if (isUpcomingA && isUpcomingB) {
+        return timeA - timeB; // Chronological ascending for upcoming: today first!
+      }
+      return timeB - timeA; // Reverse chronological for past
+    });
   }, [baseTypeEvents, mode, fixedEventType, trainingTimeFilter, trainingStatusFilter, plans]);
 
   const trainingsCount = useMemo(() => events.filter(e => e.type === 'TRENING').length, [events]);
@@ -1112,24 +1129,37 @@ export function TrainingPlannerContent({
                   </button>
                 </div>
               ) : (mode === 'TRAININGS' || fixedEventType === 'TRENING') ? (
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-                  {/* Filtry statusu rozpisania konspektu */}
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                  {/* Spójny pasek filtrów treningów */}
                   <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto scrollbar-none w-full sm:w-auto">
                     <button
                       type="button"
-                      onClick={() => setTrainingStatusFilter('ALL')}
+                      onClick={() => { setTrainingStatusFilter('ALL'); setTrainingTimeFilter('ALL'); }}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
-                        trainingStatusFilter === 'ALL'
-                          ? 'bg-emerald-600 text-white shadow-xs'
+                        trainingStatusFilter === 'ALL' && trainingTimeFilter === 'ALL'
+                          ? 'bg-emerald-600 text-white shadow-xs font-black'
                           : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                       }`}
                     >
+                      <Volleyball className="w-3.5 h-3.5" />
                       <span>Wszystkie treningi</span>
                       <span className="font-mono text-[10px] opacity-80 font-black">({allTrainingsCount})</span>
                     </button>
                     <button
                       type="button"
-                      onClick={() => setTrainingStatusFilter('UNPLANNED')}
+                      onClick={() => { setTrainingStatusFilter('ALL'); setTrainingTimeFilter('UPCOMING'); }}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
+                        trainingStatusFilter === 'ALL' && trainingTimeFilter === 'UPCOMING'
+                          ? 'bg-emerald-600 text-white shadow-xs font-black'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                      }`}
+                    >
+                      <Calendar className="w-3.5 h-3.5" />
+                      <span>Nadchodzące</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setTrainingStatusFilter('UNPLANNED'); setTrainingTimeFilter('ALL'); }}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
                         trainingStatusFilter === 'UNPLANNED'
                           ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
@@ -1141,56 +1171,16 @@ export function TrainingPlannerContent({
                     </button>
                     <button
                       type="button"
-                      onClick={() => setTrainingStatusFilter('PLANNED')}
+                      onClick={() => { setTrainingStatusFilter('PLANNED'); setTrainingTimeFilter('ALL'); }}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
                         trainingStatusFilter === 'PLANNED'
-                          ? 'bg-emerald-700 text-white shadow-xs'
+                          ? 'bg-emerald-700 text-white shadow-xs font-black'
                           : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                       }`}
                     >
                       <span>✓ Rozpisane konspekty</span>
                       <span className="font-mono text-[10px] opacity-80 font-black">({plannedTrainingsCount})</span>
                     </button>
-                  </div>
-
-                  {/* Filtr horyzontu czasowego (Nadchodzące / Wszystkie / Przeszłe) */}
-                  <div className="flex items-center gap-1.5 text-xs self-start sm:self-auto shrink-0">
-                    <span className="text-[11px] font-black uppercase text-slate-400 tracking-wider">Zakres:</span>
-                    <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-xl border border-slate-200">
-                      <button
-                        type="button"
-                        onClick={() => setTrainingTimeFilter('UPCOMING')}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
-                          trainingTimeFilter === 'UPCOMING'
-                            ? 'bg-white text-slate-900 shadow-2xs'
-                            : 'text-slate-500 hover:text-slate-900'
-                        }`}
-                      >
-                        Nadchodzące
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setTrainingTimeFilter('ALL')}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
-                          trainingTimeFilter === 'ALL'
-                            ? 'bg-white text-slate-900 shadow-2xs'
-                            : 'text-slate-500 hover:text-slate-900'
-                        }`}
-                      >
-                        Wszystkie
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setTrainingTimeFilter('PAST')}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
-                          trainingTimeFilter === 'PAST'
-                            ? 'bg-white text-slate-900 shadow-2xs'
-                            : 'text-slate-500 hover:text-slate-900'
-                        }`}
-                      >
-                        Przeszłe
-                      </button>
-                    </div>
                   </div>
                 </div>
               ) : null
@@ -1419,14 +1409,14 @@ export function TrainingPlannerContent({
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                        activeEvent?.type === 'SPARING' ? 'bg-amber-500 text-slate-950 font-bold' :
-                        activeEvent?.type === 'MECZ' ? 'bg-indigo-600 text-white' :
-                        'bg-sky-600 text-white'
+                        activeEvent?.type === 'SPARING' ? 'bg-amber-100 text-amber-900 border border-amber-300' :
+                        activeEvent?.type === 'MECZ' ? 'bg-indigo-100 text-indigo-900 border border-indigo-300' :
+                        'bg-emerald-100 text-emerald-900 border border-emerald-300'
                       }`}>
                         {activeEvent?.type === 'SPARING' ? 'Założenia Sparingowe' : activeEvent?.type === 'MECZ' ? 'Plan Meczowy LALS' : 'Plan Treningowy'}
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-sky-800 border border-slate-200 flex items-center gap-1">
-                        <Calendar className="w-3 h-3 text-sky-600" />
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-800 border border-slate-200 flex items-center gap-1">
+                        <Calendar className="w-3 h-3 text-emerald-600" />
                         {new Date(activePlan.date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' })}
                       </span>
                       <span className="px-2 py-0.5 rounded text-[10px] font-mono text-slate-700 bg-slate-100 border border-slate-200 flex items-center gap-1 font-bold">
@@ -1455,7 +1445,7 @@ export function TrainingPlannerContent({
                     {activeEvent && (
                       <Link
                         href={`/taktyka?tab=board&eventId=${activeEvent.id}`}
-                        className="px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold text-xs transition flex items-center gap-1.5 shadow-xs"
+                        className="px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
                         title="Otwórz tablicę taktyczną i rozrysuj ustawienie na to spotkanie"
                       >
                         <Compass className="w-3.5 h-3.5 text-sky-600" />
@@ -1466,7 +1456,7 @@ export function TrainingPlannerContent({
                     {canManage && (
                       <button
                         onClick={() => handleOpenExerciseModal()}
-                        className="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs transition flex items-center gap-1.5 shadow-sm"
+                        className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition flex items-center gap-1.5 shadow-sm"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Dodaj Ćwiczenie / Założenie</span>
@@ -1478,7 +1468,7 @@ export function TrainingPlannerContent({
                 {/* Main Goals & Equipment */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-100 text-xs">
                   <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-sky-700">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800">
                       🎯 Główny cel jednostki:
                     </span>
                     <p className="text-slate-900 font-bold leading-snug">
@@ -1494,7 +1484,7 @@ export function TrainingPlannerContent({
                   </div>
 
                   <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-amber-400">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-amber-800">
                       📦 Sprzęt & Założenia organizacyjne:
                     </span>
                     <p className="text-slate-700 text-xs">
@@ -1515,7 +1505,7 @@ export function TrainingPlannerContent({
                   onClick={() => setActiveTab('EXERCISES')}
                   className={`shrink-0 whitespace-nowrap flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                     activeTab === 'EXERCISES'
-                      ? 'bg-sky-600 text-white shadow-sm'
+                      ? 'bg-emerald-600 text-white shadow-sm'
                       : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
                   }`}
                 >
@@ -1527,7 +1517,7 @@ export function TrainingPlannerContent({
                   onClick={() => setActiveTab('MATERIALS')}
                   className={`shrink-0 whitespace-nowrap flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                     activeTab === 'MATERIALS'
-                      ? 'bg-sky-600 text-white shadow-sm'
+                      ? 'bg-emerald-600 text-white shadow-sm'
                       : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
                   }`}
                 >
@@ -1539,7 +1529,7 @@ export function TrainingPlannerContent({
                   onClick={() => setActiveTab('CONCLUSIONS')}
                   className={`shrink-0 whitespace-nowrap flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                     activeTab === 'CONCLUSIONS'
-                      ? 'bg-sky-600 text-white shadow-sm'
+                      ? 'bg-emerald-600 text-white shadow-sm'
                       : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
                   }`}
                 >
@@ -1551,7 +1541,7 @@ export function TrainingPlannerContent({
                   onClick={() => setActiveTab('COMMENTS')}
                   className={`shrink-0 whitespace-nowrap flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
                     activeTab === 'COMMENTS'
-                      ? 'bg-sky-600 text-white shadow-sm'
+                      ? 'bg-emerald-600 text-white shadow-sm'
                       : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
                   }`}
                 >
@@ -1565,14 +1555,14 @@ export function TrainingPlannerContent({
                 <div className="space-y-4">
                   {(!activePlan.exercises || activePlan.exercises.length === 0) ? (
                     <div className="text-center py-10 px-4 bg-slate-50 rounded-3xl border border-dashed border-slate-200 space-y-3">
-                      <Volleyball className="w-8 h-8 text-sky-400/60 mx-auto" />
-                      <p className="text-xs font-bold text-slate-600">
+                      <Volleyball className="w-8 h-8 text-emerald-500 mx-auto" />
+                      <p className="text-xs font-bold text-slate-700">
                         Brak rozpisanych ćwiczeń w tym treningu.
                       </p>
                       {canManage && (
                         <button
                           onClick={() => handleOpenExerciseModal()}
-                          className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs transition"
+                          className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition shadow-sm"
                         >
                           + Dodaj pierwsze ćwiczenie
                         </button>
@@ -1583,7 +1573,7 @@ export function TrainingPlannerContent({
                       {activePlan.exercises.map((ex, idx) => (
                         <div
                           key={ex.id}
-                          className={`p-4 sm:p-5 rounded-3xl bg-white border border-slate-300 shadow-md hover:shadow-lg space-y-3 transition ${
+                          className={`p-4 sm:p-5 rounded-3xl bg-white border border-slate-200 shadow-sm hover:shadow-md space-y-3 transition ${
                             ex.category === 'ROZGRZEWKA' ? 'border-t-4 border-t-amber-500' :
                             ex.category === 'TAKTYKA' ? 'border-t-4 border-t-sky-500' :
                             ex.category === 'GRA' ? 'border-t-4 border-t-purple-500' :
@@ -1592,14 +1582,14 @@ export function TrainingPlannerContent({
                         >
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-200">
                             <div className="flex items-center gap-2.5 flex-wrap">
-                              <span className="w-6 h-6 rounded-full bg-sky-500/20 text-sky-400 font-mono font-black text-xs flex items-center justify-center border border-sky-200">
+                              <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-mono font-black text-xs flex items-center justify-center border border-emerald-300">
                                 {idx + 1}
                               </span>
-                              <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
-                                ex.category === 'ROZGRZEWKA' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
-                                ex.category === 'TAKTYKA' ? 'bg-sky-500/20 text-sky-300 border border-sky-200' :
-                                ex.category === 'GRA' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
-                                'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                              <span className={`px-2.5 py-0.5 rounded text-[10px] font-black uppercase border ${
+                                ex.category === 'ROZGRZEWKA' ? 'bg-amber-50 text-amber-900 border-amber-300' :
+                                ex.category === 'TAKTYKA' ? 'bg-sky-50 text-sky-900 border-sky-300' :
+                                ex.category === 'GRA' ? 'bg-purple-50 text-purple-900 border-purple-300' :
+                                'bg-emerald-50 text-emerald-900 border-emerald-300'
                               }`}>
                                 {ex.category}
                               </span>
@@ -1609,7 +1599,7 @@ export function TrainingPlannerContent({
                             </div>
 
                             <div className="flex items-center gap-2">
-                              <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-mono text-xs font-bold">
+                              <span className="px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700 font-mono text-xs font-bold border border-slate-200">
                                 ⏱ {ex.durationMinutes} min
                               </span>
 
@@ -1617,14 +1607,14 @@ export function TrainingPlannerContent({
                                 <div className="flex items-center gap-1">
                                   <button
                                     onClick={() => handleOpenExerciseModal(ex)}
-                                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-700 text-slate-600 transition"
+                                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
                                     title="Edytuj ćwiczenie"
                                   >
                                     <Edit3 className="w-3.5 h-3.5" />
                                   </button>
                                   <button
                                     onClick={() => handleDeleteExercise(ex.id)}
-                                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 transition"
+                                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-500 hover:text-rose-700 transition"
                                     title="Usuń ćwiczenie"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
@@ -1642,11 +1632,11 @@ export function TrainingPlannerContent({
                               </p>
 
                               {ex.keyPoints && ex.keyPoints.length > 0 && (
-                                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
-                                  <span className="text-[10px] font-black uppercase text-amber-400 tracking-wider">
+                                <div className="p-3 rounded-xl bg-amber-50/60 border border-amber-200 space-y-1">
+                                  <span className="text-[10px] font-black uppercase text-amber-800 tracking-wider">
                                     💡 Punkty kluczowe dla trenera / wykonania:
                                   </span>
-                                  <ul className="text-xs text-slate-600 space-y-1 list-disc list-inside">
+                                  <ul className="text-xs text-slate-700 space-y-1 list-disc list-inside">
                                     {ex.keyPoints.map((kp, kIdx) => (
                                       <li key={kIdx}>{kp}</li>
                                     ))}
@@ -1660,10 +1650,10 @@ export function TrainingPlannerContent({
                                     href={ex.videoUrl}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-bold transition"
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-300 text-xs font-bold transition shadow-2xs"
                                   >
-                                    <Play className="w-3.5 h-3.5 fill-rose-400" />
-                                    <span>Zobacz wideo instruktażowe ({ex.videoUrl})</span>
+                                    <Play className="w-3.5 h-3.5 fill-rose-600 text-rose-600" />
+                                    <span>Zobacz wideo instruktażowe</span>
                                   </a>
                                 </div>
                               )}
@@ -1672,18 +1662,18 @@ export function TrainingPlannerContent({
                             {/* Media Visual: Court Drawing or Graphics */}
                             <div className="md:col-span-5 flex flex-col gap-2">
                               {ex.courtDrawing ? (
-                                <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 p-1 group relative">
+                                <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 p-1 group relative shadow-2xs">
                                   <img
                                     src={ex.courtDrawing}
                                     alt="Rozrysowanie ćwiczenia"
                                     className="w-full h-44 object-contain rounded-xl"
                                   />
-                                  <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/60 backdrop-blur text-[10px] text-sky-400 font-bold border border-sky-400/30">
-                                    Rysunek na boisku
+                                  <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/60 backdrop-blur text-[10px] text-white font-bold border border-white/20">
+                                    Rysunek boiska
                                   </div>
                                 </div>
                               ) : ex.imageUrl ? (
-                                <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 p-1 relative">
+                                <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 p-1 relative shadow-2xs">
                                   <img
                                     src={ex.imageUrl}
                                     alt="Grafika ćwiczenia"
@@ -1691,7 +1681,7 @@ export function TrainingPlannerContent({
                                   />
                                 </div>
                               ) : (
-                                <div className="h-28 rounded-2xl bg-slate-100/30 border border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-500 text-xs p-3 text-center">
+                                <div className="h-28 rounded-2xl bg-slate-50 border border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-500 text-xs p-3 text-center">
                                   <span>Brak rysunku boiska lub grafiki</span>
                                   {canManage && (
                                     <button
@@ -1699,7 +1689,7 @@ export function TrainingPlannerContent({
                                         handleOpenExerciseModal(ex);
                                         setIsDrawingMode(true);
                                       }}
-                                      className="mt-1 text-[11px] text-sky-400 hover:underline font-bold"
+                                      className="mt-1 text-[11px] text-emerald-700 hover:underline font-bold"
                                     >
                                       + Rozrysuj na tablicy
                                     </button>
