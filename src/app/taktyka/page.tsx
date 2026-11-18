@@ -337,6 +337,7 @@ function TacticsContent() {
   const [positions, setPositions] = useState<CourtPlayerPosition[]>(ROTATION_DEFAULTS.P1.PRZYJECIE);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const selectedPlayer = positions.find(p => p.id === selectedPlayerId);
+  const hasLibero = useMemo(() => positions.some(p => p.roleCode === 'L'), [positions]);
   const [draggingId, setDraggingId] = useState<string | null>(null);
 
   // Volleyball Ball marker on court
@@ -992,6 +993,69 @@ function TacticsContent() {
           ? { ...p, name: `${member.name} (${roleCode})`, number: member.number || p.number }
           : p
       )
+    );
+  };
+
+  // Przełączanie pozycji na tablicy: Libero (L) ⇄ Środkowy (Ś)
+  const handleToggleLiberoMiddle = () => {
+    setPositions(prev => {
+      const hasL = prev.some(p => p.roleCode === 'L');
+      if (hasL) {
+        // Zamień Libero (L) na Środkowego (Ś)
+        return prev.map(p => {
+          if (p.roleCode === 'L') {
+            const hasS1 = prev.some(item => item.roleCode === 'Ś1' || item.roleCode === 'Ś');
+            const newRole = hasS1 ? 'Ś2' : 'Ś';
+            return {
+              ...p,
+              roleCode: newRole,
+              name: `Środkowy (${newRole})`,
+              task: p.task ? p.task.replace(/Libero/gi, 'Środkowy') : 'Środkowy w II linii'
+            };
+          }
+          return p;
+        });
+      } else {
+        // Zamień Środkowego w II linii (strefy 1, 6, 5 lub Ś2 / Ś) na Libero (L)
+        const target = prev.find(p => p.roleCode === 'Ś2' || p.roleCode === 'Ś' || ((p.roleCode === 'Ś1' || p.roleCode.startsWith('Ś')) && [1, 6, 5].includes(p.zone)));
+        const targetId = target?.id || prev.find(p => p.roleCode.startsWith('Ś'))?.id;
+        if (!targetId) return prev;
+        return prev.map(p => {
+          if (p.id === targetId) {
+            return {
+              ...p,
+              roleCode: 'L',
+              name: 'Libero (L)',
+              task: p.task ? p.task.replace(/Środkowy/gi, 'Libero') : 'Libero w II linii'
+            };
+          }
+          return p;
+        });
+      }
+    });
+  };
+
+  // Zmiana roli konkretnego gracza na boisku (np. bezpośrednio po kliknięciu znacznika gracza)
+  const handleSetPlayerRole = (playerId: string, newRole: string) => {
+    setPositions(prev =>
+      prev.map(p => {
+        if (p.id !== playerId) return p;
+        const isNowLibero = newRole === 'L';
+        const newName = isNowLibero
+          ? 'Libero (L)'
+          : newRole === 'Ś' || newRole === 'Ś2' || newRole === 'Ś1'
+          ? `Środkowy (${newRole})`
+          : `${newRole}`;
+        const newTask = isNowLibero
+          ? (p.task?.replace(/Środkowy/gi, 'Libero') || 'Libero w II linii')
+          : (p.task?.replace(/Libero/gi, 'Środkowy') || 'Środkowy w II linii');
+        return {
+          ...p,
+          roleCode: newRole,
+          name: newName,
+          task: newTask
+        };
+      })
     );
   };
 
@@ -2862,7 +2926,7 @@ function TacticsContent() {
                   <span className="hidden sm:inline">Reset</span>
                 </button>
 
-                {/* Na telefonie: Piłka i Rywale w jednym rzędzie z Przesuń i Reset */}
+                {/* Na telefonie: Piłka, Rywale i L/Ś w jednym rzędzie z Przesuń i Reset */}
                 <div className="flex sm:hidden items-center gap-1">
                   <button
                     onClick={() => setShowBall(!showBall)}
@@ -2888,6 +2952,24 @@ function TacticsContent() {
                   >
                     <Users className="w-3.5 h-3.5" />
                     <span>Rywale</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleToggleLiberoMiddle}
+                    className={`h-7 px-2 rounded-lg border text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
+                      hasLibero
+                        ? 'bg-amber-50 text-amber-900 border-amber-300'
+                        : 'bg-sky-50 text-sky-900 border-sky-300'
+                    }`}
+                    title="Przełącz pozycję: Libero (L) ⇄ Środkowy (Ś)"
+                  >
+                    <span className={`w-3.5 h-3.5 rounded-full flex items-center justify-center font-black text-[9px] ${
+                      hasLibero ? 'bg-amber-500 text-slate-950' : 'bg-sky-600 text-white'
+                    }`}>
+                      {hasLibero ? 'L' : 'Ś'}
+                    </span>
+                    <span>{hasLibero ? 'L' : 'Ś'}</span>
                   </button>
                 </div>
               </div>
@@ -2969,6 +3051,25 @@ function TacticsContent() {
                 >
                   <Volleyball className="w-3.5 h-3.5" />
                   <span>Piłka</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleToggleLiberoMiddle}
+                  className={`px-2.5 py-1 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs ${
+                    hasLibero
+                      ? 'bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100'
+                      : 'bg-sky-50 text-sky-900 border-sky-300 hover:bg-sky-100'
+                  }`}
+                  title="Przełącz pozycję na boisku: Libero (L) ⇄ Środkowy (Ś)"
+                >
+                  <span className={`w-4 h-4 rounded-full flex items-center justify-center font-black text-[10px] ${
+                    hasLibero ? 'bg-amber-500 text-slate-950' : 'bg-sky-600 text-white'
+                  }`}>
+                    {hasLibero ? 'L' : 'Ś'}
+                  </span>
+                  <span>{hasLibero ? 'Libero (L)' : 'Środkowy (Ś)'}</span>
+                  <span className="text-[10px] opacity-70 font-normal hidden lg:inline">⇄ {hasLibero ? 'Wstaw Ś' : 'Wstaw L'}</span>
                 </button>
 
                 <div className="hidden sm:inline-flex items-center p-0.5 bg-white rounded-xl border border-slate-300 shadow-2xs">
@@ -3265,6 +3366,56 @@ function TacticsContent() {
                   >
                     {player.number ? `#${player.number}` : player.roleCode}
                   </div>
+
+                  {/* Szybkie menu akcji dla wybranego zawodnika: zmiana L ⇄ Ś */}
+                  {isSelected && (
+                    <div
+                      onClick={e => e.stopPropagation()}
+                      className="absolute -top-10 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 backdrop-blur-sm text-white px-2 py-1 rounded-xl shadow-xl flex items-center gap-1.5 whitespace-nowrap border border-slate-700 animate-in fade-in zoom-in-95 duration-150"
+                    >
+                      <span className="text-[10px] font-black text-slate-300 font-mono">
+                        {player.roleCode}
+                      </span>
+                      {isLibero ? (
+                        <button
+                          type="button"
+                          onClick={() => handleSetPlayerRole(player.id, 'Ś')}
+                          className="px-2 py-0.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-[10px] transition shadow-xs flex items-center gap-1 cursor-pointer"
+                          title="Wstaw Środkowego (Ś) zamiast Libero (L)"
+                        >
+                          <span>Wstaw Ś</span>
+                        </button>
+                      ) : player.roleCode.startsWith('Ś') ? (
+                        <button
+                          type="button"
+                          onClick={() => handleSetPlayerRole(player.id, 'L')}
+                          className="px-2 py-0.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-[10px] transition shadow-xs flex items-center gap-1 cursor-pointer"
+                          title="Wstaw Libero (L) zamiast Środkowego (Ś)"
+                        >
+                          <span>Wstaw L</span>
+                        </button>
+                      ) : (
+                        <div className="flex items-center gap-0.5">
+                          <button
+                            type="button"
+                            onClick={() => handleSetPlayerRole(player.id, 'Ś')}
+                            className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-sky-600 text-white text-[10px] font-black transition cursor-pointer"
+                            title="Zmień na Środkowego (Ś)"
+                          >
+                            Ś
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleSetPlayerRole(player.id, 'L')}
+                            className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-white text-[10px] font-black transition cursor-pointer"
+                            title="Zmień na Libero (L)"
+                          >
+                            L
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}
