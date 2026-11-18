@@ -1741,8 +1741,7 @@
       "courtPositions": [
         {
           "id": "p1_r",
-          "name": "Kamil (R)",
-          "number": 4,
+          "name": "Rozgrywający (R)",
           "roleCode": "R",
           "zone": 1,
           "x": 86,
@@ -1751,8 +1750,7 @@
         },
         {
           "id": "p1_p1",
-          "name": "Tomasz (P1)",
-          "number": 1,
+          "name": "Przyjmujący 1 (P1)",
           "roleCode": "P1",
           "zone": 2,
           "x": 76,
@@ -1761,8 +1759,7 @@
         },
         {
           "id": "p1_s1",
-          "name": "Maciek (Ś1)",
-          "number": 47,
+          "name": "Środkowy 1 (Ś1)",
           "roleCode": "Ś1",
           "zone": 3,
           "x": 50,
@@ -1771,8 +1768,7 @@
         },
         {
           "id": "p1_a",
-          "name": "Łukasz (A)",
-          "number": 17,
+          "name": "Atakujący (A)",
           "roleCode": "A",
           "zone": 4,
           "x": 18,
@@ -1781,8 +1777,7 @@
         },
         {
           "id": "p1_p2",
-          "name": "Michał (P2)",
-          "number": 8,
+          "name": "Przyjmujący 2 (P2)",
           "roleCode": "P2",
           "zone": 5,
           "x": 24,
@@ -1791,8 +1786,7 @@
         },
         {
           "id": "p1_l",
-          "name": "Tomasz (L)",
-          "number": 5,
+          "name": "Libero (L)",
           "roleCode": "L",
           "zone": 6,
           "x": 50,
@@ -1820,8 +1814,7 @@
       "courtPositions": [
         {
           "id": "p1_r",
-          "name": "Kamil (R)",
-          "number": 4,
+          "name": "Rozgrywający (R)",
           "roleCode": "R",
           "zone": 1,
           "x": 86,
@@ -1830,8 +1823,7 @@
         },
         {
           "id": "p1_p1",
-          "name": "Tomasz (P1)",
-          "number": 1,
+          "name": "Przyjmujący 1 (P1)",
           "roleCode": "P1",
           "zone": 2,
           "x": 76,
@@ -1840,8 +1832,7 @@
         },
         {
           "id": "p1_s1",
-          "name": "Maciek (Ś1)",
-          "number": 47,
+          "name": "Środkowy 1 (Ś1)",
           "roleCode": "Ś1",
           "zone": 3,
           "x": 50,
@@ -1850,8 +1841,7 @@
         },
         {
           "id": "p1_a",
-          "name": "Łukasz (A)",
-          "number": 17,
+          "name": "Atakujący (A)",
           "roleCode": "A",
           "zone": 4,
           "x": 18,
@@ -1860,8 +1850,7 @@
         },
         {
           "id": "p1_p2",
-          "name": "Michał (P2)",
-          "number": 8,
+          "name": "Przyjmujący 2 (P2)",
           "roleCode": "P2",
           "zone": 5,
           "x": 24,
@@ -1870,8 +1859,7 @@
         },
         {
           "id": "p1_l",
-          "name": "Tomasz (L)",
-          "number": 5,
+          "name": "Libero (L)",
           "roleCode": "L",
           "zone": 6,
           "x": 50,
@@ -1899,8 +1887,7 @@
       "courtPositions": [
         {
           "id": "p1_r",
-          "name": "Kamil Pujanek (R)",
-          "number": 4,
+          "name": "Rozgrywający (R)",
           "roleCode": "R",
           "zone": 1,
           "x": 82,
@@ -1909,8 +1896,7 @@
         },
         {
           "id": "p1_p1",
-          "name": "Łukasz Kremer (P1)",
-          "number": 17,
+          "name": "Przyjmujący 1 (P1)",
           "roleCode": "P1",
           "zone": 2,
           "x": 76,
@@ -1919,8 +1905,7 @@
         },
         {
           "id": "p1_s1",
-          "name": "Michał Śmigiel (Ś1)",
-          "number": 8,
+          "name": "Środkowy 1 (Ś1)",
           "roleCode": "Ś1",
           "zone": 3,
           "x": 50,
@@ -1929,8 +1914,7 @@
         },
         {
           "id": "p1_a",
-          "name": "Karol Ordon (A)",
-          "number": 28,
+          "name": "Atakujący (A)",
           "roleCode": "A",
           "zone": 4,
           "x": 18,
@@ -1939,8 +1923,7 @@
         },
         {
           "id": "p1_p2",
-          "name": "Tomasz Krupa (P2)",
-          "number": 1,
+          "name": "Przyjmujący 2 (P2)",
           "roleCode": "P2",
           "zone": 5,
           "x": 24,
@@ -1949,8 +1932,7 @@
         },
         {
           "id": "p1_l",
-          "name": "Tomasz Żądło (L)",
-          "number": 5,
+          "name": "Libero (L)",
           "roleCode": "L",
           "zone": 6,
           "x": 50,
@@ -3024,8 +3006,7 @@
             "courtPositions": [
               {
                 "id": "p1_r",
-                "name": "Karol (R)",
-                "number": 28,
+                "name": "Rozgrywający (R)",
                 "roleCode": "R",
                 "zone": 1,
                 "x": 80,
@@ -3034,8 +3015,7 @@
               },
               {
                 "id": "p1_p1",
-                "name": "Michał (P1)",
-                "number": 8,
+                "name": "Przyjmujący 1 (P1)",
                 "roleCode": "P1",
                 "zone": 2,
                 "x": 78,
@@ -3044,8 +3024,7 @@
               },
               {
                 "id": "p1_s1",
-                "name": "Maciek (Ś1)",
-                "number": 47,
+                "name": "Środkowy 1 (Ś1)",
                 "roleCode": "Ś1",
                 "zone": 3,
                 "x": 50,
@@ -3054,8 +3033,7 @@
               },
               {
                 "id": "p1_a",
-                "name": "Łukasz (A)",
-                "number": 17,
+                "name": "Atakujący (A)",
                 "roleCode": "A",
                 "zone": 4,
                 "x": 18,
@@ -3064,8 +3042,7 @@
               },
               {
                 "id": "p1_p2",
-                "name": "Jan (P2)",
-                "number": 7,
+                "name": "Przyjmujący 2 (P2)",
                 "roleCode": "P2",
                 "zone": 5,
                 "x": 24,
@@ -3074,8 +3051,7 @@
               },
               {
                 "id": "p1_l",
-                "name": "Bartosz (L)",
-                "number": 97,
+                "name": "Libero (L)",
                 "roleCode": "L",
                 "zone": 6,
                 "x": 50,
@@ -3086,8 +3062,8 @@
             "directives": [
               "Karol (R): Zagrywka taktyczna w strefę 1 lub 5",
               "Michał (P1): Blok prawy",
-              "Maciek (Ś1): Blok środkowy",
-              "Łukasz (A): Blok lewy",
+              "Środkowy 1 (Ś1): Blok środkowy",
+              "Atakujący (A): Blok lewy",
               "Jan (P2): Obrona skosu",
               "Bartosz (L): Obrona środka"
             ],
@@ -3107,8 +3083,7 @@
             "courtPositions": [
               {
                 "id": "p1_r",
-                "name": "Karol (R)",
-                "number": 28,
+                "name": "Rozgrywający (R)",
                 "roleCode": "R",
                 "zone": 1,
                 "x": 80,
@@ -3117,8 +3092,7 @@
               },
               {
                 "id": "p1_p1",
-                "name": "Michał (P1)",
-                "number": 8,
+                "name": "Przyjmujący 1 (P1)",
                 "roleCode": "P1",
                 "zone": 2,
                 "x": 78,
@@ -3127,8 +3101,7 @@
               },
               {
                 "id": "p1_s1",
-                "name": "Maciek (Ś1)",
-                "number": 47,
+                "name": "Środkowy 1 (Ś1)",
                 "roleCode": "Ś1",
                 "zone": 3,
                 "x": 50,
@@ -3137,8 +3110,7 @@
               },
               {
                 "id": "p1_a",
-                "name": "Łukasz (A)",
-                "number": 17,
+                "name": "Atakujący (A)",
                 "roleCode": "A",
                 "zone": 4,
                 "x": 18,
@@ -3147,8 +3119,7 @@
               },
               {
                 "id": "p1_p2",
-                "name": "Jan (P2)",
-                "number": 7,
+                "name": "Przyjmujący 2 (P2)",
                 "roleCode": "P2",
                 "zone": 5,
                 "x": 24,
@@ -3157,8 +3128,7 @@
               },
               {
                 "id": "p1_l",
-                "name": "Bartosz (L)",
-                "number": 97,
+                "name": "Libero (L)",
                 "roleCode": "L",
                 "zone": 6,
                 "x": 50,
@@ -3169,8 +3139,8 @@
             "directives": [
               "Karol (R): Zagrywka taktyczna w strefę 1 lub 5",
               "Michał (P1): Blok prawy",
-              "Maciek (Ś1): Blok środkowy",
-              "Łukasz (A): Blok lewy",
+              "Środkowy 1 (Ś1): Blok środkowy",
+              "Atakujący (A): Blok lewy",
               "Jan (P2): Obrona skosu",
               "Bartosz (L): Obrona środka"
             ],
@@ -3191,8 +3161,7 @@
             "courtPositions": [
               {
                 "id": "pos_1",
-                "name": "Tomasz (R)",
-                "number": 1,
+                "name": "Rozgrywający (R)",
                 "roleCode": "R",
                 "x": 80,
                 "y": 82,
@@ -3201,8 +3170,7 @@
               },
               {
                 "id": "pos_2",
-                "name": "Kamil (P1)",
-                "number": 2,
+                "name": "Przyjmujący 1 (P1)",
                 "roleCode": "P1",
                 "x": 25,
                 "y": 55,
@@ -3211,8 +3179,7 @@
               },
               {
                 "id": "pos_3",
-                "name": "Środkowy (Ś1)",
-                "number": 3,
+                "name": "Środkowy 1 (Ś1)",
                 "roleCode": "Ś1",
                 "x": 50,
                 "y": 53,
@@ -3222,7 +3189,6 @@
               {
                 "id": "pos_4",
                 "name": "Atakujący (A)",
-                "number": 4,
                 "roleCode": "A",
                 "x": 80,
                 "y": 55,
@@ -3231,8 +3197,7 @@
               },
               {
                 "id": "pos_5",
-                "name": "Przyjmujący (P2)",
-                "number": 5,
+                "name": "Przyjmujący 2 (P2)",
                 "roleCode": "P2",
                 "x": 25,
                 "y": 82,
@@ -3242,7 +3207,6 @@
               {
                 "id": "pos_6",
                 "name": "Libero (L)",
-                "number": 6,
                 "roleCode": "L",
                 "x": 50,
                 "y": 82,
@@ -3278,8 +3242,7 @@
             "courtPositions": [
               {
                 "id": "pos_1",
-                "name": "Tomasz (R)",
-                "number": 1,
+                "name": "Rozgrywający (R)",
                 "roleCode": "R",
                 "x": 65,
                 "y": 54,
@@ -3288,8 +3251,7 @@
               },
               {
                 "id": "pos_2",
-                "name": "Kamil (P1)",
-                "number": 2,
+                "name": "Przyjmujący 1 (P1)",
                 "roleCode": "P1",
                 "x": 20,
                 "y": 52,
@@ -3298,8 +3260,7 @@
               },
               {
                 "id": "pos_3",
-                "name": "Środkowy (Ś1)",
-                "number": 3,
+                "name": "Środkowy 1 (Ś1)",
                 "roleCode": "Ś1",
                 "x": 50,
                 "y": 52,
@@ -3309,7 +3270,6 @@
               {
                 "id": "pos_4",
                 "name": "Atakujący (A)",
-                "number": 4,
                 "roleCode": "A",
                 "x": 80,
                 "y": 80,
@@ -3318,8 +3278,7 @@
               },
               {
                 "id": "pos_5",
-                "name": "Przyjmujący (P2)",
-                "number": 5,
+                "name": "Przyjmujący 2 (P2)",
                 "roleCode": "P2",
                 "x": 48,
                 "y": 76,
@@ -3329,7 +3288,6 @@
               {
                 "id": "pos_6",
                 "name": "Libero (L)",
-                "number": 6,
                 "roleCode": "L",
                 "x": 22,
                 "y": 80,
@@ -3355,7 +3313,6 @@
               {
                 "id": "pos_1",
                 "name": "Rozgrywający (R)",
-                "number": 1,
                 "roleCode": "R",
                 "x": 80,
                 "y": 82,
@@ -3365,7 +3322,6 @@
               {
                 "id": "pos_2",
                 "name": "Przyjmujący 1 (P1)",
-                "number": 2,
                 "roleCode": "P1",
                 "x": 25,
                 "y": 55,
@@ -3375,7 +3331,6 @@
               {
                 "id": "pos_3",
                 "name": "Środkowy 1 (Ś1)",
-                "number": 3,
                 "roleCode": "Ś1",
                 "x": 50,
                 "y": 53,
@@ -3385,7 +3340,6 @@
               {
                 "id": "pos_4",
                 "name": "Atakujący (A)",
-                "number": 4,
                 "roleCode": "A",
                 "x": 80,
                 "y": 55,
@@ -3395,7 +3349,6 @@
               {
                 "id": "pos_5",
                 "name": "Przyjmujący 2 (P2)",
-                "number": 5,
                 "roleCode": "P2",
                 "x": 25,
                 "y": 82,
@@ -3405,7 +3358,6 @@
               {
                 "id": "pos_6",
                 "name": "Libero (L)",
-                "number": 6,
                 "roleCode": "L",
                 "x": 50,
                 "y": 82,

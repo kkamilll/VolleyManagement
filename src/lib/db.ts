@@ -618,19 +618,19 @@ function getInitialData(): AppDatabase {
       scope: 'MECZ_LIGOWY',
       targetOpponent: 'Gladiatorzy BUD-WENT',
       matchId: 'mat_1',
-      description: 'System 5-1. Rozgrywający (#28 Karol Ordon) w strefie 1 schowany za Przyjmującego (#8 Michał Śmigiel). Trójkąt przyjęcia tworzą: #97 Bartosz Augustynek (L), #8 Michał Śmigiel (P2) i #1 Tomasz Krupa (P1). Atakujący (#17 Łukasz Kremer) na lewym skrzydle (strefa 4).',
+      description: 'System 5-1. Rozgrywający (R) w strefie 1 schowany za Przyjmującego (P2). Trójkąt przyjęcia tworzą: Libero (L), Przyjmujący 2 (P2) i Przyjmujący 1 (P1). Atakujący (A) na lewym skrzydle (strefa 4).',
       courtPositions: [
-        { id: 'pos_1', name: 'Karol Ordon', number: 28, roleCode: 'R', zone: 1, x: 82, y: 72, task: 'Zbieg pod siatkę między strefę 2 i 3 zaraz po uderzeniu zagrywki' },
-        { id: 'pos_2', name: 'Michał Śmigiel', number: 8, roleCode: 'P2', zone: 2, x: 74, y: 55, task: 'Przyjęcie skrótu i pasa bocznego strefy 1/2' },
-        { id: 'pos_3', name: 'Maciek Noak', number: 47, roleCode: 'Ś1', zone: 3, x: 48, y: 22, task: 'Atak z 1. tempa (krótka A na wprost rozgrywającego)' },
-        { id: 'pos_4', name: 'Łukasz Kremer', number: 17, roleCode: 'A', zone: 4, x: 18, y: 24, task: 'Atak ze skrzydła lewego (wysoka piłka na pojedynczy blok)' },
-        { id: 'pos_5', name: 'Bartosz Augustynek', number: 97, roleCode: 'L', zone: 5, x: 26, y: 68, task: 'Dowodzenie linią przyjęcia, asekuracja strefy 5 i środka' },
-        { id: 'pos_6', name: 'Tomasz Krupa', number: 1, roleCode: 'P1', zone: 6, x: 50, y: 70, task: 'Główny pas przyjęcia strefy 6 oraz opcja ataku z pajpa' },
+        { id: 'pos_1', name: 'Rozgrywający (R)', roleCode: 'R', zone: 1, x: 82, y: 72, task: 'Zbieg pod siatkę między strefę 2 i 3 zaraz po uderzeniu zagrywki' },
+        { id: 'pos_2', name: 'Przyjmujący 2 (P2)', roleCode: 'P2', zone: 2, x: 74, y: 55, task: 'Przyjęcie skrótu i pasa bocznego strefy 1/2' },
+        { id: 'pos_3', name: 'Środkowy 1 (Ś1)', roleCode: 'Ś1', zone: 3, x: 48, y: 22, task: 'Atak z 1. tempa (krótka A na wprost rozgrywającego)' },
+        { id: 'pos_4', name: 'Atakujący (A)', roleCode: 'A', zone: 4, x: 18, y: 24, task: 'Atak ze skrzydła lewego (wysoka piłka na pojedynczy blok)' },
+        { id: 'pos_5', name: 'Libero (L)', roleCode: 'L', zone: 5, x: 26, y: 68, task: 'Dowodzenie linią przyjęcia, asekuracja strefy 5 i środka' },
+        { id: 'pos_6', name: 'Przyjmujący 1 (P1)', roleCode: 'P1', zone: 6, x: 50, y: 70, task: 'Główny pas przyjęcia strefy 6 oraz opcja ataku z pajpa' },
       ],
       directives: [
         'Rozgrywający startuje DOPIERO w momencie kontaktu zagrywającego z piłką (uniknięcie błędu ustawienia).',
-        'Libero (#97) przejmuje 60% szerokości boiska przy mocnej zagrywce z wyskoku.',
-        'Pierwsza opcja rozegrania przy dokładnym przyjęciu (do 1m od siatki) to szybki środek (#47 Maciek Noak).'
+        'Libero (L) przejmuje 60% szerokości boiska przy mocnej zagrywce z wyskoku.',
+        'Pierwsza opcja rozegrania przy dokładnym przyjęciu (do 1m od siatki) to szybki środek (Ś1).'
       ],
       createdById: 'usr_trener',
       createdByName: 'Tomasz Lewandowski',
@@ -644,16 +644,16 @@ function getInitialData(): AppDatabase {
       scope: 'OGOLNA',
       description: 'Ustawienie defensywne po własnej zagrywce. Podwójny blok na lewym skrzydle rywala (Ś1 + R), obrona po prostej przez Libero.',
       courtPositions: [
-        { id: 'pos_d1', name: 'Karol Ordon', number: 28, roleCode: 'R', zone: 2, x: 78, y: 15, task: 'Blok prawy (zamyka prostą atakującemu rywala)' },
-        { id: 'pos_d2', name: 'Maciek Noak', number: 47, roleCode: 'Ś1', zone: 3, x: 56, y: 15, task: 'Dostawienie bloku do skrzydła (podwójny blok)' },
-        { id: 'pos_d3', name: 'Łukasz Kremer', number: 17, roleCode: 'A', zone: 4, x: 18, y: 20, task: 'Asekuracja kiwki i przygotowanie do kontrataku' },
-        { id: 'pos_d4', name: 'Bartosz Augustynek', number: 97, roleCode: 'L', zone: 1, x: 80, y: 75, task: 'Obrona mocnego ataku po prostej' },
-        { id: 'pos_d5', name: 'Tomasz Krupa', number: 1, roleCode: 'P1', zone: 6, x: 50, y: 80, task: 'Obrona ataku po głębokim skosie' },
-        { id: 'pos_d6', name: 'Michał Śmigiel', number: 8, roleCode: 'P2', zone: 5, x: 22, y: 70, task: 'Obrona ciasnego skosu oraz asekuracja bloku' }
+        { id: 'pos_d1', name: 'Rozgrywający (R)', roleCode: 'R', zone: 2, x: 78, y: 15, task: 'Blok prawy (zamyka prostą atakującemu rywala)' },
+        { id: 'pos_d2', name: 'Środkowy 1 (Ś1)', roleCode: 'Ś1', zone: 3, x: 56, y: 15, task: 'Dostawienie bloku do skrzydła (podwójny blok)' },
+        { id: 'pos_d3', name: 'Atakujący (A)', roleCode: 'A', zone: 4, x: 18, y: 20, task: 'Asekuracja kiwki i przygotowanie do kontrataku' },
+        { id: 'pos_d4', name: 'Libero (L)', roleCode: 'L', zone: 1, x: 80, y: 75, task: 'Obrona mocnego ataku po prostej' },
+        { id: 'pos_d5', name: 'Przyjmujący 1 (P1)', roleCode: 'P1', zone: 6, x: 50, y: 80, task: 'Obrona ataku po głębokim skosie' },
+        { id: 'pos_d6', name: 'Przyjmujący 2 (P2)', roleCode: 'P2', zone: 5, x: 22, y: 70, task: 'Obrona ciasnego skosu oraz asekuracja bloku' }
       ],
       directives: [
         'Blok skacze z opóźnieniem 0.2s przy atakach z głębi siatki.',
-        'Libero (#97) stoi 1 metr od linii końcowej w strefie 1, gotowy na obronę piłek po rękach bloku.'
+        'Libero (L) stoi 1 metr od linii końcowej w strefie 1, gotowy na obronę piłek po rękach bloku.'
       ],
       createdById: 'usr_trener',
       createdByName: 'Tomasz Lewandowski',
@@ -669,15 +669,15 @@ function getInitialData(): AppDatabase {
       matchId: 'mat_1',
       description: 'Rozgrywający na siatce (strefa 4). Trzy opcje w ataku: skrzydło, krótka przesunięta B oraz pajp z 6. metra.',
       courtPositions: [
-        { id: 'pos_a1', name: 'Karol Ordon', number: 28, roleCode: 'R', zone: 4, x: 25, y: 16, task: 'Rozegranie z wyskoku pod siatką (opcja kiwki lewą ręką)' },
-        { id: 'pos_a2', name: 'Kamil Pujanek', number: 4, roleCode: 'Ś2', zone: 3, x: 50, y: 18, task: 'Krótka B przesunięta w prawo' },
-        { id: 'pos_a3', name: 'Tomasz Krupa', number: 1, roleCode: 'P1', zone: 2, x: 80, y: 22, task: 'Szybkie skrzydło ze strefy 2' },
-        { id: 'pos_a4', name: 'Michał Śmigiel', number: 8, roleCode: 'P2', zone: 6, x: 50, y: 55, task: 'Dynamiczne wejście na Pajp (atak z 6. metra)' },
-        { id: 'pos_a5', name: 'Łukasz Kremer', number: 17, roleCode: 'A', zone: 1, x: 82, y: 65, task: 'Atak z II linii ze strefy 1 (skos lub po linii)' },
-        { id: 'pos_a6', name: 'Bartosz Augustynek', number: 97, roleCode: 'L', zone: 5, x: 20, y: 70, task: 'Asekuracja bloku pod siatką' }
+        { id: 'pos_a1', name: 'Rozgrywający (R)', roleCode: 'R', zone: 4, x: 25, y: 16, task: 'Rozegranie z wyskoku pod siatką (opcja kiwki lewą ręką)' },
+        { id: 'pos_a2', name: 'Środkowy 2 (Ś2)', roleCode: 'Ś2', zone: 3, x: 50, y: 18, task: 'Krótka B przesunięta w prawo' },
+        { id: 'pos_a3', name: 'Przyjmujący 1 (P1)', roleCode: 'P1', zone: 2, x: 80, y: 22, task: 'Szybkie skrzydło ze strefy 2' },
+        { id: 'pos_a4', name: 'Przyjmujący 2 (P2)', roleCode: 'P2', zone: 6, x: 50, y: 55, task: 'Dynamiczne wejście na Pajp (atak z 6. metra)' },
+        { id: 'pos_a5', name: 'Atakujący (A)', roleCode: 'A', zone: 1, x: 82, y: 65, task: 'Atak z II linii ze strefy 1 (skos lub po linii)' },
+        { id: 'pos_a6', name: 'Libero (L)', roleCode: 'L', zone: 5, x: 20, y: 70, task: 'Asekuracja bloku pod siatką' }
       ],
       directives: [
-        'Przy negatywnym przyjęciu bezwzględna piłka sytuacyjna na prawe skrzydło do Łukasza Kremera (#17).',
+        'Przy negatywnym przyjęciu bezwzględna piłka sytuacyjna na prawe skrzydło do Atakującego (A).',
         'Pajp grany na metrowym pułapie nad siatką, ściąga uwagę środkowego rywala.'
       ],
       createdById: 'usr_trener',
@@ -693,12 +693,12 @@ function getInitialData(): AppDatabase {
       eventId: 'evt_2',
       description: 'Taktyka na turniej: skrócone sety do 21 pkt, maksymalne ryzyko zagrywką i gra szybkim skrzydłem bez długich wymian.',
       courtPositions: [
-        { id: 'pos_t1', name: 'Karol Ordon', number: 28, roleCode: 'R', zone: 2, x: 66, y: 18, task: 'Szybkie tempo na skrzydła' },
-        { id: 'pos_t2', name: 'Maciek Noak', number: 47, roleCode: 'Ś1', zone: 3, x: 50, y: 16, task: 'Krótka' },
-        { id: 'pos_t3', name: 'Łukasz Kremer', number: 17, roleCode: 'A', zone: 2, x: 82, y: 20, task: 'Atak strefa 2' },
-        { id: 'pos_t4', name: 'Tomasz Krupa', number: 1, roleCode: 'P1', zone: 4, x: 18, y: 20, task: 'Atak strefa 4' },
-        { id: 'pos_t5', name: 'Michał Śmigiel', number: 8, roleCode: 'P2', zone: 6, x: 50, y: 55, task: 'Pajp' },
-        { id: 'pos_t6', name: 'Bartosz Augustynek', number: 97, roleCode: 'L', zone: 5, x: 24, y: 70, task: 'Asekuracja' }
+        { id: 'pos_t1', name: 'Rozgrywający (R)', roleCode: 'R', zone: 2, x: 66, y: 18, task: 'Szybkie tempo na skrzydła' },
+        { id: 'pos_t2', name: 'Środkowy 1 (Ś1)', roleCode: 'Ś1', zone: 3, x: 50, y: 16, task: 'Krótka' },
+        { id: 'pos_t3', name: 'Atakujący (A)', roleCode: 'A', zone: 2, x: 82, y: 20, task: 'Atak strefa 2' },
+        { id: 'pos_t4', name: 'Przyjmujący 1 (P1)', roleCode: 'P1', zone: 4, x: 18, y: 20, task: 'Atak strefa 4' },
+        { id: 'pos_t5', name: 'Przyjmujący 2 (P2)', roleCode: 'P2', zone: 6, x: 50, y: 55, task: 'Pajp' },
+        { id: 'pos_t6', name: 'Libero (L)', roleCode: 'L', zone: 5, x: 24, y: 70, task: 'Asekuracja' }
       ],
       directives: [
         'W turnieju gramy krótsze sety – zero błędów własnych na zagrywce w końcówce.',
@@ -717,12 +717,12 @@ function getInitialData(): AppDatabase {
       eventId: 'evt_1',
       description: 'Założenie sparingowe: testujemy asekurację kiwek środkowego w strefie 3 i podwójny blok prawy.',
       courtPositions: [
-        { id: 'pos_s1', name: 'Karol Ordon', number: 28, roleCode: 'R', zone: 6, x: 50, y: 78, task: 'Obrona środka' },
-        { id: 'pos_s2', name: 'Michał Śmigiel', number: 8, roleCode: 'P2', zone: 1, x: 80, y: 75, task: 'Obrona po prostej' },
-        { id: 'pos_s3', name: 'Maciek Noak', number: 47, roleCode: 'Ś1', zone: 3, x: 50, y: 16, task: 'Blok środkowy' },
-        { id: 'pos_s4', name: 'Łukasz Kremer', number: 17, roleCode: 'A', zone: 2, x: 78, y: 16, task: 'Blok prawy' },
-        { id: 'pos_s5', name: 'Bartosz Augustynek', number: 97, roleCode: 'L', zone: 5, x: 22, y: 72, task: 'Obrona skosu' },
-        { id: 'pos_s6', name: 'Tomasz Krupa', number: 1, roleCode: 'P1', zone: 4, x: 18, y: 16, task: 'Blok lewy' }
+        { id: 'pos_s1', name: 'Rozgrywający (R)', roleCode: 'R', zone: 6, x: 50, y: 78, task: 'Obrona środka' },
+        { id: 'pos_s2', name: 'Przyjmujący 2 (P2)', roleCode: 'P2', zone: 1, x: 80, y: 75, task: 'Obrona po prostej' },
+        { id: 'pos_s3', name: 'Środkowy 1 (Ś1)', roleCode: 'Ś1', zone: 3, x: 50, y: 16, task: 'Blok środkowy' },
+        { id: 'pos_s4', name: 'Atakujący (A)', roleCode: 'A', zone: 2, x: 78, y: 16, task: 'Blok prawy' },
+        { id: 'pos_s5', name: 'Libero (L)', roleCode: 'L', zone: 5, x: 22, y: 72, task: 'Obrona skosu' },
+        { id: 'pos_s6', name: 'Przyjmujący 1 (P1)', roleCode: 'P1', zone: 4, x: 18, y: 16, task: 'Blok lewy' }
       ],
       directives: [
         'W sparingu nie ryzykujemy kontuzji – blok bez wciskania rąk pod taśmę.',
