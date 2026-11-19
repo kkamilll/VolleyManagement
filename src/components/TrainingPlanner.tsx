@@ -1273,13 +1273,12 @@ export function TrainingPlannerContent({
                   ) : (
                     <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-50 via-white to-slate-50 border border-slate-200 shadow-2xs">
                       <div className="flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left">
-                        {/* Gospodarz */}
+                        {/* Drużyna 1 */}
                         <div className="flex items-center gap-3.5">
                           <div className="w-12 h-12 rounded-2xl bg-sky-600 text-white flex items-center justify-center font-black text-xl shadow-sm shrink-0 border border-sky-400">
                             👼
                           </div>
                           <div>
-                            <span className="text-[10px] font-mono font-bold uppercase text-sky-700 block">Gospodarz</span>
                             <h4 className="text-xl font-black text-slate-900 uppercase font-athletic tracking-tight">Angels ZTP</h4>
                           </div>
                         </div>
@@ -1299,13 +1298,12 @@ export function TrainingPlannerContent({
                           </span>
                         </div>
 
-                        {/* Gość */}
+                        {/* Drużyna 2 */}
                         <div className="flex items-center sm:flex-row-reverse gap-3.5 text-center sm:text-right">
                           <div className="w-12 h-12 rounded-2xl bg-slate-800 text-white flex items-center justify-center font-black text-xl shadow-sm shrink-0 border border-slate-700">
                             🏐
                           </div>
                           <div>
-                            <span className="text-[10px] font-mono font-bold uppercase text-amber-600 block">Przeciwnik</span>
                             <h4 className="text-xl font-black text-slate-900 uppercase font-athletic tracking-tight">
                               {oppName || 'Rywal Ligowy'}
                             </h4>

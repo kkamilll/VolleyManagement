@@ -201,21 +201,16 @@ function DashboardContent() {
           <div className="relative z-10 px-5 sm:px-8 py-6">
             <div className="grid grid-cols-1 md:grid-cols-7 items-center gap-5 sm:gap-6">
               
-              {/* GOSPODARZ */}
+              {/* DRUŻYNA 1 */}
               <div className="md:col-span-3 flex items-center gap-4 sm:gap-5">
                 <TeamCrestBadge
                   teamName={homeTeamName}
                   crestsMap={leagueData?.teamCrests}
                   size="xl"
                   rounded="rounded-2xl"
-                  className="shadow-sm border border-slate-200/80"
+                  className="shadow-sm border border-slate-200/80 shrink-0"
                 />
                 <div className="space-y-0.5 min-w-0">
-                  <span className={`inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider ${
-                    isAngelsHome ? 'text-sky-600' : 'text-slate-400'
-                  }`}>
-                    {isAngelsHome ? 'Gospodarz • Angels ZTP' : 'Gospodarz'}
-                  </span>
                   <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 truncate">
                     {homeTeamName}
                   </h2>
@@ -233,21 +228,16 @@ function DashboardContent() {
                 </div>
               </div>
 
-              {/* GOŚĆ */}
+              {/* DRUŻYNA 2 */}
               <div className="md:col-span-3 flex items-center md:flex-row-reverse gap-4 sm:gap-5 md:text-right">
                 <TeamCrestBadge
                   teamName={awayTeamName}
                   crestsMap={leagueData?.teamCrests}
                   size="xl"
                   rounded="rounded-2xl"
-                  className="shadow-sm border border-slate-200/80"
+                  className="shadow-sm border border-slate-200/80 shrink-0"
                 />
                 <div className="space-y-0.5 min-w-0">
-                  <span className={`inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider ${
-                    isAngelsAway ? 'text-sky-600' : 'text-slate-400'
-                  }`}>
-                    {isAngelsAway ? 'Gość • Angels ZTP' : 'Gość'}
-                  </span>
                   <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 truncate">
                     {awayTeamName}
                   </h2>

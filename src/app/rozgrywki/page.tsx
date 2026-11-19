@@ -3049,14 +3049,11 @@ function RozgrywkiContent() {
                         </div>
                       </div>
 
-                      {/* 2. Główna Arena Pojedynku: Gospodarz vs Gość z centralną tablicą wyników */}
+                      {/* 2. Główna Arena Pojedynku z centralną tablicą wyników */}
                       <div className="py-2 flex items-center justify-between gap-3 sm:gap-6 min-w-0">
-                        {/* Gospodarz / Drużyna A (Wyrównanie do prawej na desktopie) */}
+                        {/* Drużyna A (Wyrównanie do prawej na desktopie) */}
                         <div className="flex items-center justify-end gap-2.5 sm:gap-3.5 flex-1 min-w-0 text-right">
                           <div className="min-w-0">
-                            <span className="text-[10px] font-black uppercase text-sky-600 tracking-wider block">
-                              Gospodarz
-                            </span>
                             <h4 className={`text-base sm:text-xl font-black ${isHomeAngels ? 'text-sky-950 font-athletic' : 'text-slate-900'} group-hover:text-amber-700 transition tracking-tight truncate`}>
                               {homeTeam}
                             </h4>
@@ -3107,7 +3104,7 @@ function RozgrywkiContent() {
                           )}
                         </div>
 
-                        {/* Gość / Drużyna B (Wyrównanie do lewej na desktopie) */}
+                        {/* Drużyna B (Wyrównanie do lewej na desktopie) */}
                         <div className="flex items-center justify-start gap-2.5 sm:gap-3.5 flex-1 min-w-0 text-left">
                           <TeamCrestBadge
                             teamName={awayTeam}
@@ -3116,9 +3113,6 @@ function RozgrywkiContent() {
                             rounded="rounded-2xl"
                           />
                           <div className="min-w-0">
-                            <span className="text-[10px] font-black uppercase text-amber-600 tracking-wider block">
-                              Gość
-                            </span>
                             <h4 className={`text-base sm:text-xl font-black ${isAwayAngels ? 'text-sky-950 font-athletic' : 'text-slate-900'} group-hover:text-amber-700 transition tracking-tight truncate`}>
                               {awayTeam}
                             </h4>
