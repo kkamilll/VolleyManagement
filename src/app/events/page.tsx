@@ -1385,14 +1385,14 @@ function EventsAttendanceContent() {
                                   🔒 Zakończono (tylko wgląd)
                                 </span>
                               ) : (
-                                <div className="grid grid-cols-3 gap-1.5 w-full sm:w-auto">
+                                <div className="grid grid-cols-3 gap-2 w-full sm:w-auto">
                                   <button
                                     type="button"
                                     disabled={submittingAttendanceId === event.id}
                                     onClick={() => handleAttendance(event.id, 'BEDE')}
-                                    className={`py-2 sm:py-1.5 px-2 rounded-xl text-xs font-black transition border text-center justify-center ${
+                                    className={`h-11 sm:h-9.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center cursor-pointer active:scale-95 ${
                                       myAttendance?.status === 'BEDE'
-                                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm font-black'
                                         : 'bg-slate-50 text-emerald-800 border-slate-200 hover:bg-emerald-50'
                                     }`}
                                   >
@@ -1402,9 +1402,9 @@ function EventsAttendanceContent() {
                                     type="button"
                                     disabled={submittingAttendanceId === event.id}
                                     onClick={() => handleAttendance(event.id, 'NIEPEWNE')}
-                                    className={`py-2 sm:py-1.5 px-2 rounded-xl text-xs font-black transition border text-center justify-center ${
+                                    className={`h-11 sm:h-9.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center cursor-pointer active:scale-95 ${
                                       myAttendance?.status === 'NIEPEWNE'
-                                        ? 'bg-amber-600 text-white border-amber-600 shadow-sm'
+                                        ? 'bg-amber-600 text-white border-amber-600 shadow-sm font-black'
                                         : 'bg-slate-50 text-amber-800 border-slate-200 hover:bg-amber-50'
                                     }`}
                                   >
@@ -1414,9 +1414,9 @@ function EventsAttendanceContent() {
                                     type="button"
                                     disabled={submittingAttendanceId === event.id}
                                     onClick={() => handleAttendance(event.id, 'NIE_BEDE')}
-                                    className={`py-2 sm:py-1.5 px-2 rounded-xl text-xs font-black transition border text-center justify-center ${
+                                    className={`h-11 sm:h-9.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center cursor-pointer active:scale-95 ${
                                       myAttendance?.status === 'NIE_BEDE'
-                                        ? 'bg-rose-600 text-white border-rose-600 shadow-sm'
+                                        ? 'bg-rose-600 text-white border-rose-600 shadow-sm font-black'
                                         : 'bg-slate-50 text-rose-800 border-slate-200 hover:bg-rose-50'
                                     }`}
                                   >
@@ -1430,7 +1430,7 @@ function EventsAttendanceContent() {
                                   setViewMode('list');
                                   setExpandedEventId(event.id);
                                 }}
-                                className="py-2 sm:py-1.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition border border-slate-200 shadow-sm text-center justify-center"
+                                className="h-11 sm:h-9.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs sm:text-sm font-bold transition border border-slate-200 shadow-2xs flex items-center justify-center cursor-pointer active:scale-95"
                               >
                                 Szczegóły & Skład →
                               </button>
@@ -1706,39 +1706,38 @@ function EventsAttendanceContent() {
                         </div>
                       </div>
 
-                      {/* Prawa strona nagłówka: Uporządkowane, równe przyciski akcji */}
-                      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 justify-end flex-wrap sm:flex-nowrap">
+                      {/* Prawa strona nagłówka: Wygodne, duże przyciski akcji dopasowane pod kciuk */}
+                      <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-slate-100 flex-wrap sm:flex-nowrap">
                         {/* 1. Szybki link do Ligi / Sparingów / Treningu */}
                         {isLeagueMatch ? (
                           <Link
                             href="/rozgrywki?tab=liga"
                             onClick={e => e.stopPropagation()}
-                            className="h-8.5 px-2.5 sm:px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs transition shrink-0"
+                            className="flex-1 sm:flex-initial h-10 sm:h-9 px-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition shrink-0 cursor-pointer active:scale-95 min-h-[40px]"
                             title="Przejdź do oficjalnego meczu i tabeli LALS"
                           >
-                            <img src="/lals_logo.png" alt="LALS" className="w-3.5 h-3.5 rounded-full bg-white p-0.5 object-contain shrink-0" />
-                            <span className="hidden xs:inline">Liga </span>
-                            <span>LALS</span>
+                            <img src="/lals_logo.png" alt="LALS" className="w-4 h-4 rounded-full bg-white p-0.5 object-contain shrink-0" />
+                            <span>Liga LALS</span>
                           </Link>
                         ) : event.type === 'SPARING' ? (
                           <Link
                             href="/rozgrywki?tab=sparingi"
                             onClick={e => e.stopPropagation()}
-                            className="h-8.5 px-2.5 sm:px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs transition shrink-0"
+                            className="flex-1 sm:flex-initial h-10 sm:h-9 px-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition shrink-0 cursor-pointer active:scale-95 min-h-[40px]"
                             title="Przejdź do sparingów"
                           >
-                            <Swords className="w-3.5 h-3.5 text-slate-950 shrink-0" />
+                            <Swords className="w-4 h-4 text-slate-950 shrink-0" />
                             <span>Sparing</span>
                           </Link>
                         ) : event.type === 'TRENING' ? (
                           <Link
                             href={`/trening?eventId=${event.id}`}
                             onClick={e => e.stopPropagation()}
-                            className="h-8.5 px-3 sm:px-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs hover:shadow transition shrink-0 cursor-pointer"
+                            className="flex-1 sm:flex-initial h-10 sm:h-9 px-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs hover:shadow transition shrink-0 cursor-pointer active:scale-95 min-h-[40px]"
                             title="Otwórz konspekt i ćwiczenia treningu"
                           >
-                            <Volleyball className="w-3.5 h-3.5 shrink-0" />
-                            <span>Rozpiska treningu &rarr;</span>
+                            <Volleyball className="w-4 h-4 shrink-0" />
+                            <span>Rozpiska &rarr;</span>
                           </Link>
                         ) : null}
 
@@ -1748,21 +1747,21 @@ function EventsAttendanceContent() {
                             <Link
                               href={event.type === 'SPARING' ? `/taktyka?tab=sparingi&eventId=${event.id}&type=SPARING` : event.type === 'TURNIEJ' ? `/taktyka?tab=turnieje&eventId=${event.id}&type=TURNIEJ` : `/taktyka?tab=matches&eventId=${event.id}&type=MECZ`}
                               onClick={e => e.stopPropagation()}
-                              className="h-8.5 px-2.5 sm:px-3 rounded-xl border font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-2xs transition shrink-0 bg-sky-50 hover:bg-sky-100 text-sky-900 border-sky-300"
+                              className="flex-1 sm:flex-initial h-10 sm:h-9 px-3 rounded-xl border font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-2xs transition shrink-0 bg-sky-50 hover:bg-sky-100 text-sky-900 border-sky-300 cursor-pointer active:scale-95 min-h-[40px]"
                               title={`Założenia taktyczne (${eventTactics.length})`}
                             >
-                              <Target className="w-3.5 h-3.5 shrink-0 text-sky-600" />
-                              <span className="hidden xs:inline">Taktyka</span>
+                              <Target className="w-4 h-4 shrink-0 text-sky-600" />
+                              <span>Taktyka</span>
                             </Link>
                           ) : canManage ? (
                             <Link
                               href={event.type === 'SPARING' ? `/taktyka?tab=sparingi&eventId=${event.id}&type=SPARING` : event.type === 'TURNIEJ' ? `/taktyka?tab=turnieje&eventId=${event.id}&type=TURNIEJ` : `/taktyka?tab=matches&eventId=${event.id}&type=MECZ`}
                               onClick={e => e.stopPropagation()}
-                              className="h-8.5 px-2 sm:px-2.5 rounded-xl border font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1 shadow-2xs transition shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-300 opacity-70 hover:opacity-100"
+                              className="flex-1 sm:flex-initial h-10 sm:h-9 px-3 rounded-xl border font-bold text-xs sm:text-sm flex items-center justify-center gap-1 shadow-2xs transition shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-300 opacity-80 hover:opacity-100 cursor-pointer active:scale-95 min-h-[40px]"
                               title="Dodaj taktykę"
                             >
-                              <Target className="w-3.5 h-3.5 shrink-0 text-slate-500" />
-                              <span className="hidden sm:inline">Taktyka</span>
+                              <Target className="w-4 h-4 shrink-0 text-slate-500" />
+                              <span>+ Taktyka</span>
                             </Link>
                           ) : null
                         )}
@@ -1771,7 +1770,7 @@ function EventsAttendanceContent() {
                         {!isEventPast && !isFinished && matchInfo.ourSetsWon === undefined && (
                           myAttendance ? (
                             <span
-                              className={`h-8.5 px-3 rounded-xl text-xs font-bold border flex items-center justify-center text-center shrink-0 ${
+                              className={`flex-1 sm:flex-initial h-10 sm:h-9 px-3 rounded-xl text-xs sm:text-sm font-bold border flex items-center justify-center text-center shrink-0 min-h-[40px] ${
                                 myAttendance.status === 'BEDE'
                                   ? 'bg-emerald-50 text-emerald-800 border-emerald-300 shadow-2xs'
                                   : myAttendance.status === 'NIEPEWNE'
@@ -1787,34 +1786,36 @@ function EventsAttendanceContent() {
                             <button
                               type="button"
                               onClick={() => setExpandedEventId(isExpanded ? null : event.id)}
-                              className="h-8.5 px-3 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 flex items-center justify-center gap-1 transition shadow-2xs shrink-0 cursor-pointer"
+                              className="flex-1 sm:flex-initial h-10 sm:h-9 px-3 rounded-xl text-xs sm:text-sm font-bold bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 flex items-center justify-center gap-1.5 transition shadow-2xs shrink-0 cursor-pointer active:scale-95 min-h-[40px]"
                               title="Kliknij, aby oddać głos w ankiecie obecności"
                             >
-                              <Lock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                              <Lock className="w-4 h-4 text-amber-600 shrink-0" />
                               <span className="truncate">Oddaj głos</span>
                             </button>
                           )
                         )}
 
-                        {/* 4. Quick Edit Button dla sztabu */}
-                        {canManage && (
-                          <button
-                            type="button"
-                            onClick={() => openEditModal(event)}
-                            className="w-8.5 h-8.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-800 border border-slate-200 transition shadow-2xs flex items-center justify-center shrink-0 cursor-pointer"
-                            title="Edytuj jednostkę"
-                          >
-                            <Edit3 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
+                        <div className="flex items-center gap-1.5 shrink-0 ml-auto sm:ml-0">
+                          {/* 4. Quick Edit Button dla sztabu */}
+                          {canManage && (
+                            <button
+                              type="button"
+                              onClick={() => openEditModal(event)}
+                              className="w-10 h-10 sm:w-9 sm:h-9 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 transition shadow-2xs flex items-center justify-center shrink-0 cursor-pointer active:scale-95 min-w-[40px]"
+                              title="Edytuj jednostkę"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                          )}
 
-                        {/* 5. Pojedynczy przycisk Chevron */}
-                        <div
-                          className={`w-8.5 h-8.5 rounded-xl border flex items-center justify-center transition-all duration-200 shrink-0 ${
-                            isExpanded ? 'rotate-180 bg-slate-200 border-slate-300 text-slate-900' : 'bg-slate-100 border-slate-200 text-slate-500 group-hover:text-slate-900'
-                          }`}
-                        >
-                          <ChevronDown className="w-3.5 h-3.5" />
+                          {/* 5. Przycisk Chevron */}
+                          <div
+                            className={`w-10 h-10 sm:w-9 sm:h-9 rounded-xl border flex items-center justify-center transition-all duration-200 shrink-0 min-w-[40px] ${
+                              isExpanded ? 'rotate-180 bg-slate-200 border-slate-300 text-slate-900' : 'bg-slate-100 border-slate-200 text-slate-600 group-hover:text-slate-900'
+                            }`}
+                          >
+                            <ChevronDown className="w-4 h-4" />
+                          </div>
                         </div>
                       </div>
                     </div>

@@ -260,37 +260,37 @@ function DashboardContent() {
                   <button
                     onClick={() => handleQuickAttendance(nextEvent.id, 'BEDE')}
                     disabled={updatingAttendance}
-                    className={`flex-1 sm:flex-initial py-1.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                    className={`flex-1 sm:flex-initial h-11 sm:h-9.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
                       myStatusRecord?.status === 'BEDE'
                         ? 'bg-emerald-600 text-white shadow-xs'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <CheckCircle2 className="w-4 h-4" />
                     <span>Będę</span>
                   </button>
                   <button
                     onClick={() => handleQuickAttendance(nextEvent.id, 'NIEPEWNE')}
                     disabled={updatingAttendance}
-                    className={`flex-1 sm:flex-initial py-1.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                    className={`flex-1 sm:flex-initial h-11 sm:h-9.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
                       myStatusRecord?.status === 'NIEPEWNE'
                         ? 'bg-amber-500 text-slate-950 shadow-xs'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    <HelpCircle className="w-3.5 h-3.5" />
+                    <HelpCircle className="w-4 h-4" />
                     <span>Może</span>
                   </button>
                   <button
                     onClick={() => handleQuickAttendance(nextEvent.id, 'NIE_BEDE')}
                     disabled={updatingAttendance}
-                    className={`flex-1 sm:flex-initial py-1.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                    className={`flex-1 sm:flex-initial h-11 sm:h-9.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
                       myStatusRecord?.status === 'NIE_BEDE'
                         ? 'bg-rose-600 text-white shadow-xs'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    <AlertCircle className="w-3.5 h-3.5" />
+                    <AlertCircle className="w-4 h-4" />
                     <span>Nieobecny</span>
                   </button>
                 </div>
@@ -301,7 +301,7 @@ function DashboardContent() {
             <div className="flex items-center gap-2 w-full lg:w-auto">
               <Link 
                 href={nextEvent?.id ? `/events?eventId=${nextEvent.id}` : '/events'}
-                className="flex-1 sm:flex-initial text-xs text-slate-700 hover:text-sky-700 transition flex items-center justify-center gap-1.5 font-bold py-2 px-3.5 rounded-xl bg-white border border-slate-200/80 hover:border-sky-300 shadow-2xs"
+                className="flex-1 sm:flex-initial text-xs sm:text-sm text-slate-700 hover:text-sky-700 transition flex items-center justify-center gap-1.5 font-bold h-11 sm:h-9.5 px-3.5 rounded-xl bg-white border border-slate-200/80 hover:border-sky-300 shadow-2xs"
               >
                 <Users className="w-4 h-4 text-sky-600 shrink-0" />
                 <span>Skład: <strong className="text-slate-900 font-black">{attendingCount === 1 ? '1 obecny' : `${attendingCount} obecnych`}</strong> &rarr;</span>
@@ -309,7 +309,7 @@ function DashboardContent() {
 
               <Link
                 href={nextEvent?.id ? `/taktyka?eventId=${nextEvent.id}` : '/taktyka'}
-                className="flex-1 sm:flex-initial py-2 px-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-xs hover:shadow active:scale-95"
+                className="flex-1 sm:flex-initial h-11 sm:h-9.5 px-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-xs hover:shadow active:scale-95"
               >
                 <Target className="w-4 h-4 text-sky-200 shrink-0" />
                 <span>Taktyka na mecz &rarr;</span>

@@ -131,20 +131,9 @@ const getPhaseBadge = (phase?: string) => {
   );
 };
 
-function TeamShieldBadge({ name, isAngels = false }: { name: string; isAngels?: boolean }) {
-  if (isAngels) {
-    return (
-      <div className="w-8 h-8 rounded-xl bg-sky-600 text-white font-black text-sm flex items-center justify-center shadow-sm shrink-0 border border-sky-400">
-        👼
-      </div>
-    );
-  }
-  const clean = cleanTeamName(name);
-  const initial = (clean[0] || '?').toUpperCase();
+function TeamShieldBadge({ name }: { name: string; isAngels?: boolean }) {
   return (
-    <div className="w-8 h-8 rounded-xl bg-slate-800 text-white font-black text-sm flex items-center justify-center shadow-sm shrink-0 border border-slate-700">
-      {initial}
-    </div>
+    <TeamCrestBadge teamName={name} size="sm" className="shadow-2xs shrink-0" />
   );
 }
 
@@ -3032,14 +3021,14 @@ function RozgrywkiContent() {
                             <span className="hidden sm:inline">obecnych</span>
                           </span>
 
-                          {/* Przycisk rozwijania (Chevron) */}
+                          {/* Przycisk rozwijania (Chevron) - wygodny rozmiar pod palec */}
                           <button
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleSparring(event.id);
                             }}
-                            className={`w-8 h-8 rounded-xl border flex items-center justify-center transition-all duration-200 ${
+                            className={`w-10 h-10 sm:w-9 sm:h-9 rounded-xl border flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-95 shrink-0 ${
                               isExpanded ? 'rotate-180 bg-amber-100 text-amber-900 border-amber-300' : 'bg-slate-50 border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300'
                             }`}
                             title={isExpanded ? 'Zwiń szczegóły' : 'Rozwiń szczegóły'}

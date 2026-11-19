@@ -2534,12 +2534,12 @@ function TacticsContent() {
 
       {/* GŁÓWNY PODZIAŁ MODUŁU TAKTYKI: TABLICA + ROZPISKI (MECZE, SPARINGI, TURNIEJE, TRENINGI) */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 p-1.5 rounded-2xl bg-slate-100/90 border border-slate-200/90 shadow-2xs">
-        {/* 5 Głównych Zakładek Taktyki - spójny, elegancki pasek segmentowy */}
-        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none w-full lg:w-auto">
+        {/* 5 Głównych Zakładek Taktyki - spójny, elegancki pasek segmentowy z dużymi przyciskami pod kciuk */}
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none w-full lg:w-auto py-0.5">
           <button
             type="button"
             onClick={() => { setTacticsSection('board'); setSelectedTactic(null); setLastAddedTactic(null); }}
-            className={`shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
+            className={`shrink-0 flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'board'
                 ? 'bg-sky-600 text-white border-sky-600 shadow-xs font-black'
                 : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
@@ -2552,7 +2552,7 @@ function TacticsContent() {
           <button
             type="button"
             onClick={() => { setTacticsSection('matches'); setSelectedTactic(null); setLastAddedTactic(null); }}
-            className={`shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
+            className={`shrink-0 flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'matches'
                 ? 'bg-sky-600 text-white border-sky-600 shadow-xs font-black'
                 : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
@@ -2560,7 +2560,7 @@ function TacticsContent() {
           >
             <Trophy className={`w-4 h-4 ${tacticsSection === 'matches' ? 'text-sky-200' : 'text-sky-600'}`} />
             <span>Mecze</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'matches' ? 'bg-sky-700/60 text-sky-100 font-black' : 'bg-slate-100 text-slate-600'}`}>
+            <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'matches' ? 'bg-sky-700/60 text-sky-100 font-black' : 'bg-slate-100 text-slate-600'}`}>
               {matchesCount}
             </span>
           </button>
@@ -2568,7 +2568,7 @@ function TacticsContent() {
           <button
             type="button"
             onClick={() => { setTacticsSection('sparingi'); setSelectedTactic(null); setLastAddedTactic(null); }}
-            className={`shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
+            className={`shrink-0 flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'sparingi'
                 ? 'bg-sky-600 text-white border-sky-600 shadow-xs font-black'
                 : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
@@ -2576,7 +2576,7 @@ function TacticsContent() {
           >
             <Swords className={`w-4 h-4 ${tacticsSection === 'sparingi' ? 'text-sky-200' : 'text-slate-600'}`} />
             <span>Sparingi</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'sparingi' ? 'bg-sky-700/60 text-sky-100 font-black' : 'bg-slate-100 text-slate-600'}`}>
+            <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'sparingi' ? 'bg-sky-700/60 text-sky-100 font-black' : 'bg-slate-100 text-slate-600'}`}>
               {sparringsCount}
             </span>
           </button>
@@ -2584,7 +2584,7 @@ function TacticsContent() {
           <button
             type="button"
             onClick={() => { setTacticsSection('turnieje'); setSelectedTactic(null); setLastAddedTactic(null); }}
-            className={`shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
+            className={`shrink-0 flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'turnieje'
                 ? 'bg-sky-600 text-white border-sky-600 shadow-xs font-black'
                 : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
@@ -2592,7 +2592,7 @@ function TacticsContent() {
           >
             <Crown className={`w-4 h-4 ${tacticsSection === 'turnieje' ? 'text-sky-200' : 'text-slate-600'}`} />
             <span>Turnieje</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'turnieje' ? 'bg-sky-700/60 text-sky-100 font-black' : 'bg-slate-100 text-slate-600'}`}>
+            <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'turnieje' ? 'bg-sky-700/60 text-sky-100 font-black' : 'bg-slate-100 text-slate-600'}`}>
               {tournamentsCount}
             </span>
           </button>
@@ -2600,7 +2600,7 @@ function TacticsContent() {
           <button
             type="button"
             onClick={() => setTacticsSection('trainings')}
-            className={`shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
+            className={`shrink-0 flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'trainings'
                 ? 'bg-sky-600 text-white border-sky-600 shadow-xs font-black'
                 : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
@@ -2608,21 +2608,21 @@ function TacticsContent() {
           >
             <Volleyball className={`w-4 h-4 ${tacticsSection === 'trainings' ? 'text-sky-200' : 'text-slate-600'}`} />
             <span>Treningi</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'trainings' ? 'bg-sky-700/60 text-sky-100 font-black' : 'bg-slate-100 text-slate-600'}`}>
+            <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'trainings' ? 'bg-sky-700/60 text-sky-100 font-black' : 'bg-slate-100 text-slate-600'}`}>
               {trainingsCount}
             </span>
           </button>
         </div>
 
-        {/* Prawa strona w trybie Tablicy: Kontekst i szybkie przyciski */}
+        {/* Prawa strona w trybie Tablicy: Kontekst i wygodne przyciski zapisu */}
         {tacticsSection === 'board' && (
-          <div className="flex items-center gap-2 flex-wrap lg:flex-nowrap justify-between lg:justify-end w-full lg:w-auto pt-1 lg:pt-0 border-t lg:border-t-0 border-slate-200">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto pt-1.5 lg:pt-0 border-t lg:border-t-0 border-slate-200">
             {/* Wybór kontekstu tablicy */}
-            <div className="flex items-center gap-1 flex-1 lg:flex-initial min-w-0">
+            <div className="flex items-center gap-1.5 w-full sm:w-auto">
               <select
                 value={selectedContextKey}
                 onChange={e => setSelectedContextKey(e.target.value)}
-                className="w-full lg:w-auto bg-white border border-slate-300 text-slate-800 rounded-xl px-2.5 py-1.5 text-xs font-bold focus:outline-none focus:border-sky-500 shadow-2xs max-w-[240px] truncate"
+                className="flex-1 sm:flex-initial h-10 sm:h-9 bg-white border border-slate-200/90 text-slate-800 rounded-xl px-3 text-xs sm:text-sm font-bold focus:outline-none focus:border-sky-500 shadow-2xs truncate"
                 title="Wybierz wydarzenie, którego dotyczy ta taktyka"
               >
                 <option value="GENERAL">🌐 Ogólna Tablica Drużyny</option>
@@ -2676,7 +2676,7 @@ function TacticsContent() {
               {selectedContextKey !== 'GENERAL' && (
                 <button
                   onClick={() => setSelectedContextKey('GENERAL')}
-                  className="px-2 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 text-xs font-bold transition shadow-2xs whitespace-nowrap"
+                  className="h-10 sm:h-9 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 text-xs font-bold transition shadow-2xs whitespace-nowrap cursor-pointer"
                   title="Powrót do ogólnej tablicy"
                 >
                   ✕
@@ -2686,53 +2686,46 @@ function TacticsContent() {
 
             {/* Narzędzia tablicy */}
             {canEdit && (
-              <div className="flex items-center gap-1.5 shrink-0">
+              <div className="flex items-center gap-1.5 flex-wrap sm:flex-nowrap">
                 {tactics.length > 0 && (
                   <button
                     onClick={() => setShowLoadTacticModal(true)}
-                    className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold transition flex items-center gap-1 shadow-2xs"
+                    className="flex-1 sm:flex-initial h-10 sm:h-9 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
                     title="Wczytaj zapisany schemat z bazy"
                   >
-                    <FolderArchive className="w-3.5 h-3.5 text-sky-600" />
+                    <FolderArchive className="w-4 h-4 text-sky-600" />
                     <span>Wczytaj</span>
                   </button>
                 )}
 
                 <button
                   onClick={handleResetPositions}
-                  className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold transition flex items-center gap-1 shadow-2xs"
+                  className="flex-1 sm:flex-initial h-10 sm:h-9 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
                   title="Przywróć domyślne pozycje"
                 >
-                  <RotateCcw className="w-3.5 h-3.5 text-amber-600" />
-                  <span className="hidden sm:inline">Reset</span>
+                  <RotateCcw className="w-4 h-4 text-amber-600" />
+                  <span>Reset</span>
                 </button>
 
                 <button
                   onClick={handleSaveAsMatchPost}
                   disabled={saving}
-                  className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition flex items-center gap-1.5 shadow-sm active:scale-95 disabled:opacity-50"
+                  className="flex-2 sm:flex-initial h-10 sm:h-9 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xs active:scale-95 disabled:opacity-50 cursor-pointer"
                   title="Zapisz ten schemat bezpośrednio jako post do wybranego meczu"
                 >
-                  <Save className="w-3.5 h-3.5 text-amber-300" />
+                  <Save className="w-4 h-4 text-amber-300" />
                   <span>
-                    {saving ? 'Zapisuję...' : (
-                      activeTargetEvent || activeTargetMatch ? (
-                        <>
-                          <span className="hidden sm:inline">Zapisz do meczu: {activeTargetEvent?.opponent || activeTargetMatch?.opponent || 'LALS'}</span>
-                          <span className="sm:hidden">Zapisz</span>
-                        </>
-                      ) : 'Zapisz'
-                    )}
+                    {saving ? 'Zapisuję...' : 'Zapisz'}
                   </span>
                 </button>
 
                 <button
                   onClick={handleOpenSaveModal}
-                  className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold transition flex items-center gap-1 shadow-2xs"
+                  className="flex-1 sm:flex-initial h-10 sm:h-9 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
                   title="Więcej opcji zapisu (baza ogólna, własny tytuł)"
                 >
-                  <Save className="w-3.5 h-3.5 text-sky-600" />
-                  <span className="hidden sm:inline">Więcej...</span>
+                  <Save className="w-4 h-4 text-sky-600" />
+                  <span>Więcej</span>
                 </button>
               </div>
             )}
@@ -2859,20 +2852,20 @@ function TacticsContent() {
       <div className="bg-white border border-slate-300 rounded-3xl p-3 sm:p-5 shadow-md space-y-4 border-t-4 border-t-sky-600">
           
           {/* KONSOLA TAKTYCZNA (ROTACJE P1-P6, NARZĘDZIA I BOISKO) */}
-          <div className="bg-slate-50 border border-slate-300/80 rounded-2xl p-2 sm:p-3 shadow-2xs space-y-2">
-            {/* Rząd 1: Szybki Pasek Rotacji (P1 - P6) i Fazy Gry */}
-            <div className="flex items-center justify-between gap-1.5 flex-wrap sm:flex-nowrap pb-1.5 border-b border-slate-200">
-              <div className="flex items-center gap-1 overflow-x-auto scrollbar-none py-0.5 max-w-full">
-                <span className="text-[10px] font-black uppercase text-slate-400 shrink-0 mr-0.5">Rotacja:</span>
+          <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-2.5 sm:p-3.5 shadow-2xs space-y-2.5">
+            {/* Rząd 1: Pasek Rotacji (P1 - P6) i Fazy Gry - duże, dotykowe przyciski */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-200/80">
+              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5 max-w-full">
+                <span className="text-[11px] font-black uppercase text-slate-400 shrink-0 mr-0.5">Rotacja:</span>
                 {(['P1', 'P2', 'P3', 'P4', 'P5', 'P6'] as RotationCode[]).map(r => (
                   <button
                     key={r}
                     type="button"
                     onClick={() => applyPreset(r, phase)}
-                    className={`h-7 px-2.5 rounded-lg text-xs font-black transition cursor-pointer shrink-0 ${
+                    className={`h-9 sm:h-8 px-3 rounded-xl text-xs font-black transition cursor-pointer shrink-0 min-w-[36px] flex items-center justify-center active:scale-95 ${
                       rotation === r
                         ? 'bg-sky-600 text-white shadow-xs'
-                        : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-300'
+                        : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200/90'
                     }`}
                     title={`Ustawienie ${r}`}
                   >
@@ -2881,8 +2874,8 @@ function TacticsContent() {
                 ))}
               </div>
 
-              <div className="flex items-center gap-1 overflow-x-auto scrollbar-none py-0.5 max-w-full">
-                <span className="text-[10px] font-black uppercase text-slate-400 shrink-0 mr-0.5">Faza:</span>
+              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5 max-w-full">
+                <span className="text-[11px] font-black uppercase text-slate-400 shrink-0 mr-0.5">Faza:</span>
                 {(['PRZYJECIE', 'OBRONA', 'ATAK', 'ZAGRYWKA'] as TacticalPhase[]).map(p => {
                   const label = p === 'PRZYJECIE' ? 'Przyjęcie' : p === 'OBRONA' ? 'Obrona' : p === 'ATAK' ? 'Atak' : 'Zagrywka';
                   return (
@@ -2890,10 +2883,10 @@ function TacticsContent() {
                       key={p}
                       type="button"
                       onClick={() => applyPreset(rotation, p)}
-                      className={`h-7 px-2.5 rounded-lg text-[11px] font-bold transition cursor-pointer shrink-0 ${
+                      className={`h-9 sm:h-8 px-3 rounded-xl text-xs font-bold transition cursor-pointer shrink-0 flex items-center justify-center active:scale-95 ${
                         phase === p
                           ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
-                          : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-300'
+                          : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/90'
                       }`}
                     >
                       {label}
@@ -2903,16 +2896,16 @@ function TacticsContent() {
               </div>
             </div>
 
-            {/* Rząd 2: Główne Przyciski Boiska (Zoptymalizowane na telefon: bez dublowania) */}
-            <div className="flex items-center justify-between gap-1.5 flex-wrap sm:flex-nowrap">
-              <div className="flex items-center gap-1 flex-wrap sm:flex-nowrap">
+            {/* Rząd 2: Główne Przyciski Boiska - wygodne i równe na telefonie */}
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <button
                   type="button"
                   onClick={() => setActiveTool('move')}
-                  className={`h-7 px-2.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition border cursor-pointer ${
+                  className={`h-9.5 px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 transition border cursor-pointer active:scale-95 ${
                     activeTool === 'move'
-                      ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
-                      : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
+                      ? 'bg-sky-600 text-white border-sky-600 shadow-sm font-black'
+                      : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
                   }`}
                   title="Przesuwaj: chwyć i przeciągaj zawodników i piłkę"
                 >
@@ -2923,28 +2916,28 @@ function TacticsContent() {
                 <button
                   type="button"
                   onClick={handleToggleLiberoMiddle}
-                  className={`h-7 px-2 sm:px-2.5 rounded-lg border text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-2xs ${
+                  className={`h-9.5 px-3 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95 ${
                     hasLibero
                       ? 'bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100'
                       : 'bg-sky-50 text-sky-900 border-sky-300 hover:bg-sky-100'
                   }`}
                   title="Przełącz gracza w II linii: Libero (L) ⇄ Środkowy (Ś)"
                 >
-                  <span className={`w-3.5 h-3.5 rounded-full flex items-center justify-center font-black text-[9px] ${
+                  <span className={`w-4 h-4 rounded-full flex items-center justify-center font-black text-[10px] ${
                     hasLibero ? 'bg-amber-500 text-slate-950' : 'bg-sky-600 text-white'
                   }`}>
                     {hasLibero ? 'L' : 'Ś'}
                   </span>
-                  <span className="font-bold">{hasLibero ? 'L (Libero)' : 'Ś (Środkowy)'}</span>
+                  <span>{hasLibero ? 'Libero' : 'Środkowy'}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setShowOpponents(!showOpponents)}
-                  className={`h-7 px-2 rounded-lg border text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
+                  className={`h-9.5 px-3 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 cursor-pointer active:scale-95 ${
                     showOpponents
                       ? 'bg-rose-50 text-rose-800 border-rose-300'
-                      : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
+                      : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
                   }`}
                   title="Pokaż/ukryj blok i obronę przeciwnika"
                 >
@@ -2955,10 +2948,10 @@ function TacticsContent() {
                 <button
                   type="button"
                   onClick={() => setShowBall(!showBall)}
-                  className={`h-7 px-2 rounded-lg border text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
+                  className={`h-9.5 px-3 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 cursor-pointer active:scale-95 ${
                     showBall
                       ? 'bg-amber-50 text-amber-800 border-amber-300'
-                      : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
+                      : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
                   }`}
                   title="Pokaż/ukryj piłkę"
                 >
@@ -2978,10 +2971,10 @@ function TacticsContent() {
                       setActiveTool('move');
                     }
                   }}
-                  className={`h-7 px-2.5 rounded-lg border text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
+                  className={`h-9.5 px-3 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 cursor-pointer active:scale-95 ${
                     showDrawingTools || activeTool !== 'move'
-                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                      : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
+                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs font-black'
+                      : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
                   }`}
                   title="Pokaż/ukryj narzędzia pisaka i kolorów"
                 >
@@ -2992,21 +2985,21 @@ function TacticsContent() {
                 <button
                   type="button"
                   onClick={handleResetPositions}
-                  className="h-7 px-2 sm:px-2.5 rounded-lg bg-white hover:bg-slate-100 text-slate-600 border border-slate-300 text-xs font-bold transition flex items-center justify-center gap-1 shadow-2xs cursor-pointer"
+                  className="h-9.5 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/90 text-xs font-bold transition flex items-center justify-center gap-1 shadow-2xs cursor-pointer active:scale-95"
                   title="Przywróć domyślne pozycje na boisku"
                 >
                   <RotateCcw className="w-3.5 h-3.5 text-amber-600" />
-                  <span className="hidden sm:inline">Reset</span>
+                  <span>Reset</span>
                 </button>
               </div>
 
               {/* Przełącznik orientacji boiska: pionowo (telefon) vs poziomo */}
               <div className="flex items-center gap-1 shrink-0">
-                <div className="inline-flex items-center p-0.5 bg-white rounded-xl border border-slate-300 shadow-2xs">
+                <div className="inline-flex items-center p-0.5 bg-white rounded-xl border border-slate-200/90 shadow-2xs">
                   <button
                     type="button"
                     onClick={() => handleToggleOrientation('vertical')}
-                    className={`h-6 px-2 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
+                    className={`h-8 px-2.5 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer active:scale-95 ${
                       boardOrientation === 'vertical'
                         ? 'bg-slate-900 text-white font-black'
                         : 'text-slate-600 hover:text-slate-900'
@@ -3014,12 +3007,12 @@ function TacticsContent() {
                     title="Widok pionowy (telefon)"
                   >
                     <Smartphone className="w-3.5 h-3.5" />
-                    <span className="text-[10px] hidden sm:inline">Pion</span>
+                    <span>Pion</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => handleToggleOrientation('horizontal')}
-                    className={`h-6 px-2 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
+                    className={`h-8 px-2.5 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer active:scale-95 ${
                       boardOrientation === 'horizontal'
                         ? 'bg-slate-900 text-white font-black'
                         : 'text-slate-600 hover:text-slate-900'
@@ -3027,7 +3020,7 @@ function TacticsContent() {
                     title="Widok poziomy (desktop / obrócony telefon)"
                   >
                     <Maximize2 className="w-3.5 h-3.5" />
-                    <span className="text-[10px] hidden sm:inline">Poziom</span>
+                    <span>Poziom</span>
                   </button>
                 </div>
               </div>
@@ -3576,56 +3569,56 @@ function TacticsContent() {
               )}
             </div>
 
-            {/* Narzędzia i formaty rozpiski: Równy, estetyczny pasek o stałej wysokości */}
+            {/* Narzędzia i formaty rozpiski: Równy, duży pasek o stałej wysokości 44px pod kciuk */}
             {canEdit && (
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-0.5">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-2.5 pt-0.5">
                 <button
                   type="button"
                   onClick={() => setTacticsSection('board')}
-                  className="col-span-2 sm:col-span-1 h-9 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer active:scale-95"
+                  className="col-span-2 sm:col-span-1 h-11 sm:h-10 px-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xs cursor-pointer active:scale-95 min-h-[44px]"
                   title="Otwórz pełną tablicę taktyczną dla tego meczu"
                 >
-                  <Compass className="w-3.5 h-3.5 text-sky-200 shrink-0" />
+                  <Compass className="w-4 h-4 text-sky-200 shrink-0" />
                   <span>Tablica taktyczna</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleOpenQuickDrawModal}
-                  className="h-9 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
+                  className="h-11 sm:h-10 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 min-h-[44px]"
                   title="Szybki szkic pisakiem na boisku"
                 >
-                  <Pencil className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+                  <Pencil className="w-4 h-4 text-sky-600 shrink-0" />
                   <span>Szybki szkic</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setShowAddNoteModal(true)}
-                  className="h-9 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
+                  className="h-11 sm:h-10 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 min-h-[44px]"
                   title="Dodaj notatkę lub wytyczne dla drużyny"
                 >
-                  <FileText className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                  <FileText className="w-4 h-4 text-slate-500 shrink-0" />
                   <span>Notatka</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleOpenAddMaterialForCurrentTarget('VIDEO')}
-                  className="h-9 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
+                  className="h-11 sm:h-10 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 min-h-[44px]"
                   title="Dodaj wideo rywala z YouTube"
                 >
-                  <Play className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                  <Play className="w-4 h-4 text-rose-500 shrink-0" />
                   <span>Wideo rywala</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleOpenAddMaterialForCurrentTarget('IMAGE')}
-                  className="h-9 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
+                  className="h-11 sm:h-10 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 min-h-[44px]"
                   title="Dodaj zdjęcie lub dokument PDF"
                 >
-                  <ImageIcon className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <ImageIcon className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>Zdjęcie / PDF</span>
                 </button>
               </div>
