@@ -229,11 +229,11 @@ export default function Navbar() {
               href="/"
               className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname === '/'
-                  ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm'
+                  ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              <LayoutDashboard className="w-4 h-4 text-sky-600" />
+              <LayoutDashboard className={`w-4 h-4 ${pathname === '/' ? 'text-amber-400' : 'text-slate-500'}`} />
               Pulpit
             </Link>
 
@@ -241,11 +241,11 @@ export default function Navbar() {
               href="/events"
               className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname.startsWith('/events')
-                  ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm'
+                  ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              <Calendar className="w-4 h-4 text-amber-600" />
+              <Calendar className={`w-4 h-4 ${pathname.startsWith('/events') ? 'text-amber-400' : 'text-amber-600'}`} />
               <span>Terminarz</span>
             </Link>
 
@@ -255,11 +255,11 @@ export default function Navbar() {
                 href="/rozgrywki"
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                   pathname.startsWith('/rozgrywki')
-                    ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm'
+                    ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-sm'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
-                <Volleyball className="w-4 h-4 text-amber-600" />
+                <Volleyball className={`w-4 h-4 ${pathname.startsWith('/rozgrywki') ? 'text-amber-400' : 'text-amber-600'}`} />
                 <span>Rozgrywki</span>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition" />
               </Link>
@@ -296,11 +296,11 @@ export default function Navbar() {
               href="/fees"
               className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname === '/fees'
-                  ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm'
+                  ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              <CreditCard className="w-4 h-4 text-emerald-600" />
+              <CreditCard className={`w-4 h-4 ${pathname === '/fees' ? 'text-amber-400' : 'text-emerald-600'}`} />
               Składki
             </Link>
 
@@ -308,11 +308,11 @@ export default function Navbar() {
               href="/team"
               className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname === '/team'
-                  ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm'
+                  ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              <Users className="w-4 h-4 text-slate-600" />
+              <Users className={`w-4 h-4 ${pathname === '/team' ? 'text-amber-400' : 'text-slate-600'}`} />
               Kadra
             </Link>
 
@@ -322,11 +322,11 @@ export default function Navbar() {
                 href="/taktyka"
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                   pathname.startsWith('/taktyka') || pathname.startsWith('/coach')
-                    ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm'
+                    ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-sm'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
-                <Target className="w-4 h-4 text-sky-600" />
+                <Target className={`w-4 h-4 ${(pathname.startsWith('/taktyka') || pathname.startsWith('/coach')) ? 'text-amber-400' : 'text-amber-600'}`} />
                 <span>Taktyka</span>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition" />
               </Link>
@@ -364,11 +364,11 @@ export default function Navbar() {
               href="/trening"
               className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname.startsWith('/trening')
-                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm'
+                  ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              <Volleyball className="w-4 h-4 text-emerald-600" />
+              <Volleyball className={`w-4 h-4 ${pathname.startsWith('/trening') ? 'text-amber-400' : 'text-emerald-600'}`} />
               <span>Treningi</span>
             </Link>
 
@@ -376,11 +376,11 @@ export default function Navbar() {
               href="/galeria"
               className={`flex items-center gap-1.5 lg:gap-2 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                 pathname === '/galeria'
-                  ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm'
+                  ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              <Camera className="w-4 h-4 text-sky-600" />
+              <Camera className={`w-4 h-4 ${pathname === '/galeria' ? 'text-amber-400' : 'text-slate-600'}`} />
               Galeria
             </Link>
 
@@ -389,11 +389,11 @@ export default function Navbar() {
                 href="/admin"
                 className={`flex items-center gap-1.5 px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-xl text-xs lg:text-sm font-bold whitespace-nowrap shrink-0 transition ${
                   pathname === '/admin'
-                    ? 'bg-amber-50 text-amber-800 border border-amber-300 shadow-sm'
+                    ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-sm'
                     : 'text-amber-700 hover:text-amber-900 hover:bg-amber-50'
                 }`}
               >
-                <Shield className="w-4 h-4 text-amber-600" />
+                <Shield className={`w-4 h-4 ${pathname === '/admin' ? 'text-amber-400' : 'text-amber-600'}`} />
                 <span>Admin</span>
               </Link>
             )}
@@ -777,10 +777,10 @@ export default function Navbar() {
             href="/"
             onClick={() => setIsMobileMenuOpen(false)}
             className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
-              pathname === '/' ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'text-slate-700 hover:bg-slate-100'
+              pathname === '/' ? 'bg-slate-900 text-amber-400 border border-slate-800' : 'text-slate-700 hover:bg-slate-100'
             }`}
           >
-            <LayoutDashboard className="w-4 h-4 text-sky-600" />
+            <LayoutDashboard className={`w-4 h-4 ${pathname === '/' ? 'text-amber-400' : 'text-slate-500'}`} />
             <span>Pulpit</span>
           </Link>
 
@@ -788,10 +788,10 @@ export default function Navbar() {
             href="/events"
             onClick={() => setIsMobileMenuOpen(false)}
             className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
-              pathname.startsWith('/events') ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'text-slate-700 hover:bg-slate-100'
+              pathname.startsWith('/events') ? 'bg-slate-900 text-amber-400 border border-slate-800' : 'text-slate-700 hover:bg-slate-100'
             }`}
           >
-            <Calendar className="w-4 h-4 text-amber-600" />
+            <Calendar className={`w-4 h-4 ${pathname.startsWith('/events') ? 'text-amber-400' : 'text-amber-600'}`} />
             <span>Terminarz & Frekwencja</span>
           </Link>
 
@@ -827,10 +827,10 @@ export default function Navbar() {
             href="/fees"
             onClick={() => setIsMobileMenuOpen(false)}
             className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
-              pathname === '/fees' ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'text-slate-700 hover:bg-slate-100'
+              pathname === '/fees' ? 'bg-slate-900 text-amber-400 border border-slate-800' : 'text-slate-700 hover:bg-slate-100'
             }`}
           >
-            <CreditCard className="w-4 h-4 text-emerald-600" />
+            <CreditCard className={`w-4 h-4 ${pathname === '/fees' ? 'text-amber-400' : 'text-emerald-600'}`} />
             <span>Składki i Płatności (BLIK)</span>
           </Link>
 
@@ -838,10 +838,10 @@ export default function Navbar() {
             href="/team"
             onClick={() => setIsMobileMenuOpen(false)}
             className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold transition ${
-              pathname === '/team' ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'text-slate-700 hover:bg-slate-100'
+              pathname === '/team' ? 'bg-slate-900 text-amber-400 border border-slate-800' : 'text-slate-700 hover:bg-slate-100'
             }`}
           >
-            <Users className="w-4 h-4 text-slate-600" />
+            <Users className={`w-4 h-4 ${pathname === '/team' ? 'text-amber-400' : 'text-slate-600'}`} />
             <span>Kadra Drużyny</span>
           </Link>
 

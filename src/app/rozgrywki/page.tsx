@@ -2820,8 +2820,8 @@ function RozgrywkiContent() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 shrink-0 shadow-sm">
-            <Volleyball className="w-6 h-6" />
+          <div className="w-11 h-11 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-amber-400 shrink-0 shadow-sm">
+            <Volleyball className="w-6 h-6 text-amber-400" />
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight font-athletic text-slate-900">
@@ -3543,7 +3543,7 @@ function RozgrywkiContent() {
                 onClick={() => setLigaSubTab('tabela')}
                 className={`shrink-0 flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition whitespace-nowrap ${
                   ligaSubTab === 'tabela'
-                    ? 'bg-sky-600 text-white shadow-sm'
+                    ? 'bg-slate-900 text-amber-400 shadow-sm border border-slate-800'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                 }`}
               >
@@ -3554,7 +3554,7 @@ function RozgrywkiContent() {
                 onClick={() => setLigaSubTab('wyniki')}
                 className={`shrink-0 flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition whitespace-nowrap ${
                   ligaSubTab === 'wyniki'
-                    ? 'bg-sky-600 text-white shadow-sm'
+                    ? 'bg-slate-900 text-amber-400 shadow-sm border border-slate-800'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                 }`}
               >
@@ -3565,7 +3565,7 @@ function RozgrywkiContent() {
                 onClick={() => setLigaSubTab('statystyki')}
                 className={`shrink-0 flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition whitespace-nowrap ${
                   ligaSubTab === 'statystyki'
-                    ? 'bg-sky-600 text-white shadow-sm'
+                    ? 'bg-slate-900 text-amber-400 shadow-sm border border-slate-800'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                 }`}
               >
@@ -3608,9 +3608,9 @@ function RozgrywkiContent() {
                       <button
                         type="button"
                         onClick={() => handleOpenEditTable(currentLeaguePhase?.id || 'faza_1')}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 transition shadow-sm whitespace-nowrap shrink-0"
                       >
-                        <Edit3 className="w-3.5 h-3.5" />
+                        <Edit3 className="w-3.5 h-3.5 text-amber-400" />
                         <span>Edytuj Tabelę</span>
                       </button>
                     </>
@@ -3641,9 +3641,9 @@ function RozgrywkiContent() {
                       <button
                         type="button"
                         onClick={() => setShowAddMatchModal(true)}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-sky-600 hover:bg-sky-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 transition shadow-sm whitespace-nowrap shrink-0"
                       >
-                        <Plus className="w-3.5 h-3.5" />
+                        <Plus className="w-3.5 h-3.5 text-amber-400" />
                         <span>Dodaj Wynik</span>
                       </button>
                       <button

@@ -172,8 +172,8 @@ function DashboardContent() {
       {/* 2. NOWOCZESNA KARTA MECZU DNIA (MATCHDAY HERO CENTER) */}
       {(nextEvent || officialNextMatch) ? (
         <div className="relative overflow-hidden rounded-3xl bg-white border border-slate-200/80 shadow-sm hover:shadow-md text-slate-900 transition-all duration-300">
-          {/* Subtelny pasek akcentu na samej górze */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-500 via-sky-400 to-amber-400" />
+          {/* Subtelny pasek akcentu na samej górze - Angels Navy & Gold */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-slate-900 via-amber-500 to-amber-400" />
 
           {/* GÓRNY PASEK: KATEGORIA, RUNDA, DATA I GODZINA */}
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-2.5 px-5 sm:px-7 pt-4 pb-3 border-b border-slate-100 bg-slate-50/60">
@@ -309,9 +309,9 @@ function DashboardContent() {
 
               <Link
                 href={nextEvent?.id ? `/taktyka?eventId=${nextEvent.id}` : '/taktyka'}
-                className="flex-1 sm:flex-initial h-11 sm:h-9.5 px-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-xs hover:shadow active:scale-95"
+                className="flex-1 sm:flex-initial h-11 sm:h-9.5 px-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-xs hover:shadow active:scale-95 border border-slate-800"
               >
-                <Target className="w-4 h-4 text-sky-200 shrink-0" />
+                <Target className="w-4 h-4 text-amber-400 shrink-0" />
                 <span>Taktyka na mecz &rarr;</span>
               </Link>
             </div>

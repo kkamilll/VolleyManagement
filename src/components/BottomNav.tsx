@@ -222,19 +222,19 @@ export default function BottomNav() {
                   key={item.label}
                   type="button"
                   onClick={() => setShowMoreMenu(!showMoreMenu)}
-                  className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition group relative ${active ? 'text-sky-600' : 'text-slate-500 hover:text-slate-900'
+                  className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition group relative ${active ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'
                     }`}
                 >
-                  <div className={`p-1.5 rounded-xl transition ${active ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm' : 'group-hover:bg-slate-100'
+                  <div className={`p-1.5 rounded-xl transition ${active ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-sm' : 'group-hover:bg-slate-100 text-slate-500'
                     }`}>
                     <Icon className="w-5 h-5" />
                   </div>
-                  <span className={`text-[10px] tracking-tight mt-0.5 ${active ? 'font-black text-sky-700' : 'font-semibold'
+                  <span className={`text-[10px] tracking-tight mt-0.5 ${active ? 'font-black text-slate-900' : 'font-semibold text-slate-500'
                     }`}>
                     {item.label}
                   </span>
                   {active && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-sky-600 absolute bottom-0" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 absolute bottom-0" />
                   )}
                 </button>
               );
@@ -244,19 +244,19 @@ export default function BottomNav() {
               <Link
                 key={item.label}
                 href={item.href}
-                className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition group relative ${active ? 'text-sky-600' : 'text-slate-500 hover:text-slate-900'
+                className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition group relative ${active ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'
                   }`}
               >
-                <div className={`p-1.5 rounded-xl transition ${active ? 'bg-sky-50 text-sky-700 border border-sky-200 shadow-sm' : 'group-hover:bg-slate-100'
+                <div className={`p-1.5 rounded-xl transition ${active ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-sm' : 'group-hover:bg-slate-100 text-slate-500'
                   }`}>
                   <Icon className="w-5 h-5" />
                 </div>
-                <span className={`text-[10px] tracking-tight mt-0.5 ${active ? 'font-black text-sky-700' : 'font-semibold'
+                <span className={`text-[10px] tracking-tight mt-0.5 ${active ? 'font-black text-slate-900' : 'font-semibold text-slate-500'
                   }`}>
                   {item.label}
                 </span>
                 {active && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-sky-600 absolute bottom-0" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 absolute bottom-0" />
                 )}
               </Link>
             );

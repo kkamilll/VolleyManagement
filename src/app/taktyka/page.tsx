@@ -2541,11 +2541,11 @@ function TacticsContent() {
             onClick={() => { setTacticsSection('board'); setSelectedTactic(null); setLastAddedTactic(null); }}
             className={`shrink-0 flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'board'
-                ? 'bg-sky-600 text-white border-sky-600 shadow-xs font-black'
+                ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
                 : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
             }`}
           >
-            <Compass className={`w-4 h-4 ${tacticsSection === 'board' ? 'text-sky-200' : 'text-sky-600'}`} />
+            <Compass className={`w-4 h-4 ${tacticsSection === 'board' ? 'text-amber-400' : 'text-slate-600'}`} />
             <span>Tablica</span>
           </button>
 
@@ -2554,13 +2554,13 @@ function TacticsContent() {
             onClick={() => { setTacticsSection('matches'); setSelectedTactic(null); setLastAddedTactic(null); }}
             className={`shrink-0 flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'matches'
-                ? 'bg-sky-600 text-white border-sky-600 shadow-xs font-black'
+                ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
                 : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
             }`}
           >
-            <Trophy className={`w-4 h-4 ${tacticsSection === 'matches' ? 'text-sky-200' : 'text-sky-600'}`} />
+            <Trophy className={`w-4 h-4 ${tacticsSection === 'matches' ? 'text-amber-400' : 'text-slate-600'}`} />
             <span>Mecze</span>
-            <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'matches' ? 'bg-sky-700/60 text-sky-100 font-black' : 'bg-slate-100 text-slate-600'}`}>
+            <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'matches' ? 'bg-amber-400/20 text-amber-300 font-black' : 'bg-slate-100 text-slate-600'}`}>
               {matchesCount}
             </span>
           </button>
@@ -2570,13 +2570,13 @@ function TacticsContent() {
             onClick={() => { setTacticsSection('sparingi'); setSelectedTactic(null); setLastAddedTactic(null); }}
             className={`shrink-0 flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'sparingi'
-                ? 'bg-sky-600 text-white border-sky-600 shadow-xs font-black'
+                ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
                 : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
             }`}
           >
-            <Swords className={`w-4 h-4 ${tacticsSection === 'sparingi' ? 'text-sky-200' : 'text-slate-600'}`} />
+            <Swords className={`w-4 h-4 ${tacticsSection === 'sparingi' ? 'text-amber-400' : 'text-slate-600'}`} />
             <span>Sparingi</span>
-            <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'sparingi' ? 'bg-sky-700/60 text-sky-100 font-black' : 'bg-slate-100 text-slate-600'}`}>
+            <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'sparingi' ? 'bg-amber-400/20 text-amber-300 font-black' : 'bg-slate-100 text-slate-600'}`}>
               {sparringsCount}
             </span>
           </button>
@@ -2586,13 +2586,13 @@ function TacticsContent() {
             onClick={() => { setTacticsSection('turnieje'); setSelectedTactic(null); setLastAddedTactic(null); }}
             className={`shrink-0 flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'turnieje'
-                ? 'bg-sky-600 text-white border-sky-600 shadow-xs font-black'
+                ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
                 : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
             }`}
           >
-            <Crown className={`w-4 h-4 ${tacticsSection === 'turnieje' ? 'text-sky-200' : 'text-slate-600'}`} />
+            <Crown className={`w-4 h-4 ${tacticsSection === 'turnieje' ? 'text-amber-400' : 'text-slate-600'}`} />
             <span>Turnieje</span>
-            <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'turnieje' ? 'bg-sky-700/60 text-sky-100 font-black' : 'bg-slate-100 text-slate-600'}`}>
+            <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'turnieje' ? 'bg-amber-400/20 text-amber-300 font-black' : 'bg-slate-100 text-slate-600'}`}>
               {tournamentsCount}
             </span>
           </button>
@@ -2602,13 +2602,13 @@ function TacticsContent() {
             onClick={() => setTacticsSection('trainings')}
             className={`shrink-0 flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'trainings'
-                ? 'bg-sky-600 text-white border-sky-600 shadow-xs font-black'
+                ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
                 : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
             }`}
           >
-            <Volleyball className={`w-4 h-4 ${tacticsSection === 'trainings' ? 'text-sky-200' : 'text-slate-600'}`} />
+            <Volleyball className={`w-4 h-4 ${tacticsSection === 'trainings' ? 'text-amber-400' : 'text-slate-600'}`} />
             <span>Treningi</span>
-            <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'trainings' ? 'bg-sky-700/60 text-sky-100 font-black' : 'bg-slate-100 text-slate-600'}`}>
+            <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'trainings' ? 'bg-amber-400/20 text-amber-300 font-black' : 'bg-slate-100 text-slate-600'}`}>
               {trainingsCount}
             </span>
           </button>
@@ -3575,10 +3575,10 @@ function TacticsContent() {
                 <button
                   type="button"
                   onClick={() => setTacticsSection('board')}
-                  className="col-span-2 sm:col-span-1 h-11 sm:h-10 px-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xs cursor-pointer active:scale-95 min-h-[44px]"
+                  className="col-span-2 sm:col-span-1 h-11 sm:h-10 px-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xs cursor-pointer active:scale-95 min-h-[44px]"
                   title="Otwórz pełną tablicę taktyczną dla tego meczu"
                 >
-                  <Compass className="w-4 h-4 text-sky-200 shrink-0" />
+                  <Compass className="w-4 h-4 text-amber-400 shrink-0" />
                   <span>Tablica taktyczna</span>
                 </button>
 

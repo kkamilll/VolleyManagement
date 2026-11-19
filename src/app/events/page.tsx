@@ -928,9 +928,9 @@ function EventsAttendanceContent() {
             <button
               type="button"
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider transition shadow-sm whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-black text-xs uppercase tracking-wider transition shadow-sm whitespace-nowrap shrink-0"
             >
-              <Plus className="w-4 h-4 stroke-[3]" />
+              <Plus className="w-4 h-4 stroke-[3] text-amber-400" />
               <span>Nowa Jednostka</span>
             </button>
           )}
@@ -995,10 +995,10 @@ function EventsAttendanceContent() {
                 <div className="flex flex-wrap items-center gap-1.5">
                   <span className="text-[11px] font-bold text-slate-500 mr-1">Typ:</span>
                   {[
-                    { id: 'ALL', label: 'Wszystkie', activeClass: 'bg-sky-600 text-white font-black shadow-sm' },
+                    { id: 'ALL', label: 'Wszystkie', activeClass: 'bg-slate-900 text-amber-400 font-black shadow-sm border border-slate-800' },
                     { id: 'TRENING', label: '🏐 Treningi', activeClass: 'bg-emerald-600 text-white font-black shadow-sm' },
                     { id: 'SPARING', label: '⚔️ Sparingi', activeClass: 'bg-amber-600 text-white font-black shadow-sm' },
-                    { id: 'MECZ_LALS', label: '🔵 Mecze LALS', activeClass: 'bg-sky-600 text-white font-black shadow-sm' },
+                    { id: 'MECZ_LALS', label: '🔵 Mecze LALS', activeClass: 'bg-slate-900 text-amber-400 font-black shadow-sm border border-slate-800' },
                     { id: 'TURNIEJ', label: '🏆 Turnieje', activeClass: 'bg-purple-600 text-white font-black shadow-sm' }
                   ].map(t => (
                     <button
@@ -1029,7 +1029,7 @@ function EventsAttendanceContent() {
                       onClick={() => setFilterTime(t.id as any)}
                       className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
                         filterTime === t.id
-                          ? 'bg-sky-600 text-white font-black shadow-sm'
+                          ? 'bg-slate-900 text-amber-400 font-black shadow-sm border border-slate-800'
                           : 'bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 hover:bg-slate-100'
                       }`}
                     >
@@ -1713,7 +1713,7 @@ function EventsAttendanceContent() {
                           <Link
                             href="/rozgrywki?tab=liga"
                             onClick={e => e.stopPropagation()}
-                            className="flex-1 sm:flex-initial h-10 sm:h-9 px-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition shrink-0 cursor-pointer active:scale-95 min-h-[40px]"
+                            className="flex-1 sm:flex-initial h-10 sm:h-9 px-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition shrink-0 cursor-pointer active:scale-95 min-h-[40px]"
                             title="Przejdź do oficjalnego meczu i tabeli LALS"
                           >
                             <img src="/lals_logo.png" alt="LALS" className="w-4 h-4 rounded-full bg-white p-0.5 object-contain shrink-0" />
