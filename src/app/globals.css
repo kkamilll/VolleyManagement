@@ -25,7 +25,7 @@ body {
    1. MODERN PRO SPORTS DESIGN SYSTEM - LIGHT AS DEFAULT
    ========================================================================== */
 
-/* Subtle energetic sports canvas background */
+/* Modern Pro Sports Canvas Background - Clean, Elegant & Stadium Ambient */
 .cyber-court-bg {
   position: fixed;
   inset: 0;
@@ -33,16 +33,28 @@ body {
   z-index: 0;
   background-color: #f8fafc;
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 100% 100%, rgba(14, 165, 233, 0.05) 0%, transparent 40%),
-    linear-gradient(rgba(226, 232, 240, 0.6) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(226, 232, 240, 0.6) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
-  background-position: 0 0, 0 0, -1px -1px, -1px -1px;
+    radial-gradient(ellipse 90% 55% at 50% -12%, rgba(2, 132, 199, 0.09) 0%, transparent 65%),
+    radial-gradient(ellipse 65% 45% at 100% 100%, rgba(14, 165, 233, 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 40% at 0% 85%, rgba(245, 158, 11, 0.035) 0%, transparent 55%);
 }
 
 .court-lines-overlay {
   display: none !important;
+}
+
+/* Volleyball Tactical Net Texture Utility */
+.volleyball-net-mesh-h {
+  background-color: rgba(15, 23, 42, 0.85);
+  background-image: 
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.35) 0px, rgba(255, 255, 255, 0.35) 1px, transparent 1px, transparent 5px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.35) 0px, rgba(255, 255, 255, 0.35) 1px, transparent 1px, transparent 5px);
+}
+
+.volleyball-net-mesh-v {
+  background-color: rgba(15, 23, 42, 0.85);
+  background-image: 
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.35) 0px, rgba(255, 255, 255, 0.35) 1px, transparent 1px, transparent 5px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.35) 0px, rgba(255, 255, 255, 0.35) 1px, transparent 1px, transparent 5px);
 }
 
 /* Premium Pro Sports Cards */
@@ -50,8 +62,8 @@ body {
 .angel-card {
   background: #ffffff;
   color: #0f172a;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02);
   border-radius: 1.25rem;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -59,7 +71,7 @@ body {
 .cyber-card:hover,
 .angel-card:hover {
   border-color: #38bdf8;
-  box-shadow: 0 12px 30px -4px rgba(2, 132, 199, 0.12), 0 2px 6px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 10px 25px -4px rgba(2, 132, 199, 0.1), 0 2px 6px rgba(15, 23, 42, 0.04);
   transform: translateY(-2px);
 }
 
@@ -81,15 +93,15 @@ body {
 .sports-card-light {
   background: #ffffff;
   color: #0f172a;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02);
   border-radius: 1.5rem;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .sports-card-light:hover {
   border-color: #7dd3fc;
-  box-shadow: 0 12px 30px -4px rgba(2, 132, 199, 0.1), 0 2px 6px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 10px 25px -4px rgba(2, 132, 199, 0.09), 0 2px 6px rgba(15, 23, 42, 0.03);
   transform: translateY(-2px);
 }
 

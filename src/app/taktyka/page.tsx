@@ -3144,7 +3144,7 @@ function TacticsContent() {
           <div
             id="tactical-court-container"
             ref={courtContainerRef}
-            className={`relative bg-[#0f172a] rounded-3xl border-2 border-slate-300 shadow-md overflow-hidden mx-auto select-none transition-all duration-300 ${
+            className={`relative bg-[#0a0f1d] rounded-3xl border-2 border-slate-300/80 shadow-xl overflow-hidden mx-auto select-none transition-all duration-300 ${
               boardOrientation === 'horizontal'
                 ? 'aspect-[16/10] sm:aspect-[18/11] max-w-5xl'
                 : 'aspect-[9/13] sm:aspect-[9/12] max-w-3xl'
@@ -3153,94 +3153,113 @@ function TacticsContent() {
             }`}
             onClick={handleCourtClick}
           >
-            {/* Outer Playing Boundary Line (White 2px) */}
-            <div className="absolute inset-3 sm:inset-5 border-2 border-white rounded-sm pointer-events-none z-1 shadow-xs" />
+            {/* Outer Playing Boundary Line (White 2.5px with crisp glow) */}
+            <div className="absolute inset-3 sm:inset-5 border-[2.5px] border-white rounded-xs pointer-events-none z-1 shadow-[0_0_8px_rgba(255,255,255,0.2)]" />
 
             {boardOrientation === 'vertical' ? (
               <>
-                {/* Top Half: Połowa Rywali (0% - 50%) */}
-                <div className="absolute top-3 sm:top-5 left-3 sm:left-5 right-3 sm:right-5 bottom-1/2 bg-gradient-to-b from-[#1e3a8a] to-[#1e40af] pointer-events-none" />
+                {/* Top Half: Połowa Rywali (0% - 50%) - Authentic Taraflex Court */}
+                <div className="absolute top-3 sm:top-5 left-3 sm:left-5 right-3 sm:right-5 bottom-1/2 bg-gradient-to-b from-[#1a3375] via-[#1d3d8f] to-[#1e40af] pointer-events-none" />
 
                 {/* Opponent 3m Attack Line (at 33.3%) */}
-                <div className="absolute top-[33.3%] left-3 sm:left-5 right-3 sm:right-5 border-b-2 border-dashed border-rose-300/70 pointer-events-none z-5" />
+                <div className="absolute top-[33.3%] left-3 sm:left-5 right-3 sm:right-5 border-b-2 border-dashed border-rose-300/80 pointer-events-none z-5" />
+                {/* Opponent 3m Extension Dashes outside court */}
+                <div className="absolute top-[33.3%] left-0.5 sm:left-1 w-2 sm:w-3 border-b-2 border-dashed border-rose-300/60 pointer-events-none z-5" />
+                <div className="absolute top-[33.3%] right-0.5 sm:right-1 w-2 sm:w-3 border-b-2 border-dashed border-rose-300/60 pointer-events-none z-5" />
 
                 {/* Subtle Opponent Zone Watermarks */}
-                <div className="absolute top-7 left-6 text-xs font-black text-white/20 select-none pointer-events-none">V</div>
-                <div className="absolute top-7 left-1/2 -translate-x-1/2 text-xs font-black text-white/20 select-none pointer-events-none">VI</div>
-                <div className="absolute top-7 right-6 text-xs font-black text-white/20 select-none pointer-events-none">I</div>
-                <div className="absolute top-[42%] left-6 text-xs font-black text-white/20 select-none pointer-events-none">IV</div>
-                <div className="absolute top-[42%] left-1/2 -translate-x-1/2 text-xs font-black text-white/20 select-none pointer-events-none">III</div>
-                <div className="absolute top-[42%] right-6 text-xs font-black text-white/20 select-none pointer-events-none">II</div>
+                <div className="absolute top-7 left-6 text-xs font-black text-white/25 select-none pointer-events-none font-mono">V</div>
+                <div className="absolute top-7 left-1/2 -translate-x-1/2 text-xs font-black text-white/25 select-none pointer-events-none font-mono">VI</div>
+                <div className="absolute top-7 right-6 text-xs font-black text-white/25 select-none pointer-events-none font-mono">I</div>
+                <div className="absolute top-[42%] left-6 text-xs font-black text-white/25 select-none pointer-events-none font-mono">IV</div>
+                <div className="absolute top-[42%] left-1/2 -translate-x-1/2 text-xs font-black text-white/25 select-none pointer-events-none font-mono">III</div>
+                <div className="absolute top-[42%] right-6 text-xs font-black text-white/25 select-none pointer-events-none font-mono">II</div>
 
-                {/* Center Net System: Czysta, profesjonalna siatka bez zbędnych napisów */}
+                {/* Center Net System: Realistyczna siatka siatkarska (taśma górna, splot oczek, taśma dolna) */}
                 <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 z-20 pointer-events-none flex items-center justify-between">
                   {/* Left Post */}
-                  <div className="w-3.5 h-8 bg-slate-400 rounded-r border border-slate-600 shadow-md -translate-x-0.5" />
+                  <div className="w-3.5 sm:w-4 h-9 sm:h-10 bg-gradient-to-r from-slate-500 to-slate-400 rounded-r border border-slate-600 shadow-md -translate-x-0.5 shrink-0" />
 
-                  {/* Net: Sleek white volleyball net tape & grid mesh (bez tekstu/badge'y) */}
-                  <div className="flex-1 h-2.5 bg-white border-y border-slate-300 shadow-sm relative overflow-hidden">
-                    <div className="absolute inset-0 opacity-25 bg-[radial-gradient(#0f172a_1px,transparent_1px)] [background-size:4px_4px]" />
+                  {/* Realistic Volleyball Net Band & Woven Mesh */}
+                  <div className="flex-1 flex flex-col h-4.5 sm:h-5 shadow-sm relative overflow-hidden">
+                    {/* Top White Tape (5cm band) */}
+                    <div className="h-1 sm:h-1.5 bg-white border-b border-slate-300 shadow-2xs w-full" />
+                    {/* Woven Dark Mesh */}
+                    <div className="flex-1 volleyball-net-mesh-h w-full opacity-90" />
+                    {/* Bottom White Tape */}
+                    <div className="h-0.5 sm:h-1 bg-white/95 border-t border-slate-300/80 w-full" />
                   </div>
 
                   {/* Right Post */}
-                  <div className="w-3.5 h-8 bg-slate-400 rounded-l border border-slate-600 shadow-md translate-x-0.5" />
+                  <div className="w-3.5 sm:w-4 h-9 sm:h-10 bg-gradient-to-l from-slate-500 to-slate-400 rounded-l border border-slate-600 shadow-md translate-x-0.5 shrink-0" />
                 </div>
 
-                {/* Center Line Under Net */}
-                <div className="absolute top-1/2 left-3 sm:left-5 right-3 sm:right-5 h-[2px] bg-white pointer-events-none z-10" />
+                {/* Center Line Under Net (Official 5cm White Line) */}
+                <div className="absolute top-1/2 left-3 sm:left-5 right-3 sm:right-5 h-[2px] bg-white pointer-events-none z-10 -translate-y-1/2" />
 
-                {/* Antennas (Czerwono-białe antenki na liniach bocznych) */}
+                {/* Antennas (Czerwono-białe antenki na liniach bocznych - FIVB official) */}
                 <div
-                  className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 -translate-x-1/2 h-12 w-1.5 bg-[repeating-linear-gradient(to_bottom,#ef4444,#ef4444_6px,#ffffff_6px,#ffffff_12px)] rounded-full shadow-lg z-25 pointer-events-none border border-slate-900"
+                  className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 -translate-x-1/2 h-14 w-2 bg-[repeating-linear-gradient(to_bottom,#ef4444,#ef4444_7px,#ffffff_7px,#ffffff_14px)] rounded-full shadow-lg z-25 pointer-events-none border border-slate-900"
                   title="Antenka siatkarska lewa"
                 />
                 <div
-                  className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 translate-x-1/2 h-12 w-1.5 bg-[repeating-linear-gradient(to_bottom,#ef4444,#ef4444_6px,#ffffff_6px,#ffffff_12px)] rounded-full shadow-lg z-25 pointer-events-none border border-slate-900"
+                  className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 translate-x-1/2 h-14 w-2 bg-[repeating-linear-gradient(to_bottom,#ef4444,#ef4444_7px,#ffffff_7px,#ffffff_14px)] rounded-full shadow-lg z-25 pointer-events-none border border-slate-900"
                   title="Antenka siatkarska prawa"
                 />
 
-                {/* Bottom Half: Połowa Angels ZTP (50% - 100%) */}
-                <div className="absolute top-1/2 left-3 sm:left-5 right-3 sm:right-5 bottom-3 sm:bottom-5 bg-gradient-to-b from-[#1e40af] to-[#1d4ed8] pointer-events-none" />
+                {/* Bottom Half: Połowa Angels ZTP (50% - 100%) - Authentic Taraflex Royal Blue */}
+                <div className="absolute top-1/2 left-3 sm:left-5 right-3 sm:right-5 bottom-3 sm:bottom-5 bg-gradient-to-b from-[#1e40af] via-[#214dc7] to-[#2563eb] pointer-events-none" />
 
                 {/* Angels ZTP 3m Attack Line (at 66.7%) */}
-                <div className="absolute top-[66.7%] left-3 sm:left-5 right-3 sm:right-5 border-b-2 border-dashed border-sky-200/80 pointer-events-none z-5" />
+                <div className="absolute top-[66.7%] left-3 sm:left-5 right-3 sm:right-5 border-b-2 border-dashed border-sky-200/90 pointer-events-none z-5" />
+                {/* Angels 3m Extension Dashes outside court */}
+                <div className="absolute top-[66.7%] left-0.5 sm:left-1 w-2 sm:w-3 border-b-2 border-dashed border-sky-300/60 pointer-events-none z-5" />
+                <div className="absolute top-[66.7%] right-0.5 sm:right-1 w-2 sm:w-3 border-b-2 border-dashed border-sky-300/60 pointer-events-none z-5" />
 
                 {/* Subtle Angels ZTP Zone Watermarks */}
-                <div className="absolute top-[55%] left-6 text-xs font-black text-white/20 select-none pointer-events-none">IV</div>
-                <div className="absolute top-[55%] left-1/2 -translate-x-1/2 text-xs font-black text-white/20 select-none pointer-events-none">III</div>
-                <div className="absolute top-[55%] right-6 text-xs font-black text-white/20 select-none pointer-events-none">II</div>
-                <div className="absolute bottom-6 left-6 text-xs font-black text-white/20 select-none pointer-events-none">V</div>
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs font-black text-white/20 select-none pointer-events-none">VI</div>
-                <div className="absolute bottom-6 right-6 text-xs font-black text-white/20 select-none pointer-events-none">I</div>
+                <div className="absolute top-[55%] left-6 text-xs font-black text-white/25 select-none pointer-events-none font-mono">IV</div>
+                <div className="absolute top-[55%] left-1/2 -translate-x-1/2 text-xs font-black text-white/25 select-none pointer-events-none font-mono">III</div>
+                <div className="absolute top-[55%] right-6 text-xs font-black text-white/25 select-none pointer-events-none font-mono">II</div>
+                <div className="absolute bottom-6 left-6 text-xs font-black text-white/25 select-none pointer-events-none font-mono">V</div>
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs font-black text-white/25 select-none pointer-events-none font-mono">VI</div>
+                <div className="absolute bottom-6 right-6 text-xs font-black text-white/25 select-none pointer-events-none font-mono">I</div>
               </>
             ) : (
               <>
                 {/* Left Half: Połowa Rywali (0% - 50%) */}
-                <div className="absolute top-3 sm:top-5 left-3 sm:left-5 right-1/2 bottom-3 sm:bottom-5 bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] pointer-events-none" />
+                <div className="absolute top-3 sm:top-5 left-3 sm:left-5 right-1/2 bottom-3 sm:bottom-5 bg-gradient-to-r from-[#1a3375] via-[#1d3d8f] to-[#1e40af] pointer-events-none" />
 
                 {/* Opponent 3m Attack Line (at 33.3%) */}
-                <div className="absolute left-[33.3%] top-3 sm:top-5 bottom-3 sm:bottom-5 border-r-2 border-dashed border-rose-300/70 pointer-events-none z-5" />
+                <div className="absolute left-[33.3%] top-3 sm:top-5 bottom-3 sm:bottom-5 border-r-2 border-dashed border-rose-300/80 pointer-events-none z-5" />
+                {/* Opponent 3m Extension Dashes outside court */}
+                <div className="absolute left-[33.3%] top-0.5 sm:top-1 h-2 sm:h-3 border-r-2 border-dashed border-rose-300/60 pointer-events-none z-5" />
+                <div className="absolute left-[33.3%] bottom-0.5 sm:bottom-1 h-2 sm:h-3 border-r-2 border-dashed border-rose-300/60 pointer-events-none z-5" />
 
                 {/* Opponent Zone Watermarks (Horizontal) */}
-                <div className="absolute top-6 left-7 text-xs font-black text-white/20 select-none pointer-events-none">V</div>
-                <div className="absolute top-1/2 -translate-y-1/2 left-7 text-xs font-black text-white/20 select-none pointer-events-none">VI</div>
-                <div className="absolute bottom-6 left-7 text-xs font-black text-white/20 select-none pointer-events-none">I</div>
-                <div className="absolute top-6 left-[41%] text-xs font-black text-white/20 select-none pointer-events-none">IV</div>
-                <div className="absolute top-1/2 -translate-y-1/2 left-[41%] text-xs font-black text-white/20 select-none pointer-events-none">III</div>
-                <div className="absolute bottom-6 left-[41%] text-xs font-black text-white/20 select-none pointer-events-none">II</div>
+                <div className="absolute top-6 left-7 text-xs font-black text-white/25 select-none pointer-events-none font-mono">V</div>
+                <div className="absolute top-1/2 -translate-y-1/2 left-7 text-xs font-black text-white/25 select-none pointer-events-none font-mono">VI</div>
+                <div className="absolute bottom-6 left-7 text-xs font-black text-white/25 select-none pointer-events-none font-mono">I</div>
+                <div className="absolute top-6 left-[41%] text-xs font-black text-white/25 select-none pointer-events-none font-mono">IV</div>
+                <div className="absolute top-1/2 -translate-y-1/2 left-[41%] text-xs font-black text-white/25 select-none pointer-events-none font-mono">III</div>
+                <div className="absolute bottom-6 left-[41%] text-xs font-black text-white/25 select-none pointer-events-none font-mono">II</div>
 
                 {/* Center Net System: Czysta, profesjonalna siatka w pionie */}
                 <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 z-20 pointer-events-none flex flex-col items-center justify-between">
                   {/* Top Post */}
-                  <div className="h-3.5 w-8 bg-slate-400 rounded-b border border-slate-600 shadow-md -translate-y-0.5" />
+                  <div className="h-3.5 sm:h-4 w-9 sm:w-10 bg-gradient-to-b from-slate-500 to-slate-400 rounded-b border border-slate-600 shadow-md -translate-y-0.5 shrink-0" />
 
-                  {/* Net: Sleek white volleyball net tape & grid mesh */}
-                  <div className="flex-1 w-2.5 bg-white border-x border-slate-300 shadow-sm relative overflow-hidden">
-                    <div className="absolute inset-0 opacity-25 bg-[radial-gradient(#0f172a_1px,transparent_1px)] [background-size:4px_4px]" />
+                  {/* Realistic Volleyball Net Band & Woven Mesh (Vertical) */}
+                  <div className="flex-1 flex flex-row w-4.5 sm:w-5 shadow-sm relative overflow-hidden">
+                    {/* Left White Tape (5cm band) */}
+                    <div className="w-1 sm:w-1.5 bg-white border-r border-slate-300 shadow-2xs h-full" />
+                    {/* Woven Dark Mesh */}
+                    <div className="flex-1 volleyball-net-mesh-v h-full opacity-90" />
+                    {/* Right White Tape */}
+                    <div className="w-0.5 sm:w-1 bg-white/95 border-l border-slate-300/80 h-full" />
                   </div>
 
                   {/* Bottom Post */}
-                  <div className="h-3.5 w-8 bg-slate-400 rounded-t border border-slate-600 shadow-md translate-y-0.5" />
+                  <div className="h-3.5 sm:h-4 w-9 sm:w-10 bg-gradient-to-t from-slate-500 to-slate-400 rounded-t border border-slate-600 shadow-md translate-y-0.5 shrink-0" />
                 </div>
 
                 {/* Center Line Under Net */}
@@ -3248,27 +3267,30 @@ function TacticsContent() {
 
                 {/* Antennas (Czerwono-białe antenki na liniach bocznych - góra i dół) */}
                 <div
-                  className="absolute top-3 sm:top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-1.5 bg-[repeating-linear-gradient(to_right,#ef4444,#ef4444_6px,#ffffff_6px,#ffffff_12px)] rounded-full shadow-lg z-25 pointer-events-none border border-slate-900"
+                  className="absolute top-3 sm:top-5 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-2 bg-[repeating-linear-gradient(to_right,#ef4444,#ef4444_7px,#ffffff_7px,#ffffff_14px)] rounded-full shadow-lg z-25 pointer-events-none border border-slate-900"
                   title="Antenka siatkarska górna"
                 />
                 <div
-                  className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 translate-y-1/2 w-12 h-1.5 bg-[repeating-linear-gradient(to_right,#ef4444,#ef4444_6px,#ffffff_6px,#ffffff_12px)] rounded-full shadow-lg z-25 pointer-events-none border border-slate-900"
+                  className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 translate-y-1/2 w-14 h-2 bg-[repeating-linear-gradient(to_right,#ef4444,#ef4444_7px,#ffffff_7px,#ffffff_14px)] rounded-full shadow-lg z-25 pointer-events-none border border-slate-900"
                   title="Antenka siatkarska dolna"
                 />
 
                 {/* Right Half: Połowa Angels ZTP (50% - 100%) */}
-                <div className="absolute top-3 sm:top-5 left-1/2 right-3 sm:right-5 bottom-3 sm:bottom-5 bg-gradient-to-r from-[#1e40af] to-[#1d4ed8] pointer-events-none" />
+                <div className="absolute top-3 sm:top-5 left-1/2 right-3 sm:right-5 bottom-3 sm:bottom-5 bg-gradient-to-r from-[#1e40af] via-[#214dc7] to-[#2563eb] pointer-events-none" />
 
                 {/* Angels ZTP 3m Attack Line (at 66.7%) */}
-                <div className="absolute left-[66.7%] top-3 sm:top-5 bottom-3 sm:bottom-5 border-r-2 border-dashed border-sky-200/80 pointer-events-none z-5" />
+                <div className="absolute left-[66.7%] top-3 sm:top-5 bottom-3 sm:bottom-5 border-r-2 border-dashed border-sky-200/90 pointer-events-none z-5" />
+                {/* Angels 3m Extension Dashes outside court */}
+                <div className="absolute left-[66.7%] top-0.5 sm:top-1 h-2 sm:h-3 border-r-2 border-dashed border-sky-300/60 pointer-events-none z-5" />
+                <div className="absolute left-[66.7%] bottom-0.5 sm:bottom-1 h-2 sm:h-3 border-r-2 border-dashed border-sky-300/60 pointer-events-none z-5" />
 
                 {/* Angels ZTP Zone Watermarks (Horizontal) */}
-                <div className="absolute top-6 left-[56%] text-xs font-black text-white/20 select-none pointer-events-none">II</div>
-                <div className="absolute top-1/2 -translate-y-1/2 left-[56%] text-xs font-black text-white/20 select-none pointer-events-none">III</div>
-                <div className="absolute bottom-6 left-[56%] text-xs font-black text-white/20 select-none pointer-events-none">IV</div>
-                <div className="absolute top-6 right-7 text-xs font-black text-white/20 select-none pointer-events-none">I</div>
-                <div className="absolute top-1/2 -translate-y-1/2 right-7 text-xs font-black text-white/20 select-none pointer-events-none">VI</div>
-                <div className="absolute bottom-6 right-7 text-xs font-black text-white/20 select-none pointer-events-none">V</div>
+                <div className="absolute top-6 left-[56%] text-xs font-black text-white/25 select-none pointer-events-none font-mono">II</div>
+                <div className="absolute top-1/2 -translate-y-1/2 left-[56%] text-xs font-black text-white/25 select-none pointer-events-none font-mono">III</div>
+                <div className="absolute bottom-6 left-[56%] text-xs font-black text-white/25 select-none pointer-events-none font-mono">IV</div>
+                <div className="absolute top-6 right-7 text-xs font-black text-white/25 select-none pointer-events-none font-mono">I</div>
+                <div className="absolute top-1/2 -translate-y-1/2 right-7 text-xs font-black text-white/25 select-none pointer-events-none font-mono">VI</div>
+                <div className="absolute bottom-6 right-7 text-xs font-black text-white/25 select-none pointer-events-none font-mono">V</div>
               </>
             )}
 
