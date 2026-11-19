@@ -3581,10 +3581,9 @@ function RozgrywkiContent() {
                   <button
                     type="button"
                     onClick={() => setShowTeamCrestsModal(true)}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 hover:border-sky-300 transition shadow-sm whitespace-nowrap shrink-0"
+                    className="inline-flex items-center justify-center px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 hover:border-sky-300 transition shadow-sm whitespace-nowrap shrink-0"
                     title="Dodawaj i zarządzaj herbami rywali i drużyn ligowych"
                   >
-                    <Shield className="w-3.5 h-3.5 text-sky-600" />
                     <span>Herby drużyn</span>
                   </button>
                   {canManageMatches && (
@@ -3632,10 +3631,9 @@ function RozgrywkiContent() {
                   <button
                     type="button"
                     onClick={() => setShowTeamCrestsModal(true)}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 hover:border-sky-300 transition shadow-sm whitespace-nowrap shrink-0"
+                    className="inline-flex items-center justify-center px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 hover:border-sky-300 transition shadow-sm whitespace-nowrap shrink-0"
                     title="Dodawaj i zarządzaj herbami rywali i drużyn ligowych"
                   >
-                    <Shield className="w-3.5 h-3.5 text-sky-600" />
                     <span>Herby drużyn</span>
                   </button>
                   {canManageMatches && (
