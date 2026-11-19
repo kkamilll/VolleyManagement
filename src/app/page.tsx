@@ -452,14 +452,9 @@ function DashboardContent() {
             </div>
 
             {unpaidUserPayments.length === 0 ? (
-              <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 text-xs text-emerald-950 space-y-1">
-                <div className="font-black flex items-center gap-1.5 text-emerald-800">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  Wszystkie Twoje składki są w pełni uregulowane!
-                </div>
-                <p className="text-[11px] text-emerald-700">
-                  Brak jakichkolwiek zaległości na Twoim koncie zawodnika.
-                </p>
+              <div className="py-2.5 px-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-200 flex items-center gap-2 text-xs text-emerald-900 font-bold">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Wszystkie składki opłacone</span>
               </div>
             ) : (
               <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-300 text-xs text-amber-950 space-y-2.5">
