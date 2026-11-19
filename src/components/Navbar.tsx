@@ -710,10 +710,10 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* Mobile Hamburger Button */}
+            {/* Mobile Hamburger Button (Tylko na tabletach md..xl, bo na telefonach <md jest dedykowany dolny pasek nawigacyjny BottomNav) */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="xl:hidden p-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 transition shadow-sm"
+              className="hidden md:flex xl:hidden p-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 transition shadow-sm"
               aria-label="Menu"
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -722,9 +722,9 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Navigation Drawer */}
+      {/* Mobile Navigation Drawer (Tylko na tabletach md..xl) */}
       {isMobileMenuOpen && (
-        <div className="xl:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-5 space-y-2 animate-fadeIn shadow-xl text-slate-800">
+        <div className="hidden md:block xl:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-5 space-y-2 animate-fadeIn shadow-xl text-slate-800">
           {user && (
             <div className="p-3 mb-2 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
