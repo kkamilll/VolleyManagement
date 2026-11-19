@@ -57,22 +57,22 @@ body {
     repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.35) 0px, rgba(255, 255, 255, 0.35) 1px, transparent 1px, transparent 5px);
 }
 
-/* Premium Pro Sports Cards */
+/* Premium Clean Pro Sports Cards */
 .cyber-card,
 .angel-card {
   background: #ffffff;
   color: #0f172a;
-  border: 1px solid rgba(226, 232, 240, 0.85);
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02);
+  border: 1px solid rgba(226, 232, 240, 0.75);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 6px 18px -3px rgba(15, 23, 42, 0.03);
   border-radius: 1.25rem;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cyber-card:hover,
 .angel-card:hover {
-  border-color: #38bdf8;
-  box-shadow: 0 10px 25px -4px rgba(2, 132, 199, 0.1), 0 2px 6px rgba(15, 23, 42, 0.04);
-  transform: translateY(-2px);
+  border-color: #7dd3fc;
+  box-shadow: 0 8px 25px -4px rgba(2, 132, 199, 0.08), 0 2px 6px rgba(15, 23, 42, 0.03);
+  transform: translateY(-1.5px);
 }
 
 .sports-card-dark {
@@ -93,16 +93,16 @@ body {
 .sports-card-light {
   background: #ffffff;
   color: #0f172a;
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02);
+  border: 1px solid rgba(226, 232, 240, 0.75);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 6px 18px -3px rgba(15, 23, 42, 0.03);
   border-radius: 1.5rem;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .sports-card-light:hover {
   border-color: #7dd3fc;
-  box-shadow: 0 10px 25px -4px rgba(2, 132, 199, 0.09), 0 2px 6px rgba(15, 23, 42, 0.03);
-  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -4px rgba(2, 132, 199, 0.08), 0 2px 6px rgba(15, 23, 42, 0.03);
+  transform: translateY(-1.5px);
 }
 
 .cyber-card-gold {

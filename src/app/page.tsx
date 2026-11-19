@@ -171,27 +171,25 @@ function DashboardContent() {
 
       {/* 2. NOWOCZESNA KARTA MECZU DNIA (MATCHDAY HERO CENTER) */}
       {(nextEvent || officialNextMatch) ? (
-        <div className="relative overflow-hidden rounded-3xl bg-white border border-slate-200/90 shadow-xl text-slate-900 transition-all">
-          {/* Subtelny akcent boiska w tle */}
-          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-sky-500 via-amber-400 to-sky-600" />
-          <div className="absolute -right-20 -top-20 w-80 h-80 bg-sky-100/50 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-amber-100/40 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative overflow-hidden rounded-3xl bg-white border border-slate-200/80 shadow-sm hover:shadow-md text-slate-900 transition-all duration-300">
+          {/* Subtelny pasek akcentu na samej górze */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-500 via-sky-400 to-amber-400" />
 
           {/* GÓRNY PASEK: KATEGORIA, RUNDA, DATA I GODZINA */}
-          <div className="relative z-10 flex flex-wrap items-center justify-between gap-2.5 px-4 sm:px-6 pt-4 pb-3.5 border-b border-slate-100 bg-slate-50/70">
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-2.5 px-5 sm:px-7 pt-4 pb-3 border-b border-slate-100 bg-slate-50/60">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="px-3 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider bg-amber-400 text-slate-950 flex items-center gap-1.5 shadow-xs font-sans">
-                <Flame className="w-3.5 h-3.5 fill-slate-950" />
-                Najbliższy Mecz Ligowy
+              <span className="px-2.5 py-1 rounded-lg text-xs font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-200/80 flex items-center gap-1.5">
+                <Flame className="w-3.5 h-3.5 text-amber-600" />
+                Mecz Ligowy
               </span>
               {officialNextMatch && (
-                <span className="px-2.5 py-1 rounded-xl text-[11px] font-mono font-bold bg-white text-slate-700 border border-slate-200 shadow-2xs">
+                <span className="text-xs font-semibold text-slate-500">
                   LALS Runda {officialNextMatch.round} • Mecz #{officialNextMatch.matchNumber}
                 </span>
               )}
             </div>
 
-            <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-white border border-slate-200 text-slate-700 font-mono text-xs font-bold shadow-2xs">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
               <Clock className="w-3.5 h-3.5 text-sky-600" />
               <span>
                 {officialNextMatch?.dateStr || (nextEvent ? new Date(nextEvent.date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' }) : '')} • godz. {officialNextMatch?.timeStr || (nextEvent ? new Date(nextEvent.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) : '')}
@@ -200,8 +198,8 @@ function DashboardContent() {
           </div>
 
           {/* GŁÓWNY POJEDYNEK DRUŻYN (SCOREBOARD DUEL) */}
-          <div className="relative z-10 px-4 sm:px-8 py-5 sm:py-6">
-            <div className="grid grid-cols-1 md:grid-cols-7 items-center gap-6">
+          <div className="relative z-10 px-5 sm:px-8 py-6">
+            <div className="grid grid-cols-1 md:grid-cols-7 items-center gap-5 sm:gap-6">
               
               {/* GOSPODARZ */}
               <div className="md:col-span-3 flex items-center gap-4 sm:gap-5">
@@ -210,26 +208,26 @@ function DashboardContent() {
                   crestsMap={leagueData?.teamCrests}
                   size="xl"
                   rounded="rounded-2xl"
-                  className="shadow-md"
+                  className="shadow-sm border border-slate-200/80"
                 />
-                <div className="space-y-1 min-w-0">
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider font-mono ${
-                    isAngelsHome ? 'bg-sky-100 text-sky-800 border border-sky-200' : 'bg-slate-100 text-slate-700 border border-slate-200'
+                <div className="space-y-0.5 min-w-0">
+                  <span className={`inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider ${
+                    isAngelsHome ? 'text-sky-600' : 'text-slate-400'
                   }`}>
                     {isAngelsHome ? 'Gospodarz • Angels ZTP' : 'Gospodarz'}
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-black tracking-tight uppercase font-athletic text-slate-900 truncate">
+                  <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 truncate">
                     {homeTeamName}
                   </h2>
                 </div>
               </div>
 
               {/* ŚRODEK (VS & HALA) */}
-              <div className="md:col-span-1 flex flex-col items-center justify-center text-center space-y-2 py-2 md:py-0">
-                <div className="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-sm font-black text-slate-700 font-mono shadow-inner">
+              <div className="md:col-span-1 flex flex-col items-center justify-center text-center space-y-1.5 py-1 md:py-0">
+                <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-700 font-black text-xs flex items-center justify-center border border-slate-200/80 shadow-2xs font-athletic">
                   VS
                 </div>
-                <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-[11px] font-semibold text-slate-600 max-w-[150px] truncate">
+                <div className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 max-w-[150px] truncate">
                   <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
                   <span className="truncate">{nextEvent?.location || 'Hala OSiR, Luboń'}</span>
                 </div>
@@ -242,15 +240,15 @@ function DashboardContent() {
                   crestsMap={leagueData?.teamCrests}
                   size="xl"
                   rounded="rounded-2xl"
-                  className="shadow-md"
+                  className="shadow-sm border border-slate-200/80"
                 />
-                <div className="space-y-1 min-w-0">
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider font-mono ${
-                    isAngelsAway ? 'bg-sky-100 text-sky-800 border border-sky-200' : 'bg-slate-100 text-slate-700 border border-slate-200'
+                <div className="space-y-0.5 min-w-0">
+                  <span className={`inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider ${
+                    isAngelsAway ? 'text-sky-600' : 'text-slate-400'
                   }`}>
                     {isAngelsAway ? 'Gość • Angels ZTP' : 'Gość'}
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-black tracking-tight uppercase font-athletic text-slate-900 truncate">
+                  <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 truncate">
                     {awayTeamName}
                   </h2>
                 </div>
@@ -260,49 +258,49 @@ function DashboardContent() {
           </div>
 
           {/* DOLNY PASEK: OBECNOŚĆ, SKŁAD & TAKTYKA */}
-          <div className="relative z-10 px-4 sm:px-8 py-4 bg-slate-50/80 border-t border-slate-200/90 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3.5">
+          <div className="relative z-10 px-5 sm:px-8 py-3.5 bg-slate-50/60 border-t border-slate-100 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
             
             {/* Twoja deklaracja obecności */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full lg:w-auto">
-              <span className="text-xs font-black uppercase tracking-wider text-slate-700 shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full lg:w-auto">
+              <span className="text-xs font-bold text-slate-700 shrink-0">
                 Twoja obecność:
               </span>
               {nextEvent && (
-                <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-white border border-slate-200 shadow-2xs w-full sm:w-auto">
+                <div className="inline-flex p-1 rounded-2xl bg-white border border-slate-200/80 shadow-2xs w-full sm:w-auto">
                   <button
                     onClick={() => handleQuickAttendance(nextEvent.id, 'BEDE')}
                     disabled={updatingAttendance}
-                    className={`py-2 sm:py-1.5 px-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                    className={`flex-1 sm:flex-initial py-1.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
                       myStatusRecord?.status === 'BEDE'
-                        ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-500/30'
+                        ? 'bg-emerald-600 text-white shadow-xs'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
+                    <CheckCircle2 className="w-3.5 h-3.5" />
                     <span>Będę</span>
                   </button>
                   <button
                     onClick={() => handleQuickAttendance(nextEvent.id, 'NIEPEWNE')}
                     disabled={updatingAttendance}
-                    className={`py-2 sm:py-1.5 px-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                    className={`flex-1 sm:flex-initial py-1.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
                       myStatusRecord?.status === 'NIEPEWNE'
-                        ? 'bg-amber-500 text-slate-950 shadow-sm ring-2 ring-amber-400/40'
+                        ? 'bg-amber-500 text-slate-950 shadow-xs'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    <HelpCircle className="w-3.5 h-3.5 text-amber-800 shrink-0" />
+                    <HelpCircle className="w-3.5 h-3.5" />
                     <span>Może</span>
                   </button>
                   <button
                     onClick={() => handleQuickAttendance(nextEvent.id, 'NIE_BEDE')}
                     disabled={updatingAttendance}
-                    className={`py-2 sm:py-1.5 px-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                    className={`flex-1 sm:flex-initial py-1.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
                       myStatusRecord?.status === 'NIE_BEDE'
-                        ? 'bg-rose-600 text-white shadow-sm ring-2 ring-rose-500/30'
+                        ? 'bg-rose-600 text-white shadow-xs'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    <AlertCircle className="w-3.5 h-3.5 text-rose-200 shrink-0" />
+                    <AlertCircle className="w-3.5 h-3.5" />
                     <span>Nieobecny</span>
                   </button>
                 </div>
@@ -310,21 +308,21 @@ function DashboardContent() {
             </div>
 
             {/* Skład & Przejście do Taktyki */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full lg:w-auto">
+            <div className="flex items-center gap-2 w-full lg:w-auto">
               <Link 
                 href={nextEvent?.id ? `/events?eventId=${nextEvent.id}` : '/events'}
-                className="text-xs text-slate-700 hover:text-sky-700 transition flex items-center justify-center gap-1.5 font-bold py-2.5 sm:py-2 px-3.5 rounded-xl bg-white border border-slate-200 hover:border-sky-300 shadow-2xs"
+                className="flex-1 sm:flex-initial text-xs text-slate-700 hover:text-sky-700 transition flex items-center justify-center gap-1.5 font-bold py-2 px-3.5 rounded-xl bg-white border border-slate-200/80 hover:border-sky-300 shadow-2xs"
               >
                 <Users className="w-4 h-4 text-sky-600 shrink-0" />
-                <span>Skład: <strong className="text-slate-900">{attendingCount === 1 ? '1 obecny' : `${attendingCount} obecnych`}</strong> &rarr;</span>
+                <span>Skład: <strong className="text-slate-900 font-black">{attendingCount === 1 ? '1 obecny' : `${attendingCount} obecnych`}</strong> &rarr;</span>
               </Link>
 
               <Link
                 href={nextEvent?.id ? `/taktyka?eventId=${nextEvent.id}` : '/taktyka'}
-                className="py-2.5 sm:py-2 px-4 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-sm hover:shadow cursor-pointer active:scale-95"
+                className="flex-1 sm:flex-initial py-2 px-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-xs hover:shadow active:scale-95"
               >
                 <Target className="w-4 h-4 text-sky-200 shrink-0" />
-                <span>Założenia Taktyczne &rarr;</span>
+                <span>Taktyka na mecz &rarr;</span>
               </Link>
             </div>
 

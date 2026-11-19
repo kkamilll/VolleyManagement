@@ -171,27 +171,27 @@ function EventsAttendanceContent() {
   const isCoach = user?.role === 'TRENER' || user?.role === 'KIEROWNIK';
 
   const getPositionBadgeStyle = (position?: string) => {
-    if (!position) return 'bg-slate-900 text-slate-400 border-slate-800';
+    if (!position) return 'bg-slate-100 text-slate-600 border-slate-200';
     const pos = position.toLowerCase();
     if (pos.includes('przyjmu') || pos === 'p') {
-      return 'bg-sky-500/10 text-sky-300 border-sky-500/30';
+      return 'bg-sky-50 text-sky-700 border-sky-200';
     }
     if (pos.includes('środkow') || pos.includes('srodkow') || pos === 'ś' || pos === 's') {
-      return 'bg-amber-500/10 text-amber-300 border-amber-500/30';
+      return 'bg-purple-50 text-purple-700 border-purple-200';
     }
     if (pos.includes('atakuj') || pos === 'a') {
-      return 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30';
+      return 'bg-emerald-50 text-emerald-800 border-emerald-200';
     }
     if (pos.includes('rozgryw') || pos === 'r') {
-      return 'bg-purple-500/10 text-purple-300 border-purple-500/30';
+      return 'bg-blue-50 text-blue-700 border-blue-200';
     }
     if (pos.includes('libero') || pos === 'l') {
-      return 'bg-rose-500/10 text-rose-300 border-rose-500/30';
+      return 'bg-amber-50 text-amber-800 border-amber-200';
     }
     if (pos.includes('trener') || pos.includes('kierownik')) {
-      return 'bg-slate-800 text-slate-200 border-slate-700';
+      return 'bg-slate-100 text-slate-700 border-slate-200';
     }
-    return 'bg-slate-900 text-slate-300 border-slate-800';
+    return 'bg-slate-100 text-slate-600 border-slate-200';
   };
 
   // Helper to calculate 14-player ideal training lineup position balance
@@ -1633,8 +1633,8 @@ function EventsAttendanceContent() {
                               <span
                                 className={`px-2.5 py-0.5 rounded-md text-[11px] font-black uppercase tracking-wide flex items-center gap-1.5 border shadow-2xs ${
                                   matchInfo.isWin
-                                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                                    : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                                    ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                                    : 'bg-rose-100 text-rose-800 border-rose-300'
                                 }`}
                               >
                                 <span>{matchInfo.isWin ? '✓ Wygrana' : '✗ Przegrana'}</span>
@@ -1644,29 +1644,25 @@ function EventsAttendanceContent() {
                               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1">
                                 <CheckCircle2 className="w-3 h-3 text-slate-400" /> Zakończone
                               </span>
-                            ) : (
-                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/30">
-                                Zgłoszenia w toku
-                              </span>
-                            )}
+                            ) : null}
 
                             {/* Attendance counter ONLY for upcoming events */}
                             {!isEventPast && !isFinished && matchInfo.ourSetsWon === undefined && (
                               <span
                                 className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border flex items-center gap-1.5 ${
                                   posBalance.isFull
-                                    ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                                    : 'bg-slate-900/90 text-slate-300 border-slate-800'
+                                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                    : 'bg-slate-50 text-slate-700 border-slate-200'
                                 }`}
                                 title="Liczba zawodników zapisanych na to wydarzenie"
                               >
-                                <Users className="w-3 h-3 text-amber-400" />
+                                <Users className="w-3 h-3 text-sky-600" />
                                 <span><strong>{posBalance.totalConfirmed}</strong>/14 graczy</span>
                               </span>
                             )}
 
                             {Boolean(event.costPerPerson && event.costPerPerson > 0) && (
-                              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-900/90 text-slate-300 border border-slate-800">
+                              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200">
                                 {event.costPerPerson} zł / os.
                               </span>
                             )}
