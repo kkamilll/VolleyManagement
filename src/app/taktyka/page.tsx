@@ -2533,34 +2533,34 @@ function TacticsContent() {
       </div>
 
       {/* GŁÓWNY PODZIAŁ MODUŁU TAKTYKI: TABLICA + ROZPISKI (MECZE, SPARINGI, TURNIEJE, TRENINGI) */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 p-1.5 rounded-2xl bg-slate-100 border border-slate-300 shadow-xs">
-        {/* 5 Głównych Zakładek Taktyki - responsywny pasek z płynnym przewijaniem na telefonach */}
-        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none w-full lg:w-auto pb-0.5">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 p-1.5 rounded-2xl bg-slate-100/90 border border-slate-200/90 shadow-2xs">
+        {/* 5 Głównych Zakładek Taktyki - spójny, elegancki pasek segmentowy */}
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none w-full lg:w-auto">
           <button
             type="button"
             onClick={() => { setTacticsSection('board'); setSelectedTactic(null); setLastAddedTactic(null); }}
-            className={`shrink-0 flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
+            className={`shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'board'
-                ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
-                : 'bg-white text-slate-700 hover:text-slate-900 border-slate-300 hover:bg-slate-50'
+                ? 'bg-sky-600 text-white border-sky-600 shadow-xs font-black'
+                : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
             }`}
           >
-            <Compass className={`w-4 h-4 ${tacticsSection === 'board' ? 'text-amber-300' : 'text-sky-600'}`} />
+            <Compass className={`w-4 h-4 ${tacticsSection === 'board' ? 'text-sky-200' : 'text-sky-600'}`} />
             <span>Tablica</span>
           </button>
 
           <button
             type="button"
             onClick={() => { setTacticsSection('matches'); setSelectedTactic(null); setLastAddedTactic(null); }}
-            className={`shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
+            className={`shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'matches'
-                ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
-                : 'bg-white text-slate-700 hover:text-slate-900 border-slate-300 hover:bg-slate-50'
+                ? 'bg-sky-600 text-white border-sky-600 shadow-xs font-black'
+                : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
             }`}
           >
-            <Trophy className={`w-4 h-4 ${tacticsSection === 'matches' ? 'text-amber-300' : 'text-sky-600'}`} />
+            <Trophy className={`w-4 h-4 ${tacticsSection === 'matches' ? 'text-sky-200' : 'text-sky-600'}`} />
             <span>Mecze</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'matches' ? 'bg-white/20 text-white font-black' : 'bg-slate-100 text-slate-600'}`}>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'matches' ? 'bg-sky-700/60 text-sky-100 font-black' : 'bg-slate-100 text-slate-600'}`}>
               {matchesCount}
             </span>
           </button>
@@ -2568,15 +2568,15 @@ function TacticsContent() {
           <button
             type="button"
             onClick={() => { setTacticsSection('sparingi'); setSelectedTactic(null); setLastAddedTactic(null); }}
-            className={`shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
+            className={`shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'sparingi'
-                ? 'bg-amber-500 text-slate-950 border-amber-400 font-black shadow-sm'
-                : 'bg-white text-slate-700 hover:text-slate-900 border-slate-300 hover:bg-slate-50'
+                ? 'bg-sky-600 text-white border-sky-600 shadow-xs font-black'
+                : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
             }`}
           >
-            <Swords className={`w-4 h-4 ${tacticsSection === 'sparingi' ? 'text-slate-950' : 'text-amber-600'}`} />
+            <Swords className={`w-4 h-4 ${tacticsSection === 'sparingi' ? 'text-sky-200' : 'text-slate-600'}`} />
             <span>Sparingi</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'sparingi' ? 'bg-slate-950/20 text-slate-950 font-black' : 'bg-slate-100 text-slate-600'}`}>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'sparingi' ? 'bg-sky-700/60 text-sky-100 font-black' : 'bg-slate-100 text-slate-600'}`}>
               {sparringsCount}
             </span>
           </button>
@@ -2584,15 +2584,15 @@ function TacticsContent() {
           <button
             type="button"
             onClick={() => { setTacticsSection('turnieje'); setSelectedTactic(null); setLastAddedTactic(null); }}
-            className={`shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
+            className={`shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'turnieje'
-                ? 'bg-purple-600 text-white border-purple-600 shadow-sm'
-                : 'bg-white text-slate-700 hover:text-slate-900 border-slate-300 hover:bg-slate-50'
+                ? 'bg-sky-600 text-white border-sky-600 shadow-xs font-black'
+                : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
             }`}
           >
-            <Crown className={`w-4 h-4 ${tacticsSection === 'turnieje' ? 'text-amber-300' : 'text-purple-600'}`} />
+            <Crown className={`w-4 h-4 ${tacticsSection === 'turnieje' ? 'text-sky-200' : 'text-slate-600'}`} />
             <span>Turnieje</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'turnieje' ? 'bg-white/20 text-white font-black' : 'bg-slate-100 text-slate-600'}`}>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'turnieje' ? 'bg-sky-700/60 text-sky-100 font-black' : 'bg-slate-100 text-slate-600'}`}>
               {tournamentsCount}
             </span>
           </button>
@@ -2600,15 +2600,15 @@ function TacticsContent() {
           <button
             type="button"
             onClick={() => setTacticsSection('trainings')}
-            className={`shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition border whitespace-nowrap ${
+            className={`shrink-0 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'trainings'
-                ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-                : 'bg-white text-slate-700 hover:text-slate-900 border-slate-300 hover:bg-slate-50'
+                ? 'bg-sky-600 text-white border-sky-600 shadow-xs font-black'
+                : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
             }`}
           >
-            <Volleyball className={`w-4 h-4 ${tacticsSection === 'trainings' ? 'text-amber-300' : 'text-emerald-600'}`} />
+            <Volleyball className={`w-4 h-4 ${tacticsSection === 'trainings' ? 'text-sky-200' : 'text-slate-600'}`} />
             <span>Treningi</span>
-            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'trainings' ? 'bg-white/20 text-white font-black' : 'bg-slate-100 text-slate-600'}`}>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'trainings' ? 'bg-sky-700/60 text-sky-100 font-black' : 'bg-slate-100 text-slate-600'}`}>
               {trainingsCount}
             </span>
           </button>
@@ -3513,22 +3513,17 @@ function TacticsContent() {
       {tacticsSection !== 'board' && tacticsSection !== 'trainings' && (
         <div className="space-y-5 animate-in fade-in duration-200">
           
-          {/* 1. PASEK NAWIGACJI MECZU & NAGŁÓWEK SPOTKANIA */}
-          <div className={`bg-white border border-slate-300 rounded-3xl p-4 sm:p-5 shadow-md space-y-4 ${
-            tacticsSection === 'sparingi'
-              ? 'border-t-4 border-t-amber-500'
-              : tacticsSection === 'turnieje'
-              ? 'border-t-4 border-t-purple-600'
-              : 'border-t-4 border-t-sky-600'
-          }`}>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          {/* 1. KARTA MECZU & SZYBKIE NARZĘDZIA */}
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 sm:p-5 shadow-2xs space-y-3.5">
+            {/* Wybór meczu i informacje */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-slate-100">
               {sectionTargetOptions.length > 0 ? (
-                <div className="flex items-center gap-1.5 flex-1 max-w-2xl">
+                <div className="flex items-center gap-1.5 w-full sm:max-w-xl">
                   <button
                     type="button"
                     onClick={handlePrevTarget}
                     disabled={currentSectionTargetIndex <= 0}
-                    className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0"
+                    className="w-9 h-9 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0 cursor-pointer active:scale-95"
                     title="Poprzedni mecz"
                   >
                     <ChevronLeft className="w-4 h-4" />
@@ -3537,11 +3532,11 @@ function TacticsContent() {
                   <select
                     value={selectedContextKey}
                     onChange={e => setSelectedContextKey(e.target.value)}
-                    className="flex-1 bg-slate-50 hover:bg-white border border-slate-300 text-slate-900 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold focus:outline-none focus:border-sky-500 shadow-2xs min-w-0 truncate"
+                    className="flex-1 h-9 bg-slate-50 hover:bg-white border border-slate-200/90 text-slate-900 rounded-xl px-3 text-xs sm:text-sm font-bold focus:outline-none focus:border-sky-500 shadow-2xs min-w-0 truncate cursor-pointer"
                   >
                     {sectionTargetOptions.map((opt) => (
                       <option key={opt.key} value={opt.key}>
-                        {new Date(opt.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} — {opt.title} ({opt.location})
+                        {new Date(opt.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} — {opt.title}
                       </option>
                     ))}
                   </select>
@@ -3550,124 +3545,89 @@ function TacticsContent() {
                     type="button"
                     onClick={handleNextTarget}
                     disabled={currentSectionTargetIndex >= sectionTargetOptions.length - 1}
-                    className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0"
+                    className="w-9 h-9 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0 cursor-pointer active:scale-95"
                     title="Następny mecz"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
-                <p className="text-xs text-slate-500">
-                  Brak zaplanowanych spotkań w tej kategorii.
-                </p>
+                <p className="text-xs text-slate-500">Brak zaplanowanych spotkań w tej kategorii.</p>
               )}
 
-              {/* Informacja o spotkaniu */}
+              {/* Informacja o lokalizacji i frekwencji */}
               {(activeTargetEvent || activeTargetMatch) && (
-                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-700 bg-slate-100/80 px-3 py-1.5 rounded-xl border border-slate-200 self-start sm:self-auto font-medium">
-                  <Calendar className="w-3.5 h-3.5 text-sky-600 shrink-0" />
-                  <span className="font-bold">
-                    {new Date(activeTargetEvent?.date || activeTargetMatch?.date || '').toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'long' })}
+                <div className="flex items-center gap-2 text-xs text-slate-600 flex-wrap sm:justify-end">
+                  <span className="flex items-center gap-1 font-medium">
+                    <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                    <span className="truncate max-w-[200px]">{activeTargetEvent?.location || activeTargetMatch?.location || 'Hala OSiR, Luboń'}</span>
                   </span>
-                  <span>•</span>
-                  <span>{activeTargetEvent?.location || activeTargetMatch?.location || 'Hala OSiR, Luboń'}</span>
                   {activeTargetEvent && (activeTargetEvent.attendees || []).filter(a => a.status === 'BEDE').length > 0 && (
-                    <>
-                      <span>•</span>
-                      <Link
-                        href={`/events?eventId=${activeTargetEvent.id}`}
-                        className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 hover:bg-emerald-100 transition"
-                        title="Zobacz frekwencję w Terminarzu"
-                      >
-                        <span>✓ {(activeTargetEvent.attendees || []).filter(a => a.status === 'BEDE').length} obecnych</span>
-                      </Link>
-                    </>
+                    <Link
+                      href={`/events?eventId=${activeTargetEvent.id}`}
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200 hover:bg-emerald-100 transition shrink-0"
+                      title="Zobacz frekwencję w Terminarzu"
+                    >
+                      <Users className="w-3 h-3 text-emerald-600" />
+                      <span>{(activeTargetEvent.attendees || []).filter(a => a.status === 'BEDE').length} obecnych</span>
+                    </Link>
                   )}
                 </div>
               )}
             </div>
 
-            {/* 2. PASEK SZYBKICH AKCJI: DODAJ DO TEGO MECZU (UPORZĄDKOWANY I RESPONSYWNY NA TELEFONACH) */}
+            {/* Narzędzia i formaty rozpiski: Równy, estetyczny pasek o stałej wysokości */}
             {canEdit && (
-              <div className="bg-slate-50/90 border border-slate-200/90 rounded-2xl p-2.5 sm:p-3 space-y-2">
-                <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-500 px-0.5">
-                  <span className="flex items-center gap-1.5">
-                    <span>⚡ Narzędzia i materiały do meczu</span>
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-semibold hidden sm:inline">
-                    Wybierz format rozpiski
-                  </span>
-                </div>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-0.5">
+                <button
+                  type="button"
+                  onClick={() => setTacticsSection('board')}
+                  className="col-span-2 sm:col-span-1 h-9 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer active:scale-95"
+                  title="Otwórz pełną tablicę taktyczną dla tego meczu"
+                >
+                  <Compass className="w-3.5 h-3.5 text-sky-200 shrink-0" />
+                  <span>Tablica taktyczna</span>
+                </button>
 
-                {/* Poziom 1: Główne akcje tablicy */}
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setTacticsSection('board')}
-                    className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-black text-xs transition flex items-center justify-center gap-2 shadow-xs"
-                    title="Otwórz pełną tablicę taktyczną dla tego meczu"
-                  >
-                    <Compass className="w-4 h-4 text-amber-300 shrink-0" />
-                    <span>Rozrysuj na tablicy</span>
-                  </button>
+                <button
+                  type="button"
+                  onClick={handleOpenQuickDrawModal}
+                  className="h-9 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
+                  title="Szybki szkic pisakiem na boisku"
+                >
+                  <Pencil className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+                  <span>Szybki szkic</span>
+                </button>
 
-                  <button
-                    type="button"
-                    onClick={handleOpenQuickDrawModal}
-                    className="hidden sm:inline-flex px-3.5 py-2.5 rounded-xl bg-white hover:bg-sky-50 text-sky-900 border border-sky-300 font-black text-xs transition items-center justify-center gap-1.5 shadow-2xs"
-                    title="Szybki szkic pisakiem na boisku bez przełączania zakładek"
-                  >
-                    <Pencil className="w-4 h-4 text-sky-600 shrink-0" />
-                    <span>Szybki szkic</span>
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowAddNoteModal(true)}
+                  className="h-9 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
+                  title="Dodaj notatkę lub wytyczne dla drużyny"
+                >
+                  <FileText className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                  <span>Notatka</span>
+                </button>
 
-                {/* Poziom 2: Dodatkowe załączniki (Na mobile: płynny pojedynczy poziomy pasek zamiast łamania na 3 chaotyczne rzędy) */}
-                <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pt-1 border-t border-slate-200/80 pb-0.5">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 shrink-0 mr-0.5">
-                    Załącz:
-                  </span>
+                <button
+                  type="button"
+                  onClick={() => handleOpenAddMaterialForCurrentTarget('VIDEO')}
+                  className="h-9 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
+                  title="Dodaj wideo rywala z YouTube"
+                >
+                  <Play className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                  <span>Wideo rywala</span>
+                </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setShowAddNoteModal(true)}
-                    className="shrink-0 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
-                    title="Dodaj notatkę lub wytyczne dla drużyny"
-                  >
-                    <FileText className="w-3.5 h-3.5 text-slate-600" />
-                    <span>Notatka</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleOpenAddMaterialForCurrentTarget('VIDEO')}
-                    className="shrink-0 px-3 py-1.5 rounded-xl bg-white hover:bg-rose-50 text-rose-800 border border-rose-300 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
-                    title="Dodaj wideo rywala z YouTube lub plik"
-                  >
-                    <Play className="w-3 h-3 text-rose-600 fill-rose-600" />
-                    <span>Wideo rywala</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleOpenAddMaterialForCurrentTarget('IMAGE')}
-                    className="shrink-0 px-3 py-1.5 rounded-xl bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
-                    title="Dodaj zdjęcie tablicy z szatni lub grafikę"
-                  >
-                    <ImageIcon className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Zdjęcie</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleOpenAddMaterialForCurrentTarget('PDF')}
-                    className="shrink-0 px-3 py-1.5 rounded-xl bg-white hover:bg-purple-50 text-purple-800 border border-purple-300 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
-                    title="Wgraj raport skautingowy lub playbook PDF"
-                  >
-                    <FileText className="w-3.5 h-3.5 text-purple-600" />
-                    <span>PDF</span>
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => handleOpenAddMaterialForCurrentTarget('IMAGE')}
+                  className="h-9 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
+                  title="Dodaj zdjęcie lub dokument PDF"
+                >
+                  <ImageIcon className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Zdjęcie / PDF</span>
+                </button>
               </div>
             )}
 
@@ -3711,11 +3671,11 @@ function TacticsContent() {
 
             {/* GŁÓWNA NOTATKA / WYTYCZNE TRENERA (JEŚLI ISTNIEJĄ) */}
             {tacticComment.trim() && (
-              <div className="bg-white border border-slate-300 rounded-3xl p-5 shadow-md space-y-3 border-t-4 border-t-amber-500">
+              <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-bold border border-amber-300 shadow-2xs">
-                      <FileText className="w-4 h-4 text-amber-700" />
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-sm font-bold border border-amber-200/80 shadow-2xs shrink-0">
+                      <FileText className="w-4 h-4 text-amber-600" />
                     </div>
                     <div>
                       <h4 className="text-xs font-black uppercase tracking-wider text-slate-900">
@@ -3730,14 +3690,14 @@ function TacticsContent() {
                     <button
                       type="button"
                       onClick={() => setShowAddNoteModal(true)}
-                      className="text-xs font-bold text-sky-600 hover:text-sky-800 flex items-center gap-1 hover:underline"
+                      className="text-xs font-bold text-sky-600 hover:text-sky-800 flex items-center gap-1 hover:underline cursor-pointer"
                     >
                       <Pencil className="w-3.5 h-3.5" />
                       <span>Edytuj</span>
                     </button>
                   )}
                 </div>
-                <div className="text-xs text-slate-800 leading-relaxed whitespace-pre-line bg-slate-50/90 p-4 rounded-2xl border border-slate-200/90 font-medium">
+                <div className="text-xs text-slate-800 leading-relaxed whitespace-pre-line bg-slate-50/70 p-3.5 sm:p-4 rounded-xl border border-slate-100 font-medium">
                   {tacticComment}
                 </div>
               </div>
@@ -3748,13 +3708,7 @@ function TacticsContent() {
               return (
                 <div
                   key={tac.id}
-                  className={`bg-white border border-slate-300 rounded-3xl p-4 sm:p-6 shadow-md hover:shadow-lg transition space-y-4 animate-in fade-in duration-200 ${
-                    tacticsSection === 'sparingi'
-                      ? 'border-t-4 border-t-amber-500'
-                      : tacticsSection === 'turnieje'
-                      ? 'border-t-4 border-t-purple-600'
-                      : 'border-t-4 border-t-sky-600'
-                  }`}
+                  className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs hover:shadow-xs transition space-y-3.5 animate-in fade-in duration-200"
                 >
                   {/* Nagłówek posta ze schematem */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
@@ -3936,9 +3890,7 @@ function TacticsContent() {
               return (
                 <div
                   key={mat.id}
-                  className={`bg-white border border-slate-300 rounded-3xl p-4 sm:p-6 shadow-md hover:shadow-lg transition space-y-4 animate-in fade-in duration-200 ${
-                    isVideo ? 'border-t-4 border-t-rose-500' : mat.type === 'IMAGE' ? 'border-t-4 border-t-sky-500' : 'border-t-4 border-t-emerald-500'
-                  }`}
+                  className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs hover:shadow-xs transition space-y-3.5 animate-in fade-in duration-200"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
                     <div className="flex items-center gap-3">
