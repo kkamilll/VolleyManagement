@@ -5259,7 +5259,7 @@ function RozgrywkiContent() {
                             <span>{event.result?.tournamentRank || 'W trakcie / Brak wpisanego miejsca'}</span>
                           </div>
                           {event.result?.notes && (
-                            <p className="text-xs text-slate-600 leading-relaxed bg-white p-2.5 rounded-xl border border-purple-100">
+                            <p className="text-xs text-slate-600 leading-relaxed bg-white p-2.5 rounded-xl border border-purple-100 text-justified-clean">
                               {event.result.notes}
                             </p>
                           )}

@@ -3690,7 +3690,7 @@ function TacticsContent() {
                     </button>
                   )}
                 </div>
-                <div className="text-xs text-slate-800 leading-relaxed whitespace-pre-line bg-slate-50/70 p-3.5 sm:p-4 rounded-xl border border-slate-100 font-medium">
+                <div className="text-xs text-slate-800 leading-relaxed whitespace-pre-line bg-slate-50/70 p-3.5 sm:p-4 rounded-xl border border-slate-100 font-medium text-justified-clean">
                   {tacticComment}
                 </div>
               </div>
@@ -3765,7 +3765,7 @@ function TacticsContent() {
                         {hasLeftContent && (
                           <div className="md:col-span-7 space-y-3">
                             {tac.description && (
-                              <p className="text-xs text-slate-800 leading-relaxed bg-slate-50/90 p-3.5 rounded-2xl border border-slate-200/90 font-medium">
+                              <p className="text-xs text-slate-800 leading-relaxed bg-slate-50/90 p-3.5 rounded-2xl border border-slate-200/90 font-medium text-justified-clean">
                                 {tac.description}
                               </p>
                             )}
@@ -3776,14 +3776,14 @@ function TacticsContent() {
                                   <span>💡 Punkty kluczowe dla trenera / wykonania:</span>
                                 </div>
                                 {coachDirectives.length > 0 && (
-                                  <ul className="list-disc list-inside space-y-1.5 text-slate-900 text-xs pl-1 font-medium">
+                                  <ul className="list-disc list-inside space-y-1.5 text-slate-900 text-xs pl-1 font-medium text-justified-clean">
                                     {coachDirectives.map((dir, dIdx) => (
                                       <li key={dIdx} className="leading-snug">{dir}</li>
                                     ))}
                                   </ul>
                                 )}
                                 {hasNotes && (
-                                  <p className={`text-slate-900 text-xs font-medium ${coachDirectives.length > 0 ? 'pt-2 border-t border-amber-200/80' : ''}`}>
+                                  <p className={`text-slate-900 text-xs font-medium text-justified-clean ${coachDirectives.length > 0 ? 'pt-2 border-t border-amber-200/80' : ''}`}>
                                     {tac.tacticalNotes}
                                   </p>
                                 )}
@@ -4024,7 +4024,7 @@ function TacticsContent() {
 
                   {/* Opis materiału */}
                   {mat.description && (
-                    <p className="text-xs text-slate-700 bg-slate-50 p-3 rounded-2xl border border-slate-200/60 leading-relaxed">
+                    <p className="text-xs text-slate-700 bg-slate-50 p-3 rounded-2xl border border-slate-200/60 leading-relaxed text-justified-clean">
                       {mat.description}
                     </p>
                   )}

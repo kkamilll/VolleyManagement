@@ -2725,7 +2725,7 @@ function EventsAttendanceContent() {
                                   Plan & Wytyczne Trenerskie:
                                 </div>
                                 {event.description ? (
-                                  <p className="leading-relaxed text-slate-800 whitespace-pre-line">{event.description}</p>
+                                  <p className="leading-relaxed text-slate-800 whitespace-pre-line text-justified-clean">{event.description}</p>
                                 ) : (
                                   <p className="italic text-slate-400">Brak dodatkowych wytycznych tekstowych. Sprawdź tablicę taktyczną poniżej.</p>
                                 )}

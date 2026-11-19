@@ -762,7 +762,7 @@ export default function TeamPage() {
                       <Target className="w-3.5 h-3.5 text-amber-600" />
                       Notatka Trenerska
                     </h4>
-                    <p className="text-slate-700 leading-relaxed">
+                    <p className="text-slate-700 leading-relaxed text-justified-clean">
                       {profileUser.stats.coachNotes}
                     </p>
                   </div>

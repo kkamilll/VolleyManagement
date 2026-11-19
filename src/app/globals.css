@@ -243,6 +243,18 @@ textarea::placeholder {
   text-transform: uppercase;
 }
 
+/* Clean Justified Typography */
+.text-justified-clean {
+  text-align: justify;
+  text-justify: inter-word;
+  text-align-last: left;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
 .glow-cyan {
   box-shadow: 0 4px 16px -2px rgba(2, 132, 199, 0.25);
 }

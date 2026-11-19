@@ -1616,7 +1616,7 @@ export function TrainingPlannerContent({
                           {/* Exercise Description & Key Points */}
                           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
                             <div className="md:col-span-7 space-y-2">
-                              <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap">
+                              <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap text-justified-clean">
                                 {ex.description}
                               </p>
 
@@ -1625,7 +1625,7 @@ export function TrainingPlannerContent({
                                   <span className="text-[10px] font-black uppercase text-amber-800 tracking-wider">
                                     💡 Punkty kluczowe dla trenera / wykonania:
                                   </span>
-                                  <ul className="text-xs text-slate-700 space-y-1 list-disc list-inside">
+                                  <ul className="text-xs text-slate-700 space-y-1 list-disc list-inside text-justified-clean">
                                     {ex.keyPoints.map((kp, kIdx) => (
                                       <li key={kIdx}>{kp}</li>
                                     ))}

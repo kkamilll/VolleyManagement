@@ -500,7 +500,7 @@ function DashboardContent() {
 
               <div className="space-y-1">
                 <h4 className="text-xs sm:text-sm font-black text-slate-900">{urgentAnnouncement.title}</h4>
-                <p className="text-xs text-slate-600 leading-relaxed font-normal">{urgentAnnouncement.content}</p>
+                <p className="text-xs text-slate-600 leading-relaxed font-normal text-justified-clean">{urgentAnnouncement.content}</p>
               </div>
 
               <div className="pt-1 text-[10px] text-slate-400 flex items-center justify-between">
