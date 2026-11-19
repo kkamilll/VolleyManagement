@@ -484,6 +484,7 @@ export async function GET(request: Request) {
     leagueTable,
     leaguePhotos,
     leagueSchedule: (db.leagueSchedule && db.leagueSchedule.length > 0) ? db.leagueSchedule : DEFAULT_LALS_SCHEDULE,
+    teamCrests: db.teamCrests || {},
     matches: leagueMatches
   });
 }
@@ -741,6 +742,75 @@ export async function POST(request: Request) {
         phase: newPhase,
         message: `Utworzono fazę: "${newPhase.name}" z ${splitTable.length} zespołami (miejsca ${start + 1} do ${end})!`
       });
+    }
+
+    if (body.action === 'SET_TEAM_CREST') {
+      const { teamName, logoUrl } = body;
+      if (!teamName || !logoUrl) {
+        return NextResponse.json({ error: 'Podaj nazwę drużyny i plik/adres herbu' }, { status: 400 });
+      }
+
+      const cleanName = teamName.trim();
+      if (!db.teamCrests) db.teamCrests = {};
+      db.teamCrests[cleanName] = logoUrl;
+
+      // Zaktualizuj także herby w tabeli ligowej
+      if (db.leagueTable) {
+        db.leagueTable.forEach(t => {
+          if (t.teamName.toLowerCase().trim() === cleanName.toLowerCase()) {
+            t.logo = logoUrl;
+          }
+        });
+      }
+      if (db.leaguePhases) {
+        db.leaguePhases.forEach(p => {
+          p.table?.forEach(t => {
+            if (t.teamName.toLowerCase().trim() === cleanName.toLowerCase()) {
+              t.logo = logoUrl;
+            }
+          });
+        });
+      }
+
+      writeDatabase(db);
+      return NextResponse.json({
+        success: true,
+        message: `Herb drużyny "${cleanName}" został zapisany!`,
+        teamCrests: db.teamCrests
+      });
+    }
+
+    if (body.action === 'DELETE_TEAM_CREST') {
+      const { teamName } = body;
+      if (teamName && db.teamCrests) {
+        const cleanName = teamName.trim();
+        delete db.teamCrests[cleanName];
+
+        if (db.leagueTable) {
+          db.leagueTable.forEach(t => {
+            if (t.teamName.toLowerCase().trim() === cleanName.toLowerCase()) {
+              delete t.logo;
+            }
+          });
+        }
+        if (db.leaguePhases) {
+          db.leaguePhases.forEach(p => {
+            p.table?.forEach(t => {
+              if (t.teamName.toLowerCase().trim() === cleanName.toLowerCase()) {
+                delete t.logo;
+              }
+            });
+          });
+        }
+
+        writeDatabase(db);
+        return NextResponse.json({
+          success: true,
+          message: `Herb drużyny "${cleanName}" został usunięty`,
+          teamCrests: db.teamCrests
+        });
+      }
+      return NextResponse.json({ error: 'Podaj nazwę drużyny do usunięcia herbu' }, { status: 400 });
     }
 
     if (body.action === 'UPDATE_TABLE') {

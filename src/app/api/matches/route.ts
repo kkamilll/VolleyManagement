@@ -226,7 +226,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const { opponent, date, location, isHome, matchType, sets, mvp, notes, coachComments, reportId, leaguePhaseId, leaguePhaseName } = body;
+    const { opponent, opponentLogo, date, location, isHome, matchType, sets, mvp, notes, coachComments, reportId, leaguePhaseId, leaguePhaseName } = body;
 
     if (!opponent || !date || !sets || !Array.isArray(sets) || sets.length === 0) {
       return NextResponse.json({ error: 'Wypełnij wymagane pola (Przeciwnik, data, sety)' }, { status: 400 });
@@ -254,9 +254,16 @@ export async function POST(request: Request) {
 
     const db = readDatabase();
 
+    const cleanOpponent = opponent.trim();
+    if (opponentLogo) {
+      if (!db.teamCrests) db.teamCrests = {};
+      db.teamCrests[cleanOpponent] = opponentLogo.trim();
+    }
+
     const newMatch: MatchResult = {
       id: `mat_${Date.now()}`,
-      opponent: opponent.trim(),
+      opponent: cleanOpponent,
+      opponentLogo: opponentLogo ? opponentLogo.trim() : undefined,
       date,
       location: location ? location.trim() : 'Hala domowa',
       isHome: Boolean(isHome),
@@ -331,7 +338,7 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { id, reportId, mvp, coachComments, notes, leaguePhaseId, leaguePhaseName } = body;
+    const { id, reportId, mvp, coachComments, notes, leaguePhaseId, leaguePhaseName, opponentLogo } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'Brak ID meczu' }, { status: 400 });
@@ -341,6 +348,14 @@ export async function PUT(request: Request) {
     const match = db.matches.find(m => m.id === id);
     if (!match) {
       return NextResponse.json({ error: 'Mecz nie istnieje' }, { status: 404 });
+    }
+
+    if (opponentLogo !== undefined) {
+      match.opponentLogo = opponentLogo?.trim() || undefined;
+      if (match.opponent && match.opponentLogo) {
+        if (!db.teamCrests) db.teamCrests = {};
+        db.teamCrests[match.opponent.trim()] = match.opponentLogo;
+      }
     }
 
     // If reportId is changing

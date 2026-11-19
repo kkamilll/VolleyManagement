@@ -79,6 +79,7 @@ export interface VolleyballSet {
 export interface MatchResult {
   id: string;
   opponent: string;
+  opponentLogo?: string;
   date: string;
   location: string;
   isHome: boolean;
@@ -143,6 +144,8 @@ export interface TournamentMatch {
   round: string;
   teamA: string;
   teamB: string;
+  teamALogo?: string;
+  teamBLogo?: string;
   scoreA?: number;
   scoreB?: number;
   setScores?: string; // np. "21:18, 19:21, 15:11"
@@ -171,6 +174,7 @@ export interface EventItem {
   endDate?: string;
   location: string;
   opponent?: string;
+  opponentLogo?: string;
   description: string;
   costPerPerson?: number;
   linkedFeeId?: string;
@@ -233,6 +237,8 @@ export interface VolleyStationScheduleMatch {
   matchNumber: number;
   homeTeam: string;
   awayTeam: string;
+  homeLogo?: string;
+  awayLogo?: string;
   homeSetsWon?: number;
   awaySetsWon?: number;
   isFinished?: boolean;
@@ -362,6 +368,7 @@ export interface LeagueTableTeam {
   position: number;
   teamName: string;
   teamUrl?: string;
+  logo?: string;
   matchesPlayed: number;
   matchesWon?: number;
   matchesLost?: number;
@@ -540,6 +547,7 @@ export interface SeasonArchive {
     announcements?: Announcement[];
     polls?: Poll[];
     users?: User[];
+    teamCrests?: Record<string, string>;
     rosterSnapshot: {
       id: string;
       name: string;
@@ -624,6 +632,7 @@ export interface AppDatabase {
   leagueSchedule?: VolleyStationScheduleMatch[];
   leaguePhotos?: LeaguePhoto[];
   leaguePlayerRankings?: any[];
+  teamCrests?: Record<string, string>;
   tacticalMaterials?: TacticalMaterial[];
   treasuryExpenses?: TreasuryExpense[];
   seasonsArchive?: SeasonArchive[];

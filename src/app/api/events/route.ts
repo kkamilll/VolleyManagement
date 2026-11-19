@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { title, type, date, endDate, location, opponent, description, costPerPerson, tournamentMatches, status, result } = body;
+    const { title, type, date, endDate, location, opponent, opponentLogo, description, costPerPerson, tournamentMatches, status, result } = body;
 
     if (!title || !type || !date || !location) {
       return NextResponse.json({ error: 'Uzupełnij wymagane pola (Tytuł, typ wydarzenia, data, miejsce)' }, { status: 400 });
@@ -48,6 +48,7 @@ export async function POST(request: Request) {
       endDate: endDate || undefined,
       location: location.trim(),
       opponent: opponent ? opponent.trim() : undefined,
+      opponentLogo: opponentLogo ? opponentLogo.trim() : undefined,
       description: description ? description.trim() : '',
       costPerPerson: costPerPerson ? Number(costPerPerson) : undefined,
       result: result || undefined,
@@ -87,6 +88,11 @@ export async function POST(request: Request) {
           status: 'OCZEKUJE'
         });
       });
+    }
+
+    if (newEvent.opponent && newEvent.opponentLogo) {
+      if (!db.teamCrests) db.teamCrests = {};
+      db.teamCrests[newEvent.opponent.trim()] = newEvent.opponentLogo;
     }
 
     db.events.push(newEvent);
@@ -155,7 +161,7 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { id, title, type, date, endDate, location, opponent, description, status, costPerPerson, actualAttendees, result, tournamentMatches, lineup, liveScore, bestAction, socialDraft, coachPostMatchNote } = body;
+    const { id, title, type, date, endDate, location, opponent, opponentLogo, description, status, costPerPerson, actualAttendees, result, tournamentMatches, lineup, liveScore, bestAction, socialDraft, coachPostMatchNote } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'Brak ID wydarzenia' }, { status: 400 });
@@ -173,7 +179,13 @@ export async function PUT(request: Request) {
     if (endDate !== undefined) event.endDate = endDate;
     if (location !== undefined) event.location = location.trim();
     if (opponent !== undefined) event.opponent = opponent.trim();
-    if (description !== undefined) event.description = description.trim();
+    if (opponentLogo !== undefined) {
+      event.opponentLogo = opponentLogo ? opponentLogo.trim() : undefined;
+      if (event.opponent && event.opponentLogo) {
+        if (!db.teamCrests) db.teamCrests = {};
+        db.teamCrests[event.opponent.trim()] = event.opponentLogo;
+      }
+    }
     if (costPerPerson !== undefined) event.costPerPerson = costPerPerson;
     if (status !== undefined) event.status = status as EventStatus;
     if (actualAttendees !== undefined) event.actualAttendees = actualAttendees;

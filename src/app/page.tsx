@@ -31,6 +31,7 @@ import {
   AttendanceStatus,
   User 
 } from '@/lib/types';
+import { TeamCrestBadge } from '@/lib/team-crests';
 
 function DashboardContent() {
   const { user } = useAuth();
@@ -204,19 +205,13 @@ function DashboardContent() {
               
               {/* GOSPODARZ */}
               <div className="md:col-span-3 flex items-center gap-4 sm:gap-5">
-                <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl p-1 shadow-lg shrink-0 flex items-center justify-center ${
-                  isAngelsHome 
-                    ? 'bg-gradient-to-br from-sky-500 to-blue-700 shadow-sky-500/20' 
-                    : 'bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/20'
-                }`}>
-                  <div className="w-full h-full rounded-xl bg-white flex items-center justify-center">
-                    {isAngelsHome ? (
-                      <Volleyball className="w-8 h-8 sm:w-10 sm:h-10 text-sky-600 drop-shadow-xs" />
-                    ) : (
-                      <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-amber-600 drop-shadow-xs" />
-                    )}
-                  </div>
-                </div>
+                <TeamCrestBadge
+                  teamName={homeTeamName}
+                  crestsMap={leagueData?.teamCrests}
+                  size="xl"
+                  rounded="rounded-2xl"
+                  className="shadow-md"
+                />
                 <div className="space-y-1 min-w-0">
                   <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider font-mono ${
                     isAngelsHome ? 'bg-sky-100 text-sky-800 border border-sky-200' : 'bg-slate-100 text-slate-700 border border-slate-200'
@@ -242,19 +237,13 @@ function DashboardContent() {
 
               {/* GOŚĆ */}
               <div className="md:col-span-3 flex items-center md:flex-row-reverse gap-4 sm:gap-5 md:text-right">
-                <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl p-1 shadow-lg shrink-0 flex items-center justify-center ${
-                  isAngelsAway 
-                    ? 'bg-gradient-to-br from-sky-500 to-blue-700 shadow-sky-500/20' 
-                    : 'bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/20'
-                }`}>
-                  <div className="w-full h-full rounded-xl bg-white flex items-center justify-center">
-                    {isAngelsAway ? (
-                      <Volleyball className="w-8 h-8 sm:w-10 sm:h-10 text-sky-600 drop-shadow-xs" />
-                    ) : (
-                      <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-amber-600 drop-shadow-xs" />
-                    )}
-                  </div>
-                </div>
+                <TeamCrestBadge
+                  teamName={awayTeamName}
+                  crestsMap={leagueData?.teamCrests}
+                  size="xl"
+                  rounded="rounded-2xl"
+                  className="shadow-md"
+                />
                 <div className="space-y-1 min-w-0">
                   <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider font-mono ${
                     isAngelsAway ? 'bg-sky-100 text-sky-800 border border-sky-200' : 'bg-slate-100 text-slate-700 border border-slate-200'

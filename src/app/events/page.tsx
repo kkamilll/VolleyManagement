@@ -56,6 +56,7 @@ import {
   LeagueMatchReport,
   MatchResult
 } from '@/lib/types';
+import { TeamCrestBadge } from '@/lib/team-crests';
 
 function EventsAttendanceContent() {
   const searchParams = useSearchParams();
@@ -89,6 +90,7 @@ function EventsAttendanceContent() {
   const [newEventDate, setNewEventDate] = useState('');
   const [newEventLocation, setNewEventLocation] = useState('Hala Sportowa OSiR, ul. Sportowa 5');
   const [newEventOpponent, setNewEventOpponent] = useState('');
+  const [newEventOpponentLogo, setNewEventOpponentLogo] = useState('');
   const [newEventDescription, setNewEventDescription] = useState('');
   const [newEventCost, setNewEventCost] = useState('');
   const [creating, setCreating] = useState(false);
@@ -99,10 +101,48 @@ function EventsAttendanceContent() {
   const [editDate, setEditDate] = useState('');
   const [editLocation, setEditLocation] = useState('');
   const [editOpponent, setEditOpponent] = useState('');
+  const [editOpponentLogo, setEditOpponentLogo] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editCost, setEditCost] = useState('');
   const [editStatus, setEditStatus] = useState<EventStatus>('ANKIETA');
   const [savingEdit, setSavingEdit] = useState(false);
+
+  // Helper do kompresji herbu drużyny z pliku
+  const handleOpponentLogoUpload = (file: File, callback: (dataUrl: string) => void) => {
+    if (!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 320;
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          callback(canvas.toDataURL('image/png'));
+        } else {
+          callback(event.target?.result as string);
+        }
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Note editor modal for coach on player
   const [editingPlayerNote, setEditingPlayerNote] = useState<{ userId: string; name: string; note: string } | null>(null);
@@ -621,6 +661,7 @@ function EventsAttendanceContent() {
           date: newEventDate,
           location: newEventLocation,
           opponent: newEventOpponent ? newEventOpponent.trim() : undefined,
+          opponentLogo: newEventOpponentLogo ? newEventOpponentLogo.trim() : undefined,
           description: newEventDescription ? newEventDescription.trim() : undefined,
           costPerPerson: newEventCost ? Number(newEventCost) : undefined
         })
@@ -630,6 +671,7 @@ function EventsAttendanceContent() {
         setNewEventTitle('');
         setNewEventDescription('');
         setNewEventOpponent('');
+        setNewEventOpponentLogo('');
         setNewEventCost('');
         await fetchData();
       } else {
@@ -670,6 +712,7 @@ function EventsAttendanceContent() {
     }
     setEditLocation(event.location || '');
     setEditOpponent(event.opponent || '');
+    setEditOpponentLogo(event.opponentLogo || '');
     setEditDescription(event.description || '');
     setEditCost(event.costPerPerson ? event.costPerPerson.toString() : '');
     setEditStatus(event.status || 'ANKIETA');
@@ -691,6 +734,7 @@ function EventsAttendanceContent() {
           date: new Date(editDate).toISOString(),
           location: editLocation.trim(),
           opponent: editOpponent.trim() || undefined,
+          opponentLogo: editOpponentLogo.trim() || undefined,
           description: editDescription.trim() || undefined,
           costPerPerson: editCost ? parseFloat(editCost) : 0,
           status: editStatus
@@ -1642,9 +1686,19 @@ function EventsAttendanceContent() {
                               </h3>
                             </Link>
                           ) : (
-                            <h3 className={`text-base sm:text-lg font-black text-slate-900 ${theme.titleHover} transition truncate`}>
-                              {displayTitle}
-                            </h3>
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              {cleanOpponent && (
+                                <TeamCrestBadge
+                                  teamName={cleanOpponent}
+                                  logoUrl={event.opponentLogo}
+                                  size="sm"
+                                  className="shadow-2xs"
+                                />
+                              )}
+                              <h3 className={`text-base sm:text-lg font-black text-slate-900 ${theme.titleHover} transition truncate`}>
+                                {displayTitle}
+                              </h3>
+                            </div>
                           )}
 
                           <div className="flex items-center gap-3 text-xs text-slate-500 truncate">
@@ -3084,15 +3138,57 @@ function EventsAttendanceContent() {
 
               {/* Opponent (if Sparing, Tournament, or Match) */}
               {(newEventType === 'SPARING' || newEventType === 'TURNIEJ' || newEventType === 'MECZ') && (
-                <div>
-                  <label className="block text-slate-600 font-bold mb-1">Rywal / Zaproszone zespoły</label>
-                  <input
-                    type="text"
-                    placeholder="np. KS Metro Warszawa, Trefl Gdańsk II"
-                    value={newEventOpponent}
-                    onChange={e => setNewEventOpponent(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
-                  />
+                <div className="space-y-2">
+                  <div>
+                    <label className="block text-slate-600 font-bold mb-1">Rywal / Zaproszone zespoły</label>
+                    <input
+                      type="text"
+                      placeholder="np. KS Metro Warszawa, Trefl Gdańsk II"
+                      value={newEventOpponent}
+                      onChange={e => setNewEventOpponent(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
+                    />
+                  </div>
+
+                  {/* Herb rywala (Upload lub URL) */}
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                        <Shield className="w-3.5 h-3.5 text-sky-600" />
+                        Herb rywala (plik z dysku / telefonu lub link URL)
+                      </label>
+                      {newEventOpponentLogo && (
+                        <button
+                          type="button"
+                          onClick={() => setNewEventOpponentLogo('')}
+                          className="text-[10px] text-rose-500 hover:underline font-bold"
+                        >
+                          Usuń herb
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <TeamCrestBadge teamName={newEventOpponent || 'Rywal'} logoUrl={newEventOpponentLogo} size="lg" />
+                      <div className="flex-1 space-y-1.5">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (file) handleOpponentLogoUpload(file, setNewEventOpponentLogo);
+                          }}
+                          className="block w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 file:cursor-pointer"
+                        />
+                        <input
+                          type="url"
+                          placeholder="lub wklej link URL do herbu..."
+                          value={newEventOpponentLogo}
+                          onChange={e => setNewEventOpponentLogo(e.target.value)}
+                          className="w-full px-2.5 py-1 text-xs rounded-lg bg-white border border-slate-300 text-slate-800 focus:outline-none focus:border-sky-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -3227,15 +3323,57 @@ function EventsAttendanceContent() {
 
               {/* Rywal (opcjonalny dla sparingu, meczu i turnieju) */}
               {(editType === 'SPARING' || editType === 'TURNIEJ' || editType === 'MECZ') && (
-                <div>
-                  <label className="block text-slate-600 font-bold mb-1">Rywal / Przeciwnik</label>
-                  <input
-                    type="text"
-                    value={editOpponent}
-                    onChange={e => setEditOpponent(e.target.value)}
-                    placeholder="np. KS Sobieski Poznań"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white"
-                  />
+                <div className="space-y-2">
+                  <div>
+                    <label className="block text-slate-600 font-bold mb-1">Rywal / Przeciwnik</label>
+                    <input
+                      type="text"
+                      value={editOpponent}
+                      onChange={e => setEditOpponent(e.target.value)}
+                      placeholder="np. KS Sobieski Poznań"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white"
+                    />
+                  </div>
+
+                  {/* Herb rywala (Edycja) */}
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                        <Shield className="w-3.5 h-3.5 text-sky-600" />
+                        Herb rywala (plik z dysku / telefonu lub link URL)
+                      </label>
+                      {editOpponentLogo && (
+                        <button
+                          type="button"
+                          onClick={() => setEditOpponentLogo('')}
+                          className="text-[10px] text-rose-500 hover:underline font-bold"
+                        >
+                          Usuń herb
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <TeamCrestBadge teamName={editOpponent || 'Rywal'} logoUrl={editOpponentLogo} size="lg" />
+                      <div className="flex-1 space-y-1.5">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (file) handleOpponentLogoUpload(file, setEditOpponentLogo);
+                          }}
+                          className="block w-full text-xs text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 file:cursor-pointer"
+                        />
+                        <input
+                          type="url"
+                          placeholder="lub wklej link URL do herbu..."
+                          value={editOpponentLogo}
+                          onChange={e => setEditOpponentLogo(e.target.value)}
+                          className="w-full px-2.5 py-1 text-xs rounded-lg bg-white border border-slate-300 text-slate-800 focus:outline-none focus:border-sky-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 

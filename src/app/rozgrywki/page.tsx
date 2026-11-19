@@ -78,6 +78,8 @@ import {
 } from '@/lib/types';
 import { recognizeTextFromImage } from '@/lib/ocr';
 import { parseVolleyStationTable, parseVolleyStationSchedule, cleanTeamName } from '@/lib/volleystation-parser';
+import { TeamCrestBadge } from '@/lib/team-crests';
+import TeamCrestModal from '@/components/TeamCrestModal';
 
 function formatVolleyDate(dateStr: string): string {
   try {
@@ -236,6 +238,10 @@ function RozgrywkiContent() {
   const [scheduleImagePreview, setScheduleImagePreview] = useState<string | null>(null);
   const [scheduleOcrLoading, setScheduleOcrLoading] = useState(false);
   const [scheduleOcrProgress, setScheduleOcrProgress] = useState(0);
+
+  // Herby Drużyn i Rywali
+  const [teamCrests, setTeamCrests] = useState<Record<string, string>>({});
+  const [showTeamCrestsModal, setShowTeamCrestsModal] = useState(false);
   const [scheduleOcrStatus, setScheduleOcrStatus] = useState('');
   const [parsedMatchesToImport, setParsedMatchesToImport] = useState<any[]>([]);
   const [parsedFixturesToImport, setParsedFixturesToImport] = useState<any[]>([]);
@@ -576,6 +582,9 @@ function RozgrywkiContent() {
         setLeagueTable(l.leagueTable || []);
         setLeagueSchedule(l.leagueSchedule || []);
         setLeaguePhotos(l.leaguePhotos || []);
+        if (l.teamCrests) {
+          setTeamCrests(l.teamCrests);
+        }
       }
       if (tacRes.ok) {
         const td = await tacRes.json();
@@ -3052,13 +3061,12 @@ function RozgrywkiContent() {
                               {homeTeam}
                             </h4>
                           </div>
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl overflow-hidden border-2 border-sky-400 shadow-sm shrink-0 bg-slate-900 flex items-center justify-center ring-2 ring-sky-100">
-                            {isHomeAngels ? (
-                              <img src="/logo.jpg" alt={homeTeam} className="w-full h-full object-cover" />
-                            ) : (
-                              <span className="text-white font-black text-base uppercase">{(homeTeam[0] || '?').toUpperCase()}</span>
-                            )}
-                          </div>
+                          <TeamCrestBadge
+                            teamName={homeTeam}
+                            crestsMap={teamCrests}
+                            size="lg"
+                            rounded="rounded-2xl"
+                          />
                         </div>
 
                         {/* Środkowa tablica: Wynik meczu / VS */}
@@ -3101,13 +3109,12 @@ function RozgrywkiContent() {
 
                         {/* Gość / Drużyna B (Wyrównanie do lewej na desktopie) */}
                         <div className="flex items-center justify-start gap-2.5 sm:gap-3.5 flex-1 min-w-0 text-left">
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl overflow-hidden border-2 border-slate-700 shadow-sm shrink-0 bg-gradient-to-br from-slate-800 to-slate-950 flex items-center justify-center text-white font-black text-base uppercase ring-2 ring-slate-100">
-                            {isAwayAngels ? (
-                              <img src="/logo.jpg" alt={awayTeam} className="w-full h-full object-cover" />
-                            ) : (
-                              (awayTeam[0] || '?').toUpperCase()
-                            )}
-                          </div>
+                          <TeamCrestBadge
+                            teamName={awayTeam}
+                            crestsMap={teamCrests}
+                            size="lg"
+                            rounded="rounded-2xl"
+                          />
                           <div className="min-w-0">
                             <span className="text-[10px] font-black uppercase text-amber-600 tracking-wider block">
                               Gość
@@ -3588,6 +3595,15 @@ function RozgrywkiContent() {
             <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-0.5 justify-start xl:justify-end w-full xl:w-auto shrink-0">
               {ligaSubTab === 'tabela' && (
                 <>
+                  <button
+                    type="button"
+                    onClick={() => setShowTeamCrestsModal(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 hover:border-sky-300 transition shadow-sm whitespace-nowrap shrink-0"
+                    title="Dodawaj i zarządzaj herbami rywali i drużyn ligowych"
+                  >
+                    <Shield className="w-3.5 h-3.5 text-sky-600" />
+                    <span>Herby drużyn</span>
+                  </button>
                   {canManageMatches && (
                     <>
                       <button
@@ -3630,6 +3646,15 @@ function RozgrywkiContent() {
               )}
               {ligaSubTab === 'wyniki' && (
                 <>
+                  <button
+                    type="button"
+                    onClick={() => setShowTeamCrestsModal(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 hover:border-sky-300 transition shadow-sm whitespace-nowrap shrink-0"
+                    title="Dodawaj i zarządzaj herbami rywali i drużyn ligowych"
+                  >
+                    <Shield className="w-3.5 h-3.5 text-sky-600" />
+                    <span>Herby drużyn</span>
+                  </button>
                   {canManageMatches && (
                     <>
                       <button
@@ -3833,20 +3858,27 @@ function RozgrywkiContent() {
                               </span>
                             </td>
 
-                            <td className={`py-3 px-4 font-sans font-bold text-slate-900 text-sm sticky left-[48px] ${stickyCellBg} z-10 border-r border-slate-200 min-w-[190px]`}>
-                              <div className="flex items-center gap-2">
+                            <td className={`py-3 px-4 font-sans font-bold text-slate-900 text-sm sticky left-[48px] ${stickyCellBg} z-10 border-r border-slate-200 min-w-[210px]`}>
+                              <div className="flex items-center gap-2.5">
+                                <TeamCrestBadge
+                                  teamName={team.teamName}
+                                  logoUrl={team.logo}
+                                  crestsMap={teamCrests}
+                                  size="sm"
+                                  className="shadow-2xs cursor-pointer hover:ring-2 hover:ring-sky-400 transition shrink-0"
+                                />
                                 {team.teamUrl ? (
                                   <a
                                     href={team.teamUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="hover:underline hover:text-sky-600 transition flex items-center gap-1.5"
+                                    className="hover:underline hover:text-sky-600 transition flex items-center gap-1.5 truncate"
                                     title="Otwórz profil drużyny na VolleyStation"
                                   >
-                                    <span>{team.teamName}</span>
+                                    <span className="truncate">{team.teamName}</span>
                                   </a>
                                 ) : (
-                                  <span>{team.teamName}</span>
+                                  <span className="truncate">{team.teamName}</span>
                                 )}
                               </div>
                             </td>
@@ -5142,19 +5174,23 @@ function RozgrywkiContent() {
 
                                     {/* Drużyny i Wynik */}
                                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
-                                      <div className="space-y-1">
-                                        <div className="flex items-center gap-2">
-                                          <span className={`text-xs font-black ${isWin ? 'text-slate-900' : 'text-slate-700'}`}>
+                                      <div className="space-y-1.5 min-w-0">
+                                        <div className="flex items-center gap-1.5 min-w-0">
+                                          <TeamCrestBadge teamName={match.teamA} logoUrl={match.teamALogo} crestsMap={teamCrests} size="xs" />
+                                          <span className={`text-xs font-black truncate ${isWin ? 'text-slate-900' : 'text-slate-700'}`}>
                                             {match.teamA}
                                           </span>
                                           {match.teamA.includes('Angels') && (
-                                            <span className="text-[9px] px-1 rounded bg-sky-100 text-sky-800 font-bold border border-sky-200">
+                                            <span className="text-[9px] px-1 rounded bg-sky-100 text-sky-800 font-bold border border-sky-200 shrink-0">
                                               MY
                                             </span>
                                           )}
                                         </div>
-                                        <div className="text-xs font-bold text-slate-600">
-                                          {match.teamB}
+                                        <div className="flex items-center gap-1.5 min-w-0">
+                                          <TeamCrestBadge teamName={match.teamB} logoUrl={match.teamBLogo} crestsMap={teamCrests} size="xs" />
+                                          <span className="text-xs font-bold text-slate-600 truncate">
+                                            {match.teamB}
+                                          </span>
                                         </div>
                                       </div>
 
@@ -8042,6 +8078,29 @@ Punkty
           </div>
         </div>
       )}
+
+      {/* Modal Zarządzania Herbami Drużyn i Rywali */}
+      <TeamCrestModal
+        isOpen={showTeamCrestsModal}
+        onClose={() => setShowTeamCrestsModal(false)}
+        teamCrests={teamCrests}
+        knownTeams={Array.from(new Set([
+          ...leagueTable.map(t => t.teamName),
+          ...leagueSchedule.map(s => s.homeTeam),
+          ...leagueSchedule.map(s => s.awayTeam),
+          ...matches.map(m => m.opponent),
+          ...events.map(e => e.opponent || '')
+        ])).filter(Boolean)}
+        onCrestUpdated={(teamName, logoUrl) => {
+          setTeamCrests(prev => {
+            const next = { ...prev };
+            if (logoUrl) next[teamName] = logoUrl;
+            else delete next[teamName];
+            return next;
+          });
+          setLeagueTable(prev => prev.map(t => t.teamName.toLowerCase().trim() === teamName.toLowerCase().trim() ? { ...t, logo: logoUrl } : t));
+        }}
+      />
     </div>
   );
 }
