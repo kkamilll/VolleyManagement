@@ -159,10 +159,10 @@ function DashboardContent() {
           </h1>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <Link
             href="/events"
-            className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-amber-400 flex items-center gap-2 text-xs font-bold text-slate-800 shadow-2xs transition"
+            className="w-full sm:w-auto px-3.5 py-2.5 sm:py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-amber-400 flex items-center justify-center gap-2 text-xs font-bold text-slate-800 shadow-2xs transition"
           >
             <Calendar className="w-4 h-4 text-amber-600" />
             <span>Pełny Terminarz &rarr;</span>

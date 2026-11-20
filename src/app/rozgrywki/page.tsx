@@ -3592,40 +3592,43 @@ function RozgrywkiContent() {
         <div className="space-y-6">
           {/* Liga Subtabs (Tabela, Wyniki, Statystyki) & Dedicated Actions Bar */}
           <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 pb-3 border-b border-slate-200">
-            {/* 3 Główne Zakładki Ligi - stały, pojedynczy rząd */}
-            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-300 overflow-x-auto scrollbar-none shrink-0 w-full sm:w-auto">
+            {/* 3 Główne Zakładki Ligi - równe 3 kolumny na telefonie od krawędzi do krawędzi */}
+            <div className="grid grid-cols-3 sm:inline-flex items-center gap-1 p-1 rounded-2xl bg-slate-100 border border-slate-300 shrink-0 w-full sm:w-auto">
               <button
                 onClick={() => setLigaSubTab('tabela')}
-                className={`shrink-0 flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition whitespace-nowrap ${
+                className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3.5 py-2 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wider transition whitespace-nowrap ${
                   ligaSubTab === 'tabela'
                     ? 'bg-slate-900 text-amber-400 shadow-sm border border-slate-800'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                 }`}
               >
-                <Trophy className="w-3.5 h-3.5" />
-                <span>Tabela Ligowa</span>
+                <Trophy className="w-3.5 h-3.5 shrink-0" />
+                <span className="sm:hidden">Tabela</span>
+                <span className="hidden sm:inline">Tabela Ligowa</span>
               </button>
               <button
                 onClick={() => setLigaSubTab('wyniki')}
-                className={`shrink-0 flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition whitespace-nowrap ${
+                className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3.5 py-2 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wider transition whitespace-nowrap ${
                   ligaSubTab === 'wyniki'
                     ? 'bg-slate-900 text-amber-400 shadow-sm border border-slate-800'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                 }`}
               >
-                <Volleyball className="w-3.5 h-3.5" />
-                <span>Wyniki & Terminarz</span>
+                <Volleyball className="w-3.5 h-3.5 shrink-0" />
+                <span className="sm:hidden">Wyniki</span>
+                <span className="hidden sm:inline">Wyniki &amp; Terminarz</span>
               </button>
               <button
                 onClick={() => setLigaSubTab('statystyki')}
-                className={`shrink-0 flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition whitespace-nowrap ${
+                className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3.5 py-2 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wider transition whitespace-nowrap ${
                   ligaSubTab === 'statystyki'
                     ? 'bg-slate-900 text-amber-400 shadow-sm border border-slate-800'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                 }`}
               >
-                <BarChart3 className="w-3.5 h-3.5" />
-                <span>Statystyki VolleyStation</span>
+                <BarChart3 className="w-3.5 h-3.5 shrink-0" />
+                <span className="sm:hidden">Statystyki</span>
+                <span className="hidden sm:inline">Statystyki VolleyStation</span>
               </button>
             </div>
 

@@ -2783,9 +2783,9 @@ function TacticsContent() {
             )}
           </div>
 
-          {/* Narzędzia zapisu / wczytywania tablicy */}
+          {/* Narzędzia zapisu / wczytywania tablicy (równo 50/50 na telefonie) */}
           {canEdit && (
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto shrink-0">
               {tactics.length > 0 && (
                 <button
                   onClick={() => setShowLoadTacticModal(true)}

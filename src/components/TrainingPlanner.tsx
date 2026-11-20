@@ -1007,8 +1007,8 @@ export function TrainingPlannerContent({
                 </div>
               </div>
 
-              {/* Przycisk Mini-Kalendarza (floating popover) + link do Terminarza */}
-              <div className="flex items-center gap-1.5 shrink-0">
+              {/* Przycisk Mini-Kalendarza (floating popover) + link do Terminarza (równo 50/50 na telefonie) */}
+              <div className="grid grid-cols-2 sm:flex items-center gap-1.5 w-full sm:w-auto shrink-0">
                 <div ref={miniCalendarRef} className="relative">
                   <button
                     type="button"
@@ -1018,7 +1018,7 @@ export function TrainingPlannerContent({
                       }
                       setShowMiniCalendar(prev => !prev);
                     }}
-                    className={`h-10 px-3.5 rounded-xl text-xs font-bold transition border flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 ${
+                    className={`w-full sm:w-auto h-10 px-3.5 rounded-xl text-xs font-bold transition border flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 ${
                       showMiniCalendar
                         ? 'bg-slate-900 text-amber-400 border-slate-800 font-black'
                         : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200/90 hover:border-amber-400'
@@ -1563,11 +1563,11 @@ export function TrainingPlannerContent({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto shrink-0">
                     {activeEvent && (
                       <Link
                         href={`/taktyka?tab=board&eventId=${activeEvent.id}`}
-                        className="h-10 px-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 hover:border-amber-400 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
+                        className="h-10 px-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 hover:border-amber-400 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs"
                         title="Otwórz tablicę taktyczną i rozrysuj ustawienie na to spotkanie"
                       >
                         <Compass className="w-3.5 h-3.5 text-amber-600" />
@@ -1578,7 +1578,7 @@ export function TrainingPlannerContent({
                     {canManage && (
                       <button
                         onClick={() => handleOpenExerciseModal()}
-                        className="h-10 px-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-black text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-95"
+                        className="h-10 px-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-black text-xs transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer active:scale-95"
                       >
                         <Plus className="w-3.5 h-3.5 text-amber-400" />
                         <span>Dodaj Ćwiczenie</span>

@@ -917,14 +917,14 @@ function EventsAttendanceContent() {
           </div>
         </div>
 
-        {/* Right Controls: View Switcher + Primary Action Button */}
-        <div className="flex items-center gap-2.5 shrink-0 self-start xl:self-auto flex-nowrap">
+        {/* Right Controls: View Switcher + Primary Action Button (równo od krawędzi do krawędzi na telefonie) */}
+        <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto shrink-0">
           {/* Przełącznik widoku: Lista vs Kalendarz */}
-          <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-1 shadow-2xs shrink-0">
+          <div className="grid grid-cols-2 sm:flex items-center bg-slate-100 border border-slate-200 rounded-xl p-1 shadow-2xs flex-1 sm:flex-initial">
             <button
               type="button"
               onClick={() => setViewMode('list')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition ${
+              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition ${
                 viewMode === 'list'
                   ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
                   : 'text-slate-600 hover:text-slate-900'
@@ -936,7 +936,7 @@ function EventsAttendanceContent() {
             <button
               type="button"
               onClick={() => setViewMode('calendar')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition ${
+              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition ${
                 viewMode === 'calendar'
                   ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
                   : 'text-slate-600 hover:text-slate-900'
@@ -951,7 +951,7 @@ function EventsAttendanceContent() {
             <button
               type="button"
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-black text-xs uppercase tracking-wider transition shadow-sm whitespace-nowrap shrink-0"
+              className="inline-flex items-center justify-center gap-1.5 h-10 sm:h-9 px-3.5 sm:px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-black text-xs uppercase tracking-wider transition shadow-sm whitespace-nowrap shrink-0"
             >
               <Plus className="w-4 h-4 stroke-[3] text-amber-400" />
               <span className="sm:hidden">Dodaj</span>
@@ -997,7 +997,7 @@ function EventsAttendanceContent() {
             </div>
 
             <div className="bg-white border border-slate-200/90 rounded-2xl p-2.5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-              <div className="flex items-center gap-1.5 flex-wrap">
+              <div className="grid grid-cols-3 sm:flex sm:items-center gap-1.5 w-full sm:w-auto">
                 {[
                   { id: 'ALL', label: 'Wszystkie' },
                   { id: 'UPCOMING', label: 'Nadchodzące' },
@@ -1007,7 +1007,7 @@ function EventsAttendanceContent() {
                     key={t.id}
                     type="button"
                     onClick={() => setFilterTime(t.id as any)}
-                    className={`h-9 px-3 rounded-xl text-xs font-bold transition border cursor-pointer active:scale-95 ${
+                    className={`h-9 px-2 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold transition border flex items-center justify-center cursor-pointer active:scale-95 ${
                       filterTime === t.id
                         ? 'bg-slate-900 text-amber-400 border-slate-800 font-black shadow-xs'
                         : 'bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-100'
@@ -1025,9 +1025,9 @@ function EventsAttendanceContent() {
                       setFilterTime('ALL');
                       setSearchQuery('');
                     }}
-                    className="text-[11px] font-bold text-slate-500 hover:text-rose-600 transition underline underline-offset-2 ml-1 cursor-pointer"
+                    className="col-span-3 sm:col-span-1 text-[11px] font-bold text-slate-500 hover:text-rose-600 transition underline underline-offset-2 sm:ml-1 py-1 sm:py-0 text-center cursor-pointer"
                   >
-                    Resetuj
+                    Resetuj filtry
                   </button>
                 )}
               </div>
