@@ -13,7 +13,7 @@ body {
   color: #0f172a;
   background-color: #f8fafc;
   min-height: 100vh;
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
   max-width: 100%;
   position: relative;
@@ -239,7 +239,8 @@ textarea::placeholder {
 
 /* Common Athletic Utilities */
 .font-athletic {
-  letter-spacing: 0.05em;
+  font-family: var(--font-display), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
 }
 

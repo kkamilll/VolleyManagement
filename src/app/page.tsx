@@ -161,89 +161,94 @@ function DashboardContent() {
         <div className="flex items-center gap-2">
           <Link
             href="/events"
-            className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-sky-300 flex items-center gap-2 text-xs font-bold text-slate-800 shadow-2xs transition"
+            className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-amber-400 flex items-center gap-2 text-xs font-bold text-slate-800 shadow-2xs transition"
           >
-            <Calendar className="w-4 h-4 text-sky-600" />
+            <Calendar className="w-4 h-4 text-amber-600" />
             <span>Pełny Terminarz &rarr;</span>
           </Link>
         </div>
       </div>
 
-      {/* 2. NOWOCZESNA KARTA MECZU DNIA (MATCHDAY HERO CENTER) */}
+      {/* 2. NOWOCZESNA KARTA MECZU DNIA (PRO-SPORTS NAVY & GOLD MATCHDAY HERO) */}
       {(nextEvent || officialNextMatch) ? (
-        <div className="relative overflow-hidden rounded-3xl bg-white border border-slate-200/80 shadow-sm hover:shadow-md text-slate-900 transition-all duration-300">
-          {/* Subtelny pasek akcentu na samej górze - Angels Navy & Gold */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-slate-900 via-amber-500 to-amber-400" />
+        <div className="relative overflow-hidden rounded-3xl bg-white border border-slate-200/90 shadow-md hover:shadow-lg text-slate-900 transition-all duration-300">
+          {/* GÓRNA STREFA STADIONOWA (DARK NAVY & GOLD SCOREBOARD) */}
+          <div className="relative bg-gradient-to-br from-slate-950 via-slate-900 to-[#111c36] text-white overflow-hidden">
+            {/* Subtelny złoty pasek na górnej krawędzi */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
+            {/* Ambientowy blask stadionowy */}
+            <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[520px] h-[220px] rounded-full bg-amber-400/10 blur-3xl" />
 
-          {/* GÓRNY PASEK: KATEGORIA, RUNDA, DATA I GODZINA */}
-          <div className="relative z-10 flex flex-wrap items-center justify-between gap-2.5 px-5 sm:px-7 pt-4 pb-3 border-b border-slate-100 bg-slate-50/60">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="px-2.5 py-1 rounded-lg text-xs font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-200/80 flex items-center gap-1.5">
-                <Flame className="w-3.5 h-3.5 text-amber-600" />
-                Mecz Ligowy
-              </span>
-              {officialNextMatch && (
-                <span className="text-xs font-semibold text-slate-500">
-                  LALS Runda {officialNextMatch.round} • Mecz #{officialNextMatch.matchNumber}
+            {/* GÓRNY PASEK: KATEGORIA, RUNDA, DATA I GODZINA */}
+            <div className="relative z-10 flex flex-wrap items-center justify-between gap-2.5 px-5 sm:px-7 pt-4 pb-3 border-b border-white/10">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider bg-amber-400 text-slate-950 flex items-center gap-1.5 shadow-xs">
+                  <Flame className="w-3.5 h-3.5 text-slate-950" />
+                  Mecz Ligowy
                 </span>
-              )}
+                {officialNextMatch && (
+                  <span className="text-xs font-semibold text-slate-300">
+                    LALS Runda {officialNextMatch.round} • Mecz #{officialNextMatch.matchNumber}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-200">
+                <Clock className="w-3.5 h-3.5 text-amber-400" />
+                <span>
+                  {officialNextMatch?.dateStr || (nextEvent ? new Date(nextEvent.date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' }) : '')} • godz. {officialNextMatch?.timeStr || (nextEvent ? new Date(nextEvent.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) : '')}
+                </span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
-              <Clock className="w-3.5 h-3.5 text-sky-600" />
-              <span>
-                {officialNextMatch?.dateStr || (nextEvent ? new Date(nextEvent.date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' }) : '')} • godz. {officialNextMatch?.timeStr || (nextEvent ? new Date(nextEvent.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) : '')}
-              </span>
-            </div>
-          </div>
-
-          {/* GŁÓWNY POJEDYNEK DRUŻYN (SCOREBOARD DUEL) */}
-          <div className="relative z-10 px-5 sm:px-8 py-6">
-            <div className="grid grid-cols-1 md:grid-cols-7 items-center gap-5 sm:gap-6">
-              
-              {/* DRUŻYNA 1 */}
-              <div className="md:col-span-3 flex items-center gap-4 sm:gap-5">
-                <TeamCrestBadge
-                  teamName={homeTeamName}
-                  crestsMap={leagueData?.teamCrests}
-                  size="xl"
-                  rounded="rounded-2xl"
-                  className="shadow-sm border border-slate-200/80 shrink-0"
-                />
-                <div className="space-y-0.5 min-w-0">
-                  <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 truncate">
-                    {homeTeamName}
-                  </h2>
+            {/* GŁÓWNY POJEDYNEK DRUŻYN (SCOREBOARD DUEL) */}
+            <div className="relative z-10 px-5 sm:px-8 py-6 sm:py-7">
+              <div className="grid grid-cols-1 md:grid-cols-7 items-center gap-5 sm:gap-6">
+                
+                {/* DRUŻYNA 1 */}
+                <div className="md:col-span-3 flex items-center gap-4 sm:gap-5">
+                  <TeamCrestBadge
+                    teamName={homeTeamName}
+                    crestsMap={leagueData?.teamCrests}
+                    size="xl"
+                    rounded="rounded-2xl"
+                    className="shadow-md border border-white/15 bg-white/95 p-0.5 shrink-0"
+                  />
+                  <div className="space-y-0.5 min-w-0">
+                    <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white truncate font-athletic">
+                      {homeTeamName}
+                    </h2>
+                  </div>
                 </div>
+
+                {/* ŚRODEK (VS & HALA) */}
+                <div className="md:col-span-1 flex flex-col items-center justify-center text-center space-y-2 py-1 md:py-0">
+                  <div className="w-11 h-11 rounded-full bg-amber-400/15 text-amber-400 font-black text-xs flex items-center justify-center border border-amber-400/40 shadow-sm font-athletic">
+                    VS
+                  </div>
+                  <div className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-300 max-w-[165px] truncate">
+                    <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <span className="truncate">{nextEvent?.location || 'Hala OSiR, Luboń'}</span>
+                  </div>
+                </div>
+
+                {/* DRUŻYNA 2 */}
+                <div className="md:col-span-3 flex items-center md:flex-row-reverse gap-4 sm:gap-5 md:text-right">
+                  <TeamCrestBadge
+                    teamName={awayTeamName}
+                    crestsMap={leagueData?.teamCrests}
+                    size="xl"
+                    rounded="rounded-2xl"
+                    className="shadow-md border border-white/15 bg-white/95 p-0.5 shrink-0"
+                  />
+                  <div className="space-y-0.5 min-w-0">
+                    <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white truncate font-athletic">
+                      {awayTeamName}
+                    </h2>
+                  </div>
+                </div>
+
               </div>
-
-              {/* ŚRODEK (VS & HALA) */}
-              <div className="md:col-span-1 flex flex-col items-center justify-center text-center space-y-1.5 py-1 md:py-0">
-                <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-700 font-black text-xs flex items-center justify-center border border-slate-200/80 shadow-2xs font-athletic">
-                  VS
-                </div>
-                <div className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 max-w-[150px] truncate">
-                  <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                  <span className="truncate">{nextEvent?.location || 'Hala OSiR, Luboń'}</span>
-                </div>
-              </div>
-
-              {/* DRUŻYNA 2 */}
-              <div className="md:col-span-3 flex items-center md:flex-row-reverse gap-4 sm:gap-5 md:text-right">
-                <TeamCrestBadge
-                  teamName={awayTeamName}
-                  crestsMap={leagueData?.teamCrests}
-                  size="xl"
-                  rounded="rounded-2xl"
-                  className="shadow-sm border border-slate-200/80 shrink-0"
-                />
-                <div className="space-y-0.5 min-w-0">
-                  <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 truncate">
-                    {awayTeamName}
-                  </h2>
-                </div>
-              </div>
-
             </div>
           </div>
 
@@ -301,9 +306,9 @@ function DashboardContent() {
             <div className="flex items-center gap-2 w-full lg:w-auto">
               <Link 
                 href={nextEvent?.id ? `/events?eventId=${nextEvent.id}` : '/events'}
-                className="flex-1 sm:flex-initial text-xs sm:text-sm text-slate-700 hover:text-sky-700 transition flex items-center justify-center gap-1.5 font-bold h-11 sm:h-9.5 px-3.5 rounded-xl bg-white border border-slate-200/80 hover:border-sky-300 shadow-2xs"
+                className="flex-1 sm:flex-initial text-xs sm:text-sm text-slate-700 hover:text-amber-700 transition flex items-center justify-center gap-1.5 font-bold h-11 sm:h-9.5 px-3.5 rounded-xl bg-white border border-slate-200/80 hover:border-amber-400 shadow-2xs"
               >
-                <Users className="w-4 h-4 text-sky-600 shrink-0" />
+                <Users className="w-4 h-4 text-amber-600 shrink-0" />
                 <span>Skład: <strong className="text-slate-900 font-black">{attendingCount === 1 ? '1 obecny' : `${attendingCount} obecnych`}</strong> &rarr;</span>
               </Link>
 
@@ -334,7 +339,7 @@ function DashboardContent() {
         <div className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4 hover:shadow-md transition">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-100">
+              <div className="w-8 h-8 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center border border-slate-800 shadow-2xs">
                 <Calendar className="w-4 h-4" />
               </div>
               <div>
@@ -344,7 +349,7 @@ function DashboardContent() {
                 <span className="text-[10px] text-slate-500 font-mono">Oficjalny kalendarz zespołu</span>
               </div>
             </div>
-            <Link href="/events" className="text-xs font-bold text-sky-600 hover:text-sky-800 transition flex items-center gap-1">
+            <Link href="/events" className="text-xs font-bold text-amber-700 hover:text-amber-900 transition flex items-center gap-1">
               <span>Wszystkie ({events.length})</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </Link>
@@ -360,12 +365,12 @@ function DashboardContent() {
                   <Link
                     key={ev.id}
                     href={`/events?eventId=${ev.id}`}
-                    className="p-3.5 rounded-2xl bg-slate-50/80 hover:bg-white border border-slate-200 hover:border-sky-300 transition-all flex items-center justify-between gap-3 text-xs group hover:shadow-sm"
+                    className="p-3.5 rounded-2xl bg-slate-50/80 hover:bg-white border border-slate-200 hover:border-amber-400 transition-all flex items-center justify-between gap-3 text-xs group hover:shadow-sm"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       {/* Date block on the left */}
-                      <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex flex-col items-center justify-center shrink-0 shadow-2xs group-hover:border-sky-300 transition">
-                        <span className="text-[9px] font-black uppercase text-sky-600 font-mono">
+                      <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex flex-col items-center justify-center shrink-0 shadow-2xs group-hover:border-amber-400 transition">
+                        <span className="text-[9px] font-black uppercase text-amber-600 font-mono">
                           {evDate.toLocaleDateString('pl-PL', { month: 'short' })}
                         </span>
                         <span className="text-base font-black text-slate-900 font-mono leading-none">
@@ -380,7 +385,7 @@ function DashboardContent() {
                           }`}>
                             {ev.type}
                           </span>
-                          <h4 className="font-bold text-slate-900 group-hover:text-sky-600 transition truncate">{ev.title}</h4>
+                          <h4 className="font-bold text-slate-900 group-hover:text-amber-700 transition truncate">{ev.title}</h4>
                         </div>
                         <div className="text-[11px] text-slate-500 font-mono flex items-center gap-1.5 truncate">
                           <span>{evDate.toLocaleDateString('pl-PL', { weekday: 'short' })}</span>

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Plus_Jakarta_Sans, Outfit } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 import { SeasonArchiveProvider } from '@/lib/season-archive-context';
@@ -9,6 +10,20 @@ import Footer from '@/components/Footer';
 import UnreadAnnouncementPopup from '@/components/UnreadAnnouncementPopup';
 import AuthGuard from '@/components/AuthGuard';
 import { ToastProvider } from '@/components/ToastProvider';
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin', 'latin-ext'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-sans',
+  display: 'swap',
+});
+
+const outfit = Outfit({
+  subsets: ['latin', 'latin-ext'],
+  weight: ['600', '700', '800', '900'],
+  variable: '--font-display',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Angels ZTP Volleyball Team',
@@ -47,7 +62,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pl" className="theme-light light">
+    <html lang="pl" className={`theme-light light ${plusJakartaSans.variable} ${outfit.variable}`}>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="mobile-web-app-capable" content="yes" />
@@ -55,7 +70,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Angels ZTP" />
       </head>
-      <body className="font-sans antialiased flex flex-col min-h-screen bg-[#f6f8fb] text-slate-900 selection:bg-sky-500 selection:text-white relative">
+      <body className="font-sans antialiased flex flex-col min-h-screen bg-[#f8fafc] text-slate-900 selection:bg-amber-400 selection:text-slate-950 relative">
         {/* Dynamic Cyber-Athletic Court Background */}
         <div className="cyber-court-bg" />
         <div className="court-lines-overlay" />

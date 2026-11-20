@@ -696,11 +696,11 @@ function FeesContent() {
           onClick={() => setFeesTab('fees_table')}
           className={`pb-3.5 px-3 sm:px-4 text-xs sm:text-sm font-black uppercase tracking-wider transition flex items-center gap-2 border-b-2 shrink-0 ${
             feesTab === 'fees_table'
-              ? 'border-sky-600 text-sky-950 font-black'
+              ? 'border-slate-900 text-slate-950 font-black'
               : 'border-transparent text-slate-500 hover:text-slate-900 font-bold'
           }`}
         >
-          <FileSpreadsheet className="w-4 h-4 text-sky-600" />
+          <FileSpreadsheet className={`w-4 h-4 ${feesTab === 'fees_table' ? 'text-amber-600' : 'text-slate-500'}`} />
           <span>Tabela Składek</span>
           <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-100 border border-slate-200 font-mono text-slate-700 font-bold">
             {filteredPayments.length}
@@ -1065,7 +1065,7 @@ function FeesContent() {
                         onClick={() => setPaymentsPage(idx + 1)}
                         className={`min-w-[28px] h-7 px-2 rounded-xl text-xs font-black transition ${
                           paymentsPage === idx + 1
-                            ? 'bg-sky-600 text-white shadow-xs'
+                            ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-xs'
                             : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
                         }`}
                       >

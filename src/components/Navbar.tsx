@@ -199,13 +199,15 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md text-slate-800 shadow-sm border-b border-slate-200">
+      {/* Angels Navy & Gold Club Accent Ribbon */}
+      <div className="h-[2.5px] w-full bg-gradient-to-r from-slate-950 via-amber-500 to-slate-950" />
       {/* Main Navbar */}
       <div className="w-full">
         <div className="max-w-[2000px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 flex items-center justify-between h-16">
           {/* Logo & Brand with Angels ZTP Logo */}
           <div className="flex items-center gap-3 shrink-0">
             <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white p-0.5 shadow-sm border border-slate-200 group-hover:border-sky-400 group-hover:shadow-md transition overflow-hidden shrink-0 flex items-center justify-center">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white p-0.5 shadow-sm border border-slate-200 group-hover:border-amber-400 group-hover:shadow-md transition overflow-hidden shrink-0 flex items-center justify-center">
                 <img 
                   src="/logo.jpg" 
                   alt="Angels ZTP Logo" 
@@ -213,10 +215,10 @@ export default function Navbar() {
                 />
               </div>
               <div className="flex flex-col shrink-0 leading-tight">
-                <span className="font-black text-base sm:text-lg tracking-wider uppercase font-athletic text-slate-900 group-hover:text-sky-600 transition whitespace-nowrap">
+                <span className="font-black text-base sm:text-lg tracking-wider uppercase font-athletic text-slate-900 group-hover:text-amber-600 transition whitespace-nowrap">
                   ANGELS ZTP
                 </span>
-                <span className="hidden sm:inline-block text-[9px] sm:text-[10px] font-bold text-sky-600 tracking-widest uppercase whitespace-nowrap">
+                <span className="hidden sm:inline-block text-[9px] sm:text-[10px] font-extrabold text-amber-600 tracking-widest uppercase whitespace-nowrap">
                   VOLLEYBALL TEAM
                 </span>
               </div>
@@ -426,7 +428,7 @@ export default function Navbar() {
               >
                 <Bell className="w-4 h-4 text-slate-600" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-sky-600 text-white rounded-full text-[10px] font-black flex items-center justify-center shadow-md ring-2 ring-white animate-pulse">
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-amber-500 text-slate-950 rounded-full text-[10px] font-black flex items-center justify-center shadow-md ring-2 ring-white animate-pulse">
                     {unreadCount}
                   </span>
                 )}
@@ -615,11 +617,11 @@ export default function Navbar() {
                 {/* Profile Pill with Photo & Details - Clickable */}
                 <button
                   onClick={() => setShowProfileModal(true)}
-                  className="flex items-center gap-2 sm:gap-2.5 h-9 sm:h-10 px-2 sm:px-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-sky-300 shadow-sm transition text-left group cursor-pointer"
+                  className="flex items-center gap-2 sm:gap-2.5 h-9 sm:h-10 px-2 sm:px-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-amber-400 shadow-sm transition text-left group cursor-pointer"
                   title="Kliknij, aby otworzyć swój profil"
                 >
                   {/* Circular Avatar / Photo with hover camera hint */}
-                  <div className="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden shrink-0 ring-1 ring-slate-200 group-hover:ring-sky-400 shadow-sm transition">
+                  <div className="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden shrink-0 ring-1 ring-slate-200 group-hover:ring-amber-400 shadow-sm transition">
                     {user.avatar ? (
                       <img
                         src={user.avatar}
@@ -627,7 +629,7 @@ export default function Navbar() {
                         className="w-full h-full object-cover group-hover:scale-105 transition duration-200"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-tr from-sky-600 via-sky-500 to-indigo-600 text-white font-black text-xs flex items-center justify-center">
+                      <div className="w-full h-full bg-gradient-to-tr from-slate-950 via-slate-800 to-slate-700 text-amber-400 font-black text-xs flex items-center justify-center">
                         {user.name.charAt(0)}
                       </div>
                     )}

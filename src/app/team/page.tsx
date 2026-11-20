@@ -252,12 +252,12 @@ export default function TeamPage() {
       {/* Header - Pro Cyber Athletic */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 shrink-0 shadow-sm">
+          <div className="w-10 h-10 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-amber-400 shrink-0 shadow-sm">
             <Users className="w-5 h-5" />
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight font-athletic">
-              Kadra <span className="text-sky-600">Drużyny</span>
+              Kadra <span className="text-amber-600">Drużyny</span>
             </h1>
             <p className="text-xs text-slate-500 font-medium">Angels ZTP • Sezon LALS 2026/2027</p>
           </div>
@@ -265,7 +265,7 @@ export default function TeamPage() {
 
         <div className="flex items-center gap-2">
           <span className="px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 shadow-sm">
-            Zawodnicy: <strong className="text-sky-600 font-mono text-sm ml-1">{players.length}</strong>
+            Zawodnicy: <strong className="text-slate-900 font-mono text-sm ml-1">{players.length}</strong>
           </span>
           <span className="px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 shadow-sm">
             Sztab: <strong className="text-amber-600 font-mono text-sm ml-1">{staff.length}</strong>
@@ -407,7 +407,7 @@ export default function TeamPage() {
                   onClick={() => setPositionFilter(pos.id)}
                   className={`px-2.5 py-1 rounded-lg text-xs font-bold transition border ${
                     positionFilter === pos.id
-                      ? 'bg-sky-600 text-white font-black border-sky-600 shadow-sm'
+                      ? 'bg-slate-900 text-amber-400 font-black border-slate-800 shadow-sm'
                       : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border-slate-200'
                   }`}
                 >

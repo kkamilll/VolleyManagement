@@ -306,8 +306,8 @@ function GaleriaContent() {
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-sky-500/20 text-sky-600 border border-sky-500/30">
+          <div className="flex items-center gap-2.5">
+            <span className="p-2.5 rounded-xl bg-slate-900 text-amber-400 border border-slate-800 shadow-sm">
               <Camera className="w-5 h-5" />
             </span>
             <h1 className="text-xl sm:text-2xl font-black tracking-wide uppercase font-athletic text-slate-900">
@@ -345,14 +345,14 @@ function GaleriaContent() {
               }}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0 ${
                 categoryFilter === cat.id
-                  ? 'bg-sky-600 text-white font-black shadow-sm'
+                  ? 'bg-slate-900 text-amber-400 border border-slate-800 font-black shadow-sm'
                   : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-sm'
               }`}
             >
               <span>{cat.label}</span>
               <span
                 className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                  categoryFilter === cat.id ? 'bg-white/20 text-white font-black' : 'bg-slate-100 text-slate-600'
+                  categoryFilter === cat.id ? 'bg-amber-400/20 text-amber-300 font-black' : 'bg-slate-100 text-slate-600'
                 }`}
               >
                 {cat.count}
