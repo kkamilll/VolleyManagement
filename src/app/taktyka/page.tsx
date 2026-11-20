@@ -2975,38 +2975,112 @@ function TacticsContent() {
       {/* SEKCJA 1: TABLICA TAKTYCZNA (BOISKO I KONSOLA ROZGRYWANIA) */}
       <div className="bg-white border border-slate-300 rounded-3xl p-3 sm:p-5 shadow-md space-y-4 border-t-4 border-t-slate-900">
           
-          {/* KONSOLA TAKTYCZNA (FAZY GRY, NARZĘDZIA I BOISKO) */}
-          <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-2.5 sm:p-3.5 shadow-2xs space-y-2.5">
-            {/* Rząd 1: Fazy Gry + Orientacja Boiska (wyrównane w jednym rzędzie) */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-200/80">
-              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5 max-w-full">
-                <span className="text-[11px] font-black uppercase text-slate-400 shrink-0 mr-0.5">Faza:</span>
-                {(['PRZYJECIE', 'OBRONA', 'ATAK', 'ZAGRYWKA'] as TacticalPhase[]).map(p => {
-                  const label = p === 'PRZYJECIE' ? 'Przyjęcie' : p === 'OBRONA' ? 'Obrona' : p === 'ATAK' ? 'Atak' : 'Zagrywka';
-                  return (
-                    <button
-                      key={p}
-                      type="button"
-                      onClick={() => applyPreset(rotation, p)}
-                      className={`h-9 sm:h-8 px-3 rounded-xl text-xs font-bold transition cursor-pointer shrink-0 flex items-center justify-center active:scale-95 ${
-                        phase === p
-                          ? 'bg-slate-900 text-amber-400 border border-slate-800 font-black shadow-xs'
-                          : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/90'
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
+          {/* KONSOLA TAKTYCZNA (NARZĘDZIA I ORIENTACJA BOISKA) */}
+          <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-2.5 sm:p-3 shadow-2xs space-y-2.5">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
+              {/* Równa, symetryczna siatka narzędzi boiska (3 kolumny telefon / 6 kolumn desktop) */}
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 flex-1">
+                <button
+                  type="button"
+                  onClick={() => setActiveTool('move')}
+                  className={`h-10 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition border cursor-pointer active:scale-95 ${
+                    activeTool === 'move'
+                      ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-sm font-black'
+                      : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
+                  }`}
+                  title="Przesuwaj: chwyć i przeciągaj zawodników i piłkę"
+                >
+                  <Move className="w-3.5 h-3.5 shrink-0" />
+                  <span>Przesuń</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleToggleLiberoMiddle}
+                  className={`h-10 px-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs active:scale-95 ${
+                    hasLibero
+                      ? 'bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100'
+                      : 'bg-slate-100 text-slate-900 border-slate-300 hover:bg-slate-200'
+                  }`}
+                  title="Przełącz gracza w II linii: Libero (L) ⇄ Środkowy (Ś)"
+                >
+                  <span className={`w-4 h-4 rounded-full flex items-center justify-center font-black text-[10px] shrink-0 ${
+                    hasLibero ? 'bg-amber-500 text-slate-950' : 'bg-slate-900 text-amber-400'
+                  }`}>
+                    {hasLibero ? 'L' : 'Ś'}
+                  </span>
+                  <span className="truncate">{hasLibero ? 'Libero' : 'Środkowy'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowOpponents(!showOpponents)}
+                  className={`h-10 px-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                    showOpponents
+                      ? 'bg-rose-50 text-rose-800 border-rose-300'
+                      : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
+                  }`}
+                  title="Pokaż/ukryj blok i obronę przeciwnika"
+                >
+                  <Users className="w-3.5 h-3.5 shrink-0" />
+                  <span>Rywale</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowBall(!showBall)}
+                  className={`h-10 px-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                    showBall
+                      ? 'bg-amber-50 text-amber-800 border-amber-300'
+                      : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
+                  }`}
+                  title="Pokaż/ukryj piłkę"
+                >
+                  <Volleyball className="w-3.5 h-3.5 shrink-0" />
+                  <span>Piłka</span>
+                </button>
+
+                {/* Przycisk rozwijania narzędzi rysowania */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = !showDrawingTools;
+                    setShowDrawingTools(next);
+                    if (next && activeTool === 'move') {
+                      setActiveTool('pen');
+                    } else if (!next) {
+                      setActiveTool('move');
+                    }
+                  }}
+                  className={`h-10 px-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                    showDrawingTools || activeTool !== 'move'
+                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs font-black'
+                      : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
+                  }`}
+                  title="Pokaż/ukryj narzędzia pisaka i kolorów"
+                >
+                  <Pencil className="w-3.5 h-3.5 shrink-0" />
+                  <span>Rysuj</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleResetPositions}
+                  className="h-10 px-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/90 text-xs font-bold transition flex items-center justify-center gap-1 shadow-2xs cursor-pointer active:scale-95"
+                  title="Przywróć domyślne pozycje na boisku"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                  <span>Reset</span>
+                </button>
               </div>
 
               {/* Przełącznik orientacji boiska: pionowo (telefon) vs poziomo */}
               <div className="flex items-center justify-end shrink-0">
-                <div className="inline-flex items-center p-0.5 bg-white rounded-xl border border-slate-200/90 shadow-2xs w-full sm:w-auto">
+                <div className="inline-flex items-center p-0.5 bg-white rounded-xl border border-slate-200/90 shadow-2xs w-full lg:w-auto h-10">
                   <button
                     type="button"
                     onClick={() => handleToggleOrientation('vertical')}
-                    className={`flex-1 sm:flex-initial h-8 px-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
+                    className={`flex-1 lg:flex-initial h-full px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
                       boardOrientation === 'vertical'
                         ? 'bg-slate-900 text-amber-400 font-black'
                         : 'text-slate-600 hover:text-slate-900'
@@ -3019,7 +3093,7 @@ function TacticsContent() {
                   <button
                     type="button"
                     onClick={() => handleToggleOrientation('horizontal')}
-                    className={`flex-1 sm:flex-initial h-8 px-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
+                    className={`flex-1 lg:flex-initial h-full px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
                       boardOrientation === 'horizontal'
                         ? 'bg-slate-900 text-amber-400 font-black'
                         : 'text-slate-600 hover:text-slate-900'
@@ -3031,102 +3105,6 @@ function TacticsContent() {
                   </button>
                 </div>
               </div>
-            </div>
-
-            {/* Rząd 2: Równa, symetryczna siatka narzędzi boiska (3 kolumny telefon / 6 kolumn desktop) */}
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
-              <button
-                type="button"
-                onClick={() => setActiveTool('move')}
-                className={`h-10 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition border cursor-pointer active:scale-95 ${
-                  activeTool === 'move'
-                    ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-sm font-black'
-                    : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
-                }`}
-                title="Przesuwaj: chwyć i przeciągaj zawodników i piłkę"
-              >
-                <Move className="w-3.5 h-3.5 shrink-0" />
-                <span>Przesuń</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleToggleLiberoMiddle}
-                className={`h-10 px-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs active:scale-95 ${
-                  hasLibero
-                    ? 'bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100'
-                    : 'bg-slate-100 text-slate-900 border-slate-300 hover:bg-slate-200'
-                }`}
-                title="Przełącz gracza w II linii: Libero (L) ⇄ Środkowy (Ś)"
-              >
-                <span className={`w-4 h-4 rounded-full flex items-center justify-center font-black text-[10px] shrink-0 ${
-                  hasLibero ? 'bg-amber-500 text-slate-950' : 'bg-slate-900 text-amber-400'
-                }`}>
-                  {hasLibero ? 'L' : 'Ś'}
-                </span>
-                <span className="truncate">{hasLibero ? 'Libero' : 'Środkowy'}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowOpponents(!showOpponents)}
-                className={`h-10 px-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
-                  showOpponents
-                    ? 'bg-rose-50 text-rose-800 border-rose-300'
-                    : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
-                }`}
-                title="Pokaż/ukryj blok i obronę przeciwnika"
-              >
-                <Users className="w-3.5 h-3.5 shrink-0" />
-                <span>Rywale</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowBall(!showBall)}
-                className={`h-10 px-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
-                  showBall
-                    ? 'bg-amber-50 text-amber-800 border-amber-300'
-                    : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
-                }`}
-                title="Pokaż/ukryj piłkę"
-              >
-                <Volleyball className="w-3.5 h-3.5 shrink-0" />
-                <span>Piłka</span>
-              </button>
-
-              {/* Przycisk rozwijania narzędzi rysowania */}
-              <button
-                type="button"
-                onClick={() => {
-                  const next = !showDrawingTools;
-                  setShowDrawingTools(next);
-                  if (next && activeTool === 'move') {
-                    setActiveTool('pen');
-                  } else if (!next) {
-                    setActiveTool('move');
-                  }
-                }}
-                className={`h-10 px-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
-                  showDrawingTools || activeTool !== 'move'
-                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs font-black'
-                    : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
-                }`}
-                title="Pokaż/ukryj narzędzia pisaka i kolorów"
-              >
-                <Pencil className="w-3.5 h-3.5 shrink-0" />
-                <span>Rysuj</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleResetPositions}
-                className="h-10 px-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/90 text-xs font-bold transition flex items-center justify-center gap-1 shadow-2xs cursor-pointer active:scale-95"
-                title="Przywróć domyślne pozycje na boisku"
-              >
-                <RotateCcw className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                <span>Reset</span>
-              </button>
             </div>
 
             {/* Rząd 3: Rozwijany panel narzędzi rysowania (widoczny tylko gdy włączono 'Rysuj') */}
