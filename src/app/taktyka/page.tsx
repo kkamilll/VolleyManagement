@@ -2522,18 +2522,20 @@ function TacticsContent() {
   }, [isLockedToUnit, unitTactics, tactics, playbookCategory, playbookMatchFilter, playbookSearch, matches, events]);
 
   return (
-    <div className="w-full max-w-[2000px] mx-auto px-2 sm:px-6 lg:px-10 xl:px-12 pt-4 sm:pt-6 pb-28 md:pb-16 space-y-3 sm:space-y-4">
-      {/* Top Header - Unified Taktyka & Trening Hub */}
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-28 md:pb-16 space-y-4 sm:space-y-5">
       {/* GŁÓWNY NAGŁÓWEK MODUŁU */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 shrink-0 shadow-sm">
+          <div className="w-10 h-10 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-amber-400 shrink-0 shadow-sm">
             <Target className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-base sm:text-2xl font-black text-slate-900 uppercase tracking-tight font-athletic leading-tight">
-              Taktyka
+            <h1 className="text-lg sm:text-2xl font-black text-slate-900 uppercase tracking-tight font-athletic leading-tight">
+              Taktyka <span className="text-amber-600">&amp; Rozpiski</span>
             </h1>
+            <p className="text-[11px] text-slate-500 font-medium">
+              Tablica trenerska, założenia meczowe i konspekty zespołu
+            </p>
           </div>
         </div>
 
@@ -2546,33 +2548,32 @@ function TacticsContent() {
         )}
       </div>
 
-      {/* GŁÓWNY PODZIAŁ MODUŁU TAKTYKI: TABLICA + ROZPISKI (MECZE, SPARINGI, TURNIEJE, TRENINGI) */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 p-1.5 rounded-2xl bg-slate-100/90 border border-slate-200/90 shadow-2xs">
-        {/* 5 Głównych Zakładek Taktyki - spójny, elegancki pasek segmentowy z dużymi przyciskami pod kciuk */}
-        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none w-full lg:w-auto py-0.5">
+      {/* GŁÓWNY PODZIAŁ MODUŁU TAKTYKI: RÓWNY PASEK 5 ZAKŁADEK */}
+      <div className="p-1.5 rounded-2xl bg-slate-100/90 border border-slate-200/90 shadow-2xs">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
           <button
             type="button"
             onClick={() => { setTacticsSection('board'); setSelectedTactic(null); setLastAddedTactic(null); }}
-            className={`shrink-0 flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
+            className={`col-span-2 sm:col-span-1 flex items-center justify-center gap-2 h-11 sm:h-10 px-3 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'board'
                 ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
                 : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
             }`}
           >
-            <Compass className={`w-4 h-4 ${tacticsSection === 'board' ? 'text-amber-400' : 'text-slate-600'}`} />
+            <Compass className={`w-4 h-4 shrink-0 ${tacticsSection === 'board' ? 'text-amber-400' : 'text-slate-500'}`} />
             <span>Tablica</span>
           </button>
 
           <button
             type="button"
             onClick={() => { setTacticsSection('matches'); setSelectedTactic(null); setLastAddedTactic(null); }}
-            className={`shrink-0 flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
+            className={`flex items-center justify-center gap-1.5 h-11 sm:h-10 px-3 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'matches'
                 ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
                 : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
             }`}
           >
-            <Trophy className={`w-4 h-4 ${tacticsSection === 'matches' ? 'text-amber-400' : 'text-slate-600'}`} />
+            <Trophy className={`w-4 h-4 shrink-0 ${tacticsSection === 'matches' ? 'text-amber-400' : 'text-slate-500'}`} />
             <span>Mecze</span>
             <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'matches' ? 'bg-amber-400/20 text-amber-300 font-black' : 'bg-slate-100 text-slate-600'}`}>
               {matchesCount}
@@ -2582,13 +2583,13 @@ function TacticsContent() {
           <button
             type="button"
             onClick={() => { setTacticsSection('sparingi'); setSelectedTactic(null); setLastAddedTactic(null); }}
-            className={`shrink-0 flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
+            className={`flex items-center justify-center gap-1.5 h-11 sm:h-10 px-3 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'sparingi'
                 ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
                 : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
             }`}
           >
-            <Swords className={`w-4 h-4 ${tacticsSection === 'sparingi' ? 'text-amber-400' : 'text-slate-600'}`} />
+            <Swords className={`w-4 h-4 shrink-0 ${tacticsSection === 'sparingi' ? 'text-amber-400' : 'text-slate-500'}`} />
             <span>Sparingi</span>
             <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'sparingi' ? 'bg-amber-400/20 text-amber-300 font-black' : 'bg-slate-100 text-slate-600'}`}>
               {sparringsCount}
@@ -2598,13 +2599,13 @@ function TacticsContent() {
           <button
             type="button"
             onClick={() => { setTacticsSection('turnieje'); setSelectedTactic(null); setLastAddedTactic(null); }}
-            className={`shrink-0 flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
+            className={`flex items-center justify-center gap-1.5 h-11 sm:h-10 px-3 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'turnieje'
                 ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
                 : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
             }`}
           >
-            <Crown className={`w-4 h-4 ${tacticsSection === 'turnieje' ? 'text-amber-400' : 'text-slate-600'}`} />
+            <Crown className={`w-4 h-4 shrink-0 ${tacticsSection === 'turnieje' ? 'text-amber-400' : 'text-slate-500'}`} />
             <span>Turnieje</span>
             <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'turnieje' ? 'bg-amber-400/20 text-amber-300 font-black' : 'bg-slate-100 text-slate-600'}`}>
               {tournamentsCount}
@@ -2614,120 +2615,115 @@ function TacticsContent() {
           <button
             type="button"
             onClick={() => setTacticsSection('trainings')}
-            className={`shrink-0 flex items-center justify-center gap-2 h-11 sm:h-10 px-4 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
+            className={`flex items-center justify-center gap-1.5 h-11 sm:h-10 px-3 rounded-xl text-xs sm:text-sm font-bold transition border whitespace-nowrap cursor-pointer active:scale-95 ${
               tacticsSection === 'trainings'
                 ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
                 : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
             }`}
           >
-            <Volleyball className={`w-4 h-4 ${tacticsSection === 'trainings' ? 'text-amber-400' : 'text-slate-600'}`} />
+            <Volleyball className={`w-4 h-4 shrink-0 ${tacticsSection === 'trainings' ? 'text-amber-400' : 'text-slate-500'}`} />
             <span>Treningi</span>
             <span className={`text-[11px] px-1.5 py-0.2 rounded-full font-mono ${tacticsSection === 'trainings' ? 'bg-amber-400/20 text-amber-300 font-black' : 'bg-slate-100 text-slate-600'}`}>
               {trainingsCount}
             </span>
           </button>
         </div>
+      </div>
 
-        {/* Prawa strona w trybie Tablicy: Kontekst i wygodne przyciski zapisu */}
-        {tacticsSection === 'board' && (
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto pt-1.5 lg:pt-0 border-t lg:border-t-0 border-slate-200">
-            {/* Wybór kontekstu tablicy */}
-            <div className="flex items-center gap-1.5 w-full sm:w-auto">
-              <select
-                value={selectedContextKey}
-                onChange={e => setSelectedContextKey(e.target.value)}
-                className="flex-1 sm:flex-initial h-10 sm:h-9 bg-white border border-slate-200/90 text-slate-800 rounded-xl px-3 text-xs sm:text-sm font-bold focus:outline-none focus:border-sky-500 shadow-2xs truncate"
-                title="Wybierz wydarzenie, którego dotyczy ta taktyka"
+      {/* PASEK KONTEKSTU I ZAPISU TABLICY (DEDYKOWANY, CZYSTY RZĄD TYLKO W TRYBIE TABLICY) */}
+      {tacticsSection === 'board' && (
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-2.5 sm:p-3 shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+          {/* Wybór kontekstu tablicy */}
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <span className="hidden md:inline-flex items-center gap-1 text-[11px] font-black uppercase tracking-wider text-slate-400 shrink-0 pl-1">
+              Przypisz do:
+            </span>
+            <select
+              value={selectedContextKey}
+              onChange={e => setSelectedContextKey(e.target.value)}
+              className="flex-1 sm:max-w-md h-10 bg-slate-50 hover:bg-white border border-slate-200/90 text-slate-900 rounded-xl px-3 text-xs sm:text-sm font-bold focus:outline-none focus:border-amber-500 shadow-2xs truncate cursor-pointer"
+              title="Wybierz wydarzenie, którego dotyczy ta taktyka"
+            >
+              <option value="GENERAL">🌐 Ogólna Tablica Drużyny</option>
+
+              {events.some(e => e.type === 'TRENING') && (
+                <optgroup label="🏐 Najbliższe Treningi">
+                  {events.filter(e => e.type === 'TRENING').map(e => (
+                    <option key={e.id} value={`EVENT_${e.id}`}>
+                      Trening: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} — {e.title}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+
+              {events.some(e => e.type === 'SPARING') && (
+                <optgroup label="⚔️ Sparingi">
+                  {events.filter(e => e.type === 'SPARING').map(e => (
+                    <option key={e.id} value={`EVENT_${e.id}`}>
+                      Sparing: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} vs {e.opponent || 'Rywal'}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+
+              {(events.some(e => e.type === 'MECZ' || e.title.toLowerCase().includes('lals') || e.title.toLowerCase().includes('mecz')) || matches.length > 0) && (
+                <optgroup label="🏆 Mecze Ligowe LALS">
+                  {events.filter(e => e.type === 'MECZ' || e.title.toLowerCase().includes('lals') || e.title.toLowerCase().includes('mecz')).map(e => (
+                    <option key={e.id} value={`EVENT_${e.id}`}>
+                      Mecz LALS: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} vs {e.opponent || 'Rywal'}
+                    </option>
+                  ))}
+                  {matches.map(m => (
+                    <option key={m.id} value={`MATCH_${m.id}`}>
+                      LALS: {new Date(m.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} vs {m.opponent}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+
+              {events.some(e => e.type === 'TURNIEJ') && (
+                <optgroup label="🥇 Turnieje">
+                  {events.filter(e => e.type === 'TURNIEJ').map(e => (
+                    <option key={e.id} value={`EVENT_${e.id}`}>
+                      Turniej: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} — {e.title}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+            </select>
+
+            {selectedContextKey !== 'GENERAL' && (
+              <button
+                onClick={() => setSelectedContextKey('GENERAL')}
+                className="w-10 h-10 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 text-xs font-bold transition shadow-2xs shrink-0 flex items-center justify-center cursor-pointer"
+                title="Powrót do ogólnej tablicy"
               >
-                <option value="GENERAL">🌐 Ogólna Tablica Drużyny</option>
+                ✕
+              </button>
+            )}
+          </div>
 
-                {events.some(e => e.type === 'TRENING') && (
-                  <optgroup label="🏐 Najbliższe Treningi">
-                    {events.filter(e => e.type === 'TRENING').map(e => (
-                      <option key={e.id} value={`EVENT_${e.id}`}>
-                        Trening: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} — {e.title}
-                      </option>
-                    ))}
-                  </optgroup>
-                )}
-
-                {events.some(e => e.type === 'SPARING') && (
-                  <optgroup label="⚔️ Sparingi">
-                    {events.filter(e => e.type === 'SPARING').map(e => (
-                      <option key={e.id} value={`EVENT_${e.id}`}>
-                        Sparing: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} vs {e.opponent || 'Rywal'}
-                      </option>
-                    ))}
-                  </optgroup>
-                )}
-
-                {(events.some(e => e.type === 'MECZ' || e.title.toLowerCase().includes('lals') || e.title.toLowerCase().includes('mecz')) || matches.length > 0) && (
-                  <optgroup label="🏆 Mecze Ligowe LALS">
-                    {events.filter(e => e.type === 'MECZ' || e.title.toLowerCase().includes('lals') || e.title.toLowerCase().includes('mecz')).map(e => (
-                      <option key={e.id} value={`EVENT_${e.id}`}>
-                        Mecz LALS: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} vs {e.opponent || 'Rywal'}
-                      </option>
-                    ))}
-                    {matches.map(m => (
-                      <option key={m.id} value={`MATCH_${m.id}`}>
-                        LALS: {new Date(m.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} vs {m.opponent}
-                      </option>
-                    ))}
-                  </optgroup>
-                )}
-
-                {events.some(e => e.type === 'TURNIEJ') && (
-                  <optgroup label="🥇 Turnieje">
-                    {events.filter(e => e.type === 'TURNIEJ').map(e => (
-                      <option key={e.id} value={`EVENT_${e.id}`}>
-                        Turniej: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} — {e.title}
-                      </option>
-                    ))}
-                  </optgroup>
-                )}
-              </select>
-
-              {selectedContextKey !== 'GENERAL' && (
+          {/* Narzędzia zapisu / wczytywania tablicy */}
+          {canEdit && (
+            <div className="flex items-center gap-2 shrink-0">
+              {tactics.length > 0 && (
                 <button
-                  onClick={() => setSelectedContextKey('GENERAL')}
-                  className="h-10 sm:h-9 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 text-xs font-bold transition shadow-2xs whitespace-nowrap cursor-pointer"
-                  title="Powrót do ogólnej tablicy"
+                  onClick={() => setShowLoadTacticModal(true)}
+                  className="flex-1 sm:flex-initial h-10 px-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 hover:border-amber-400 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
+                  title="Wczytaj zapisany schemat z bazy"
                 >
-                  ✕
+                  <FolderArchive className="w-4 h-4 text-amber-600" />
+                  <span>Wczytaj</span>
                 </button>
               )}
-            </div>
 
-            {/* Narzędzia tablicy */}
-            {canEdit && (
-              <div className="flex items-center gap-1.5 flex-wrap sm:flex-nowrap">
-                {tactics.length > 0 && (
-                  <button
-                    onClick={() => setShowLoadTacticModal(true)}
-                    className="flex-1 sm:flex-initial h-10 sm:h-9 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
-                    title="Wczytaj zapisany schemat z bazy"
-                  >
-                    <FolderArchive className="w-4 h-4 text-sky-600" />
-                    <span>Wczytaj</span>
-                  </button>
-                )}
-
-                <button
-                  onClick={handleResetPositions}
-                  className="flex-1 sm:flex-initial h-10 sm:h-9 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
-                  title="Przywróć domyślne pozycje"
-                >
-                  <RotateCcw className="w-4 h-4 text-amber-600" />
-                  <span>Reset</span>
-                </button>
-
-                <button
-                  onClick={handleSaveAsMatchPost}
-                  disabled={saving}
-                  className="flex-2 sm:flex-initial h-10 sm:h-9 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xs active:scale-95 disabled:opacity-50 cursor-pointer"
-                  title="Zapisz ten schemat bezpośrednio jako post do wybranego meczu"
-                >
-                  <Save className="w-4 h-4 text-amber-300" />
+              <button
+                onClick={handleSaveAsMatchPost}
+                disabled={saving}
+                className="flex-1 sm:flex-initial h-10 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xs active:scale-95 disabled:opacity-50 cursor-pointer"
+                title="Zapisz ten schemat bezpośrednio jako post do wybranego meczu"
+              >
+                <Save className="w-4 h-4 text-amber-400" />
                   <span>
                     {saving ? 'Zapisuję...' : 'Zapisz'}
                   </span>
@@ -2735,17 +2731,16 @@ function TacticsContent() {
 
                 <button
                   onClick={handleOpenSaveModal}
-                  className="flex-1 sm:flex-initial h-10 sm:h-9 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
+                  className="flex-1 sm:flex-initial h-10 px-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 hover:border-amber-400 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
                   title="Więcej opcji zapisu (baza ogólna, własny tytuł)"
                 >
-                  <Save className="w-4 h-4 text-sky-600" />
+                  <Save className="w-4 h-4 text-slate-500" />
                   <span>Więcej</span>
                 </button>
               </div>
             )}
           </div>
         )}
-      </div>
 
       {tacticsSection === 'board' && (
         <>
@@ -2867,8 +2862,8 @@ function TacticsContent() {
           
           {/* KONSOLA TAKTYCZNA (FAZY GRY, NARZĘDZIA I BOISKO) */}
           <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-2.5 sm:p-3.5 shadow-2xs space-y-2.5">
-            {/* Rząd 1: Fazy Gry - duże, dotykowe przyciski */}
-            <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-200/80">
+            {/* Rząd 1: Fazy Gry + Orientacja Boiska (wyrównane w jednym rzędzie) */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-200/80">
               <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5 max-w-full">
                 <span className="text-[11px] font-black uppercase text-slate-400 shrink-0 mr-0.5">Faza:</span>
                 {(['PRZYJECIE', 'OBRONA', 'ATAK', 'ZAGRYWKA'] as TacticalPhase[]).map(p => {
@@ -2889,114 +2884,16 @@ function TacticsContent() {
                   );
                 })}
               </div>
-            </div>
-
-            {/* Rząd 2: Główne Przyciski Boiska - wygodne i równe na telefonie */}
-            <div className="flex items-center justify-between gap-2 flex-wrap">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <button
-                  type="button"
-                  onClick={() => setActiveTool('move')}
-                  className={`h-9.5 px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 transition border cursor-pointer active:scale-95 ${
-                    activeTool === 'move'
-                      ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-sm font-black'
-                      : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
-                  }`}
-                  title="Przesuwaj: chwyć i przeciągaj zawodników i piłkę"
-                >
-                  <Move className="w-3.5 h-3.5" />
-                  <span>Przesuń</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleToggleLiberoMiddle}
-                  className={`h-9.5 px-3 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95 ${
-                    hasLibero
-                      ? 'bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100'
-                      : 'bg-sky-50 text-sky-900 border-sky-300 hover:bg-sky-100'
-                  }`}
-                  title="Przełącz gracza w II linii: Libero (L) ⇄ Środkowy (Ś)"
-                >
-                  <span className={`w-4 h-4 rounded-full flex items-center justify-center font-black text-[10px] ${
-                    hasLibero ? 'bg-amber-500 text-slate-950' : 'bg-sky-600 text-white'
-                  }`}>
-                    {hasLibero ? 'L' : 'Ś'}
-                  </span>
-                  <span>{hasLibero ? 'Libero' : 'Środkowy'}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setShowOpponents(!showOpponents)}
-                  className={`h-9.5 px-3 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 cursor-pointer active:scale-95 ${
-                    showOpponents
-                      ? 'bg-rose-50 text-rose-800 border-rose-300'
-                      : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
-                  }`}
-                  title="Pokaż/ukryj blok i obronę przeciwnika"
-                >
-                  <Users className="w-3.5 h-3.5" />
-                  <span>Rywale</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setShowBall(!showBall)}
-                  className={`h-9.5 px-3 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 cursor-pointer active:scale-95 ${
-                    showBall
-                      ? 'bg-amber-50 text-amber-800 border-amber-300'
-                      : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
-                  }`}
-                  title="Pokaż/ukryj piłkę"
-                >
-                  <Volleyball className="w-3.5 h-3.5" />
-                  <span>Piłka</span>
-                </button>
-
-                {/* Przycisk rozwijania narzędzi rysowania */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    const next = !showDrawingTools;
-                    setShowDrawingTools(next);
-                    if (next && activeTool === 'move') {
-                      setActiveTool('pen');
-                    } else if (!next) {
-                      setActiveTool('move');
-                    }
-                  }}
-                  className={`h-9.5 px-3 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 cursor-pointer active:scale-95 ${
-                    showDrawingTools || activeTool !== 'move'
-                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs font-black'
-                      : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
-                  }`}
-                  title="Pokaż/ukryj narzędzia pisaka i kolorów"
-                >
-                  <Pencil className="w-3.5 h-3.5" />
-                  <span>Rysuj</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleResetPositions}
-                  className="h-9.5 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/90 text-xs font-bold transition flex items-center justify-center gap-1 shadow-2xs cursor-pointer active:scale-95"
-                  title="Przywróć domyślne pozycje na boisku"
-                >
-                  <RotateCcw className="w-3.5 h-3.5 text-amber-600" />
-                  <span>Reset</span>
-                </button>
-              </div>
 
               {/* Przełącznik orientacji boiska: pionowo (telefon) vs poziomo */}
-              <div className="flex items-center gap-1 shrink-0">
-                <div className="inline-flex items-center p-0.5 bg-white rounded-xl border border-slate-200/90 shadow-2xs">
+              <div className="flex items-center justify-end shrink-0">
+                <div className="inline-flex items-center p-0.5 bg-white rounded-xl border border-slate-200/90 shadow-2xs w-full sm:w-auto">
                   <button
                     type="button"
                     onClick={() => handleToggleOrientation('vertical')}
-                    className={`h-8 px-2.5 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer active:scale-95 ${
+                    className={`flex-1 sm:flex-initial h-8 px-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
                       boardOrientation === 'vertical'
-                        ? 'bg-slate-900 text-white font-black'
+                        ? 'bg-slate-900 text-amber-400 font-black'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                     title="Widok pionowy (telefon)"
@@ -3007,9 +2904,9 @@ function TacticsContent() {
                   <button
                     type="button"
                     onClick={() => handleToggleOrientation('horizontal')}
-                    className={`h-8 px-2.5 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer active:scale-95 ${
+                    className={`flex-1 sm:flex-initial h-8 px-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
                       boardOrientation === 'horizontal'
-                        ? 'bg-slate-900 text-white font-black'
+                        ? 'bg-slate-900 text-amber-400 font-black'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                     title="Widok poziomy (desktop / obrócony telefon)"
@@ -3019,6 +2916,102 @@ function TacticsContent() {
                   </button>
                 </div>
               </div>
+            </div>
+
+            {/* Rząd 2: Równa, symetryczna siatka narzędzi boiska (3 kolumny telefon / 6 kolumn desktop) */}
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
+              <button
+                type="button"
+                onClick={() => setActiveTool('move')}
+                className={`h-10 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition border cursor-pointer active:scale-95 ${
+                  activeTool === 'move'
+                    ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-sm font-black'
+                    : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
+                }`}
+                title="Przesuwaj: chwyć i przeciągaj zawodników i piłkę"
+              >
+                <Move className="w-3.5 h-3.5 shrink-0" />
+                <span>Przesuń</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleToggleLiberoMiddle}
+                className={`h-10 px-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs active:scale-95 ${
+                  hasLibero
+                    ? 'bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100'
+                    : 'bg-slate-100 text-slate-900 border-slate-300 hover:bg-slate-200'
+                }`}
+                title="Przełącz gracza w II linii: Libero (L) ⇄ Środkowy (Ś)"
+              >
+                <span className={`w-4 h-4 rounded-full flex items-center justify-center font-black text-[10px] shrink-0 ${
+                  hasLibero ? 'bg-amber-500 text-slate-950' : 'bg-slate-900 text-amber-400'
+                }`}>
+                  {hasLibero ? 'L' : 'Ś'}
+                </span>
+                <span className="truncate">{hasLibero ? 'Libero' : 'Środkowy'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowOpponents(!showOpponents)}
+                className={`h-10 px-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                  showOpponents
+                    ? 'bg-rose-50 text-rose-800 border-rose-300'
+                    : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
+                }`}
+                title="Pokaż/ukryj blok i obronę przeciwnika"
+              >
+                <Users className="w-3.5 h-3.5 shrink-0" />
+                <span>Rywale</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowBall(!showBall)}
+                className={`h-10 px-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                  showBall
+                    ? 'bg-amber-50 text-amber-800 border-amber-300'
+                    : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
+                }`}
+                title="Pokaż/ukryj piłkę"
+              >
+                <Volleyball className="w-3.5 h-3.5 shrink-0" />
+                <span>Piłka</span>
+              </button>
+
+              {/* Przycisk rozwijania narzędzi rysowania */}
+              <button
+                type="button"
+                onClick={() => {
+                  const next = !showDrawingTools;
+                  setShowDrawingTools(next);
+                  if (next && activeTool === 'move') {
+                    setActiveTool('pen');
+                  } else if (!next) {
+                    setActiveTool('move');
+                  }
+                }}
+                className={`h-10 px-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                  showDrawingTools || activeTool !== 'move'
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs font-black'
+                    : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
+                }`}
+                title="Pokaż/ukryj narzędzia pisaka i kolorów"
+              >
+                <Pencil className="w-3.5 h-3.5 shrink-0" />
+                <span>Rysuj</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleResetPositions}
+                className="h-10 px-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/90 text-xs font-bold transition flex items-center justify-center gap-1 shadow-2xs cursor-pointer active:scale-95"
+                title="Przywróć domyślne pozycje na boisku"
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                <span>Reset</span>
+              </button>
             </div>
 
             {/* Rząd 3: Rozwijany panel narzędzi rysowania (widoczny tylko gdy włączono 'Rysuj') */}
@@ -3642,10 +3635,10 @@ function TacticsContent() {
                 <button
                   type="button"
                   onClick={handleOpenQuickDrawModal}
-                  className="h-11 sm:h-10 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 min-h-[44px]"
+                  className="h-11 sm:h-10 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 hover:border-amber-400 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 min-h-[44px]"
                   title="Szybki szkic pisakiem na boisku"
                 >
-                  <Pencil className="w-4 h-4 text-sky-600 shrink-0" />
+                  <Pencil className="w-4 h-4 text-amber-600 shrink-0" />
                   <span>Szybki szkic</span>
                 </button>
 
@@ -3686,9 +3679,9 @@ function TacticsContent() {
           {/* 4. FEED POSTÓW & ROZPISKA TAKTYCZNA DLA TEGO MECZU */}
           <div className="space-y-4">
             <div className="flex items-center justify-between px-1">
-              <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
-                <span>📋 Rozpiska & Posty Meczowe</span>
-                <span className="px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 font-mono text-xs font-black">
+              <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2 font-athletic">
+                <span>📋 Rozpiska &amp; Posty Meczowe</span>
+                <span className="px-2 py-0.5 rounded-full bg-slate-900 text-amber-400 font-mono text-xs font-black">
                   {currentUnitTactics.length + currentUnitMaterials.length + (tacticComment.trim() ? 1 : 0)}
                 </span>
               </h3>
@@ -3700,7 +3693,7 @@ function TacticsContent() {
             {/* STAN PUSTY: GDY BRAK JESZCZE POSTÓW DLA TEGO MECZU */}
             {currentUnitTactics.length === 0 && currentUnitMaterials.length === 0 && !tacticComment.trim() && (
               <div className="bg-white border border-dashed border-slate-300 rounded-3xl p-8 sm:p-10 text-center space-y-4 shadow-sm">
-                <div className="w-14 h-14 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto border border-sky-200 shadow-xs">
+                <div className="w-14 h-14 rounded-2xl bg-slate-900 text-amber-400 flex items-center justify-center mx-auto border border-slate-800 shadow-xs">
                   <Compass className="w-7 h-7" />
                 </div>
                 <div className="space-y-1">
@@ -3740,7 +3733,7 @@ function TacticsContent() {
                     <button
                       type="button"
                       onClick={() => setShowAddNoteModal(true)}
-                      className="text-xs font-bold text-sky-600 hover:text-sky-800 flex items-center gap-1 hover:underline cursor-pointer"
+                      className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-900 text-slate-700 hover:text-amber-400 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
                     >
                       <Pencil className="w-3.5 h-3.5" />
                       <span>Edytuj</span>
