@@ -968,25 +968,30 @@ function EventsAttendanceContent() {
             <div className="p-1.5 rounded-2xl bg-slate-100/90 border border-slate-200/90 shadow-2xs">
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
                 {[
-                  { id: 'ALL', label: 'Wszystkie' },
-                  { id: 'MECZ_LALS', label: 'Mecze LALS' },
-                  { id: 'TRENING', label: 'Treningi' },
-                  { id: 'SPARING', label: 'Sparingi' },
-                  { id: 'TURNIEJ', label: 'Turnieje' }
-                ].map((t, idx) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setFilterType(t.id)}
-                    className={`${idx === 0 ? 'col-span-2 sm:col-span-1' : ''} h-10 px-3 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center cursor-pointer active:scale-95 ${
-                      filterType === t.id
-                        ? 'bg-slate-900 text-amber-400 border-slate-800 font-black shadow-xs'
-                        : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
-                    }`}
-                  >
-                    {t.label}
-                  </button>
-                ))}
+                  { id: 'ALL', label: 'Wszystkie', Icon: Calendar },
+                  { id: 'MECZ_LALS', label: 'Mecze LALS', Icon: Trophy },
+                  { id: 'TRENING', label: 'Treningi', Icon: Volleyball },
+                  { id: 'SPARING', label: 'Sparingi', Icon: Swords },
+                  { id: 'TURNIEJ', label: 'Turnieje', Icon: Crown }
+                ].map((t, idx) => {
+                  const TabIcon = t.Icon;
+                  const isActive = filterType === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setFilterType(t.id)}
+                      className={`${idx === 0 ? 'col-span-2 sm:col-span-1' : ''} h-10 px-3 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                        isActive
+                          ? 'bg-slate-900 text-amber-400 border-slate-800 font-black shadow-xs'
+                          : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
+                      }`}
+                    >
+                      <TabIcon className={`w-4 h-4 shrink-0 ${isActive ? 'text-amber-400' : 'text-slate-500'}`} />
+                      <span className="truncate">{t.label}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
