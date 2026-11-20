@@ -1112,75 +1112,36 @@ function TacticsContent() {
       setLinkedEventId(foundTactic.eventId || '');
       setLinkedMatchId(foundTactic.matchId || '');
       setTacticScope(foundTactic.scope || 'MECZ_LIGOWY');
-      if (foundTactic.tacticalNotes || foundTactic.description) {
-        setTacticComment(foundTactic.tacticalNotes || foundTactic.description || '');
-      }
+      setTacticComment(foundTactic.tacticalNotes || foundTactic.description || '');
       if (foundTactic.directives && foundTactic.directives.length > 0) {
         setUnitDirectives(foundTactic.directives);
+      } else {
+        setUnitDirectives([]);
       }
       return;
     }
 
-    // 2. Jeśli nie ma jeszcze zapisanej taktyki, przygotuj szablon wyjściowy
+    // 2. Jeśli nie ma jeszcze zapisanej taktyki/odprawy w bazie, zostaw pole puste (bez sztucznych tekstów)
     if (activeTargetEvent) {
       setLinkedEventId(activeTargetEvent.id);
       setLinkedMatchId('');
-      if (activeTargetEvent.type === 'TRENING') {
-        setTacticScope('TRENING');
-        setUnitDirectives([
-          '🎯 Przyjęcie w 3-osobowym pasie (L + P1 + P2) z dograniem na 2. metr',
-          '⚡ Szybkie 1. tempo do środkowego (Ś1/Ś2) przy dobrym przyjęciu',
-          '🛡️ Asekuracja atakującego: gracz II linii na 6. metrze',
-          '🏐 Zagrywka taktyczna w strefę 1 lub 5 rywali'
-        ]);
-        setTacticComment('Główne akcenty treningowe: zgranie rozegrania ze środkowymi, przyjęcie zagrywki z rotacji P1 i P6 oraz organizacja kontrataku po obronie.');
-      } else if (activeTargetEvent.type === 'SPARING') {
-        setTacticScope('SPARING');
-        setUnitDirectives([
-          `⚔️ Test szóstki wyjściowej z rywalem: ${activeTargetEvent.opponent || 'Rywal'}`,
-          '💥 Atak z II linii (pipe) przy obronie kontrataku',
-          '🛑 Podwójny blok zamykający prostą na skrzydłach',
-          '🔄 Test wariantów gry zmienników w 2. i 3. secie'
-        ]);
-        setTacticComment(`Odprawa sparingowa vs ${activeTargetEvent.opponent || 'Rywal'}: Skupiamy się na płynności przejść z przyjęcia do ataku oraz zgraniu bloku z obroną w polu.`);
-      } else if (activeTargetEvent.type === 'TURNIEJ') {
-        setTacticScope('TURNIEJ');
-        setUnitDirectives([
-          '🏆 Optymalizacja sił i rotacja składem w turnieju',
-          '🎯 Stabilne przyjęcie i eliminacja serii punktowych rywala',
-          '⚡ Szybkie tempo na skrzydłach i zero przestojów'
-        ]);
-        setTacticComment('Strategia turniejowa: ekonomiczne gospodarowanie siłami, agresywna zagrywka od pierwszej piłki i maksymalna koncentracja w końcówkach setów.');
-      } else {
-        setTacticScope('MECZ_LIGOWY');
-        setUnitDirectives([
-          `🔵 Odprawa ligowa LALS vs ${activeTargetEvent.opponent || 'Rywal'}`,
-          '🎯 Maksymalna agresja zagrywką w strefy 1 i 5',
-          '🛡️ Strefowy podwójny blok na skrzydłowego rywali',
-          '🏐 Libero czyści pole za blokiem na 6. metrze'
-        ]);
-        setTacticComment(`Plan taktyczny na mecz LALS vs ${activeTargetEvent.opponent || 'Rywal'}: Odrzucenie rywala od siatki trudnym serwisem po skosie, odcięcie lewego skrzydła podwójnym blokiem.`);
-      }
+      if (activeTargetEvent.type === 'TRENING') setTacticScope('TRENING');
+      else if (activeTargetEvent.type === 'SPARING') setTacticScope('SPARING');
+      else if (activeTargetEvent.type === 'TURNIEJ') setTacticScope('TURNIEJ');
+      else setTacticScope('MECZ_LIGOWY');
+      setUnitDirectives([]);
+      setTacticComment('');
     } else if (activeTargetMatch) {
       setLinkedMatchId(activeTargetMatch.id);
       setLinkedEventId('');
       setTacticScope('MECZ_LIGOWY');
-      setUnitDirectives([
-        `🔵 Odprawa meczowa LALS vs ${activeTargetMatch.opponent}`,
-        '🎯 Celowanie zagrywką w strefę 1 (odcięcie rozgrywającego rywali)',
-        '🛡️ Podwójny blok zamykający prostą na skrzydle',
-        '🏐 Asekuracja i czyszczenie kiwek na 6. metrze'
-      ]);
-      setTacticComment(`Założenia ligowe vs ${activeTargetMatch.opponent}: Skupienie na własnej zagrywce, asekuracja za blokiem i szybkie tempo na skrzydłach (P1, A).`);
+      setUnitDirectives([]);
+      setTacticComment('');
     } else {
       setLinkedEventId('');
       setLinkedMatchId('');
       setTacticScope('OGOLNA');
-      setUnitDirectives([
-        'Podstawowe pozycje wyjściowe zespołu',
-        'Asekuracja i organizacja rozegrania',
-        'Zgranie i komunikacja na boisku'
-      ]);
+      setUnitDirectives([]);
       setTacticComment('');
     }
   }, [activeTargetEvent, activeTargetMatch, tactics]);
@@ -3812,14 +3773,49 @@ function TacticsContent() {
                     </div>
                   </div>
                   {canEdit && (
-                    <button
-                      type="button"
-                      onClick={() => setShowAddNoteModal(true)}
-                      className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-900 text-slate-700 hover:text-amber-400 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
-                    >
-                      <Pencil className="w-3.5 h-3.5" />
-                      <span>Edytuj</span>
-                    </button>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => setShowAddNoteModal(true)}
+                        className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-900 text-slate-700 hover:text-amber-400 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                        <span>Edytuj</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (!confirm('Czy na pewno chcesz usunąć te założenia / odprawę?')) return;
+                          setTacticComment('');
+                          const linkedTac = activeTargetEvent
+                            ? tactics.find(t => t.eventId === activeTargetEvent.id)
+                            : activeTargetMatch
+                            ? tactics.find(t => t.matchId === activeTargetMatch.id)
+                            : null;
+                          if (linkedTac) {
+                            try {
+                              await fetch('/api/tactics', {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  id: linkedTac.id,
+                                  description: '',
+                                  tacticalNotes: ''
+                                })
+                              });
+                              setTactics(prev => prev.map(t => t.id === linkedTac.id ? { ...t, description: '', tacticalNotes: '' } : t));
+                            } catch (err) {
+                              console.error('Error clearing tactic note:', err);
+                            }
+                          }
+                        }}
+                        className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 text-xs font-bold flex items-center gap-1 transition cursor-pointer"
+                        title="Usuń tę notatkę / odprawę"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Usuń</span>
+                      </button>
+                    </div>
                   )}
                 </div>
                 <div className="text-xs text-slate-800 leading-relaxed whitespace-pre-line bg-slate-50/70 p-3.5 sm:p-4 rounded-xl border border-slate-100 font-medium text-justified-clean">
