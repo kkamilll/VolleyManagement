@@ -2840,14 +2840,15 @@ function RozgrywkiContent() {
           <button
             type="button"
             onClick={() => switchTab('liga')}
-            className={`h-11 sm:h-10 px-3 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center gap-2 cursor-pointer active:scale-95 ${
+            className={`h-11 sm:h-10 px-2 sm:px-3 rounded-xl text-[11px] sm:text-sm font-bold transition border flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer active:scale-95 ${
               activeTab === 'liga'
                 ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
                 : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
             }`}
           >
             <img src="/lals_logo.png" alt="LALS" className="w-4 h-4 rounded-full bg-white p-0.5 object-contain shrink-0" />
-            <span className="truncate">Liga LALS</span>
+            <span className="sm:hidden">Liga</span>
+            <span className="hidden sm:inline">Liga LALS</span>
           </button>
 
           <button
@@ -3097,7 +3098,7 @@ function RozgrywkiContent() {
                         {/* Drużyna A (Wyrównanie do prawej na desktopie) */}
                         <div className="flex items-center justify-end gap-2.5 sm:gap-3.5 flex-1 min-w-0 text-right">
                           <div className="min-w-0">
-                            <h4 className={`text-base sm:text-xl font-black ${isHomeAngels ? 'text-sky-950 font-athletic' : 'text-slate-900'} group-hover:text-amber-700 transition tracking-tight truncate`}>
+                            <h4 className={`text-sm sm:text-xl font-black ${isHomeAngels ? 'text-sky-950 font-athletic' : 'text-slate-900'} group-hover:text-amber-700 transition tracking-tight leading-tight line-clamp-2 sm:truncate`}>
                               {homeTeam}
                             </h4>
                           </div>

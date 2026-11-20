@@ -898,16 +898,17 @@ function EventsAttendanceContent() {
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 shrink-0 shadow-sm">
+            <div className="w-10 h-10 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-amber-400 shrink-0 shadow-sm">
               <Calendar className="w-5 h-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight font-athletic whitespace-nowrap">
-                  Terminarz & Frekwencja
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-lg sm:text-2xl font-black text-slate-900 uppercase tracking-tight font-athletic leading-tight">
+                  <span className="sm:hidden">Terminarz</span>
+                  <span className="hidden sm:inline">Terminarz &amp; Frekwencja</span>
                 </h1>
                 {isCoach && (
-                  <span className="px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider bg-sky-100 text-sky-800 border border-sky-300 shrink-0">
+                  <span className="px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300 shrink-0">
                     Trener
                   </span>
                 )}
@@ -1796,7 +1797,7 @@ function EventsAttendanceContent() {
                         {!isEventPast && !isFinished && matchInfo.ourSetsWon === undefined && (
                           myAttendance ? (
                             <span
-                              className={`flex-1 sm:flex-none sm:w-[124px] h-10 sm:h-9 px-3 rounded-xl text-xs sm:text-sm font-bold border flex items-center justify-center text-center shrink-0 min-h-[40px] ${
+                              className={`flex-1 sm:flex-none sm:w-[124px] h-10 sm:h-9 px-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-bold border flex items-center justify-center text-center shrink-0 min-h-[40px] whitespace-nowrap ${
                                 myAttendance.status === 'BEDE'
                                   ? 'bg-emerald-50 text-emerald-800 border-emerald-300 shadow-2xs'
                                   : myAttendance.status === 'NIEPEWNE'
@@ -1804,7 +1805,10 @@ function EventsAttendanceContent() {
                                   : 'bg-rose-50 text-rose-800 border-rose-300'
                               }`}
                             >
-                              <span className="truncate">
+                              <span className="sm:hidden">
+                                {myAttendance.status === 'BEDE' ? '✓ Będę' : myAttendance.status === 'NIEPEWNE' ? '? Może' : '✗ Nie'}
+                              </span>
+                              <span className="hidden sm:inline">
                                 {myAttendance.status === 'BEDE' ? '✓ Będę' : myAttendance.status === 'NIEPEWNE' ? '? Niepewny' : '✗ Nieobecny'}
                               </span>
                             </span>
@@ -1812,11 +1816,12 @@ function EventsAttendanceContent() {
                             <button
                               type="button"
                               onClick={() => setExpandedEventId(isExpanded ? null : event.id)}
-                              className="flex-1 sm:flex-none sm:w-[124px] h-10 sm:h-9 px-3 rounded-xl text-xs sm:text-sm font-bold bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 flex items-center justify-center gap-1.5 transition shadow-2xs shrink-0 cursor-pointer active:scale-95 min-h-[40px]"
+                              className="flex-1 sm:flex-none sm:w-[124px] h-10 sm:h-9 px-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-bold bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 flex items-center justify-center gap-1.5 transition shadow-2xs shrink-0 cursor-pointer active:scale-95 min-h-[40px] whitespace-nowrap"
                               title="Kliknij, aby oddać głos w ankiecie obecności"
                             >
-                              <Lock className="w-4 h-4 text-amber-600 shrink-0" />
-                              <span className="truncate">Oddaj głos</span>
+                              <Lock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                              <span className="sm:hidden">Głosuj</span>
+                              <span className="hidden sm:inline">Oddaj głos</span>
                             </button>
                           )
                         )}

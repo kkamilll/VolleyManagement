@@ -1261,7 +1261,7 @@ export function TrainingPlannerContent({
                               >
                                 {evDate.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })}
                               </span>
-                              <span className={`text-xs sm:text-sm truncate ${isSelected ? 'font-bold text-white' : 'font-semibold text-slate-800'}`}>
+                              <span className={`text-xs sm:text-sm leading-snug line-clamp-2 sm:truncate ${isSelected ? 'font-bold text-white' : 'font-semibold text-slate-800'}`}>
                                 {ev.title}
                               </span>
                             </div>
@@ -1356,50 +1356,50 @@ export function TrainingPlannerContent({
                   <button
                     type="button"
                     onClick={() => { setTrainingStatusFilter('ALL'); setTrainingTimeFilter('ALL'); }}
-                    className={`h-10 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                    className={`h-10 px-2 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold transition flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
                       trainingStatusFilter === 'ALL' && trainingTimeFilter === 'ALL'
                         ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-xs font-black'
                         : 'bg-white/90 text-slate-700 hover:text-slate-900 border border-slate-200/90 hover:bg-white'
                     }`}
                   >
                     <Volleyball className="w-3.5 h-3.5 shrink-0" />
-                    <span className="truncate">Wszystkie</span>
+                    <span>Wszystkie</span>
                     <span className="font-mono text-[10px] opacity-80 font-black">({allTrainingsCount})</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => { setTrainingStatusFilter('ALL'); setTrainingTimeFilter('UPCOMING'); }}
-                    className={`h-10 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                    className={`h-10 px-2 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold transition flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
                       trainingStatusFilter === 'ALL' && trainingTimeFilter === 'UPCOMING'
                         ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-xs font-black'
                         : 'bg-white/90 text-slate-700 hover:text-slate-900 border border-slate-200/90 hover:bg-white'
                     }`}
                   >
                     <Calendar className="w-3.5 h-3.5 shrink-0" />
-                    <span className="truncate">Nadchodzące</span>
+                    <span>Nadchodzące</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => { setTrainingStatusFilter('UNPLANNED'); setTrainingTimeFilter('ALL'); }}
-                    className={`h-10 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                    className={`h-10 px-2 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold transition flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
                       trainingStatusFilter === 'UNPLANNED'
                         ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-xs font-black'
                         : 'bg-white/90 text-slate-700 hover:text-slate-900 border border-slate-200/90 hover:bg-white'
                     }`}
                   >
-                    <span className="truncate">Do rozpisania</span>
+                    <span>Do rozpisania</span>
                     <span className="font-mono text-[10px] opacity-80 font-black">({unplannedTrainingsCount})</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => { setTrainingStatusFilter('PLANNED'); setTrainingTimeFilter('ALL'); }}
-                    className={`h-10 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                    className={`h-10 px-2 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold transition flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer ${
                       trainingStatusFilter === 'PLANNED'
                         ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-xs font-black'
                         : 'bg-white/90 text-slate-700 hover:text-slate-900 border border-slate-200/90 hover:bg-white'
                     }`}
                   >
-                    <span className="truncate">Rozpisane</span>
+                    <span>Rozpisane</span>
                     <span className="font-mono text-[10px] opacity-80 font-black">({plannedTrainingsCount})</span>
                   </button>
                 </div>

@@ -231,11 +231,11 @@ function DashboardContent() {
                     href={getGoogleMapsUrl(nextEvent?.location || 'Hala OSiR, Luboń', nextEvent?.locationUrl) || '#'}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-300 hover:text-amber-300 transition max-w-[165px] truncate underline decoration-white/25 hover:decoration-amber-400 underline-offset-2"
+                    className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-300 hover:text-amber-300 transition max-w-[260px] sm:max-w-[180px] underline decoration-white/25 hover:decoration-amber-400 underline-offset-2"
                     title="Otwórz pinezkę w Google Maps"
                   >
                     <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                    <span className="truncate">{nextEvent?.location || 'Hala OSiR, Luboń'}</span>
+                    <span className="line-clamp-1">{nextEvent?.location || 'Hala OSiR, Luboń'}</span>
                   </a>
                 </div>
 

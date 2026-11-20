@@ -2963,7 +2963,8 @@ function TacticsContent() {
                   }`}>
                     {hasLibero ? 'L' : 'Ś'}
                   </span>
-                  <span className="truncate">{hasLibero ? 'Libero' : 'Środkowy'}</span>
+                  <span className="sm:hidden">{hasLibero ? 'Libero' : 'Środk.'}</span>
+                  <span className="hidden sm:inline">{hasLibero ? 'Libero' : 'Środkowy'}</span>
                 </button>
 
                 <button
@@ -3619,7 +3620,7 @@ function TacticsContent() {
                                 >
                                   {shortDate}
                                 </span>
-                                <span className={`text-xs sm:text-sm truncate ${isSelected ? 'font-bold text-white' : 'font-semibold text-slate-800'}`}>
+                                <span className={`text-xs sm:text-sm leading-snug line-clamp-2 sm:truncate ${isSelected ? 'font-bold text-white' : 'font-semibold text-slate-800'}`}>
                                   {opt.title}
                                 </span>
                               </div>
@@ -3656,7 +3657,7 @@ function TacticsContent() {
                     title="Otwórz pinezkę w Google Maps"
                   >
                     <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                    <span className="truncate max-w-[200px]">{activeTargetEvent?.location || activeTargetMatch?.location || 'Hala OSiR, Luboń'}</span>
+                    <span className="line-clamp-1">{activeTargetEvent?.location || activeTargetMatch?.location || 'Hala OSiR, Luboń'}</span>
                   </a>
                   {activeTargetEvent && (activeTargetEvent.attendees || []).filter(a => a.status === 'BEDE').length > 0 && (
                     <Link
