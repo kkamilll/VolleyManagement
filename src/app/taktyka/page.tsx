@@ -2833,26 +2833,15 @@ function TacticsContent() {
               )}
 
               <button
-                onClick={handleSaveAsMatchPost}
+                onClick={handleOpenSaveModal}
                 disabled={saving}
                 className="flex-1 sm:flex-initial h-10 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xs active:scale-95 disabled:opacity-50 cursor-pointer"
-                title="Zapisz ten schemat bezpośrednio jako post do wybranego meczu"
+                title="Zapisz schemat taktyczny"
               >
                 <Save className="w-4 h-4 text-amber-400" />
-                  <span>
-                    {saving ? 'Zapisuję...' : 'Zapisz'}
-                  </span>
-                </button>
-
-                <button
-                  onClick={handleOpenSaveModal}
-                  className="flex-1 sm:flex-initial h-10 px-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 hover:border-amber-400 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95"
-                  title="Więcej opcji zapisu (baza ogólna, własny tytuł)"
-                >
-                  <Save className="w-4 h-4 text-slate-500" />
-                  <span>Więcej</span>
-                </button>
-              </div>
+                <span>{saving ? 'Zapisuję...' : 'Zapisz'}</span>
+              </button>
+            </div>
             )}
           </div>
         )}
