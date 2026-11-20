@@ -7,6 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useSeasonArchive } from '@/lib/season-archive-context';
 import { TrainingPlannerContent } from '@/components/TrainingPlanner';
 import { drawVolleyballCourt, CourtViewMode } from '@/lib/court';
+import { getGoogleMapsUrl } from '@/lib/maps';
 import {
   Target,
   Pencil,
@@ -3644,10 +3645,16 @@ function TacticsContent() {
               {/* Informacja o lokalizacji i frekwencji */}
               {(activeTargetEvent || activeTargetMatch) && (
                 <div className="flex items-center gap-2 text-xs text-slate-600 flex-wrap sm:justify-end">
-                  <span className="flex items-center gap-1 font-medium">
+                  <a
+                    href={getGoogleMapsUrl(activeTargetEvent?.location || activeTargetMatch?.location || 'Hala OSiR, Luboń', activeTargetEvent?.locationUrl) || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 font-medium hover:text-amber-700 transition underline decoration-slate-300 hover:decoration-amber-500 underline-offset-2"
+                    title="Otwórz pinezkę w Google Maps"
+                  >
                     <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
                     <span className="truncate max-w-[200px]">{activeTargetEvent?.location || activeTargetMatch?.location || 'Hala OSiR, Luboń'}</span>
-                  </span>
+                  </a>
                   {activeTargetEvent && (activeTargetEvent.attendees || []).filter(a => a.status === 'BEDE').length > 0 && (
                     <Link
                       href={`/events?eventId=${activeTargetEvent.id}`}

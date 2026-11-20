@@ -32,6 +32,7 @@ import {
   User 
 } from '@/lib/types';
 import { TeamCrestBadge } from '@/lib/team-crests';
+import { getGoogleMapsUrl } from '@/lib/maps';
 
 function DashboardContent() {
   const { user } = useAuth();
@@ -226,10 +227,16 @@ function DashboardContent() {
                   <div className="w-11 h-11 rounded-full bg-amber-400/15 text-amber-400 font-black text-xs flex items-center justify-center border border-amber-400/40 shadow-sm font-athletic">
                     VS
                   </div>
-                  <div className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-300 max-w-[165px] truncate">
+                  <a
+                    href={getGoogleMapsUrl(nextEvent?.location || 'Hala OSiR, Luboń', nextEvent?.locationUrl) || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-300 hover:text-amber-300 transition max-w-[165px] truncate underline decoration-white/25 hover:decoration-amber-400 underline-offset-2"
+                    title="Otwórz pinezkę w Google Maps"
+                  >
                     <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <span className="truncate">{nextEvent?.location || 'Hala OSiR, Luboń'}</span>
-                  </div>
+                  </a>
                 </div>
 
                 {/* DRUŻYNA 2 */}

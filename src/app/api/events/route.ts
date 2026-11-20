@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { title, type, date, endDate, location, opponent, opponentLogo, description, costPerPerson, tournamentMatches, status, result } = body;
+    const { title, type, date, endDate, location, locationUrl, opponent, opponentLogo, description, costPerPerson, tournamentMatches, status, result } = body;
 
     if (!title || !type || !date || !location) {
       return NextResponse.json({ error: 'Uzupełnij wymagane pola (Tytuł, typ wydarzenia, data, miejsce)' }, { status: 400 });
@@ -47,6 +47,7 @@ export async function POST(request: Request) {
       date,
       endDate: endDate || undefined,
       location: location.trim(),
+      locationUrl: locationUrl ? locationUrl.trim() : undefined,
       opponent: opponent ? opponent.trim() : undefined,
       opponentLogo: opponentLogo ? opponentLogo.trim() : undefined,
       description: description ? description.trim() : '',
@@ -161,7 +162,7 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { id, title, type, date, endDate, location, opponent, opponentLogo, description, status, costPerPerson, actualAttendees, result, tournamentMatches, lineup, liveScore, bestAction, socialDraft, coachPostMatchNote } = body;
+    const { id, title, type, date, endDate, location, locationUrl, opponent, opponentLogo, description, status, costPerPerson, actualAttendees, result, tournamentMatches, lineup, liveScore, bestAction, socialDraft, coachPostMatchNote } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'Brak ID wydarzenia' }, { status: 400 });
@@ -178,6 +179,7 @@ export async function PUT(request: Request) {
     if (date !== undefined) event.date = date;
     if (endDate !== undefined) event.endDate = endDate;
     if (location !== undefined) event.location = location.trim();
+    if (locationUrl !== undefined) event.locationUrl = locationUrl ? locationUrl.trim() : undefined;
     if (opponent !== undefined) event.opponent = opponent.trim();
     if (opponentLogo !== undefined) {
       event.opponentLogo = opponentLogo ? opponentLogo.trim() : undefined;

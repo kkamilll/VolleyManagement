@@ -173,6 +173,7 @@ export interface EventItem {
   date: string;
   endDate?: string;
   location: string;
+  locationUrl?: string; // Link do pinezki Google Maps
   opponent?: string;
   opponentLogo?: string;
   description: string;

@@ -57,6 +57,7 @@ import {
   MatchResult
 } from '@/lib/types';
 import { TeamCrestBadge } from '@/lib/team-crests';
+import { getGoogleMapsUrl } from '@/lib/maps';
 
 function EventsAttendanceContent() {
   const searchParams = useSearchParams();
@@ -104,6 +105,7 @@ function EventsAttendanceContent() {
   const [newEventType, setNewEventType] = useState<EventType>('TRENING');
   const [newEventDate, setNewEventDate] = useState('');
   const [newEventLocation, setNewEventLocation] = useState('Hala Sportowa OSiR, ul. Sportowa 5');
+  const [newEventLocationUrl, setNewEventLocationUrl] = useState('');
   const [newEventOpponent, setNewEventOpponent] = useState('');
   const [newEventOpponentLogo, setNewEventOpponentLogo] = useState('');
   const [newEventDescription, setNewEventDescription] = useState('');
@@ -115,6 +117,7 @@ function EventsAttendanceContent() {
   const [editType, setEditType] = useState<EventType>('TRENING');
   const [editDate, setEditDate] = useState('');
   const [editLocation, setEditLocation] = useState('');
+  const [editLocationUrl, setEditLocationUrl] = useState('');
   const [editOpponent, setEditOpponent] = useState('');
   const [editOpponentLogo, setEditOpponentLogo] = useState('');
   const [editDescription, setEditDescription] = useState('');
@@ -675,6 +678,7 @@ function EventsAttendanceContent() {
           type: newEventType,
           date: newEventDate,
           location: newEventLocation,
+          locationUrl: newEventLocationUrl ? newEventLocationUrl.trim() : undefined,
           opponent: newEventOpponent ? newEventOpponent.trim() : undefined,
           opponentLogo: newEventOpponentLogo ? newEventOpponentLogo.trim() : undefined,
           description: newEventDescription ? newEventDescription.trim() : undefined,
@@ -684,6 +688,7 @@ function EventsAttendanceContent() {
       if (res.ok) {
         setShowCreateModal(false);
         setNewEventTitle('');
+        setNewEventLocationUrl('');
         setNewEventDescription('');
         setNewEventOpponent('');
         setNewEventOpponentLogo('');
@@ -726,6 +731,7 @@ function EventsAttendanceContent() {
       setEditDate(event.date);
     }
     setEditLocation(event.location || '');
+    setEditLocationUrl(event.locationUrl || '');
     setEditOpponent(event.opponent || '');
     setEditOpponentLogo(event.opponentLogo || '');
     setEditDescription(event.description || '');
@@ -748,6 +754,7 @@ function EventsAttendanceContent() {
           type: editType,
           date: new Date(editDate).toISOString(),
           location: editLocation.trim(),
+          locationUrl: editLocationUrl.trim(),
           opponent: editOpponent.trim() || undefined,
           opponentLogo: editOpponentLogo.trim() || undefined,
           description: editDescription.trim() || undefined,
@@ -1693,10 +1700,30 @@ function EventsAttendanceContent() {
                             </div>
                           )}
 
-                          <div className="flex items-center gap-2 text-[11px] sm:text-xs text-slate-500">
-                            <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                            <span className="line-clamp-1">{event.location}</span>
-                          </div>
+                          {(() => {
+                            const mapsHref = getGoogleMapsUrl(event.location, event.locationUrl);
+                            if (!mapsHref) return null;
+                            return (
+                              <a
+                                href={mapsHref}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={e => e.stopPropagation()}
+                                className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs text-slate-500 hover:text-amber-700 transition group/map max-w-full"
+                                title={event.locationUrl ? 'Otwórz pinezkę w Google Maps' : 'Wyszukaj ten adres w Google Maps'}
+                              >
+                                <MapPin className="w-3.5 h-3.5 text-rose-500 group-hover/map:scale-110 transition shrink-0" />
+                                <span className="line-clamp-1 underline decoration-slate-300 group-hover/map:decoration-amber-500 underline-offset-2">
+                                  {event.location}
+                                </span>
+                                {event.locationUrl && (
+                                  <span className="px-1.5 py-0.2 rounded-md bg-rose-50 text-rose-700 border border-rose-200 text-[9px] font-black uppercase tracking-wider shrink-0">
+                                    Pinezka
+                                  </span>
+                                )}
+                              </a>
+                            );
+                          })()}
                         </div>
                       </div>
 
@@ -3202,9 +3229,36 @@ function EventsAttendanceContent() {
                     required
                     value={newEventLocation}
                     onChange={e => setNewEventLocation(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-amber-500 focus:bg-white"
                   />
                 </div>
+              </div>
+
+              {/* Pinezka Google Maps (opcjonalnie) */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-slate-600 font-bold flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5 text-rose-500" />
+                    <span>Pinezka / Link Google Maps (opcjonalnie)</span>
+                  </label>
+                  {(newEventLocationUrl.trim() || newEventLocation.trim()) && (
+                    <a
+                      href={getGoogleMapsUrl(newEventLocation, newEventLocationUrl) || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] font-bold text-amber-700 hover:underline"
+                    >
+                      Sprawdź w Mapach &rarr;
+                    </a>
+                  )}
+                </div>
+                <input
+                  type="url"
+                  placeholder="https://maps.app.goo.gl/... (wklej pinezkę z Google Maps)"
+                  value={newEventLocationUrl}
+                  onChange={e => setNewEventLocationUrl(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:bg-white"
+                />
               </div>
 
               {/* Description */}
@@ -3401,7 +3455,34 @@ function EventsAttendanceContent() {
                   required
                   value={editLocation}
                   onChange={e => setEditLocation(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-amber-500 focus:bg-white"
+                />
+              </div>
+
+              {/* Pinezka Google Maps */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-slate-600 font-bold flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5 text-rose-500" />
+                    <span>Pinezka / Link Google Maps (opcjonalnie)</span>
+                  </label>
+                  {(editLocationUrl.trim() || editLocation.trim()) && (
+                    <a
+                      href={getGoogleMapsUrl(editLocation, editLocationUrl) || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] font-bold text-amber-700 hover:underline"
+                    >
+                      Sprawdź w Mapach &rarr;
+                    </a>
+                  )}
+                </div>
+                <input
+                  type="url"
+                  placeholder="https://maps.app.goo.gl/... (wklej pinezkę z Google Maps)"
+                  value={editLocationUrl}
+                  onChange={e => setEditLocationUrl(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:bg-white"
                 />
               </div>
 
