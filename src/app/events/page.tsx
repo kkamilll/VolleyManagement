@@ -72,10 +72,25 @@ function EventsAttendanceContent() {
   const [loading, setLoading] = useState(true);
 
   // Filters
+  const queryTypeParam = searchParams.get('type');
   const [showFilters, setShowFilters] = useState(false);
-  const [filterType, setFilterType] = useState<string>('ALL');
+  const [filterType, setFilterType] = useState<string>(() => {
+    if (queryTypeParam && ['TRENING', 'SPARING', 'MECZ_LALS', 'TURNIEJ'].includes(queryTypeParam.toUpperCase())) {
+      return queryTypeParam.toUpperCase();
+    }
+    return 'ALL';
+  });
   const [filterTime, setFilterTime] = useState<'ALL' | 'UPCOMING' | 'PAST'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    if (queryTypeParam) {
+      const up = queryTypeParam.toUpperCase();
+      if (['ALL', 'TRENING', 'SPARING', 'MECZ_LALS', 'TURNIEJ'].includes(up)) {
+        setFilterType(up);
+      }
+    }
+  }, [queryTypeParam]);
 
   const activeFiltersCount = (filterType !== 'ALL' ? 1 : 0) + (filterTime !== 'ALL' ? 1 : 0) + (searchQuery.trim() ? 1 : 0);
 

@@ -108,6 +108,8 @@ export function TrainingPlannerContent({
   const [trainingTimeFilter, setTrainingTimeFilter] = useState<'UPCOMING' | 'ALL' | 'PAST'>('ALL');
   const [showEventDropdown, setShowEventDropdown] = useState(false);
   const eventDropdownRef = useRef<HTMLDivElement>(null);
+  const [showMiniCalendar, setShowMiniCalendar] = useState(false);
+  const [miniCalMonth, setMiniCalMonth] = useState<Date>(() => new Date());
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -1139,16 +1141,172 @@ export function TrainingPlannerContent({
                 </div>
               )}
 
-              {/* Przycisk do Terminarza */}
-              <Link
-                href="/events"
-                className="h-10 text-xs font-bold text-slate-700 hover:text-amber-700 flex items-center justify-center gap-1.5 bg-white hover:bg-slate-50 px-3.5 rounded-xl border border-slate-200/90 hover:border-amber-400 transition shadow-2xs shrink-0 self-start lg:self-auto"
-                title="Przejdź do Terminarza"
-              >
-                <Calendar className="w-3.5 h-3.5 text-amber-600" />
-                <span>Terminarz &rarr;</span>
-              </Link>
+              {/* Przycisk Mini-Kalendarza z kropkami + link do Terminarza tylko dla treningów */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!showMiniCalendar && activeEvent) {
+                      setMiniCalMonth(new Date(activeEvent.date));
+                    }
+                    setShowMiniCalendar(prev => !prev);
+                  }}
+                  className={`h-11 sm:h-10 px-3.5 rounded-xl text-xs font-bold transition border flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 ${
+                    showMiniCalendar
+                      ? 'bg-slate-900 text-amber-400 border-slate-800 font-black'
+                      : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200/90 hover:border-amber-400'
+                  }`}
+                  title="Pokaż mały kalendarz treningów z kropkami"
+                >
+                  <Calendar className={`w-3.5 h-3.5 ${showMiniCalendar ? 'text-amber-400' : 'text-amber-600'}`} />
+                  <span>Kalendarz</span>
+                </button>
+
+                <Link
+                  href={(mode === 'TRAININGS' || fixedEventType === 'TRENING') ? '/events?type=TRENING' : '/events'}
+                  className="h-11 sm:h-10 text-xs font-bold text-slate-700 hover:text-amber-700 flex items-center justify-center gap-1.5 bg-white hover:bg-slate-50 px-3 rounded-xl border border-slate-200/90 hover:border-amber-400 transition shadow-2xs shrink-0"
+                  title="Otwórz pełny terminarz treningów"
+                >
+                  <span className="hidden sm:inline">Terminarz treningów</span>
+                  <span className="sm:hidden">Lista</span>
+                  <span>&rarr;</span>
+                </Link>
+              </div>
             </div>
+
+            {/* KOMPAKTOWY MINI-KALENDARZ TRENINGÓW Z KROPKAMI */}
+            {showMiniCalendar && (() => {
+              const year = miniCalMonth.getFullYear();
+              const month = miniCalMonth.getMonth();
+              const firstDayOfMonth = new Date(year, month, 1);
+              const daysInMonth = new Date(year, month + 1, 0).getDate();
+              const startOffset = (firstDayOfMonth.getDay() + 6) % 7; // Pn = 0 .. Nd = 6
+
+              const trainingsPool = (mode === 'TRAININGS' || fixedEventType === 'TRENING')
+                ? events.filter(e => e.type === 'TRENING')
+                : filteredEvents;
+
+              const eventsByDay: Record<number, EventItem[]> = {};
+              trainingsPool.forEach(ev => {
+                const d = new Date(ev.date);
+                if (d.getFullYear() === year && d.getMonth() === month) {
+                  const day = d.getDate();
+                  if (!eventsByDay[day]) eventsByDay[day] = [];
+                  eventsByDay[day].push(ev);
+                }
+              });
+
+              const activeDateObj = activeEvent ? new Date(activeEvent.date) : null;
+              const todayObj = new Date();
+              const monthLabel = miniCalMonth.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' });
+
+              return (
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3 animate-fadeIn max-w-md">
+                  <div className="flex items-center justify-between gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setMiniCalMonth(new Date(year, month - 1, 1))}
+                      className="w-8 h-8 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center transition cursor-pointer"
+                      title="Poprzedni miesiąc"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-900 font-athletic">
+                      {monthLabel}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setMiniCalMonth(new Date(year, month + 1, 1))}
+                      className="w-8 h-8 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center transition cursor-pointer"
+                      title="Następny miesiąc"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-7 gap-1 text-center">
+                    {['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'].map(d => (
+                      <div key={d} className="text-[10px] font-black uppercase text-slate-400 py-1">
+                        {d}
+                      </div>
+                    ))}
+                    {Array.from({ length: startOffset }).map((_, i) => (
+                      <div key={`empty-${i}`} />
+                    ))}
+                    {Array.from({ length: daysInMonth }).map((_, idx) => {
+                      const day = idx + 1;
+                      const dayEvents = eventsByDay[day] || [];
+                      const hasEvent = dayEvents.length > 0;
+                      const firstEv = dayEvents[0];
+                      const hasPlan = firstEv ? Boolean(plans.find(p => (p.eventId === firstEv.id || p.id === firstEv.id) && (p.exercises?.length || 0) > 0)) : false;
+                      const isSelected = Boolean(
+                        activeDateObj &&
+                        activeDateObj.getFullYear() === year &&
+                        activeDateObj.getMonth() === month &&
+                        activeDateObj.getDate() === day
+                      );
+                      const isToday = todayObj.getFullYear() === year && todayObj.getMonth() === month && todayObj.getDate() === day;
+
+                      return (
+                        <button
+                          key={day}
+                          type="button"
+                          disabled={!hasEvent}
+                          onClick={() => {
+                            if (!firstEv) return;
+                            setSelectedEventId(firstEv.id);
+                            const p = plans.find(planItem => planItem.eventId === firstEv.id || planItem.id === firstEv.id);
+                            setSelectedPlan(p || null);
+                            setTrainingStatusFilter('ALL');
+                            setTrainingTimeFilter('ALL');
+                            setShowMiniCalendar(false);
+                          }}
+                          className={`relative h-9 rounded-xl text-xs flex flex-col items-center justify-center transition ${
+                            isSelected
+                              ? 'bg-slate-900 text-amber-400 font-black shadow-xs'
+                              : hasEvent
+                              ? 'bg-white hover:bg-amber-50 text-slate-900 font-extrabold border border-slate-200 hover:border-amber-400 cursor-pointer shadow-2xs'
+                              : isToday
+                              ? 'bg-slate-200/60 text-slate-700 font-bold'
+                              : 'text-slate-400 font-medium cursor-default'
+                          }`}
+                          title={hasEvent ? `${firstEv.title}${hasPlan ? ' (Rozpisany)' : ' (Do rozpisania)'}` : undefined}
+                        >
+                          <span className="leading-none">{day}</span>
+                          {hasEvent && (
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full mt-0.5 ${
+                                isSelected ? 'bg-amber-400' : hasPlan ? 'bg-emerald-500' : 'bg-amber-500'
+                              }`}
+                            />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-200/80 text-[10px] font-bold text-slate-500">
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+                        Rozpisany
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
+                        Do rozpisania
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowMiniCalendar(false)}
+                      className="text-slate-400 hover:text-slate-700 cursor-pointer"
+                    >
+                      Zamknij
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Pasek Filtrów i Zakresu: równa siatka segmentowa Angels Navy & Gold */}
             {!hideTypeFilter && (
