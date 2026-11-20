@@ -52,6 +52,7 @@ import {
   TacticalMaterial
 } from '@/lib/types';
 import { drawVolleyballCourt, CourtViewMode } from '@/lib/court';
+import { getGoogleMapsUrl } from '@/lib/maps';
 
 export function TrainingPlannerContent({ 
   defaultTab, 
@@ -966,26 +967,18 @@ export function TrainingPlannerContent({
 
       {/* Main Layout - Jedno pod drugim (Full width stacked layout) */}
       <div className="flex flex-col gap-6 w-full">
-        {/* Górna sekcja: Kompaktowy selektor wydarzenia (Pasek wyboru + Szybkie pigułki) */}
+        {/* Górna sekcja: Czysty, dwurzędowy selektor wydarzenia (bez ścisku) */}
         <div className="w-full space-y-3">
           <div className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-sm space-y-3.5">
-            {/* Główny pasek: Tytuł, Dropdown ze strzałkami, Szczegóły aktywnej jednostki & Przycisk Terminarza */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold shadow-xs ${
-                  mode === 'TRAININGS' || fixedEventType === 'TRENING'
-                    ? 'bg-gradient-to-br from-emerald-500 to-teal-700 text-white'
-                    : fixedEventType === 'SPARING'
-                    ? 'bg-gradient-to-br from-amber-500 to-amber-600 text-slate-950 font-black'
-                    : fixedEventType === 'TURNIEJ'
-                    ? 'bg-gradient-to-br from-purple-500 to-indigo-700 text-white'
-                    : 'bg-gradient-to-br from-sky-500 to-indigo-600 text-white'
-                }`}>
+            {/* RZĄD 1: Nagłówek po lewej + Kalendarz & Terminarz po prawej */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-amber-400 shadow-xs shrink-0">
                   {mode === 'TRAININGS' || fixedEventType === 'TRENING' ? <Volleyball className="w-5 h-5" /> : <Calendar className="w-5 h-5" />}
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs sm:text-sm font-black uppercase text-slate-900 tracking-wider">
+                    <span className="text-xs sm:text-sm font-black uppercase text-slate-900 tracking-wider font-athletic whitespace-nowrap">
                       {mode === 'TRAININGS' || fixedEventType === 'TRENING'
                         ? 'Treningi z Terminarza'
                         : fixedEventType === 'MECZ'
@@ -996,19 +989,11 @@ export function TrainingPlannerContent({
                         ? 'Turnieje'
                         : 'Wydarzenia'}
                     </span>
-                    <span className={`px-2 py-0.5 rounded-full font-mono text-[11px] font-black border ${
-                      mode === 'TRAININGS' || fixedEventType === 'TRENING'
-                        ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                        : fixedEventType === 'SPARING'
-                        ? 'bg-amber-100 text-amber-900 border-amber-300'
-                        : fixedEventType === 'TURNIEJ'
-                        ? 'bg-purple-100 text-purple-900 border-purple-300'
-                        : 'bg-sky-100 text-sky-800 border-sky-300'
-                    }`}>
+                    <span className="px-2 py-0.5 rounded-full font-mono text-[11px] font-black bg-slate-900 text-amber-400">
                       {filteredEvents.length}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-500">
+                  <p className="text-[11px] text-slate-500 truncate">
                     {mode === 'TRAININGS' || fixedEventType === 'TRENING'
                       ? 'Wybierz trening klubowy, aby edytować konspekt ćwiczeń'
                       : fixedEventType === 'MECZ'
@@ -1022,130 +1007,7 @@ export function TrainingPlannerContent({
                 </div>
               </div>
 
-              {/* Selektor ze strzałkami Poprzedni / Następny + nowoczesny dropdown */}
-              {filteredEvents.length > 0 ? (
-                <div className="flex items-center gap-1.5 flex-1 max-w-2xl">
-                  <button
-                    type="button"
-                    onClick={() => { handlePrevEvent(); setShowEventDropdown(false); }}
-                    disabled={currentEventIndex <= 0}
-                    className="w-10 h-11 sm:h-10 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 hover:border-amber-400 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0 cursor-pointer active:scale-95"
-                    title="Poprzednia jednostka"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-
-                  <div ref={eventDropdownRef} className="relative flex-1 min-w-0">
-                    {(() => {
-                      const activePlanForBtn = activeEvent ? plans.find(p => p.eventId === activeEvent.id || p.id === activeEvent.id) : null;
-                      const activeExCount = activePlanForBtn?.exercises?.length || 0;
-                      return (
-                        <button
-                          type="button"
-                          onClick={() => setShowEventDropdown(prev => !prev)}
-                          className={`w-full h-11 sm:h-10 px-3 rounded-xl bg-white hover:bg-slate-50 border text-left flex items-center justify-between gap-2 transition shadow-2xs cursor-pointer ${
-                            showEventDropdown
-                              ? 'border-amber-500 ring-2 ring-amber-400/25'
-                              : 'border-slate-200/90 hover:border-amber-400'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2 min-w-0">
-                            {activeEvent && (
-                              <span className="px-2 py-0.5 rounded-lg bg-slate-900 text-amber-400 text-[11px] font-black font-mono shrink-0">
-                                {new Date(activeEvent.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })}
-                              </span>
-                            )}
-                            <span className="text-xs sm:text-sm font-bold text-slate-900 truncate">
-                              {activeEvent ? activeEvent.title : 'Wybierz trening'}
-                            </span>
-                            {activeEvent && (
-                              <span className={`hidden sm:inline-flex px-2 py-0.5 rounded-md text-[10px] font-black shrink-0 ${
-                                activeExCount > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-800 border border-amber-200'
-                              }`}>
-                                {activeExCount > 0 ? `${activeExCount} ćw.` : 'Do rozpisania'}
-                              </span>
-                            )}
-                          </div>
-                          <ChevronDown
-                            className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${
-                              showEventDropdown ? 'rotate-180 text-amber-600' : ''
-                            }`}
-                          />
-                        </button>
-                      );
-                    })()}
-
-                    {showEventDropdown && (
-                      <div className="absolute left-0 right-0 top-full mt-2 z-50 bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-900/10 p-1.5 max-h-72 overflow-y-auto space-y-1 animate-fadeIn">
-                        {filteredEvents.map(ev => {
-                          const p = plans.find(planItem => planItem.eventId === ev.id || planItem.id === ev.id);
-                          const exCount = p?.exercises?.length || 0;
-                          const evDate = new Date(ev.date);
-                          const isSelected = ev.id === activeEvent?.id;
-                          return (
-                            <button
-                              key={ev.id}
-                              type="button"
-                              onClick={() => {
-                                setSelectedEventId(ev.id);
-                                setSelectedPlan(p || null);
-                                setShowEventDropdown(false);
-                              }}
-                              className={`w-full px-3 py-2.5 rounded-xl flex items-center justify-between gap-2 text-left transition cursor-pointer ${
-                                isSelected
-                                  ? 'bg-slate-900 text-white shadow-xs'
-                                  : 'text-slate-800 hover:bg-slate-100'
-                              }`}
-                            >
-                              <div className="flex items-center gap-2.5 min-w-0">
-                                <span
-                                  className={`px-2 py-0.5 rounded-lg text-[11px] font-black font-mono shrink-0 ${
-                                    isSelected
-                                      ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
-                                      : 'bg-slate-100 text-slate-600 border border-slate-200/80'
-                                  }`}
-                                >
-                                  {evDate.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })}
-                                </span>
-                                <span className={`text-xs sm:text-sm truncate ${isSelected ? 'font-bold text-white' : 'font-semibold text-slate-800'}`}>
-                                  {ev.title}
-                                </span>
-                              </div>
-                              <span
-                                className={`text-[10px] font-black px-2 py-0.5 rounded-md shrink-0 ${
-                                  isSelected
-                                    ? 'bg-white/10 text-amber-300'
-                                    : exCount > 0
-                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                    : 'bg-amber-50 text-amber-800 border border-amber-200'
-                                }`}
-                              >
-                                {exCount > 0 ? `✓ ${exCount} ćw.` : '⏳ Brak'}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => { handleNextEvent(); setShowEventDropdown(false); }}
-                    disabled={currentEventIndex >= filteredEvents.length - 1}
-                    className="w-10 h-11 sm:h-10 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 hover:border-amber-400 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0 cursor-pointer active:scale-95"
-                    title="Następna jednostka"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex-1 max-w-xl text-xs text-slate-500 bg-slate-50 px-3 py-2 rounded-xl border border-dashed border-slate-200">
-                  Brak jednostek w wybranym filtrze.
-                </div>
-              )}
-
-              {/* Przycisk Mini-Kalendarza (floating popover pod przyciskiem) + link do Terminarza tylko dla treningów */}
+              {/* Przycisk Mini-Kalendarza (floating popover) + link do Terminarza */}
               <div className="flex items-center gap-1.5 shrink-0">
                 <div ref={miniCalendarRef} className="relative">
                   <button
@@ -1156,7 +1018,7 @@ export function TrainingPlannerContent({
                       }
                       setShowMiniCalendar(prev => !prev);
                     }}
-                    className={`h-11 sm:h-10 px-3.5 rounded-xl text-xs font-bold transition border flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 ${
+                    className={`h-10 px-3.5 rounded-xl text-xs font-bold transition border flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 ${
                       showMiniCalendar
                         ? 'bg-slate-900 text-amber-400 border-slate-800 font-black'
                         : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200/90 hover:border-amber-400'
@@ -1304,7 +1166,7 @@ export function TrainingPlannerContent({
 
                 <Link
                   href={(mode === 'TRAININGS' || fixedEventType === 'TRENING') ? '/events?type=TRENING' : '/events'}
-                  className="h-11 sm:h-10 text-xs font-bold text-slate-700 hover:text-amber-700 flex items-center justify-center gap-1.5 bg-white hover:bg-slate-50 px-3 rounded-xl border border-slate-200/90 hover:border-amber-400 transition shadow-2xs shrink-0"
+                  className="h-10 text-xs font-bold text-slate-700 hover:text-amber-700 flex items-center justify-center gap-1.5 bg-white hover:bg-slate-50 px-3.5 rounded-xl border border-slate-200/90 hover:border-amber-400 transition shadow-2xs shrink-0"
                   title="Otwórz pełny terminarz treningów"
                 >
                   <span className="hidden sm:inline">Terminarz treningów</span>
@@ -1313,6 +1175,129 @@ export function TrainingPlannerContent({
                 </Link>
               </div>
             </div>
+
+            {/* RZĄD 2: Pełnoszerokościowy selektor treningu ze strzałkami */}
+            {filteredEvents.length > 0 ? (
+              <div className="flex items-center gap-1.5 w-full">
+                <button
+                  type="button"
+                  onClick={() => { handlePrevEvent(); setShowEventDropdown(false); }}
+                  disabled={currentEventIndex <= 0}
+                  className="w-10 h-11 sm:h-10 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 hover:border-amber-400 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0 cursor-pointer active:scale-95"
+                  title="Poprzednia jednostka"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                <div ref={eventDropdownRef} className="relative flex-1 min-w-0">
+                  {(() => {
+                    const activePlanForBtn = activeEvent ? plans.find(p => p.eventId === activeEvent.id || p.id === activeEvent.id) : null;
+                    const activeExCount = activePlanForBtn?.exercises?.length || 0;
+                    return (
+                      <button
+                        type="button"
+                        onClick={() => setShowEventDropdown(prev => !prev)}
+                        className={`w-full h-11 sm:h-10 px-3.5 rounded-xl bg-slate-50 hover:bg-white border text-left flex items-center justify-between gap-2 transition shadow-2xs cursor-pointer ${
+                          showEventDropdown
+                            ? 'border-amber-500 bg-white ring-2 ring-amber-400/25'
+                            : 'border-slate-200/90 hover:border-amber-400'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          {activeEvent && (
+                            <span className="px-2 py-0.5 rounded-lg bg-slate-900 text-amber-400 text-[11px] font-black font-mono shrink-0">
+                              {new Date(activeEvent.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })}
+                            </span>
+                          )}
+                          <span className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                            {activeEvent ? activeEvent.title : 'Wybierz trening'}
+                          </span>
+                          {activeEvent && (
+                            <span className={`hidden sm:inline-flex px-2 py-0.5 rounded-md text-[10px] font-black shrink-0 ${
+                              activeExCount > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-800 border border-amber-200'
+                            }`}>
+                              {activeExCount > 0 ? `${activeExCount} ćw.` : 'Do rozpisania'}
+                            </span>
+                          )}
+                        </div>
+                        <ChevronDown
+                          className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${
+                            showEventDropdown ? 'rotate-180 text-amber-600' : ''
+                          }`}
+                        />
+                      </button>
+                    );
+                  })()}
+
+                  {showEventDropdown && (
+                    <div className="absolute left-0 right-0 top-full mt-2 z-50 bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-900/10 p-1.5 max-h-72 overflow-y-auto space-y-1 animate-fadeIn">
+                      {filteredEvents.map(ev => {
+                        const p = plans.find(planItem => planItem.eventId === ev.id || planItem.id === ev.id);
+                        const exCount = p?.exercises?.length || 0;
+                        const evDate = new Date(ev.date);
+                        const isSelected = ev.id === activeEvent?.id;
+                        return (
+                          <button
+                            key={ev.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedEventId(ev.id);
+                              setSelectedPlan(p || null);
+                              setShowEventDropdown(false);
+                            }}
+                            className={`w-full px-3 py-2.5 rounded-xl flex items-center justify-between gap-2 text-left transition cursor-pointer ${
+                              isSelected
+                                ? 'bg-slate-900 text-white shadow-xs'
+                                : 'text-slate-800 hover:bg-slate-100'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span
+                                className={`px-2 py-0.5 rounded-lg text-[11px] font-black font-mono shrink-0 ${
+                                  isSelected
+                                    ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
+                                    : 'bg-slate-100 text-slate-600 border border-slate-200/80'
+                                }`}
+                              >
+                                {evDate.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })}
+                              </span>
+                              <span className={`text-xs sm:text-sm truncate ${isSelected ? 'font-bold text-white' : 'font-semibold text-slate-800'}`}>
+                                {ev.title}
+                              </span>
+                            </div>
+                            <span
+                              className={`text-[10px] font-black px-2 py-0.5 rounded-md shrink-0 ${
+                                isSelected
+                                  ? 'bg-white/10 text-amber-300'
+                                  : exCount > 0
+                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                  : 'bg-amber-50 text-amber-800 border border-amber-200'
+                              }`}
+                            >
+                              {exCount > 0 ? `✓ ${exCount} ćw.` : '⏳ Brak'}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => { handleNextEvent(); setShowEventDropdown(false); }}
+                  disabled={currentEventIndex >= filteredEvents.length - 1}
+                  className="w-10 h-11 sm:h-10 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 hover:border-amber-400 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0 cursor-pointer active:scale-95"
+                  title="Następna jednostka"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <div className="w-full text-xs text-slate-500 bg-slate-50 px-3 py-2.5 rounded-xl border border-dashed border-slate-200">
+                Brak jednostek w wybranym filtrze.
+              </div>
+            )}
 
             {/* Pasek Filtrów i Zakresu: równa siatka segmentowa Angels Navy & Gold */}
             {!hideTypeFilter && (
@@ -1663,10 +1648,16 @@ export function TrainingPlannerContent({
                     </h2>
 
                     <div className="flex items-center gap-2 text-xs text-slate-600 flex-wrap">
-                      <span className="flex items-center gap-1 text-slate-500">
-                        <MapPin className="w-3.5 h-3.5 text-rose-500" />
-                        {activePlan.location || 'Hala POSiR'}
-                      </span>
+                      <a
+                        href={getGoogleMapsUrl(activePlan.location || 'Hala POSiR', activeEvent?.locationUrl) || '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-slate-500 hover:text-amber-700 transition underline decoration-slate-300 hover:decoration-amber-500 underline-offset-2"
+                        title="Otwórz pinezkę w Google Maps"
+                      >
+                        <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                        <span>{activePlan.location || 'Hala POSiR'}</span>
+                      </a>
                       <span className="text-slate-300">•</span>
                       <span className="text-amber-800 font-bold">
                         Intensywność: {activePlan.intensity}
@@ -1678,10 +1669,10 @@ export function TrainingPlannerContent({
                     {activeEvent && (
                       <Link
                         href={`/taktyka?tab=board&eventId=${activeEvent.id}`}
-                        className="px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
+                        className="h-10 px-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 hover:border-amber-400 font-bold text-xs transition flex items-center gap-1.5 shadow-2xs"
                         title="Otwórz tablicę taktyczną i rozrysuj ustawienie na to spotkanie"
                       >
-                        <Compass className="w-3.5 h-3.5 text-sky-600" />
+                        <Compass className="w-3.5 h-3.5 text-amber-600" />
                         <span className="hidden sm:inline">Rozrysuj na tablicy</span>
                         <span className="sm:hidden">Tablica</span>
                       </Link>
@@ -1689,10 +1680,10 @@ export function TrainingPlannerContent({
                     {canManage && (
                       <button
                         onClick={() => handleOpenExerciseModal()}
-                        className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition flex items-center gap-1.5 shadow-sm"
+                        className="h-10 px-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-black text-xs transition flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-95"
                       >
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>Dodaj Ćwiczenie / Założenie</span>
+                        <Plus className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Dodaj Ćwiczenie</span>
                       </button>
                     )}
                   </div>
