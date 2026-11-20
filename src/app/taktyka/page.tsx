@@ -2849,31 +2849,12 @@ function TacticsContent() {
           })()}
 
       {/* SEKCJA 1: TABLICA TAKTYCZNA (BOISKO I KONSOLA ROZGRYWANIA) */}
-      <div className="bg-white border border-slate-300 rounded-3xl p-3 sm:p-5 shadow-md space-y-4 border-t-4 border-t-sky-600">
+      <div className="bg-white border border-slate-300 rounded-3xl p-3 sm:p-5 shadow-md space-y-4 border-t-4 border-t-slate-900">
           
-          {/* KONSOLA TAKTYCZNA (ROTACJE P1-P6, NARZĘDZIA I BOISKO) */}
+          {/* KONSOLA TAKTYCZNA (FAZY GRY, NARZĘDZIA I BOISKO) */}
           <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-2.5 sm:p-3.5 shadow-2xs space-y-2.5">
-            {/* Rząd 1: Pasek Rotacji (P1 - P6) i Fazy Gry - duże, dotykowe przyciski */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-200/80">
-              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5 max-w-full">
-                <span className="text-[11px] font-black uppercase text-slate-400 shrink-0 mr-0.5">Rotacja:</span>
-                {(['P1', 'P2', 'P3', 'P4', 'P5', 'P6'] as RotationCode[]).map(r => (
-                  <button
-                    key={r}
-                    type="button"
-                    onClick={() => applyPreset(r, phase)}
-                    className={`h-9 sm:h-8 px-3 rounded-xl text-xs font-black transition cursor-pointer shrink-0 min-w-[36px] flex items-center justify-center active:scale-95 ${
-                      rotation === r
-                        ? 'bg-sky-600 text-white shadow-xs'
-                        : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200/90'
-                    }`}
-                    title={`Ustawienie ${r}`}
-                  >
-                    {r}
-                  </button>
-                ))}
-              </div>
-
+            {/* Rząd 1: Fazy Gry - duże, dotykowe przyciski */}
+            <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-200/80">
               <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5 max-w-full">
                 <span className="text-[11px] font-black uppercase text-slate-400 shrink-0 mr-0.5">Faza:</span>
                 {(['PRZYJECIE', 'OBRONA', 'ATAK', 'ZAGRYWKA'] as TacticalPhase[]).map(p => {
@@ -2885,7 +2866,7 @@ function TacticsContent() {
                       onClick={() => applyPreset(rotation, p)}
                       className={`h-9 sm:h-8 px-3 rounded-xl text-xs font-bold transition cursor-pointer shrink-0 flex items-center justify-center active:scale-95 ${
                         phase === p
-                          ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                          ? 'bg-slate-900 text-amber-400 border border-slate-800 font-black shadow-xs'
                           : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/90'
                       }`}
                     >
@@ -2904,7 +2885,7 @@ function TacticsContent() {
                   onClick={() => setActiveTool('move')}
                   className={`h-9.5 px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 transition border cursor-pointer active:scale-95 ${
                     activeTool === 'move'
-                      ? 'bg-sky-600 text-white border-sky-600 shadow-sm font-black'
+                      ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-sm font-black'
                       : 'bg-white text-slate-700 border-slate-200/90 hover:bg-slate-100'
                   }`}
                   title="Przesuwaj: chwyć i przeciągaj zawodników i piłkę"
