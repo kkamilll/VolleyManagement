@@ -106,6 +106,20 @@ export function TrainingPlannerContent({
   // Filtry statusu rozpisania i czasu dla treningów klubowych
   const [trainingStatusFilter, setTrainingStatusFilter] = useState<'ALL' | 'PLANNED' | 'UNPLANNED'>('ALL');
   const [trainingTimeFilter, setTrainingTimeFilter] = useState<'UPCOMING' | 'ALL' | 'PAST'>('ALL');
+  const [showEventDropdown, setShowEventDropdown] = useState(false);
+  const eventDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (eventDropdownRef.current && !eventDropdownRef.current.contains(event.target as Node)) {
+        setShowEventDropdown(false);
+      }
+    };
+    if (showEventDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showEventDropdown]);
 
   useEffect(() => {
     if (fixedEventType) {
@@ -1002,49 +1016,118 @@ export function TrainingPlannerContent({
                 </div>
               </div>
 
-              {/* Selektor ze strzałkami Poprzedni / Następny */}
+              {/* Selektor ze strzałkami Poprzedni / Następny + nowoczesny dropdown */}
               {filteredEvents.length > 0 ? (
-                <div className="flex items-center gap-1.5 flex-1 max-w-xl">
+                <div className="flex items-center gap-1.5 flex-1 max-w-2xl">
                   <button
                     type="button"
-                    onClick={handlePrevEvent}
+                    onClick={() => { handlePrevEvent(); setShowEventDropdown(false); }}
                     disabled={currentEventIndex <= 0}
-                    className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0"
+                    className="w-10 h-11 sm:h-10 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 hover:border-amber-400 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0 cursor-pointer active:scale-95"
                     title="Poprzednia jednostka"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
 
-                  <select
-                    value={activeEvent?.id || ''}
-                    onChange={e => {
-                      const ev = filteredEvents.find(evItem => evItem.id === e.target.value);
-                      if (ev) {
-                        setSelectedEventId(ev.id);
-                        const p = plans.find(planItem => planItem.eventId === ev.id || planItem.id === ev.id);
-                        setSelectedPlan(p || null);
-                      }
-                    }}
-                    className="flex-1 bg-slate-50 hover:bg-white border border-slate-300 text-slate-900 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold focus:outline-none focus:border-emerald-500 shadow-2xs min-w-0 truncate"
-                  >
-                    {filteredEvents.map(ev => {
-                      const p = plans.find(planItem => planItem.eventId === ev.id || planItem.id === ev.id);
-                      const exCount = p?.exercises?.length || 0;
-                      const evDate = new Date(ev.date);
-                      const statusLabel = exCount > 0 ? `✓ Rozpisany (${exCount} ćw.)` : '⏳ Do rozpisania';
+                  <div ref={eventDropdownRef} className="relative flex-1 min-w-0">
+                    {(() => {
+                      const activePlanForBtn = activeEvent ? plans.find(p => p.eventId === activeEvent.id || p.id === activeEvent.id) : null;
+                      const activeExCount = activePlanForBtn?.exercises?.length || 0;
                       return (
-                        <option key={ev.id} value={ev.id}>
-                          {evDate.toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' })} ({evDate.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}) — {ev.title} • {statusLabel}
-                        </option>
+                        <button
+                          type="button"
+                          onClick={() => setShowEventDropdown(prev => !prev)}
+                          className={`w-full h-11 sm:h-10 px-3 rounded-xl bg-white hover:bg-slate-50 border text-left flex items-center justify-between gap-2 transition shadow-2xs cursor-pointer ${
+                            showEventDropdown
+                              ? 'border-amber-500 ring-2 ring-amber-400/25'
+                              : 'border-slate-200/90 hover:border-amber-400'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            {activeEvent && (
+                              <span className="px-2 py-0.5 rounded-lg bg-slate-900 text-amber-400 text-[11px] font-black font-mono shrink-0">
+                                {new Date(activeEvent.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })}
+                              </span>
+                            )}
+                            <span className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                              {activeEvent ? activeEvent.title : 'Wybierz trening'}
+                            </span>
+                            {activeEvent && (
+                              <span className={`hidden sm:inline-flex px-2 py-0.5 rounded-md text-[10px] font-black shrink-0 ${
+                                activeExCount > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-800 border border-amber-200'
+                              }`}>
+                                {activeExCount > 0 ? `${activeExCount} ćw.` : 'Do rozpisania'}
+                              </span>
+                            )}
+                          </div>
+                          <ChevronDown
+                            className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${
+                              showEventDropdown ? 'rotate-180 text-amber-600' : ''
+                            }`}
+                          />
+                        </button>
                       );
-                    })}
-                  </select>
+                    })()}
+
+                    {showEventDropdown && (
+                      <div className="absolute left-0 right-0 top-full mt-2 z-50 bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-900/10 p-1.5 max-h-72 overflow-y-auto space-y-1 animate-fadeIn">
+                        {filteredEvents.map(ev => {
+                          const p = plans.find(planItem => planItem.eventId === ev.id || planItem.id === ev.id);
+                          const exCount = p?.exercises?.length || 0;
+                          const evDate = new Date(ev.date);
+                          const isSelected = ev.id === activeEvent?.id;
+                          return (
+                            <button
+                              key={ev.id}
+                              type="button"
+                              onClick={() => {
+                                setSelectedEventId(ev.id);
+                                setSelectedPlan(p || null);
+                                setShowEventDropdown(false);
+                              }}
+                              className={`w-full px-3 py-2.5 rounded-xl flex items-center justify-between gap-2 text-left transition cursor-pointer ${
+                                isSelected
+                                  ? 'bg-slate-900 text-white shadow-xs'
+                                  : 'text-slate-800 hover:bg-slate-100'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                <span
+                                  className={`px-2 py-0.5 rounded-lg text-[11px] font-black font-mono shrink-0 ${
+                                    isSelected
+                                      ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
+                                      : 'bg-slate-100 text-slate-600 border border-slate-200/80'
+                                  }`}
+                                >
+                                  {evDate.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })}
+                                </span>
+                                <span className={`text-xs sm:text-sm truncate ${isSelected ? 'font-bold text-white' : 'font-semibold text-slate-800'}`}>
+                                  {ev.title}
+                                </span>
+                              </div>
+                              <span
+                                className={`text-[10px] font-black px-2 py-0.5 rounded-md shrink-0 ${
+                                  isSelected
+                                    ? 'bg-white/10 text-amber-300'
+                                    : exCount > 0
+                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                    : 'bg-amber-50 text-amber-800 border border-amber-200'
+                                }`}
+                              >
+                                {exCount > 0 ? `✓ ${exCount} ćw.` : '⏳ Brak'}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
 
                   <button
                     type="button"
-                    onClick={handleNextEvent}
+                    onClick={() => { handleNextEvent(); setShowEventDropdown(false); }}
                     disabled={currentEventIndex >= filteredEvents.length - 1}
-                    className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0"
+                    className="w-10 h-11 sm:h-10 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 hover:border-amber-400 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0 cursor-pointer active:scale-95"
                     title="Następna jednostka"
                   >
                     <ChevronRight className="w-4 h-4" />
@@ -1059,25 +1142,25 @@ export function TrainingPlannerContent({
               {/* Przycisk do Terminarza */}
               <Link
                 href="/events"
-                className="text-xs font-bold text-slate-700 hover:text-slate-900 flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-xl border border-slate-300 transition shadow-2xs shrink-0 self-start lg:self-auto"
+                className="h-10 text-xs font-bold text-slate-700 hover:text-amber-700 flex items-center justify-center gap-1.5 bg-white hover:bg-slate-50 px-3.5 rounded-xl border border-slate-200/90 hover:border-amber-400 transition shadow-2xs shrink-0 self-start lg:self-auto"
                 title="Przejdź do Terminarza"
               >
-                <Plus className="w-3.5 h-3.5 text-slate-500" />
-                <span>Terminarz</span>
+                <Calendar className="w-3.5 h-3.5 text-amber-600" />
+                <span>Terminarz &rarr;</span>
               </Link>
             </div>
 
-            {/* Pasek Filtrów i Zakresu: dla Treningów (status rozpisania & czas) lub dla Meczów (typ wydarzenia) */}
+            {/* Pasek Filtrów i Zakresu: równa siatka segmentowa Angels Navy & Gold */}
             {!hideTypeFilter && (
               mode === 'MATCHES' ? (
-                <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto scrollbar-none">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1.5 bg-slate-100/90 rounded-2xl border border-slate-200/90">
                   <button
                     type="button"
                     onClick={() => setEventTypeFilter('ALL')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 ${
+                    className={`h-10 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
                       eventTypeFilter === 'ALL' || eventTypeFilter === 'TRENING'
-                        ? 'bg-sky-600 text-white shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                        ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-xs font-black'
+                        : 'bg-white/90 text-slate-700 hover:text-slate-900 border border-slate-200/90 hover:bg-white'
                     }`}
                   >
                     Wszystkie ({sparringsCount + matchesCount + tournamentsCount})
@@ -1085,10 +1168,10 @@ export function TrainingPlannerContent({
                   <button
                     type="button"
                     onClick={() => setEventTypeFilter('MECZ')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
+                    className={`h-10 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
                       eventTypeFilter === 'MECZ'
-                        ? 'bg-sky-600 text-white shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                        ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-xs font-black'
+                        : 'bg-white/90 text-slate-700 hover:text-slate-900 border border-slate-200/90 hover:bg-white'
                     }`}
                   >
                     <Volleyball className="w-3.5 h-3.5" />
@@ -1097,10 +1180,10 @@ export function TrainingPlannerContent({
                   <button
                     type="button"
                     onClick={() => setEventTypeFilter('SPARING')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
+                    className={`h-10 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
                       eventTypeFilter === 'SPARING'
-                        ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                        ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-xs font-black'
+                        : 'bg-white/90 text-slate-700 hover:text-slate-900 border border-slate-200/90 hover:bg-white'
                     }`}
                   >
                     <Swords className="w-3.5 h-3.5" />
@@ -1109,10 +1192,10 @@ export function TrainingPlannerContent({
                   <button
                     type="button"
                     onClick={() => setEventTypeFilter('TURNIEJ')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
+                    className={`h-10 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
                       eventTypeFilter === 'TURNIEJ'
-                        ? 'bg-purple-600 text-white font-black shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                        ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-xs font-black'
+                        : 'bg-white/90 text-slate-700 hover:text-slate-900 border border-slate-200/90 hover:bg-white'
                     }`}
                   >
                     <Trophy className="w-3.5 h-3.5" />
@@ -1120,59 +1203,56 @@ export function TrainingPlannerContent({
                   </button>
                 </div>
               ) : (mode === 'TRAININGS' || fixedEventType === 'TRENING') ? (
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-                  {/* Spójny pasek filtrów treningów */}
-                  <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-2xl border border-slate-200 overflow-x-auto scrollbar-none w-full sm:w-auto">
-                    <button
-                      type="button"
-                      onClick={() => { setTrainingStatusFilter('ALL'); setTrainingTimeFilter('ALL'); }}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
-                        trainingStatusFilter === 'ALL' && trainingTimeFilter === 'ALL'
-                          ? 'bg-emerald-600 text-white shadow-xs font-black'
-                          : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                      }`}
-                    >
-                      <Volleyball className="w-3.5 h-3.5" />
-                      <span>Wszystkie treningi</span>
-                      <span className="font-mono text-[10px] opacity-80 font-black">({allTrainingsCount})</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { setTrainingStatusFilter('ALL'); setTrainingTimeFilter('UPCOMING'); }}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
-                        trainingStatusFilter === 'ALL' && trainingTimeFilter === 'UPCOMING'
-                          ? 'bg-emerald-600 text-white shadow-xs font-black'
-                          : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                      }`}
-                    >
-                      <Calendar className="w-3.5 h-3.5" />
-                      <span>Nadchodzące</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { setTrainingStatusFilter('UNPLANNED'); setTrainingTimeFilter('ALL'); }}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
-                        trainingStatusFilter === 'UNPLANNED'
-                          ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
-                          : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                      }`}
-                    >
-                      <span>⏳ Do rozpisania</span>
-                      <span className="font-mono text-[10px] opacity-80 font-black">({unplannedTrainingsCount})</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { setTrainingStatusFilter('PLANNED'); setTrainingTimeFilter('ALL'); }}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
-                        trainingStatusFilter === 'PLANNED'
-                          ? 'bg-emerald-700 text-white shadow-xs font-black'
-                          : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                      }`}
-                    >
-                      <span>✓ Rozpisane konspekty</span>
-                      <span className="font-mono text-[10px] opacity-80 font-black">({plannedTrainingsCount})</span>
-                    </button>
-                  </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1.5 bg-slate-100/90 rounded-2xl border border-slate-200/90">
+                  <button
+                    type="button"
+                    onClick={() => { setTrainingStatusFilter('ALL'); setTrainingTimeFilter('ALL'); }}
+                    className={`h-10 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                      trainingStatusFilter === 'ALL' && trainingTimeFilter === 'ALL'
+                        ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-xs font-black'
+                        : 'bg-white/90 text-slate-700 hover:text-slate-900 border border-slate-200/90 hover:bg-white'
+                    }`}
+                  >
+                    <Volleyball className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">Wszystkie</span>
+                    <span className="font-mono text-[10px] opacity-80 font-black">({allTrainingsCount})</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setTrainingStatusFilter('ALL'); setTrainingTimeFilter('UPCOMING'); }}
+                    className={`h-10 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                      trainingStatusFilter === 'ALL' && trainingTimeFilter === 'UPCOMING'
+                        ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-xs font-black'
+                        : 'bg-white/90 text-slate-700 hover:text-slate-900 border border-slate-200/90 hover:bg-white'
+                    }`}
+                  >
+                    <Calendar className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">Nadchodzące</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setTrainingStatusFilter('UNPLANNED'); setTrainingTimeFilter('ALL'); }}
+                    className={`h-10 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                      trainingStatusFilter === 'UNPLANNED'
+                        ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-xs font-black'
+                        : 'bg-white/90 text-slate-700 hover:text-slate-900 border border-slate-200/90 hover:bg-white'
+                    }`}
+                  >
+                    <span className="truncate">Do rozpisania</span>
+                    <span className="font-mono text-[10px] opacity-80 font-black">({unplannedTrainingsCount})</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setTrainingStatusFilter('PLANNED'); setTrainingTimeFilter('ALL'); }}
+                    className={`h-10 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                      trainingStatusFilter === 'PLANNED'
+                        ? 'bg-slate-900 text-amber-400 border border-slate-800 shadow-xs font-black'
+                        : 'bg-white/90 text-slate-700 hover:text-slate-900 border border-slate-200/90 hover:bg-white'
+                    }`}
+                  >
+                    <span className="truncate">Rozpisane</span>
+                    <span className="font-mono text-[10px] opacity-80 font-black">({plannedTrainingsCount})</span>
+                  </button>
                 </div>
               ) : null
             )}
@@ -1488,54 +1568,54 @@ export function TrainingPlannerContent({
                 </div>
               </div>
 
-              {/* Sub-tabs: Ćwiczenia / Materiały & Załączniki / Wnioski / Dyskusja */}
-              <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto scrollbar-none flex-nowrap">
+              {/* Sub-tabs: Ćwiczenia / Materiały / Wnioski / Dyskusja - równa siatka Angels Navy & Gold */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1.5 rounded-2xl bg-slate-100/90 border border-slate-200/90 shadow-2xs">
                 <button
                   onClick={() => setActiveTab('EXERCISES')}
-                  className={`shrink-0 whitespace-nowrap flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                  className={`h-11 sm:h-10 px-3 rounded-xl text-xs font-bold transition border flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
                     activeTab === 'EXERCISES'
-                      ? 'bg-emerald-600 text-white shadow-sm'
-                      : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
+                      ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
+                      : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
                   }`}
                 >
-                  <Target className="w-3.5 h-3.5" />
-                  <span>Ćwiczenia & Rozpiska ({activePlan.exercises?.length || 0})</span>
+                  <Target className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">Ćwiczenia ({activePlan.exercises?.length || 0})</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTab('MATERIALS')}
-                  className={`shrink-0 whitespace-nowrap flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                  className={`h-11 sm:h-10 px-3 rounded-xl text-xs font-bold transition border flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
                     activeTab === 'MATERIALS'
-                      ? 'bg-emerald-600 text-white shadow-sm'
-                      : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
+                      ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
+                      : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
                   }`}
                 >
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>Materiały & Załączniki ({eventMaterials.length})</span>
+                  <FileText className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">Materiały ({eventMaterials.length})</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTab('CONCLUSIONS')}
-                  className={`shrink-0 whitespace-nowrap flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                  className={`h-11 sm:h-10 px-3 rounded-xl text-xs font-bold transition border flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
                     activeTab === 'CONCLUSIONS'
-                      ? 'bg-emerald-600 text-white shadow-sm'
-                      : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
+                      ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
+                      : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
                   }`}
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Wnioski & Ocena Trenera ({activePlan.conclusions?.length || 0})</span>
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">Wnioski ({activePlan.conclusions?.length || 0})</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTab('COMMENTS')}
-                  className={`shrink-0 whitespace-nowrap flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                  className={`h-11 sm:h-10 px-3 rounded-xl text-xs font-bold transition border flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
                     activeTab === 'COMMENTS'
-                      ? 'bg-emerald-600 text-white shadow-sm'
-                      : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
+                      ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
+                      : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
                   }`}
                 >
-                  <MessageSquare className="w-3.5 h-3.5" />
-                  <span>Dyskusja Drużyny ({activePlan.comments?.length || 0})</span>
+                  <MessageSquare className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">Dyskusja ({activePlan.comments?.length || 0})</span>
                 </button>
               </div>
 

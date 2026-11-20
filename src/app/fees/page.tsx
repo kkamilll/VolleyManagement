@@ -690,54 +690,64 @@ function FeesContent() {
         </div>
       </div>
 
-      {/* Fees Navigation Tabs */}
-      <div className="flex border-b border-slate-200 gap-2 sm:gap-4 overflow-x-auto pb-px">
-        <button
-          onClick={() => setFeesTab('fees_table')}
-          className={`pb-3.5 px-3 sm:px-4 text-xs sm:text-sm font-black uppercase tracking-wider transition flex items-center gap-2 border-b-2 shrink-0 ${
-            feesTab === 'fees_table'
-              ? 'border-slate-900 text-slate-950 font-black'
-              : 'border-transparent text-slate-500 hover:text-slate-900 font-bold'
-          }`}
-        >
-          <FileSpreadsheet className={`w-4 h-4 ${feesTab === 'fees_table' ? 'text-amber-600' : 'text-slate-500'}`} />
-          <span>Tabela Składek</span>
-          <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-100 border border-slate-200 font-mono text-slate-700 font-bold">
-            {filteredPayments.length}
-          </span>
-        </button>
+      {/* Fees Navigation Tabs - równy pasek segmentowy Angels Navy & Gold */}
+      <div className="p-1.5 rounded-2xl bg-slate-100/90 border border-slate-200/90 shadow-2xs">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+          <button
+            onClick={() => setFeesTab('fees_table')}
+            className={`h-11 sm:h-10 px-3.5 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center gap-2 cursor-pointer active:scale-95 ${
+              feesTab === 'fees_table'
+                ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
+                : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
+            }`}
+          >
+            <FileSpreadsheet className={`w-4 h-4 shrink-0 ${feesTab === 'fees_table' ? 'text-amber-400' : 'text-slate-500'}`} />
+            <span className="truncate">Tabela Składek</span>
+            <span className={`px-2 py-0.2 rounded-full text-[10px] font-mono font-black ${
+              feesTab === 'fees_table' ? 'bg-amber-400/20 text-amber-300' : 'bg-slate-100 text-slate-600'
+            }`}>
+              {filteredPayments.length}
+            </span>
+          </button>
 
-        <button
-          onClick={() => setFeesTab('expenses_revenues')}
-          className={`pb-3.5 px-3 sm:px-4 text-xs sm:text-sm font-black uppercase tracking-wider transition flex items-center gap-2 border-b-2 shrink-0 ${
-            feesTab === 'expenses_revenues'
-              ? 'border-amber-500 text-amber-950 font-black'
-              : 'border-transparent text-slate-500 hover:text-slate-900 font-bold'
-          }`}
-        >
-          <Coins className="w-4 h-4 text-amber-600" />
-          <span>Tabela Wydatków i Przychodów</span>
-          <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-100 border border-slate-200 font-mono text-slate-700 font-bold">
-            {filteredTransactions.length}
-          </span>
-        </button>
+          <button
+            onClick={() => setFeesTab('expenses_revenues')}
+            className={`h-11 sm:h-10 px-3.5 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center gap-2 cursor-pointer active:scale-95 ${
+              feesTab === 'expenses_revenues'
+                ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
+                : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
+            }`}
+          >
+            <Coins className={`w-4 h-4 shrink-0 ${feesTab === 'expenses_revenues' ? 'text-amber-400' : 'text-slate-500'}`} />
+            <span className="truncate">Wydatki i Przychody</span>
+            <span className={`px-2 py-0.2 rounded-full text-[10px] font-mono font-black ${
+              feesTab === 'expenses_revenues' ? 'bg-amber-400/20 text-amber-300' : 'bg-slate-100 text-slate-600'
+            }`}>
+              {filteredTransactions.length}
+            </span>
+          </button>
 
-        <button
-          onClick={() => setFeesTab('my_fees')}
-          className={`pb-3.5 px-3 sm:px-4 text-xs sm:text-sm font-black uppercase tracking-wider transition flex items-center gap-2 border-b-2 shrink-0 ${
-            feesTab === 'my_fees'
-              ? 'border-emerald-600 text-emerald-950 font-black'
-              : 'border-transparent text-slate-500 hover:text-slate-900 font-bold'
-          }`}
-        >
-          <CreditCard className="w-4 h-4 text-emerald-600" />
-          <span>Moje Składki (BLIK)</span>
-          <span className={`px-2 py-0.5 rounded-full text-[10px] border font-mono font-bold ${
-            unpaidUserPayments.length > 0 ? 'bg-amber-50 border-amber-300 text-amber-800' : 'bg-slate-100 border-slate-200 text-slate-700'
-          }`}>
-            {unpaidUserPayments.length > 0 ? `${unpaidUserPayments.length} do opłaty` : userPayments.length}
-          </span>
-        </button>
+          <button
+            onClick={() => setFeesTab('my_fees')}
+            className={`h-11 sm:h-10 px-3.5 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center gap-2 cursor-pointer active:scale-95 ${
+              feesTab === 'my_fees'
+                ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
+                : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
+            }`}
+          >
+            <CreditCard className={`w-4 h-4 shrink-0 ${feesTab === 'my_fees' ? 'text-amber-400' : 'text-emerald-600'}`} />
+            <span className="truncate">Moje Składki (BLIK)</span>
+            <span className={`px-2 py-0.2 rounded-full text-[10px] font-mono font-black ${
+              feesTab === 'my_fees'
+                ? 'bg-amber-400/20 text-amber-300'
+                : unpaidUserPayments.length > 0
+                ? 'bg-amber-100 text-amber-800'
+                : 'bg-slate-100 text-slate-600'
+            }`}>
+              {unpaidUserPayments.length > 0 ? `${unpaidUserPayments.length} do opłaty` : userPayments.length}
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* 1. TABELA SKŁADEK */}

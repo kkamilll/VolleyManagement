@@ -2816,9 +2816,9 @@ function RozgrywkiContent() {
   };
 
   return (
-    <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-6 lg:px-10 xl:px-12 pt-5 sm:pt-8 pb-28 md:pb-16 space-y-6 sm:space-y-8">
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-5 sm:pt-7 pb-28 md:pb-16 space-y-5 sm:space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-200">
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-amber-400 shrink-0 shadow-sm">
             <Volleyball className="w-6 h-6 text-amber-400" />
@@ -2827,7 +2827,60 @@ function RozgrywkiContent() {
             <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight font-athletic text-slate-900">
               {activeTab === 'liga' ? 'Lubońska Amatorska Liga Siatkówki (LALS)' : activeTab === 'sparingi' ? 'Mecze Sparingowe' : 'Turnieje Siatkarskie'}
             </h1>
+            <p className="text-[11px] text-slate-500 font-medium">
+              Szybkie przełączanie między ligą, sparingami i turniejami
+            </p>
           </div>
+        </div>
+      </div>
+
+      {/* Główny pasek przełączania podstron Rozgrywek (Liga / Sparingi / Turnieje) */}
+      <div className="p-1.5 rounded-2xl bg-slate-100/90 border border-slate-200/90 shadow-2xs">
+        <div className="grid grid-cols-3 gap-1.5">
+          <button
+            type="button"
+            onClick={() => switchTab('liga')}
+            className={`h-11 sm:h-10 px-3 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center gap-2 cursor-pointer active:scale-95 ${
+              activeTab === 'liga'
+                ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
+                : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
+            }`}
+          >
+            <img src="/lals_logo.png" alt="LALS" className="w-4 h-4 rounded-full bg-white p-0.5 object-contain shrink-0" />
+            <span className="truncate">Liga LALS</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => switchTab('sparingi')}
+            className={`h-11 sm:h-10 px-3 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+              activeTab === 'sparingi'
+                ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
+                : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
+            }`}
+          >
+            <Calendar className={`w-4 h-4 shrink-0 ${activeTab === 'sparingi' ? 'text-amber-400' : 'text-slate-500'}`} />
+            <span className="truncate">Sparingi</span>
+            <span className={`hidden sm:inline-flex text-[11px] px-1.5 py-0.2 rounded-full font-mono ${activeTab === 'sparingi' ? 'bg-amber-400/20 text-amber-300 font-black' : 'bg-slate-100 text-slate-600'}`}>
+              {sparringsList.length}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => switchTab('turnieje')}
+            className={`h-11 sm:h-10 px-3 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+              activeTab === 'turnieje'
+                ? 'bg-slate-900 text-amber-400 border-slate-800 shadow-xs font-black'
+                : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
+            }`}
+          >
+            <Trophy className={`w-4 h-4 shrink-0 ${activeTab === 'turnieje' ? 'text-amber-400' : 'text-slate-500'}`} />
+            <span className="truncate">Turnieje</span>
+            <span className={`hidden sm:inline-flex text-[11px] px-1.5 py-0.2 rounded-full font-mono ${activeTab === 'turnieje' ? 'bg-amber-400/20 text-amber-300 font-black' : 'bg-slate-100 text-slate-600'}`}>
+              {tournamentsList.length}
+            </span>
+          </button>
         </div>
       </div>
 

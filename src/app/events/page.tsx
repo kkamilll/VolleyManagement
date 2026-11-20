@@ -940,38 +940,65 @@ function EventsAttendanceContent() {
       {/* Terminarz & Dziennik Obecności */}
       <div className="space-y-6">
 
-        {/* Collapsible Filters Bar */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-3 shadow-sm text-slate-800">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
-                    showFilters || activeFiltersCount > 0
-                      ? 'bg-sky-50 text-sky-800 border-sky-300 shadow-sm'
-                      : 'bg-slate-50 text-slate-700 border-slate-200 hover:text-slate-900'
-                  }`}
-                >
-                  <Filter className="w-3.5 h-3.5 text-sky-600" />
-                  <span>Filtry</span>
-                  {activeFiltersCount > 0 && (
-                    <span className="px-1.5 py-0.2 rounded-full bg-sky-600 text-white font-black text-[10px]">
-                      {activeFiltersCount}
-                    </span>
-                  )}
-                  <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${showFilters ? 'rotate-180' : ''}`} />
-                </button>
+        {/* Szybki, zawsze widoczny pasek przełączania kategorii i czasu */}
+          <div className="space-y-2.5">
+            <div className="p-1.5 rounded-2xl bg-slate-100/90 border border-slate-200/90 shadow-2xs">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
+                {[
+                  { id: 'ALL', label: 'Wszystkie' },
+                  { id: 'MECZ_LALS', label: 'Mecze LALS' },
+                  { id: 'TRENING', label: 'Treningi' },
+                  { id: 'SPARING', label: 'Sparingi' },
+                  { id: 'TURNIEJ', label: 'Turnieje' }
+                ].map((t, idx) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setFilterType(t.id)}
+                    className={`${idx === 0 ? 'col-span-2 sm:col-span-1' : ''} h-10 px-3 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center cursor-pointer active:scale-95 ${
+                      filterType === t.id
+                        ? 'bg-slate-900 text-amber-400 border-slate-800 font-black shadow-xs'
+                        : 'bg-white/90 text-slate-700 hover:text-slate-900 border-slate-200/90 hover:bg-white'
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white border border-slate-200/90 rounded-2xl p-2.5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {[
+                  { id: 'ALL', label: 'Wszystkie' },
+                  { id: 'UPCOMING', label: 'Nadchodzące' },
+                  { id: 'PAST', label: 'Zakończone' }
+                ].map(t => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setFilterTime(t.id as any)}
+                    className={`h-9 px-3 rounded-xl text-xs font-bold transition border cursor-pointer active:scale-95 ${
+                      filterTime === t.id
+                        ? 'bg-slate-900 text-amber-400 border-slate-800 font-black shadow-xs'
+                        : 'bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
 
                 {activeFiltersCount > 0 && (
                   <button
+                    type="button"
                     onClick={() => {
                       setFilterType('ALL');
                       setFilterTime('ALL');
                       setSearchQuery('');
                     }}
-                    className="text-[11px] font-bold text-slate-500 hover:text-rose-600 transition underline underline-offset-2 ml-1"
+                    className="text-[11px] font-bold text-slate-500 hover:text-rose-600 transition underline underline-offset-2 ml-1 cursor-pointer"
                   >
-                    Wyczyść filtry
+                    Resetuj
                   </button>
                 )}
               </div>
@@ -984,61 +1011,10 @@ function EventsAttendanceContent() {
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   placeholder="Szukaj jednostki..."
-                  className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
+                  className="w-full h-9 pl-9 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:bg-white"
                 />
               </div>
             </div>
-
-            {/* Collapsible Panel */}
-            {showFilters && (
-              <div className="pt-3 mt-3 border-t border-slate-200 flex flex-wrap items-center gap-3">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="text-[11px] font-bold text-slate-500 mr-1">Typ:</span>
-                  {[
-                    { id: 'ALL', label: 'Wszystkie', activeClass: 'bg-slate-900 text-amber-400 font-black shadow-sm border border-slate-800' },
-                    { id: 'TRENING', label: '🏐 Treningi', activeClass: 'bg-emerald-600 text-white font-black shadow-sm' },
-                    { id: 'SPARING', label: '⚔️ Sparingi', activeClass: 'bg-amber-600 text-white font-black shadow-sm' },
-                    { id: 'MECZ_LALS', label: '🔵 Mecze LALS', activeClass: 'bg-slate-900 text-amber-400 font-black shadow-sm border border-slate-800' },
-                    { id: 'TURNIEJ', label: '🏆 Turnieje', activeClass: 'bg-purple-600 text-white font-black shadow-sm' }
-                  ].map(t => (
-                    <button
-                      key={t.id}
-                      onClick={() => setFilterType(t.id)}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
-                        filterType === t.id
-                          ? t.activeClass
-                          : 'bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 hover:bg-slate-100'
-                      }`}
-                    >
-                      {t.label}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="h-4 w-px bg-slate-200 hidden sm:block" />
-
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="text-[11px] font-bold text-slate-500 mr-1">Czas:</span>
-                  {[
-                    { id: 'ALL', label: 'Wszystkie' },
-                    { id: 'UPCOMING', label: 'Nadchodzące' },
-                    { id: 'PAST', label: 'Zakończone' }
-                  ].map(t => (
-                    <button
-                      key={t.id}
-                      onClick={() => setFilterTime(t.id as any)}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-bold transition ${
-                        filterTime === t.id
-                          ? 'bg-slate-900 text-amber-400 font-black shadow-sm border border-slate-800'
-                          : 'bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 hover:bg-slate-100'
-                      }`}
-                    >
-                      {t.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Widok Kalendarza vs Lista */}
