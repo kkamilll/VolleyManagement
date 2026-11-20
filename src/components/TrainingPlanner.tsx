@@ -1447,168 +1447,66 @@ export function TrainingPlannerContent({
               const attendingCount = activeEvent.attendees?.filter(a => a.status === 'BEDE').length || 0;
 
               return (
-                <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
-                  {/* Górny pasek metadanych */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="px-3 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider bg-sky-100 text-sky-800 border border-sky-200 font-mono">
-                        {activeEvent.type === 'SPARING' ? '⚔️ Sparing' : activeEvent.type === 'MECZ' ? `🏐 LALS ${roundNum ? `• Runda ${roundNum}` : ''}` : '🏋️ Trening'}
-                      </span>
-                      <span className="px-2.5 py-1 rounded-xl text-xs font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                        {new Date(activeEvent.date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' })}
-                      </span>
+                <div className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                    <div className="space-y-1.5 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-200">
+                          Brak rozpisanego konspektu
+                        </span>
+                        <span className="text-xs font-mono font-bold text-slate-500 flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5 text-amber-600" />
+                          {new Date(activeEvent.date).toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'long' })} • {new Date(activeEvent.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+
+                      <h4 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight font-athletic">
+                        {activeEvent.type === 'TRENING' ? activeEvent.title : `Angels ZTP vs ${oppName || 'Rywal'}`}
+                      </h4>
+
+                      <div className="flex items-center gap-3 text-xs text-slate-500 flex-wrap">
+                        <a
+                          href={getGoogleMapsUrl(activeEvent.location || 'Hala POSiR', activeEvent.locationUrl) || '#'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 hover:text-amber-700 transition underline decoration-slate-300 hover:decoration-amber-500 underline-offset-2"
+                          title="Otwórz pinezkę w Google Maps"
+                        >
+                          <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                          <span>{activeEvent.location || 'Hala POSiR'}</span>
+                        </a>
+                        <span className="text-slate-300">•</span>
+                        <Link
+                          href={`/events?eventId=${activeEvent.id}`}
+                          className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-900 font-bold"
+                        >
+                          <Users className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>{attendingCount} obecnych</span>
+                        </Link>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <span className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold font-mono">
-                        <Users className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>{attendingCount} zadeklarowanych</span>
-                      </span>
+                    {/* Dwa czyste przyciski akcji */}
+                    <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto pt-1 sm:pt-0">
+                      {canManage && (
+                        <button
+                          onClick={() => handleQuickCreatePlanForEvent(activeEvent)}
+                          disabled={creating}
+                          className="flex-1 sm:flex-initial h-10 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-black text-xs uppercase tracking-wider transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                        >
+                          <Plus className="w-4 h-4 text-amber-400" />
+                          <span>{creating ? 'Tworzenie...' : 'Rozpisz konspekt'}</span>
+                        </button>
+                      )}
+
                       <Link
-                        href={`/events?eventId=${activeEvent.id}`}
-                        className="text-xs text-sky-600 hover:text-sky-800 font-bold px-2 py-1 rounded-lg hover:bg-sky-50 transition"
+                        href={`/taktyka?tab=board&eventId=${activeEvent.id}`}
+                        className="flex-1 sm:flex-initial h-10 px-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 hover:border-amber-400 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs"
                       >
-                        Terminarz &rarr;
+                        <Compass className="w-4 h-4 text-amber-600" />
+                        <span>Tablica</span>
                       </Link>
                     </div>
-                  </div>
-
-                  {/* Duel Scoreboard Card for Match/Sparing OR Training Banner */}
-                  {activeEvent.type === 'TRENING' ? (
-                    <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-white to-emerald-50 border border-emerald-200 shadow-2xs">
-                      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-                        <div className="flex items-center gap-3.5">
-                          <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-black text-xl shadow-sm shrink-0 border border-emerald-400">
-                            🏐
-                          </div>
-                          <div>
-                            <span className="text-[10px] font-mono font-bold uppercase text-emerald-700 block">Jednostka Treningowa</span>
-                            <h4 className="text-xl font-black text-slate-900 uppercase font-athletic tracking-tight">{activeEvent.title}</h4>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col items-center sm:items-end justify-center px-4 py-1">
-                          <span className="text-xs font-mono font-bold text-slate-800 flex items-center gap-1">
-                            <Clock className="w-3.5 h-3.5 text-emerald-600" />
-                            {new Date(activeEvent.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                          <span className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
-                            <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                            <span>{activeEvent.location || 'Hala POSiR'}</span>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-50 via-white to-slate-50 border border-slate-200 shadow-2xs">
-                      <div className="flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left">
-                        {/* Drużyna 1 */}
-                        <div className="flex items-center gap-3.5">
-                          <div className="w-12 h-12 rounded-2xl bg-sky-600 text-white flex items-center justify-center font-black text-xl shadow-sm shrink-0 border border-sky-400">
-                            👼
-                          </div>
-                          <div>
-                            <h4 className="text-xl font-black text-slate-900 uppercase font-athletic tracking-tight">Angels ZTP</h4>
-                          </div>
-                        </div>
-
-                        {/* VS & Szczegóły Miejsca */}
-                        <div className="flex flex-col items-center justify-center px-4 py-1">
-                          <div className="w-9 h-9 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-xs font-black text-slate-700 font-mono">
-                            VS
-                          </div>
-                          <span className="text-xs font-mono font-bold text-slate-800 flex items-center gap-1 mt-1.5">
-                            <Clock className="w-3.5 h-3.5 text-sky-600" />
-                            {new Date(activeEvent.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                          <span className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
-                            <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                            <span>{activeEvent.location || 'Hala OSiR, Luboń'}</span>
-                          </span>
-                        </div>
-
-                        {/* Drużyna 2 */}
-                        <div className="flex items-center sm:flex-row-reverse gap-3.5 text-center sm:text-right">
-                          <div className="w-12 h-12 rounded-2xl bg-slate-800 text-white flex items-center justify-center font-black text-xl shadow-sm shrink-0 border border-slate-700">
-                            🏐
-                          </div>
-                          <div>
-                            <h4 className="text-xl font-black text-slate-900 uppercase font-athletic tracking-tight">
-                              {oppName || 'Rywal Ligowy'}
-                            </h4>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* 2 Kafelki Przygotowania Taktycznego */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                          <Target className="w-4 h-4 text-sky-600" />
-                          {activeEvent.type === 'TRENING' ? 'Konspekt & Ćwiczenia' : 'Założenia Meczowe'}
-                        </span>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
-                          Do rozpisania
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-500 leading-relaxed">
-                        {activeEvent.type === 'TRENING'
-                          ? 'Wprowadź cele jednostki, rozgrzewkę, ćwiczenia techniczne, zadaniowe i grę kontrolną.'
-                          : 'Zdefiniuj cele meczowe, taktykę zagrywki, kierunki ataku i asekurację bloku.'}
-                      </p>
-                    </div>
-
-                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                          <Compass className="w-4 h-4 text-amber-600" />
-                          {activeEvent.type === 'TRENING' ? 'Rozrysowanie na Boisku (Pisak)' : 'Ustawienie Wyjściowe (P1–P6)'}
-                        </span>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-300">
-                          Tablica
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-500 leading-relaxed">
-                        {activeEvent.type === 'TRENING'
-                          ? 'Każde ćwiczenie możesz rozrysować bezpośrednio na boisku (trajektorie piłek, strefy, obieg graczy).'
-                          : 'Rozrysuj schemat rotacji, strefy przyjęcia libero i pozycje obrony na tablicy taktycznej.'}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Pasek Głównych Akcji */}
-                  <div className="flex flex-wrap items-center gap-3 pt-2">
-                    {canManage && (
-                      <button
-                        onClick={() => handleQuickCreatePlanForEvent(activeEvent)}
-                        disabled={creating}
-                        className={`flex-1 sm:flex-initial px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition shadow-sm hover:shadow flex items-center justify-center gap-2 cursor-pointer active:scale-95 ${
-                          activeEvent.type === 'TRENING'
-                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                            : 'bg-sky-600 hover:bg-sky-500 text-white'
-                        }`}
-                      >
-                        <Plus className="w-4 h-4" />
-                        <span>
-                          {creating
-                            ? 'Tworzenie...'
-                            : activeEvent.type === 'TRENING'
-                            ? 'Rozpocznij konspekt / Dodaj ćwiczenia'
-                            : 'Rozpisz taktykę na ten mecz'}
-                        </span>
-                      </button>
-                    )}
-
-                    <Link
-                      href={`/taktyka?tab=board&eventId=${activeEvent.id}`}
-                      className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 hover:border-slate-300 font-bold text-xs transition flex items-center justify-center gap-2 shadow-2xs"
-                    >
-                      <Compass className="w-4 h-4 text-sky-600" />
-                      <span>Tablica Taktyczna</span>
-                    </Link>
                   </div>
                 </div>
               );
