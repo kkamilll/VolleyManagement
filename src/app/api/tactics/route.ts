@@ -6,7 +6,20 @@ import { TacticalPlay, ScoutingReport, TacticScope, TacticalMaterial } from '@/l
 export async function GET(req: NextRequest) {
   const seasonId = getActiveSeasonIdFromRequest(req);
   const db = getEffectiveDatabase(seasonId);
-  const tactics = db.tactics || [];
+  const user = await getServerUser();
+  const canSeeHidden = Boolean(
+    user && (
+      user.role === 'TRENER' ||
+      user.role === 'KIEROWNIK' ||
+      user.isCaptain ||
+      hasPermission(user, 'canManageTactics') ||
+      hasPermission(user, 'isAdmin')
+    )
+  );
+  const allTactics = db.tactics || [];
+  const tactics = canSeeHidden
+    ? allTactics
+    : allTactics.filter(t => t.isVisibleToPlayers !== false);
   const scoutingReports = db.scoutingReports || [];
   const materials = db.tacticalMaterials || [];
   const matches = db.matches || [];
@@ -153,6 +166,32 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // 2d. Coach/Captain toggles visibility of a tactic for players (visible vs hidden)
+    if (body.type === 'TOGGLE_VISIBILITY') {
+      const canManage = hasPermission(user, 'canManageTactics') || user.role === 'TRENER' || user.role === 'KIEROWNIK' || user.isCaptain;
+      if (!canManage) {
+        return NextResponse.json({ error: 'Brak uprawnień do zmiany widoczności taktyki' }, { status: 403 });
+      }
+      const { tacticId, isVisibleToPlayers } = body;
+      if (!tacticId) {
+        return NextResponse.json({ error: 'Brak ID taktyki' }, { status: 400 });
+      }
+      const tactic = (db.tactics || []).find(t => t.id === tacticId);
+      if (!tactic) {
+        return NextResponse.json({ error: 'Nie znaleziono taktyki' }, { status: 404 });
+      }
+      tactic.isVisibleToPlayers = Boolean(isVisibleToPlayers);
+      tactic.updatedAt = new Date().toISOString();
+      writeDatabase(db);
+      return NextResponse.json({
+        success: true,
+        tactic,
+        message: tactic.isVisibleToPlayers
+          ? 'Taktyka jest teraz widoczna dla zawodników.'
+          : 'Taktyka została ukryta przed zawodnikami (widoczna tylko dla sztabu).'
+      });
+    }
+
     // 2c. Coach updates existing tactic directly (overwrites positions / drawing / title)
     if (body.type === 'UPDATE_TACTIC') {
       const canManage = hasPermission(user, 'canManageTactics');
@@ -162,7 +201,7 @@ export async function POST(req: NextRequest) {
 
       if (!db.tactics) db.tactics = [];
 
-      const { id, title, phase, rotation, scope, targetOpponent, matchId, eventId, description, courtPositions, directives, drawingData, tacticalNotes } = body.tactic || {};
+      const { id, title, phase, rotation, scope, targetOpponent, matchId, eventId, description, courtPositions, directives, drawingData, tacticalNotes, isVisibleToPlayers } = body.tactic || {};
       if (!id) {
         return NextResponse.json({ error: 'Brak ID taktyki do aktualizacji' }, { status: 400 });
       }
@@ -221,6 +260,7 @@ export async function POST(req: NextRequest) {
         directives: Array.isArray(directives) ? directives.filter(Boolean) : existing.directives,
         drawingData: drawingData !== undefined ? drawingData : existing.drawingData,
         tacticalNotes: tacticalNotes !== undefined ? tacticalNotes : existing.tacticalNotes,
+        isVisibleToPlayers: isVisibleToPlayers !== undefined ? Boolean(isVisibleToPlayers) : existing.isVisibleToPlayers,
         updatedAt: new Date().toISOString()
       };
 
@@ -239,7 +279,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (body.type === 'TACTIC') {
-      const { title, phase, rotation, scope, targetOpponent, matchId, eventId, description, courtPositions, directives, drawingData, tacticalNotes } = body.tactic || {};
+      const { title, phase, rotation, scope, targetOpponent, matchId, eventId, description, courtPositions, directives, drawingData, tacticalNotes, isVisibleToPlayers } = body.tactic || {};
       if (!title) {
         return NextResponse.json({ error: 'Podaj tytuł taktyki' }, { status: 400 });
       }
@@ -306,6 +346,7 @@ export async function POST(req: NextRequest) {
         directives: Array.isArray(directives) ? directives.filter(Boolean) : [],
         drawingData: drawingData || undefined,
         tacticalNotes: tacticalNotes || undefined,
+        isVisibleToPlayers: isVisibleToPlayers !== undefined ? Boolean(isVisibleToPlayers) : true,
         posts: [],
         createdById: user.id,
         createdByName: user.name,

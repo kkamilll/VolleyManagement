@@ -481,6 +481,7 @@ export interface TacticalPlay {
   directives: string[];
   drawingData?: string; // Canvas drawings data (arrows, paths, markers)
   tacticalNotes?: string;
+  isVisibleToPlayers?: boolean; // Domyślnie true; false = ukryta przed zawodnikami (tylko sztab)
   posts?: TacticalPost[]; // posty i dyskusja zawodników
   createdById: string;
   createdByName: string;
