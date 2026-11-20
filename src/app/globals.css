@@ -299,6 +299,13 @@ textarea::placeholder {
   40%, 80% { transform: translateX(6px); }
 }
 
+/* Ensure all full-screen modal overlays cover the entire viewport cleanly above Navbar (never pushed down by space-y-*) */
+.fixed.inset-0 {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  z-index: 60 !important;
+}
+
 .animate-shake {
   animation: shake 0.4s ease-in-out;
 }

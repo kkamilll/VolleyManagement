@@ -198,7 +198,7 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md text-slate-800 shadow-sm border-b border-slate-200">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md text-slate-800 shadow-sm border-b border-slate-200">
       {/* Angels Navy & Gold Club Accent Ribbon */}
       <div className="h-[2.5px] w-full bg-gradient-to-r from-slate-950 via-amber-500 to-slate-950" />
       {/* Main Navbar */}
