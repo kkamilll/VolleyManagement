@@ -3591,57 +3591,55 @@ function RozgrywkiContent() {
       {activeTab === 'liga' && (
         <div className="space-y-6">
           {/* Liga Subtabs (Tabela, Wyniki, Statystyki) & Dedicated Actions Bar */}
-          <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+          <div className="flex flex-col lg:flex-row lg:flex-wrap lg:items-center justify-between gap-2.5 pb-3 border-b border-slate-200">
             {/* 3 Główne Zakładki Ligi - stała wysokość h-10 i równe 3 kolumny na telefonie */}
             <div className="grid grid-cols-3 sm:inline-flex items-center gap-1 p-1 h-10 rounded-xl bg-slate-100 border border-slate-300 shrink-0 w-full sm:w-auto">
               <button
                 onClick={() => setLigaSubTab('tabela')}
-                className={`h-full flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3.5 rounded-lg text-[11px] sm:text-xs font-bold uppercase tracking-wider transition whitespace-nowrap cursor-pointer ${
+                className={`h-full flex items-center justify-center gap-1.5 px-2 sm:px-3.5 rounded-lg text-[11px] sm:text-xs font-bold uppercase transition whitespace-nowrap cursor-pointer ${
                   ligaSubTab === 'tabela'
                     ? 'bg-slate-900 text-amber-400 shadow-sm border border-slate-800'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                 }`}
               >
                 <Trophy className="w-3.5 h-3.5 shrink-0" />
-                <span className="sm:hidden">Tabela</span>
-                <span className="hidden sm:inline">Tabela Ligowa</span>
+                <span>Tabela</span>
               </button>
               <button
                 onClick={() => setLigaSubTab('wyniki')}
-                className={`h-full flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3.5 rounded-lg text-[11px] sm:text-xs font-bold uppercase tracking-wider transition whitespace-nowrap cursor-pointer ${
+                className={`h-full flex items-center justify-center gap-1.5 px-2 sm:px-3.5 rounded-lg text-[11px] sm:text-xs font-bold uppercase transition whitespace-nowrap cursor-pointer ${
                   ligaSubTab === 'wyniki'
                     ? 'bg-slate-900 text-amber-400 shadow-sm border border-slate-800'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                 }`}
               >
                 <Volleyball className="w-3.5 h-3.5 shrink-0" />
-                <span className="sm:hidden">Wyniki</span>
-                <span className="hidden sm:inline">Wyniki &amp; Terminarz</span>
+                <span className="md:hidden">Wyniki</span>
+                <span className="hidden md:inline">Wyniki &amp; Terminarz</span>
               </button>
               <button
                 onClick={() => setLigaSubTab('statystyki')}
-                className={`h-full flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3.5 rounded-lg text-[11px] sm:text-xs font-bold uppercase tracking-wider transition whitespace-nowrap cursor-pointer ${
+                className={`h-full flex items-center justify-center gap-1.5 px-2 sm:px-3.5 rounded-lg text-[11px] sm:text-xs font-bold uppercase transition whitespace-nowrap cursor-pointer ${
                   ligaSubTab === 'statystyki'
                     ? 'bg-slate-900 text-amber-400 shadow-sm border border-slate-800'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                 }`}
               >
                 <BarChart3 className="w-3.5 h-3.5 shrink-0" />
-                <span className="sm:hidden">Statystyki</span>
-                <span className="hidden sm:inline">Statystyki VolleyStation</span>
+                <span>Statystyki</span>
               </button>
             </div>
 
-            {/* Dedykowany, stały pasek akcji (identyczna wysokość h-10 i równe kolumny na telefonie) */}
-            <div className="flex items-center gap-2 justify-start xl:justify-end w-full xl:w-auto shrink-0">
+            {/* Dedykowany, stały pasek akcji (identyczna wysokość h-10, zero ucinania na telefonie i laptopie) */}
+            <div className="flex flex-wrap items-center gap-2 justify-start lg:justify-end w-full lg:w-auto">
               {ligaSubTab === 'tabela' && (
-                <div className="grid grid-cols-3 sm:flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
+                <div className="grid grid-cols-3 sm:flex sm:flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
                   {canManageMatches && (
                     <>
                       <button
                         type="button"
                         onClick={handleOpenCreatePhase}
-                        className="h-10 inline-flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-sm whitespace-nowrap shrink-0 cursor-pointer active:scale-95"
+                        className="h-10 min-w-0 inline-flex items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold uppercase bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-sm whitespace-nowrap cursor-pointer active:scale-95"
                         title="Utwórz nowy etap / nową tabelę (np. Faza Finałowa) i wklej zestawienie"
                       >
                         <Plus className="w-3.5 h-3.5 shrink-0" />
@@ -3651,7 +3649,7 @@ function RozgrywkiContent() {
                       <button
                         type="button"
                         onClick={() => handleOpenEditTable(currentLeaguePhase?.id || 'faza_1', 'text')}
-                        className="h-10 inline-flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0 cursor-pointer active:scale-95"
+                        className="h-10 min-w-0 inline-flex items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold uppercase bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm whitespace-nowrap cursor-pointer active:scale-95"
                       >
                         <Upload className="w-3.5 h-3.5 text-sky-600 shrink-0" />
                         <span className="sm:hidden">Import</span>
@@ -3660,7 +3658,7 @@ function RozgrywkiContent() {
                       <button
                         type="button"
                         onClick={() => handleOpenEditTable(currentLeaguePhase?.id || 'faza_1')}
-                        className="h-10 inline-flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 transition shadow-sm whitespace-nowrap shrink-0 cursor-pointer active:scale-95"
+                        className="h-10 min-w-0 inline-flex items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold uppercase bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 transition shadow-sm whitespace-nowrap cursor-pointer active:scale-95"
                       >
                         <Edit3 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                         <span className="sm:hidden">Edytuj</span>
@@ -3672,7 +3670,7 @@ function RozgrywkiContent() {
                     href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hidden sm:inline-flex h-10 items-center justify-center gap-1.5 px-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                    className="hidden sm:inline-flex h-10 items-center justify-center gap-1.5 px-3 rounded-xl text-xs font-bold uppercase bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap"
                   >
                     <ExternalLink className="w-3.5 h-3.5 text-sky-600 shrink-0" />
                     <span>VolleyStation</span>
@@ -3680,13 +3678,13 @@ function RozgrywkiContent() {
                 </div>
               )}
               {ligaSubTab === 'wyniki' && (
-                <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full sm:w-auto">
                   {canManageMatches && (
                     <>
                       <button
                         type="button"
                         onClick={() => setShowAddMatchModal(true)}
-                        className="h-10 inline-flex items-center justify-center gap-1.5 px-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 transition shadow-sm whitespace-nowrap shrink-0 cursor-pointer active:scale-95"
+                        className="h-10 min-w-0 inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold uppercase bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 transition shadow-sm whitespace-nowrap cursor-pointer active:scale-95"
                       >
                         <Plus className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                         <span>Dodaj Wynik</span>
@@ -3694,7 +3692,7 @@ function RozgrywkiContent() {
                       <button
                         type="button"
                         onClick={() => setShowImportScheduleModal(true)}
-                        className="h-10 inline-flex items-center justify-center gap-1.5 px-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0 cursor-pointer active:scale-95"
+                        className="h-10 min-w-0 inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold uppercase bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm whitespace-nowrap cursor-pointer active:scale-95"
                       >
                         <Upload className="w-3.5 h-3.5 text-sky-600 shrink-0" />
                         <span className="sm:hidden">Import</span>
@@ -3706,7 +3704,7 @@ function RozgrywkiContent() {
                     href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hidden sm:inline-flex h-10 items-center justify-center gap-1.5 px-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                    className="hidden sm:inline-flex h-10 items-center justify-center gap-1.5 px-3 rounded-xl text-xs font-bold uppercase bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap"
                   >
                     <ExternalLink className="w-3.5 h-3.5 text-sky-600 shrink-0" />
                     <span>VolleyStation</span>
@@ -4056,63 +4054,65 @@ function RozgrywkiContent() {
             <div className="space-y-5">
               {/* Filter Toolbar for Matches & Schedule */}
               <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3">
-                {/* Row 1: Scope & Status Toggles */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                  <div className="flex items-center gap-1.5 p-1 bg-slate-100 border border-slate-200 rounded-2xl overflow-x-auto scrollbar-none shrink-0">
+                {/* Row 1: Scope & Status Toggles (równe siatki h-10 bez poziomego scrolla) */}
+                <div className="flex flex-col md:flex-row md:flex-wrap md:items-center justify-between gap-2.5">
+                  <div className="grid grid-cols-2 sm:inline-flex items-center gap-1 p-1 h-10 bg-slate-100 border border-slate-200 rounded-xl w-full sm:w-auto">
                     <button
                       type="button"
                       onClick={() => setLeagueScheduleScope('ALL')}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 ${
+                      className={`h-full px-2 sm:px-3 rounded-lg text-[11px] sm:text-xs font-bold transition flex items-center justify-center gap-1 whitespace-nowrap cursor-pointer ${
                         leagueScheduleScope === 'ALL'
                           ? 'bg-sky-600 text-white shadow-sm'
                           : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      🌐 Cała Liga LALS ({unifiedLeagueSchedule.length})
+                      <span className="sm:hidden">Cała Liga ({unifiedLeagueSchedule.length})</span>
+                      <span className="hidden sm:inline">🌐 Cała Liga LALS ({unifiedLeagueSchedule.length})</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setLeagueScheduleScope('ANGELS')}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1.5 ${
+                      className={`h-full px-2 sm:px-3 rounded-lg text-[11px] sm:text-xs font-bold transition flex items-center justify-center gap-1 whitespace-nowrap cursor-pointer ${
                         leagueScheduleScope === 'ANGELS'
                           ? 'bg-sky-600 text-white shadow-sm'
                           : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      <span>Tylko Angels ZTP</span>
-                      <span className="font-mono text-[11px]">({unifiedLeagueSchedule.filter(m => m.isAngels).length})</span>
+                      <span className="sm:hidden">Angels ({unifiedLeagueSchedule.filter(m => m.isAngels).length})</span>
+                      <span className="hidden sm:inline">Tylko Angels ZTP ({unifiedLeagueSchedule.filter(m => m.isAngels).length})</span>
                     </button>
                   </div>
 
-                  <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-2xl border border-slate-300 text-xs overflow-x-auto scrollbar-none shrink-0">
+                  <div className="grid grid-cols-3 sm:inline-flex items-center gap-1 bg-slate-100 p-1 h-10 rounded-xl border border-slate-300 text-[11px] sm:text-xs w-full sm:w-auto">
                     <button
                       type="button"
                       onClick={() => setLeagueScheduleStatus('ALL')}
-                      className={`px-3 py-1.5 rounded-xl font-bold transition shrink-0 ${
+                      className={`h-full px-1.5 sm:px-3 rounded-lg font-bold transition flex items-center justify-center gap-1 whitespace-nowrap cursor-pointer ${
                         leagueScheduleStatus === 'ALL' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      Wszystkie ({filteredUnifiedSchedule.length})
+                      <span>Wszystkie</span>
+                      <span className="hidden sm:inline text-[10px] opacity-75 font-mono">({filteredUnifiedSchedule.length})</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setLeagueScheduleStatus('UPCOMING')}
-                      className={`px-3 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-1 ${
+                      className={`h-full px-1.5 sm:px-3 rounded-lg font-bold transition flex items-center justify-center gap-1 whitespace-nowrap cursor-pointer ${
                         leagueScheduleStatus === 'UPCOMING' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
                       <span>Terminarz</span>
-                      <span className="text-[10px] opacity-75 font-mono">({unifiedLeagueSchedule.filter(m => !m.isFinished && (leagueScheduleScope === 'ALL' || m.isAngels)).length})</span>
+                      <span className="hidden sm:inline text-[10px] opacity-75 font-mono">({unifiedLeagueSchedule.filter(m => !m.isFinished && (leagueScheduleScope === 'ALL' || m.isAngels)).length})</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setLeagueScheduleStatus('FINISHED')}
-                      className={`px-3 py-1.5 rounded-xl font-bold transition shrink-0 flex items-center gap-1 ${
+                      className={`h-full px-1.5 sm:px-3 rounded-lg font-bold transition flex items-center justify-center gap-1 whitespace-nowrap cursor-pointer ${
                         leagueScheduleStatus === 'FINISHED' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
                       <span>Wyniki</span>
-                      <span className="text-[10px] opacity-75 font-mono">({unifiedLeagueSchedule.filter(m => m.isFinished && (leagueScheduleScope === 'ALL' || m.isAngels)).length})</span>
+                      <span className="hidden sm:inline text-[10px] opacity-75 font-mono">({unifiedLeagueSchedule.filter(m => m.isFinished && (leagueScheduleScope === 'ALL' || m.isAngels)).length})</span>
                     </button>
                   </div>
                 </div>

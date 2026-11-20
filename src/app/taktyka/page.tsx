@@ -3673,23 +3673,23 @@ function TacticsContent() {
               )}
             </div>
 
-            {/* Narzędzia i formaty rozpiski: Równy, duży pasek o stałej wysokości 44px pod kciuk */}
+            {/* Narzędzia i formaty rozpiski: Równy pasek o stałej wysokości h-10 bez ścisku na tabletach */}
             {canEdit && (
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-2.5 pt-0.5">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-2 pt-0.5">
                 <button
                   type="button"
                   onClick={() => setTacticsSection('board')}
-                  className="col-span-2 sm:col-span-1 h-11 sm:h-10 px-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-xs cursor-pointer active:scale-95 min-h-[44px]"
+                  className="col-span-2 md:col-span-1 h-10 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer active:scale-95 whitespace-nowrap"
                   title="Otwórz pełną tablicę taktyczną dla tego meczu"
                 >
                   <Compass className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Tablica taktyczna</span>
+                  <span>Tablica</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleOpenQuickDrawModal}
-                  className="h-11 sm:h-10 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 hover:border-amber-400 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 min-h-[44px]"
+                  className="h-10 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 hover:border-amber-400 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap"
                   title="Szybki szkic pisakiem na boisku"
                 >
                   <Pencil className="w-4 h-4 text-amber-600 shrink-0" />
@@ -3699,7 +3699,7 @@ function TacticsContent() {
                 <button
                   type="button"
                   onClick={() => setShowAddNoteModal(true)}
-                  className="h-11 sm:h-10 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 min-h-[44px]"
+                  className="h-10 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap"
                   title="Dodaj notatkę lub wytyczne dla drużyny"
                 >
                   <FileText className="w-4 h-4 text-slate-500 shrink-0" />
@@ -3709,17 +3709,17 @@ function TacticsContent() {
                 <button
                   type="button"
                   onClick={() => handleOpenAddMaterialForCurrentTarget('VIDEO')}
-                  className="h-11 sm:h-10 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 min-h-[44px]"
+                  className="h-10 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap"
                   title="Dodaj wideo rywala z YouTube"
                 >
                   <Play className="w-4 h-4 text-rose-500 shrink-0" />
-                  <span>Wideo rywala</span>
+                  <span>Wideo</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleOpenAddMaterialForCurrentTarget('IMAGE')}
-                  className="h-11 sm:h-10 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 min-h-[44px]"
+                  className="h-10 px-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap"
                   title="Dodaj zdjęcie lub dokument PDF"
                 >
                   <ImageIcon className="w-4 h-4 text-emerald-600 shrink-0" />

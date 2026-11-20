@@ -1007,7 +1007,7 @@ function EventsAttendanceContent() {
                     key={t.id}
                     type="button"
                     onClick={() => setFilterTime(t.id as any)}
-                    className={`h-9 px-2 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold transition border flex items-center justify-center cursor-pointer active:scale-95 ${
+                    className={`h-9 px-1.5 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold transition border flex items-center justify-center cursor-pointer active:scale-95 whitespace-nowrap ${
                       filterTime === t.id
                         ? 'bg-slate-900 text-amber-400 border-slate-800 font-black shadow-xs'
                         : 'bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-200 hover:bg-slate-100'

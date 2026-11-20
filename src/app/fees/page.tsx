@@ -629,7 +629,7 @@ function FeesContent() {
           <div className={`grid ${isManager ? 'grid-cols-3' : canManageTreasury ? 'grid-cols-2' : 'grid-cols-1'} sm:inline-flex items-center gap-1 p-1 h-10 rounded-xl bg-slate-100 border border-slate-200 shadow-2xs w-full sm:w-auto`}>
             <button
               onClick={handleExportExcel}
-              className="h-full flex items-center justify-center gap-1.5 px-2.5 sm:px-3 rounded-lg text-[11px] sm:text-xs font-bold text-slate-700 hover:text-emerald-800 hover:bg-white transition whitespace-nowrap cursor-pointer"
+              className="h-full min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 rounded-lg text-[11px] sm:text-xs font-bold text-slate-700 hover:text-emerald-800 hover:bg-white transition whitespace-nowrap cursor-pointer"
               title="Pobierz oficjalny arkusz Excel (.xlsx) ze stanem wpłat"
             >
               <Download className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
@@ -640,7 +640,7 @@ function FeesContent() {
             {canManageTreasury && (
               <button
                 onClick={handleOpenReminderModal}
-                className="h-full flex items-center justify-center gap-1.5 px-2.5 sm:px-3 rounded-lg text-[11px] sm:text-xs font-bold text-slate-700 hover:text-amber-900 hover:bg-white transition whitespace-nowrap cursor-pointer"
+                className="h-full min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 rounded-lg text-[11px] sm:text-xs font-bold text-slate-700 hover:text-amber-900 hover:bg-white transition whitespace-nowrap cursor-pointer"
                 title="Wyślij przypomnienie na WhatsApp lub tablicę drużyny"
               >
                 <BellRing className="w-3.5 h-3.5 text-amber-600 shrink-0" />
@@ -652,11 +652,12 @@ function FeesContent() {
               <button
                 type="button"
                 onClick={() => setShowManageFeesModal(true)}
-                className="h-full flex items-center justify-center gap-1.5 px-2.5 sm:px-3 rounded-lg text-[11px] sm:text-xs font-bold text-slate-700 hover:text-slate-900 hover:bg-white transition whitespace-nowrap cursor-pointer"
+                className="h-full min-w-0 flex items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 rounded-lg text-[11px] sm:text-xs font-bold text-slate-700 hover:text-slate-900 hover:bg-white transition whitespace-nowrap cursor-pointer"
                 title="Przeglądaj i usuwaj zdefiniowane składki"
               >
                 <Settings className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                <span>Składki ({fees.length})</span>
+                <span className="sm:hidden">Składki</span>
+                <span className="hidden sm:inline">Składki ({fees.length})</span>
               </button>
             )}
           </div>
