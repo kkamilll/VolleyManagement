@@ -268,63 +268,65 @@ function DashboardContent() {
                 Twoja obecność:
               </span>
               {nextEvent && (
-                <div className="inline-flex p-1 rounded-2xl bg-white border border-slate-200/80 shadow-2xs w-full sm:w-auto">
+                <div className="grid grid-cols-3 sm:inline-flex p-1 rounded-2xl bg-white border border-slate-200/80 shadow-2xs w-full sm:w-auto gap-1">
                   <button
                     onClick={() => handleQuickAttendance(nextEvent.id, 'BEDE')}
                     disabled={updatingAttendance}
-                    className={`flex-1 sm:flex-initial h-11 sm:h-9.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                    className={`h-10 px-2.5 sm:px-3.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 whitespace-nowrap ${
                       myStatusRecord?.status === 'BEDE'
                         ? 'bg-emerald-600 text-white shadow-xs'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    <CheckCircle2 className="w-4 h-4" />
+                    <CheckCircle2 className="w-4 h-4 shrink-0" />
                     <span>Będę</span>
                   </button>
                   <button
                     onClick={() => handleQuickAttendance(nextEvent.id, 'NIEPEWNE')}
                     disabled={updatingAttendance}
-                    className={`flex-1 sm:flex-initial h-11 sm:h-9.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                    className={`h-10 px-2.5 sm:px-3.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 whitespace-nowrap ${
                       myStatusRecord?.status === 'NIEPEWNE'
                         ? 'bg-amber-500 text-slate-950 shadow-xs'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    <HelpCircle className="w-4 h-4" />
+                    <HelpCircle className="w-4 h-4 shrink-0" />
                     <span>Może</span>
                   </button>
                   <button
                     onClick={() => handleQuickAttendance(nextEvent.id, 'NIE_BEDE')}
                     disabled={updatingAttendance}
-                    className={`flex-1 sm:flex-initial h-11 sm:h-9.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 ${
+                    className={`h-10 px-2.5 sm:px-3.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 whitespace-nowrap ${
                       myStatusRecord?.status === 'NIE_BEDE'
                         ? 'bg-rose-600 text-white shadow-xs'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
-                    <AlertCircle className="w-4 h-4" />
-                    <span>Nieobecny</span>
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span className="sm:hidden">Nie</span>
+                    <span className="hidden sm:inline">Nieobecny</span>
                   </button>
                 </div>
               )}
             </div>
 
             {/* Skład & Przejście do Taktyki */}
-            <div className="flex items-center gap-2 w-full lg:w-auto">
+            <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full lg:w-auto">
               <Link 
                 href={nextEvent?.id ? `/events?eventId=${nextEvent.id}` : '/events'}
-                className="flex-1 sm:flex-initial text-xs sm:text-sm text-slate-700 hover:text-amber-700 transition flex items-center justify-center gap-1.5 font-bold h-11 sm:h-9.5 px-3.5 rounded-xl bg-white border border-slate-200/80 hover:border-amber-400 shadow-2xs"
+                className="text-xs sm:text-sm text-slate-700 hover:text-amber-700 transition flex items-center justify-center gap-1.5 font-bold h-10 px-3 sm:px-3.5 rounded-xl bg-white border border-slate-200/80 hover:border-amber-400 shadow-2xs whitespace-nowrap"
               >
                 <Users className="w-4 h-4 text-amber-600 shrink-0" />
-                <span>Skład: <strong className="text-slate-900 font-black">{attendingCount === 1 ? '1 obecny' : `${attendingCount} obecnych`}</strong> &rarr;</span>
+                <span className="truncate">Skład: <strong className="text-slate-900 font-black">{attendingCount}</strong> &rarr;</span>
               </Link>
 
               <Link
                 href={nextEvent?.id ? `/taktyka?eventId=${nextEvent.id}` : '/taktyka'}
-                className="flex-1 sm:flex-initial h-11 sm:h-9.5 px-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-xs hover:shadow active:scale-95 border border-slate-800"
+                className="h-10 px-3 sm:px-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-xs hover:shadow active:scale-95 border border-slate-800 whitespace-nowrap"
               >
                 <Target className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>Taktyka na mecz &rarr;</span>
+                <span className="sm:hidden">Taktyka &rarr;</span>
+                <span className="hidden sm:inline">Taktyka na mecz &rarr;</span>
               </Link>
             </div>
 

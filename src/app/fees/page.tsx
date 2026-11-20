@@ -623,26 +623,27 @@ function FeesContent() {
           </div>
         </div>
 
-        {/* Action Controls Toolbar - Ułożony i uporządkowany zestaw akcji */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+        {/* Action Controls Toolbar - Jednolita wysokość h-10 i równe kolumny na telefonie */}
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 w-full sm:w-auto">
           {/* Narzędzia pomocnicze w spójnym kontenerze */}
-          <div className="inline-flex items-center gap-1 p-1 rounded-2xl bg-slate-100 border border-slate-200 shadow-2xs">
+          <div className={`grid ${isManager ? 'grid-cols-3' : canManageTreasury ? 'grid-cols-2' : 'grid-cols-1'} sm:inline-flex items-center gap-1 p-1 h-10 rounded-xl bg-slate-100 border border-slate-200 shadow-2xs w-full sm:w-auto`}>
             <button
               onClick={handleExportExcel}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 hover:text-emerald-800 hover:bg-white transition"
+              className="h-full flex items-center justify-center gap-1.5 px-2.5 sm:px-3 rounded-lg text-[11px] sm:text-xs font-bold text-slate-700 hover:text-emerald-800 hover:bg-white transition whitespace-nowrap cursor-pointer"
               title="Pobierz oficjalny arkusz Excel (.xlsx) ze stanem wpłat"
             >
-              <Download className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Eksport (.xlsx)</span>
+              <Download className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span className="sm:hidden">Excel</span>
+              <span className="hidden sm:inline">Eksport (.xlsx)</span>
             </button>
 
             {canManageTreasury && (
               <button
                 onClick={handleOpenReminderModal}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 hover:text-amber-900 hover:bg-white transition"
+                className="h-full flex items-center justify-center gap-1.5 px-2.5 sm:px-3 rounded-lg text-[11px] sm:text-xs font-bold text-slate-700 hover:text-amber-900 hover:bg-white transition whitespace-nowrap cursor-pointer"
                 title="Wyślij przypomnienie na WhatsApp lub tablicę drużyny"
               >
-                <BellRing className="w-3.5 h-3.5 text-amber-600" />
+                <BellRing className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                 <span>Przypomnij</span>
               </button>
             )}
@@ -651,42 +652,45 @@ function FeesContent() {
               <button
                 type="button"
                 onClick={() => setShowManageFeesModal(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 hover:bg-white transition"
+                className="h-full flex items-center justify-center gap-1.5 px-2.5 sm:px-3 rounded-lg text-[11px] sm:text-xs font-bold text-slate-700 hover:text-slate-900 hover:bg-white transition whitespace-nowrap cursor-pointer"
                 title="Przeglądaj i usuwaj zdefiniowane składki"
               >
-                <Settings className="w-3.5 h-3.5 text-slate-500" />
+                <Settings className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                 <span>Składki ({fees.length})</span>
               </button>
             )}
           </div>
 
           {/* Główne Akcje Dodawania */}
-          <div className="flex items-center gap-2">
-            {canManageTreasury && (
-              <button
-                onClick={() => {
-                  setTransactionType('EXPENSE');
-                  setExpenseCategory('SPRZET');
-                  setShowExpenseModal(true);
-                }}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 shadow-2xs hover:shadow-xs transition"
-                title="Zarejestruj wydatek lub przychód kasy drużyny"
-              >
-                <Coins className="w-4 h-4 text-amber-600" />
-                <span>+ Wydatek / Przychód</span>
-              </button>
-            )}
+          {(canManageTreasury || isManager) && (
+            <div className={`grid ${canManageTreasury && isManager ? 'grid-cols-2' : 'grid-cols-1'} sm:flex items-center gap-2 w-full sm:w-auto`}>
+              {canManageTreasury && (
+                <button
+                  onClick={() => {
+                    setTransactionType('EXPENSE');
+                    setExpenseCategory('SPRZET');
+                    setShowExpenseModal(true);
+                  }}
+                  className="h-10 flex items-center justify-center gap-1.5 px-3 sm:px-3.5 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 shadow-2xs hover:shadow-xs transition whitespace-nowrap cursor-pointer active:scale-95"
+                  title="Zarejestruj wydatek lub przychód kasy drużyny"
+                >
+                  <Coins className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span className="sm:hidden">+ Wydatek</span>
+                  <span className="hidden sm:inline">+ Wydatek / Przychód</span>
+                </button>
+              )}
 
-            {isManager && (
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-sm hover:shadow"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Nowa Składka</span>
-              </button>
-            )}
-          </div>
+              {isManager && (
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className="h-10 flex items-center justify-center gap-1.5 px-3 sm:px-4 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-sm hover:shadow whitespace-nowrap cursor-pointer active:scale-95"
+                >
+                  <Plus className="w-4 h-4 shrink-0" />
+                  <span>Nowa Składka</span>
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

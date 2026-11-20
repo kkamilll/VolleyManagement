@@ -346,24 +346,24 @@ export default function TeamPage() {
 
         {/* Collapsible Filters Bar */}
         <div className="bg-white border border-slate-200 rounded-2xl p-3 mb-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
+                className={`flex-1 sm:flex-initial h-10 flex items-center justify-center gap-2 px-3.5 rounded-xl text-xs font-bold transition border cursor-pointer active:scale-95 ${
                   showFilters || activeFiltersCount > 0
                     ? 'bg-amber-50 text-amber-800 border-amber-300'
                     : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                 }`}
               >
-                <Filter className="w-3.5 h-3.5 text-amber-600" />
-                <span>Filtry</span>
+                <Filter className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                <span>Filtry pozycji</span>
                 {activeFiltersCount > 0 && (
-                  <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-white font-black text-[10px]">
+                  <span className="px-1.5 py-0.5 rounded-full bg-amber-500 text-white font-black text-[10px]">
                     {activeFiltersCount}
                   </span>
                 )}
-                <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${showFilters ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 shrink-0 ${showFilters ? 'rotate-180' : ''}`} />
               </button>
 
               {activeFiltersCount > 0 && (
@@ -372,9 +372,9 @@ export default function TeamPage() {
                     setPositionFilter('ALL');
                     setSearchQuery('');
                   }}
-                  className="text-[11px] font-bold text-slate-500 hover:text-rose-600 transition underline underline-offset-2 ml-1"
+                  className="text-[11px] font-bold text-slate-500 hover:text-rose-600 transition underline underline-offset-2 shrink-0 cursor-pointer"
                 >
-                  Wyczyść filtry
+                  Wyczyść
                 </button>
               )}
             </div>
@@ -386,14 +386,14 @@ export default function TeamPage() {
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Szukaj po nazwisku lub numerze..."
-                className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
+                className="w-full h-10 pl-9 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:bg-white"
               />
             </div>
           </div>
 
           {showFilters && (
-            <div className="pt-3 mt-3 border-t border-slate-100 flex flex-wrap items-center gap-1.5">
-              <span className="text-[11px] font-bold text-slate-500 mr-1">Pozycja:</span>
+            <div className="pt-3 mt-3 border-t border-slate-100 grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5">
+              <span className="col-span-2 sm:col-span-1 text-[11px] font-bold text-slate-500 sm:mr-1">Pozycja:</span>
               {[
                 { id: 'ALL', label: 'Wszyscy' },
                 { id: 'Rozgrywający', label: 'Rozgrywający' },
@@ -405,7 +405,7 @@ export default function TeamPage() {
                 <button
                   key={pos.id}
                   onClick={() => setPositionFilter(pos.id)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition border ${
+                  className={`h-9 px-3 rounded-xl text-xs font-bold transition border flex items-center justify-center cursor-pointer active:scale-95 ${
                     positionFilter === pos.id
                       ? 'bg-slate-900 text-amber-400 font-black border-slate-800 shadow-sm'
                       : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border-slate-200'

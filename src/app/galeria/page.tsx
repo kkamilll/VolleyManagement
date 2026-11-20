@@ -319,50 +319,52 @@ function GaleriaContent() {
         {canManage && (
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-md shadow-amber-500/20 shrink-0"
+            className="w-full sm:w-auto h-10 flex items-center justify-center gap-2 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-md shadow-amber-500/20 shrink-0 cursor-pointer active:scale-95"
           >
-            <Plus className="w-4 h-4 stroke-[2.5]" />
+            <Plus className="w-4 h-4 stroke-[2.5] shrink-0" />
             <span>Dodaj Album / Zdjęcia</span>
           </button>
         )}
       </div>
 
       {/* Filter Tabs & Search */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-        {/* Category Chips */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-          {[
-            { id: 'ALL', label: 'Wszystkie', count: photos.length },
-            { id: 'MECZ', label: 'Liga LALS', count: photos.filter((p) => p.category === 'MECZ').length },
-            { id: 'SPARING', label: 'Sparingi', count: photos.filter((p) => p.category === 'SPARING').length },
-            { id: 'TURNIEJ', label: 'Turnieje', count: photos.filter((p) => p.category === 'TURNIEJ').length },
-            { id: 'INNE', label: 'Klub / Inne', count: photos.filter((p) => p.category === 'INNE').length }
-          ].map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => {
-                setCategoryFilter(cat.id as any);
-              }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0 ${
-                categoryFilter === cat.id
-                  ? 'bg-slate-900 text-amber-400 border border-slate-800 font-black shadow-sm'
-                  : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-sm'
-              }`}
-            >
-              <span>{cat.label}</span>
-              <span
-                className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                  categoryFilter === cat.id ? 'bg-amber-400/20 text-amber-300 font-black' : 'bg-slate-100 text-slate-600'
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        {/* Category Chips - spójny pasek segmentowy h-10 */}
+        <div className="p-1.5 rounded-2xl bg-slate-100/90 border border-slate-200/90 shadow-2xs flex-1">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
+            {[
+              { id: 'ALL', label: 'Wszystkie', count: photos.length },
+              { id: 'MECZ', label: 'Liga LALS', count: photos.filter((p) => p.category === 'MECZ').length },
+              { id: 'SPARING', label: 'Sparingi', count: photos.filter((p) => p.category === 'SPARING').length },
+              { id: 'TURNIEJ', label: 'Turnieje', count: photos.filter((p) => p.category === 'TURNIEJ').length },
+              { id: 'INNE', label: 'Klub / Inne', count: photos.filter((p) => p.category === 'INNE').length }
+            ].map((cat, idx) => (
+              <button
+                key={cat.id}
+                onClick={() => {
+                  setCategoryFilter(cat.id as any);
+                }}
+                className={`${idx === 0 ? 'col-span-2 sm:col-span-1' : ''} h-10 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border cursor-pointer active:scale-95 whitespace-nowrap ${
+                  categoryFilter === cat.id
+                    ? 'bg-slate-900 text-amber-400 border-slate-800 font-black shadow-xs'
+                    : 'bg-white/90 hover:bg-white text-slate-700 hover:text-slate-900 border-slate-200/90'
                 }`}
               >
-                {cat.count}
-              </span>
-            </button>
-          ))}
+                <span className="truncate">{cat.label}</span>
+                <span
+                  className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono shrink-0 ${
+                    categoryFilter === cat.id ? 'bg-amber-400/20 text-amber-300 font-black' : 'bg-slate-100 text-slate-600'
+                  }`}
+                >
+                  {cat.count}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Search */}
-        <div className="relative w-full md:w-64">
+        <div className="relative w-full lg:w-64 shrink-0">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"

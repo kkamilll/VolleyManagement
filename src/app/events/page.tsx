@@ -917,32 +917,32 @@ function EventsAttendanceContent() {
           </div>
         </div>
 
-        {/* Right Controls: View Switcher + Primary Action Button (równo od krawędzi do krawędzi na telefonie) */}
+        {/* Right Controls: View Switcher + Primary Action Button (identyczna wysokość h-10 i równe na telefonie) */}
         <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto shrink-0">
           {/* Przełącznik widoku: Lista vs Kalendarz */}
-          <div className="grid grid-cols-2 sm:flex items-center bg-slate-100 border border-slate-200 rounded-xl p-1 shadow-2xs flex-1 sm:flex-initial">
+          <div className="grid grid-cols-2 sm:flex items-center h-10 bg-slate-100 border border-slate-200 rounded-xl p-1 shadow-2xs flex-1 sm:flex-initial gap-1">
             <button
               type="button"
               onClick={() => setViewMode('list')}
-              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition ${
+              className={`h-full flex items-center justify-center gap-1.5 px-3 rounded-lg text-xs font-bold uppercase tracking-wider transition cursor-pointer ${
                 viewMode === 'list'
                   ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <ClipboardList className="w-3.5 h-3.5" />
+              <ClipboardList className="w-3.5 h-3.5 shrink-0" />
               <span>Lista</span>
             </button>
             <button
               type="button"
               onClick={() => setViewMode('calendar')}
-              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition ${
+              className={`h-full flex items-center justify-center gap-1.5 px-3 rounded-lg text-xs font-bold uppercase tracking-wider transition cursor-pointer ${
                 viewMode === 'calendar'
                   ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Calendar className="w-3.5 h-3.5" />
+              <Calendar className="w-3.5 h-3.5 shrink-0" />
               <span>Kalendarz</span>
             </button>
           </div>
@@ -951,9 +951,9 @@ function EventsAttendanceContent() {
             <button
               type="button"
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center justify-center gap-1.5 h-10 sm:h-9 px-3.5 sm:px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-black text-xs uppercase tracking-wider transition shadow-sm whitespace-nowrap shrink-0"
+              className="inline-flex items-center justify-center gap-1.5 h-10 px-3.5 sm:px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-black text-xs uppercase tracking-wider transition shadow-sm whitespace-nowrap shrink-0 cursor-pointer active:scale-95"
             >
-              <Plus className="w-4 h-4 stroke-[3] text-amber-400" />
+              <Plus className="w-4 h-4 stroke-[3] text-amber-400 shrink-0" />
               <span className="sm:hidden">Dodaj</span>
               <span className="hidden sm:inline">Nowa Jednostka</span>
             </button>
@@ -1307,10 +1307,10 @@ function EventsAttendanceContent() {
                               {event.type === 'TRENING' ? (
                                 <Link
                                   href={`/trening?eventId=${event.id}`}
-                                  className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition"
+                                  className="h-8 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider inline-flex items-center justify-center gap-1.5 shadow-xs transition whitespace-nowrap"
                                   title="Otwórz konspekt i ćwiczenia treningu"
                                 >
-                                  <Volleyball className="w-3.5 h-3.5" />
+                                  <Volleyball className="w-3.5 h-3.5 shrink-0" />
                                   <span>Rozpiska treningu &rarr;</span>
                                 </Link>
                               ) : (
@@ -1318,28 +1318,28 @@ function EventsAttendanceContent() {
                                   {isCalLeagueMatch ? (
                                     <Link
                                       href="/rozgrywki?tab=liga"
-                                      className="px-2.5 py-1 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-xs transition"
+                                      className="h-8 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xs uppercase tracking-wider inline-flex items-center justify-center gap-1.5 shadow-xs transition whitespace-nowrap"
                                       title="Przejdź do oficjalnego meczu i tabeli LALS"
                                     >
-                                      <img src="/lals_logo.png" alt="LALS" className="w-3.5 h-3.5 rounded-full bg-white p-0.5 object-contain" />
+                                      <img src="/lals_logo.png" alt="LALS" className="w-3.5 h-3.5 rounded-full bg-white p-0.5 object-contain shrink-0" />
                                       <span>Liga LALS</span>
                                     </Link>
                                   ) : event.type === 'SPARING' ? (
                                     <Link
                                       href="/rozgrywki?tab=sparingi"
-                                      className="px-2.5 py-1 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-xs transition"
+                                      className="h-8 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider inline-flex items-center justify-center gap-1.5 shadow-xs transition whitespace-nowrap"
                                       title="Przejdź do protokołu i sparingów w rozgrywkach"
                                     >
-                                      <Swords className="w-3.5 h-3.5 text-slate-950" />
+                                      <Swords className="w-3.5 h-3.5 text-slate-950 shrink-0" />
                                       <span>Sparing</span>
                                     </Link>
                                   ) : (
                                     <Link
                                       href="/rozgrywki?tab=turnieje"
-                                      className="px-2.5 py-1 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-xs transition"
+                                      className="h-8 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-xs uppercase tracking-wider inline-flex items-center justify-center gap-1.5 shadow-xs transition whitespace-nowrap"
                                       title="Przejdź do turnieju i drabinki"
                                     >
-                                      <Trophy className="w-3.5 h-3.5" />
+                                      <Trophy className="w-3.5 h-3.5 shrink-0" />
                                       <span>Turniej</span>
                                     </Link>
                                   )}
@@ -1347,18 +1347,18 @@ function EventsAttendanceContent() {
                                   {hasCalTactic && (
                                     <Link
                                       href={event.type === 'SPARING' ? `/taktyka?tab=sparingi&eventId=${event.id}&type=SPARING` : event.type === 'TURNIEJ' ? `/taktyka?tab=turnieje&eventId=${event.id}&type=TURNIEJ` : `/taktyka?tab=matches&eventId=${event.id}&type=MECZ`}
-                                      className="px-2.5 py-1 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-black text-xs uppercase tracking-wider flex items-center gap-1 shadow-xs transition"
+                                      className="h-8 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 font-black text-xs uppercase tracking-wider inline-flex items-center justify-center gap-1.5 shadow-xs transition whitespace-nowrap"
                                       title={`Założenia taktyczne (${calTactics.length})`}
                                     >
-                                      <Target className="w-3.5 h-3.5 text-sky-600" />
+                                      <Target className="w-3.5 h-3.5 text-sky-600 shrink-0" />
                                       <span>Taktyka</span>
                                     </Link>
                                   )}
                                 </>
                               )}
 
-                              <span className="px-2.5 py-1 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 shadow-xs">
-                                Obecnych: <strong className="text-emerald-700 font-mono">{yesAttendees.length}</strong>
+                              <span className="h-8 px-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 shadow-xs inline-flex items-center justify-center whitespace-nowrap">
+                                Obecnych: <strong className="text-emerald-700 font-mono ml-1">{yesAttendees.length}</strong>
                               </span>
                             </div>
                           </div>
@@ -1395,7 +1395,7 @@ function EventsAttendanceContent() {
                                     type="button"
                                     disabled={submittingAttendanceId === event.id}
                                     onClick={() => handleAttendance(event.id, 'BEDE')}
-                                    className={`h-11 sm:h-9.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center cursor-pointer active:scale-95 ${
+                                    className={`h-10 px-2.5 sm:px-3.5 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center cursor-pointer active:scale-95 whitespace-nowrap ${
                                       myAttendance?.status === 'BEDE'
                                         ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm font-black'
                                         : 'bg-slate-50 text-emerald-800 border-slate-200 hover:bg-emerald-50'
@@ -1407,25 +1407,25 @@ function EventsAttendanceContent() {
                                     type="button"
                                     disabled={submittingAttendanceId === event.id}
                                     onClick={() => handleAttendance(event.id, 'NIEPEWNE')}
-                                    className={`h-11 sm:h-9.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center cursor-pointer active:scale-95 ${
+                                    className={`h-10 px-2.5 sm:px-3.5 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center cursor-pointer active:scale-95 whitespace-nowrap ${
                                       myAttendance?.status === 'NIEPEWNE'
                                         ? 'bg-amber-600 text-white border-amber-600 shadow-sm font-black'
                                         : 'bg-slate-50 text-amber-800 border-slate-200 hover:bg-amber-50'
                                     }`}
                                   >
-                                    Niepewne 🤔
+                                    Może 🤔
                                   </button>
                                   <button
                                     type="button"
                                     disabled={submittingAttendanceId === event.id}
                                     onClick={() => handleAttendance(event.id, 'NIE_BEDE')}
-                                    className={`h-11 sm:h-9.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center cursor-pointer active:scale-95 ${
+                                    className={`h-10 px-2.5 sm:px-3.5 rounded-xl text-xs sm:text-sm font-bold transition border flex items-center justify-center cursor-pointer active:scale-95 whitespace-nowrap ${
                                       myAttendance?.status === 'NIE_BEDE'
                                         ? 'bg-rose-600 text-white border-rose-600 shadow-sm font-black'
                                         : 'bg-slate-50 text-rose-800 border-slate-200 hover:bg-rose-50'
                                     }`}
                                   >
-                                    Nie będę 👎
+                                    Nie 👎
                                   </button>
                                 </div>
                               )}
@@ -1435,7 +1435,7 @@ function EventsAttendanceContent() {
                                   setViewMode('list');
                                   setExpandedEventId(event.id);
                                 }}
-                                className="h-11 sm:h-9.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs sm:text-sm font-bold transition border border-slate-200 shadow-2xs flex items-center justify-center cursor-pointer active:scale-95"
+                                className="h-10 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs sm:text-sm font-bold transition border border-slate-200 shadow-2xs flex items-center justify-center cursor-pointer active:scale-95 whitespace-nowrap"
                               >
                                 Szczegóły & Skład →
                               </button>
@@ -1733,14 +1733,14 @@ function EventsAttendanceContent() {
                         </div>
                       </div>
 
-                      {/* Prawa strona nagłówka: Idealnie równe kolumny przycisków na desktopie i wygodne pod kciuk na telefonie */}
+                      {/* Prawa strona nagłówka: Identyczna wysokość h-10 wszystkich przycisków w rzędzie */}
                       <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-slate-100 flex-wrap sm:flex-nowrap">
                         {/* 1. Szybki link do Ligi / Sparingów / Treningu */}
                         {isLeagueMatch ? (
                           <Link
                             href="/rozgrywki?tab=liga"
                             onClick={e => e.stopPropagation()}
-                            className="flex-1 sm:flex-none sm:w-[122px] h-10 sm:h-9 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition shrink-0 cursor-pointer active:scale-95 min-h-[40px]"
+                            className="flex-1 sm:flex-none sm:w-[122px] h-10 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition shrink-0 cursor-pointer active:scale-95 whitespace-nowrap"
                             title="Przejdź do oficjalnego meczu i tabeli LALS"
                           >
                             <img src="/lals_logo.png" alt="LALS" className="w-4 h-4 rounded-full bg-white p-0.5 object-contain shrink-0" />
@@ -1750,7 +1750,7 @@ function EventsAttendanceContent() {
                           <Link
                             href="/rozgrywki?tab=sparingi"
                             onClick={e => e.stopPropagation()}
-                            className="flex-1 sm:flex-none sm:w-[122px] h-10 sm:h-9 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition shrink-0 cursor-pointer active:scale-95 min-h-[40px]"
+                            className="flex-1 sm:flex-none sm:w-[122px] h-10 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition shrink-0 cursor-pointer active:scale-95 whitespace-nowrap"
                             title="Przejdź do sparingów"
                           >
                             <Swords className="w-4 h-4 text-slate-950 shrink-0" />
@@ -1760,7 +1760,7 @@ function EventsAttendanceContent() {
                           <Link
                             href={`/trening?eventId=${event.id}`}
                             onClick={e => e.stopPropagation()}
-                            className="flex-1 sm:flex-none sm:w-[122px] h-10 sm:h-9 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs hover:shadow transition shrink-0 cursor-pointer active:scale-95 min-h-[40px]"
+                            className="flex-1 sm:flex-none sm:w-[122px] h-10 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs hover:shadow transition shrink-0 cursor-pointer active:scale-95 whitespace-nowrap"
                             title="Otwórz konspekt i ćwiczenia treningu"
                           >
                             <Volleyball className="w-4 h-4 shrink-0" />
@@ -1774,7 +1774,7 @@ function EventsAttendanceContent() {
                             <Link
                               href={event.type === 'SPARING' ? `/taktyka?tab=sparingi&eventId=${event.id}&type=SPARING` : event.type === 'TURNIEJ' ? `/taktyka?tab=turnieje&eventId=${event.id}&type=TURNIEJ` : `/taktyka?tab=matches&eventId=${event.id}&type=MECZ`}
                               onClick={e => e.stopPropagation()}
-                              className="flex-1 sm:flex-none sm:w-[118px] h-10 sm:h-9 px-3 rounded-xl border font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-2xs transition shrink-0 bg-sky-50 hover:bg-sky-100 text-sky-900 border-sky-300 cursor-pointer active:scale-95 min-h-[40px]"
+                              className="flex-1 sm:flex-none sm:w-[118px] h-10 px-3 rounded-xl border font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-2xs transition shrink-0 bg-sky-50 hover:bg-sky-100 text-sky-900 border-sky-300 cursor-pointer active:scale-95 whitespace-nowrap"
                               title={`Założenia taktyczne (${eventTactics.length})`}
                             >
                               <Target className="w-4 h-4 shrink-0 text-sky-600" />
@@ -1784,7 +1784,7 @@ function EventsAttendanceContent() {
                             <Link
                               href={event.type === 'SPARING' ? `/taktyka?tab=sparingi&eventId=${event.id}&type=SPARING` : event.type === 'TURNIEJ' ? `/taktyka?tab=turnieje&eventId=${event.id}&type=TURNIEJ` : `/taktyka?tab=matches&eventId=${event.id}&type=MECZ`}
                               onClick={e => e.stopPropagation()}
-                              className="flex-1 sm:flex-none sm:w-[118px] h-10 sm:h-9 px-3 rounded-xl border font-bold text-xs sm:text-sm flex items-center justify-center gap-1 shadow-2xs transition shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-300 opacity-80 hover:opacity-100 cursor-pointer active:scale-95 min-h-[40px]"
+                              className="flex-1 sm:flex-none sm:w-[118px] h-10 px-3 rounded-xl border font-bold text-xs sm:text-sm flex items-center justify-center gap-1 shadow-2xs transition shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-300 opacity-80 hover:opacity-100 cursor-pointer active:scale-95 whitespace-nowrap"
                               title="Dodaj taktykę"
                             >
                               <Target className="w-4 h-4 shrink-0 text-slate-500" />
@@ -1797,7 +1797,7 @@ function EventsAttendanceContent() {
                         {!isEventPast && !isFinished && matchInfo.ourSetsWon === undefined && (
                           myAttendance ? (
                             <span
-                              className={`flex-1 sm:flex-none sm:w-[124px] h-10 sm:h-9 px-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-bold border flex items-center justify-center text-center shrink-0 min-h-[40px] whitespace-nowrap ${
+                              className={`flex-1 sm:flex-none sm:w-[124px] h-10 px-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-bold border flex items-center justify-center text-center shrink-0 whitespace-nowrap ${
                                 myAttendance.status === 'BEDE'
                                   ? 'bg-emerald-50 text-emerald-800 border-emerald-300 shadow-2xs'
                                   : myAttendance.status === 'NIEPEWNE'
@@ -1816,7 +1816,7 @@ function EventsAttendanceContent() {
                             <button
                               type="button"
                               onClick={() => setExpandedEventId(isExpanded ? null : event.id)}
-                              className="flex-1 sm:flex-none sm:w-[124px] h-10 sm:h-9 px-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-bold bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 flex items-center justify-center gap-1.5 transition shadow-2xs shrink-0 cursor-pointer active:scale-95 min-h-[40px] whitespace-nowrap"
+                              className="flex-1 sm:flex-none sm:w-[124px] h-10 px-2.5 sm:px-3 rounded-xl text-xs sm:text-sm font-bold bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 flex items-center justify-center gap-1.5 transition shadow-2xs shrink-0 cursor-pointer active:scale-95 whitespace-nowrap"
                               title="Kliknij, aby oddać głos w ankiecie obecności"
                             >
                               <Lock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
@@ -1832,7 +1832,7 @@ function EventsAttendanceContent() {
                             <button
                               type="button"
                               onClick={() => openEditModal(event)}
-                              className="w-10 h-10 sm:w-9 sm:h-9 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 transition shadow-2xs flex items-center justify-center shrink-0 cursor-pointer active:scale-95 min-w-[40px]"
+                              className="w-10 h-10 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 transition shadow-2xs flex items-center justify-center shrink-0 cursor-pointer active:scale-95"
                               title="Edytuj jednostkę"
                             >
                               <Edit3 className="w-4 h-4" />
@@ -1841,7 +1841,7 @@ function EventsAttendanceContent() {
 
                           {/* 5. Przycisk Chevron */}
                           <div
-                            className={`w-10 h-10 sm:w-9 sm:h-9 rounded-xl border flex items-center justify-center transition-all duration-200 shrink-0 min-w-[40px] ${
+                            className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all duration-200 shrink-0 ${
                               isExpanded ? 'rotate-180 bg-slate-200 border-slate-300 text-slate-900' : 'bg-slate-100 border-slate-200 text-slate-600 group-hover:text-slate-900'
                             }`}
                           >

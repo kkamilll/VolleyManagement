@@ -2898,21 +2898,21 @@ function RozgrywkiContent() {
             </div>
 
             {canManage && (
-              <div className="flex items-center gap-2 overflow-x-auto scrollbar-none shrink-0 self-start sm:self-auto py-0.5">
+              <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto shrink-0">
                 <button
                   type="button"
                   onClick={handleOpenAddSparingResult}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                  className="h-10 inline-flex items-center justify-center gap-1.5 px-3.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0 cursor-pointer active:scale-95"
                 >
-                  <Plus className="w-3.5 h-3.5 text-amber-600" />
+                  <Plus className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                   <span>Dodaj Wynik</span>
                 </button>
                 <button
                   type="button"
                   onClick={handleOpenCreateSparing}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm whitespace-nowrap shrink-0"
+                  className="h-10 inline-flex items-center justify-center gap-1.5 px-3.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition shadow-sm whitespace-nowrap shrink-0 cursor-pointer active:scale-95"
                 >
-                  <Calendar className="w-3.5 h-3.5" />
+                  <Calendar className="w-3.5 h-3.5 shrink-0" />
                   <span>Utwórz Sparing</span>
                 </button>
               </div>
@@ -3182,62 +3182,62 @@ function RozgrywkiContent() {
                             <span className="text-xs font-black uppercase text-slate-500 tracking-wider">
                               Zarządzanie Sparingiem:
                             </span>
-                            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                            <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full sm:w-auto">
                               {/* Główny przycisk: Wynik */}
                               <button
                                 onClick={() => openResultModal(event)}
-                                className="px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-600 text-slate-950 transition flex items-center gap-1.5 shadow-xs"
+                                className="h-9 px-3 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500 hover:bg-amber-600 text-slate-950 transition flex items-center justify-center gap-1.5 shadow-xs whitespace-nowrap cursor-pointer active:scale-95"
                                 title="Wpisz wynik po sparingu"
                               >
-                                <Trophy className="w-3.5 h-3.5" />
+                                <Trophy className="w-3.5 h-3.5 shrink-0" />
                                 <span>{isFinished ? 'Edytuj wynik' : 'Wpisz wynik'}</span>
                               </button>
 
                               <button
                                 onClick={() => handleOpenAutoLineup(event)}
-                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition flex items-center gap-1.5 shadow-xs"
+                                className="h-9 px-3 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition flex items-center justify-center gap-1.5 shadow-xs whitespace-nowrap cursor-pointer active:scale-95"
                                 title="Automatycznie wygeneruj wyjściową szóstkę"
                               >
-                                <Zap className="w-3.5 h-3.5 text-amber-600" />
+                                <Zap className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                                 <span>Szóstka</span>
                               </button>
 
                               <button
                                 onClick={() => setShareModalEvent(event)}
-                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 transition flex items-center gap-1.5 shadow-xs"
+                                className="h-9 px-3 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 transition flex items-center justify-center gap-1.5 shadow-xs whitespace-nowrap cursor-pointer active:scale-95"
                                 title="Wygeneruj i skopiuj gotowy raport na WhatsApp / Messenger"
                               >
-                                <Share2 className="w-3.5 h-3.5 text-emerald-600" />
+                                <Share2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                                 <span>Na Czat</span>
                               </button>
 
                               <button
                                 onClick={() => handleOpenLiveScorekeeper(event)}
-                                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 transition flex items-center gap-1.5 shadow-xs"
+                                className="h-9 px-3 rounded-xl text-xs font-bold bg-sky-50 hover:bg-sky-100 text-sky-900 border border-sky-300 transition flex items-center justify-center gap-1.5 shadow-xs whitespace-nowrap cursor-pointer active:scale-95"
                                 title="Protokół na żywo punkt po punkcie"
                               >
-                                <Radio className="w-3.5 h-3.5 text-rose-600 animate-pulse" />
+                                <Radio className="w-3.5 h-3.5 text-rose-600 animate-pulse shrink-0" />
                                 <span>Live Score</span>
                               </button>
 
                               {isFinished && (
                                 <button
                                   onClick={() => setSocialModalEvent(event)}
-                                  className="px-3 py-1.5 rounded-xl text-xs font-bold bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 transition flex items-center gap-1.5 shadow-xs"
+                                  className="h-9 px-3 rounded-xl text-xs font-bold bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-300 transition flex items-center justify-center gap-1.5 shadow-xs whitespace-nowrap cursor-pointer active:scale-95"
                                   title="Wygeneruj post do Social Mediów"
                                 >
-                                  <Award className="w-3.5 h-3.5 text-purple-600" />
+                                  <Award className="w-3.5 h-3.5 text-purple-600 shrink-0" />
                                   <span>Social Post</span>
                                 </button>
                               )}
 
                               <button
                                 onClick={() => handleDeleteEvent(event)}
-                                className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition flex items-center gap-1.5 shadow-xs"
+                                className="h-9 px-3 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition flex items-center justify-center gap-1.5 shadow-xs whitespace-nowrap cursor-pointer active:scale-95"
                                 title="Usuń sparing"
                               >
-                                <Trash2 className="w-3.5 h-3.5" />
-                                <span className="hidden sm:inline">Usuń Sparing</span>
+                                <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                                <span>Usuń</span>
                               </button>
                             </div>
                           </div>
@@ -3592,11 +3592,11 @@ function RozgrywkiContent() {
         <div className="space-y-6">
           {/* Liga Subtabs (Tabela, Wyniki, Statystyki) & Dedicated Actions Bar */}
           <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 pb-3 border-b border-slate-200">
-            {/* 3 Główne Zakładki Ligi - równe 3 kolumny na telefonie od krawędzi do krawędzi */}
-            <div className="grid grid-cols-3 sm:inline-flex items-center gap-1 p-1 rounded-2xl bg-slate-100 border border-slate-300 shrink-0 w-full sm:w-auto">
+            {/* 3 Główne Zakładki Ligi - stała wysokość h-10 i równe 3 kolumny na telefonie */}
+            <div className="grid grid-cols-3 sm:inline-flex items-center gap-1 p-1 h-10 rounded-xl bg-slate-100 border border-slate-300 shrink-0 w-full sm:w-auto">
               <button
                 onClick={() => setLigaSubTab('tabela')}
-                className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3.5 py-2 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wider transition whitespace-nowrap ${
+                className={`h-full flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3.5 rounded-lg text-[11px] sm:text-xs font-bold uppercase tracking-wider transition whitespace-nowrap cursor-pointer ${
                   ligaSubTab === 'tabela'
                     ? 'bg-slate-900 text-amber-400 shadow-sm border border-slate-800'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
@@ -3608,7 +3608,7 @@ function RozgrywkiContent() {
               </button>
               <button
                 onClick={() => setLigaSubTab('wyniki')}
-                className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3.5 py-2 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wider transition whitespace-nowrap ${
+                className={`h-full flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3.5 rounded-lg text-[11px] sm:text-xs font-bold uppercase tracking-wider transition whitespace-nowrap cursor-pointer ${
                   ligaSubTab === 'wyniki'
                     ? 'bg-slate-900 text-amber-400 shadow-sm border border-slate-800'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
@@ -3620,7 +3620,7 @@ function RozgrywkiContent() {
               </button>
               <button
                 onClick={() => setLigaSubTab('statystyki')}
-                className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3.5 py-2 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wider transition whitespace-nowrap ${
+                className={`h-full flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3.5 rounded-lg text-[11px] sm:text-xs font-bold uppercase tracking-wider transition whitespace-nowrap cursor-pointer ${
                   ligaSubTab === 'statystyki'
                     ? 'bg-slate-900 text-amber-400 shadow-sm border border-slate-800'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
@@ -3632,36 +3632,39 @@ function RozgrywkiContent() {
               </button>
             </div>
 
-            {/* Dedykowany, stały pasek akcji dla danej zakładki */}
-            <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-0.5 justify-start xl:justify-end w-full xl:w-auto shrink-0">
+            {/* Dedykowany, stały pasek akcji (identyczna wysokość h-10 i równe kolumny na telefonie) */}
+            <div className="flex items-center gap-2 justify-start xl:justify-end w-full xl:w-auto shrink-0">
               {ligaSubTab === 'tabela' && (
-                <>
+                <div className="grid grid-cols-3 sm:flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
                   {canManageMatches && (
                     <>
                       <button
                         type="button"
                         onClick={handleOpenCreatePhase}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
+                        className="h-10 inline-flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-sm whitespace-nowrap shrink-0 cursor-pointer active:scale-95"
                         title="Utwórz nowy etap / nową tabelę (np. Faza Finałowa) i wklej zestawienie"
                       >
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>Nowa Tabela</span>
+                        <Plus className="w-3.5 h-3.5 shrink-0" />
+                        <span className="sm:hidden">Nowa</span>
+                        <span className="hidden sm:inline">Nowa Tabela</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => handleOpenEditTable(currentLeaguePhase?.id || 'faza_1', 'text')}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                        className="h-10 inline-flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0 cursor-pointer active:scale-95"
                       >
-                        <Upload className="w-3.5 h-3.5 text-sky-600" />
-                        <span>Import Tabeli</span>
+                        <Upload className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+                        <span className="sm:hidden">Import</span>
+                        <span className="hidden sm:inline">Import Tabeli</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => handleOpenEditTable(currentLeaguePhase?.id || 'faza_1')}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 transition shadow-sm whitespace-nowrap shrink-0"
+                        className="h-10 inline-flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold uppercase tracking-wider bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 transition shadow-sm whitespace-nowrap shrink-0 cursor-pointer active:scale-95"
                       >
-                        <Edit3 className="w-3.5 h-3.5 text-amber-400" />
-                        <span>Edytuj Tabelę</span>
+                        <Edit3 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                        <span className="sm:hidden">Edytuj</span>
+                        <span className="hidden sm:inline">Edytuj Tabelę</span>
                       </button>
                     </>
                   )}
@@ -3669,32 +3672,33 @@ function RozgrywkiContent() {
                     href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                    className="hidden sm:inline-flex h-10 items-center justify-center gap-1.5 px-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
                   >
-                    <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
+                    <ExternalLink className="w-3.5 h-3.5 text-sky-600 shrink-0" />
                     <span>VolleyStation</span>
                   </a>
-                </>
+                </div>
               )}
               {ligaSubTab === 'wyniki' && (
-                <>
+                <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
                   {canManageMatches && (
                     <>
                       <button
                         type="button"
                         onClick={() => setShowAddMatchModal(true)}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 transition shadow-sm whitespace-nowrap shrink-0"
+                        className="h-10 inline-flex items-center justify-center gap-1.5 px-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 transition shadow-sm whitespace-nowrap shrink-0 cursor-pointer active:scale-95"
                       >
-                        <Plus className="w-3.5 h-3.5 text-amber-400" />
+                        <Plus className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                         <span>Dodaj Wynik</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => setShowImportScheduleModal(true)}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                        className="h-10 inline-flex items-center justify-center gap-1.5 px-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0 cursor-pointer active:scale-95"
                       >
-                        <Upload className="w-3.5 h-3.5 text-sky-600" />
-                        <span>Import Terminarza</span>
+                        <Upload className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+                        <span className="sm:hidden">Import</span>
+                        <span className="hidden sm:inline">Import Terminarza</span>
                       </button>
                     </>
                   )}
@@ -3702,12 +3706,12 @@ function RozgrywkiContent() {
                     href="https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/schedule/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                    className="hidden sm:inline-flex h-10 items-center justify-center gap-1.5 px-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-sky-700 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
                   >
-                    <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
+                    <ExternalLink className="w-3.5 h-3.5 text-sky-600 shrink-0" />
                     <span>VolleyStation</span>
                   </a>
-                </>
+                </div>
               )}
 
             </div>
@@ -4620,13 +4624,13 @@ function RozgrywkiContent() {
                       </p>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full md:w-auto">
                       {/* Przełącznik Wszyscy / Angels */}
-                      <div className="flex items-center gap-1 p-1 bg-slate-100 border border-slate-200 rounded-xl text-xs">
+                      <div className="grid grid-cols-2 sm:inline-flex items-center gap-1 p-1 h-10 bg-slate-100 border border-slate-200 rounded-xl text-xs w-full sm:w-auto">
                         <button
                           type="button"
                           onClick={() => setRankingFilterTeam('ALL')}
-                          className={`px-3 py-1.5 rounded-lg font-bold transition ${
+                          className={`h-full px-3 rounded-lg font-bold transition flex items-center justify-center whitespace-nowrap cursor-pointer ${
                             rankingFilterTeam === 'ALL'
                               ? 'bg-amber-500 text-slate-950 font-bold shadow-sm'
                               : 'text-slate-600 hover:text-slate-900'
@@ -4637,25 +4641,25 @@ function RozgrywkiContent() {
                         <button
                           type="button"
                           onClick={() => setRankingFilterTeam('ANGELS')}
-                          className={`px-3 py-1.5 rounded-lg font-bold transition ${
+                          className={`h-full px-3 rounded-lg font-bold transition flex items-center justify-center whitespace-nowrap cursor-pointer ${
                             rankingFilterTeam === 'ANGELS'
                               ? 'bg-sky-600 text-white shadow-sm'
                               : 'text-slate-600 hover:text-slate-900'
                           }`}
                         >
-                          👼 Angels ZTP ({playerRankings.filter((p: any) => p.isAngels).length})
+                          👼 Angels ({playerRankings.filter((p: any) => p.isAngels).length})
                         </button>
                       </div>
 
                       {/* Wyszukiwarka */}
-                      <div className="relative">
-                        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+                      <div className="relative w-full sm:w-52">
+                        <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                         <input
                           type="text"
                           value={rankingSearch}
                           onChange={e => setRankingSearch(e.target.value)}
                           placeholder="Szukaj gracza lub klubu..."
-                          className="pl-8 pr-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-sky-500 focus:bg-white transition w-44 sm:w-52"
+                          className="w-full h-10 pl-8 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-sky-500 focus:bg-white transition"
                         />
                       </div>
                     </div>
@@ -4802,13 +4806,13 @@ function RozgrywkiContent() {
             </div>
 
             {canManage && (
-              <div className="flex items-center gap-2 overflow-x-auto scrollbar-none shrink-0 self-start sm:self-auto py-0.5">
+              <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto shrink-0">
                 <button
                   type="button"
                   onClick={() => setShowAddMatchModal(true)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0"
+                  className="h-10 inline-flex items-center justify-center gap-1.5 px-3.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 transition shadow-sm whitespace-nowrap shrink-0 cursor-pointer active:scale-95"
                 >
-                  <Plus className="w-3.5 h-3.5 text-purple-600" />
+                  <Plus className="w-3.5 h-3.5 text-purple-600 shrink-0" />
                   <span>Dodaj Wynik</span>
                 </button>
                 <button
@@ -4818,9 +4822,9 @@ function RozgrywkiContent() {
                     setEventTitle('Turniej Siatkarski');
                     setShowAddEventModal(true);
                   }}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-purple-600 hover:bg-purple-500 text-white transition shadow-sm whitespace-nowrap shrink-0"
+                  className="h-10 inline-flex items-center justify-center gap-1.5 px-3.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-purple-600 hover:bg-purple-500 text-white transition shadow-sm whitespace-nowrap shrink-0 cursor-pointer active:scale-95"
                 >
-                  <Award className="w-3.5 h-3.5" />
+                  <Award className="w-3.5 h-3.5 shrink-0" />
                   <span>Utwórz Turniej</span>
                 </button>
               </div>
