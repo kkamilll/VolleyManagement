@@ -952,19 +952,19 @@ function FeesContent() {
               </div>
             )}
 
-            {/* Table */}
+            {/* Table - na telefonie tylko 4 kluczowe kolumny bez przewijania w bok */}
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
                   <tr className="border-b border-slate-200 text-slate-500 font-black uppercase text-[10px] tracking-wider bg-slate-50/50">
-                    <th className="py-3 px-3">Zawodnik</th>
-                    <th className="py-3 px-3">Tytuł Składki</th>
-                    <th className="py-3 px-3">Termin</th>
-                    <th className="py-3 px-3 text-right">Kwota</th>
-                    <th className="py-3 px-3 text-right">Nadpłata</th>
-                    <th className="py-3 px-3 text-center">Status</th>
-                    <th className="py-3 px-3">Metoda / Transakcja</th>
-                    <th className="py-3 px-3 text-right">Akcja</th>
+                    <th className="py-3 px-2.5 sm:px-3">Zawodnik</th>
+                    <th className="hidden sm:table-cell py-3 px-3">Tytuł Składki</th>
+                    <th className="hidden md:table-cell py-3 px-3">Termin</th>
+                    <th className="py-3 px-2 sm:px-3 text-right">Kwota</th>
+                    <th className="hidden lg:table-cell py-3 px-3 text-right">Nadpłata</th>
+                    <th className="py-3 px-2 sm:px-3 text-center">Status</th>
+                    <th className="hidden md:table-cell py-3 px-3">Metoda / Transakcja</th>
+                    <th className="py-3 px-2.5 sm:px-3 text-right">Akcja</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -981,36 +981,43 @@ function FeesContent() {
                       const isOverdue = pay.status === 'ZALEGLE';
                       return (
                         <tr key={pay.id} className="hover:bg-slate-50/70 transition">
-                          <td className="py-3 px-3 font-bold text-slate-900 flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-xl bg-sky-50 text-sky-700 border border-sky-200 flex items-center justify-center text-[10px] font-mono font-bold">
-                              {pay.userName.charAt(0)}
+                          <td className="py-3 px-2.5 sm:px-3 font-bold text-slate-900">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className="hidden sm:flex w-7 h-7 rounded-xl bg-slate-900 text-amber-400 border border-slate-800 items-center justify-center text-[10px] font-mono font-bold shrink-0">
+                                {pay.userName.charAt(0)}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="font-bold text-slate-900 leading-tight">{pay.userName}</div>
+                                <div className="sm:hidden text-[10px] text-slate-500 font-medium truncate max-w-[130px]">
+                                  {fee?.title || 'Składka'}
+                                </div>
+                              </div>
                             </div>
-                            {pay.userName}
                           </td>
-                          <td className="py-3 px-3 text-slate-800 font-medium">
+                          <td className="hidden sm:table-cell py-3 px-3 text-slate-800 font-medium">
                             {fee?.title || 'Składka'}
                           </td>
-                          <td className="py-3 px-3 text-slate-500 font-mono">
+                          <td className="hidden md:table-cell py-3 px-3 text-slate-500 font-mono">
                             {fee?.dueDate || '-'}
                           </td>
-                          <td className="py-3 px-3 text-right font-mono font-black text-slate-900">
+                          <td className="py-3 px-2 sm:px-3 text-right font-mono font-black text-slate-900 whitespace-nowrap">
                             {pay.amount} zł
                           </td>
-                          <td className="py-3 px-3 text-right font-mono font-bold text-sky-700">
+                          <td className="hidden lg:table-cell py-3 px-3 text-right font-mono font-bold text-amber-700">
                             {pay.overpayment ? `+${pay.overpayment} zł` : '-'}
                           </td>
-                          <td className="py-3 px-3 text-center">
-                            <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                          <td className="py-3 px-2 sm:px-3 text-center">
+                            <span className={`inline-block px-2 sm:px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase ${
                               isPaid
                                 ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
                                 : isOverdue
                                 ? 'bg-rose-50 text-rose-800 border border-rose-300'
                                 : 'bg-amber-50 text-amber-800 border border-amber-300'
                             }`}>
-                              {pay.status}
+                              {isPaid ? 'OK' : pay.status}
                             </span>
                           </td>
-                          <td className="py-3 px-3 text-slate-500 font-mono text-[11px]">
+                          <td className="hidden md:table-cell py-3 px-3 text-slate-500 font-mono text-[11px]">
                             {pay.paymentMethod ? `${pay.paymentMethod} • ${pay.transactionId || ''}` : '-'}
                           </td>
                           <td className="py-3 px-3 text-right">

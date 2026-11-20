@@ -3011,24 +3011,25 @@ function RozgrywkiContent() {
                             <span className="text-amber-300">{new Date(event.date).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}</span>
                           </div>
 
-                          {/* Typ: Sparing */}
-                          <span className="px-2.5 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs shrink-0">
+                          {/* Typ: Sparing (ukryty na telefonie, bo jesteśmy już w zakładce Sparingi) */}
+                          <span className="hidden sm:inline-flex px-2.5 py-1 rounded-xl text-[11px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs shrink-0">
                             ⚔️ SPARING
                           </span>
 
                           {/* Status */}
                           {isFinished ? (
-                            <span className="px-2.5 py-1 rounded-xl text-[11px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1 shadow-2xs shrink-0">
+                            <span className="px-2 sm:px-2.5 py-1 rounded-xl text-[10px] sm:text-[11px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1 shadow-2xs shrink-0">
                               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" /> Rozegrany
                             </span>
                           ) : event.liveScore?.isLive ? (
-                            <span className="px-2.5 py-1 rounded-xl text-[11px] font-black uppercase bg-rose-50 text-rose-700 border border-rose-300 flex items-center gap-1.5 animate-pulse shadow-2xs shrink-0">
+                            <span className="px-2 sm:px-2.5 py-1 rounded-xl text-[10px] sm:text-[11px] font-black uppercase bg-rose-50 text-rose-700 border border-rose-300 flex items-center gap-1.5 animate-pulse shadow-2xs shrink-0">
                               <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping" />
-                              🔴 NA ŻYWO: Set {event.liveScore.currentSet} ({event.liveScore.teamCurrentScore}:{event.liveScore.opponentCurrentScore})
+                              🔴 NA ŻYWO: {event.liveScore.teamCurrentScore}:{event.liveScore.opponentCurrentScore}
                             </span>
                           ) : (
-                            <span className="px-2.5 py-1 rounded-xl text-[11px] font-bold uppercase bg-amber-50 text-amber-800 border border-amber-200 shrink-0">
-                              ⏳ Zgłoszenia w toku
+                            <span className="px-2 sm:px-2.5 py-1 rounded-xl text-[10px] sm:text-[11px] font-bold uppercase bg-amber-50 text-amber-800 border border-amber-200 shrink-0">
+                              <span className="sm:hidden">⏳ W toku</span>
+                              <span className="hidden sm:inline">⏳ Zgłoszenia w toku</span>
                             </span>
                           )}
 
@@ -3785,14 +3786,62 @@ function RozgrywkiContent() {
                 </div>
               </div>
 
-              {/* Mobile Swipe Hint */}
-              <div className="sm:hidden flex items-center justify-between px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-500 font-medium">
-                <span>Tabela ligowa LALS</span>
-                <span className="text-sky-600 font-bold flex items-center gap-1">Przesuń tabelę w prawo &rarr;</span>
+              {/* KOMPAKTOWA TABELA MOBILNA (100% BEZ PRZEWIJANIA W BOK NA TELEFONIE) */}
+              <div className="md:hidden rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <table className="w-full text-xs text-left">
+                  <thead className="bg-slate-900 text-amber-400 uppercase font-black tracking-wider text-[10px]">
+                    <tr>
+                      <th className="py-2.5 pl-2.5 pr-1 text-center w-9">#</th>
+                      <th className="py-2.5 px-2">Drużyna</th>
+                      <th className="py-2.5 px-1.5 text-center w-9">M</th>
+                      <th className="py-2.5 px-1.5 text-center w-12">Sety</th>
+                      <th className="py-2.5 pl-1.5 pr-3 text-right w-11">Pkt</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {leagueTable.map((team, idx) => {
+                      const isAngels = team.teamName.toLowerCase().includes('angels');
+                      const advSpots = currentLeaguePhase?.advancementSpots ?? 0;
+                      const isAdvancing = advSpots > 0 && team.position <= advSpots;
+                      return (
+                        <tr key={`mob-${team.id || idx}`} className={isAngels ? 'bg-amber-50/80 font-bold' : 'bg-white'}>
+                          <td className="py-2.5 pl-2.5 pr-1 text-center">
+                            <span className={`w-6 h-6 rounded-lg inline-flex items-center justify-center font-black text-[11px] font-mono ${
+                              isAdvancing ? 'bg-emerald-600 text-white' : isAngels ? 'bg-slate-900 text-amber-400' : 'bg-slate-100 text-slate-600'
+                            }`}>
+                              {team.position}
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-2 min-w-0">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <TeamCrestBadge
+                                teamName={team.teamName}
+                                logoUrl={team.logo}
+                                crestsMap={teamCrests}
+                                size="xs"
+                                className="shrink-0"
+                              />
+                              <span className={`text-xs leading-tight line-clamp-2 ${isAngels ? 'font-black text-slate-950' : 'font-bold text-slate-800'}`}>
+                                {team.teamName}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-2.5 px-1.5 text-center font-mono font-bold text-slate-600">{team.matchesPlayed}</td>
+                          <td className="py-2.5 px-1.5 text-center font-mono font-bold text-slate-700 whitespace-nowrap">
+                            {team.setsWon}:{team.setsLost}
+                          </td>
+                          <td className="py-2.5 pl-1.5 pr-3 text-right font-mono font-black text-sm text-slate-900">
+                            {team.points}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
 
-              {/* Responsive Table Container */}
-              <div className="overflow-x-auto -mx-2 sm:mx-0 rounded-2xl border border-slate-200 bg-white shadow-sm scrollbar-thin">
+              {/* PEŁNA TABELA DESKTOPOWA (18 KOLUMN VOLLEYSTATION) */}
+              <div className="hidden md:block overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm scrollbar-thin">
                 <table className="w-full text-xs text-left whitespace-nowrap min-w-[960px]">
                   <thead className="bg-slate-50 text-slate-600 uppercase font-black tracking-wider text-[10px] border-b border-slate-200">
                     <tr>

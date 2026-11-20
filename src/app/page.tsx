@@ -215,7 +215,7 @@ function DashboardContent() {
                     className="shadow-md border border-white/15 bg-white/95 p-0.5 shrink-0"
                   />
                   <div className="space-y-0.5 min-w-0">
-                    <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white truncate font-athletic">
+                    <h2 className="text-lg sm:text-2xl font-black tracking-tight text-white leading-tight line-clamp-2 sm:truncate font-athletic">
                       {homeTeamName}
                     </h2>
                   </div>
@@ -242,7 +242,7 @@ function DashboardContent() {
                     className="shadow-md border border-white/15 bg-white/95 p-0.5 shrink-0"
                   />
                   <div className="space-y-0.5 min-w-0">
-                    <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white truncate font-athletic">
+                    <h2 className="text-lg sm:text-2xl font-black tracking-tight text-white leading-tight line-clamp-2 sm:truncate font-athletic">
                       {awayTeamName}
                     </h2>
                   </div>
@@ -385,17 +385,17 @@ function DashboardContent() {
                           }`}>
                             {ev.type}
                           </span>
-                          <h4 className="font-bold text-slate-900 group-hover:text-amber-700 transition truncate">{ev.title}</h4>
+                          <h4 className="font-bold text-slate-900 group-hover:text-amber-700 transition leading-snug line-clamp-2 sm:truncate">{ev.title}</h4>
                         </div>
-                        <div className="text-[11px] text-slate-500 font-mono flex items-center gap-1.5 truncate">
+                        <div className="text-[11px] text-slate-500 font-mono flex items-center gap-1.5">
                           <span>{evDate.toLocaleDateString('pl-PL', { weekday: 'short' })}</span>
                           <span>•</span>
-                          <span>godz. {evDate.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}</span>
+                          <span>{evDate.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })}</span>
                           {ev.location && (
-                            <>
+                            <span className="hidden sm:inline-flex items-center gap-1.5 truncate max-w-[140px] text-slate-400">
                               <span>•</span>
-                              <span className="truncate max-w-[120px] text-slate-400">{ev.location}</span>
-                            </>
+                              <span className="truncate">{ev.location}</span>
+                            </span>
                           )}
                         </div>
                       </div>

@@ -928,10 +928,11 @@ function EventsAttendanceContent() {
             <button
               type="button"
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-black text-xs uppercase tracking-wider transition shadow-sm whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-black text-xs uppercase tracking-wider transition shadow-sm whitespace-nowrap shrink-0"
             >
               <Plus className="w-4 h-4 stroke-[3] text-amber-400" />
-              <span>Nowa Jednostka</span>
+              <span className="sm:hidden">Dodaj</span>
+              <span className="hidden sm:inline">Nowa Jednostka</span>
             </button>
           )}
         </div>
@@ -1607,13 +1608,14 @@ function EventsAttendanceContent() {
                             {/* Match Result & VolleyStation Score Badge if match played */}
                             {matchInfo.ourSetsWon !== undefined && matchInfo.oppSetsWon !== undefined ? (
                               <span
-                                className={`px-2.5 py-0.5 rounded-md text-[11px] font-black uppercase tracking-wide flex items-center gap-1.5 border shadow-2xs ${
+                                className={`px-2 sm:px-2.5 py-0.5 rounded-md text-[11px] font-black uppercase tracking-wide flex items-center gap-1 sm:gap-1.5 border shadow-2xs ${
                                   matchInfo.isWin
                                     ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
                                     : 'bg-rose-100 text-rose-800 border-rose-300'
                                 }`}
                               >
-                                <span>{matchInfo.isWin ? '✓ Wygrana' : '✗ Przegrana'}</span>
+                                <span className="sm:hidden">{matchInfo.isWin ? '✓' : '✗'}</span>
+                                <span className="hidden sm:inline">{matchInfo.isWin ? '✓ Wygrana' : '✗ Przegrana'}</span>
                                 <span className="font-mono text-xs font-black">{matchInfo.ourSetsWon}:{matchInfo.oppSetsWon}</span>
                               </span>
                             ) : isFinished || isEventPast ? (
@@ -1625,20 +1627,23 @@ function EventsAttendanceContent() {
                             {/* Attendance counter ONLY for upcoming events */}
                             {!isEventPast && !isFinished && matchInfo.ourSetsWon === undefined && (
                               <span
-                                className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border flex items-center gap-1.5 ${
+                                className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border flex items-center gap-1 ${
                                   posBalance.isFull
                                     ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                                     : 'bg-slate-50 text-slate-700 border-slate-200'
                                 }`}
                                 title="Liczba zawodników zapisanych na to wydarzenie"
                               >
-                                <Users className="w-3 h-3 text-sky-600" />
-                                <span><strong>{posBalance.totalConfirmed}</strong>/14 graczy</span>
+                                <Users className="w-3 h-3 text-amber-600 shrink-0" />
+                                <span>
+                                  <strong>{posBalance.totalConfirmed}</strong>/14
+                                  <span className="hidden sm:inline"> graczy</span>
+                                </span>
                               </span>
                             )}
 
                             {Boolean(event.costPerPerson && event.costPerPerson > 0) && (
-                              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                              <span className="hidden sm:inline-flex px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200">
                                 {event.costPerPerson} zł / os.
                               </span>
                             )}
@@ -1648,36 +1653,34 @@ function EventsAttendanceContent() {
                             <Link
                               href={`/trening?eventId=${event.id}`}
                               onClick={e => e.stopPropagation()}
-                              className="group/tlink inline-flex items-center gap-1.5 min-w-0 max-w-full"
+                              className="group/tlink inline-flex items-start sm:items-center gap-1.5 min-w-0 max-w-full"
                               title="Kliknij, aby otworzyć konspekt ćwiczeń tego treningu"
                             >
-                              <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover/tlink:text-emerald-700 transition truncate underline decoration-emerald-400 decoration-2 underline-offset-2 flex items-center gap-1.5">
-                                <Volleyball className="w-4 h-4 text-emerald-600 shrink-0" />
-                                <span className="truncate">{displayTitle}</span>
-                                <ArrowRight className="w-3.5 h-3.5 text-emerald-600 opacity-0 group-hover/tlink:opacity-100 group-hover/tlink:translate-x-0.5 transition shrink-0" />
+                              <h3 className="text-sm sm:text-lg font-black text-slate-900 group-hover/tlink:text-emerald-700 transition leading-snug line-clamp-2 sm:truncate underline decoration-emerald-400 decoration-2 underline-offset-2 flex items-start sm:items-center gap-1.5">
+                                <Volleyball className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5 sm:mt-0" />
+                                <span>{displayTitle}</span>
+                                <ArrowRight className="hidden sm:inline w-3.5 h-3.5 text-emerald-600 opacity-0 group-hover/tlink:opacity-100 group-hover/tlink:translate-x-0.5 transition shrink-0" />
                               </h3>
                             </Link>
                           ) : (
-                            <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="flex items-start sm:items-center gap-2 sm:gap-2.5 min-w-0">
                               {cleanOpponent && (
                                 <TeamCrestBadge
                                   teamName={cleanOpponent}
                                   logoUrl={event.opponentLogo}
                                   size="sm"
-                                  className="shadow-2xs"
+                                  className="shadow-2xs shrink-0 mt-0.5 sm:mt-0"
                                 />
                               )}
-                              <h3 className={`text-base sm:text-lg font-black text-slate-900 ${theme.titleHover} transition truncate`}>
+                              <h3 className={`text-sm sm:text-lg font-black text-slate-900 ${theme.titleHover} transition leading-snug line-clamp-2 sm:truncate`}>
                                 {displayTitle}
                               </h3>
                             </div>
                           )}
 
-                          <div className="flex items-center gap-3 text-xs text-slate-500 truncate">
-                            <span className="flex items-center gap-1 truncate">
-                              <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                              <span className="truncate">{event.location}</span>
-                            </span>
+                          <div className="flex items-center gap-2 text-[11px] sm:text-xs text-slate-500">
+                            <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                            <span className="line-clamp-1">{event.location}</span>
                           </div>
                         </div>
                       </div>
