@@ -6,7 +6,44 @@ import { Role, PlayerPosition } from '@/lib/types';
 export async function GET(request: Request) {
   const seasonId = getActiveSeasonIdFromRequest(request);
   const db = getEffectiveDatabase(seasonId);
-  const safeUsers = db.users.map(({ passwordHash: _, ...u }) => u);
+  const now = new Date();
+  const playedLeagueEvents = (db.events || []).filter(
+    e => e.type === 'MECZ' && (Boolean(e.result) || e.status === 'ZAKONCZONY' || new Date(e.date) <= now)
+  );
+  const playedSparringEvents = (db.events || []).filter(
+    e => e.type === 'SPARING' && (Boolean(e.result) || e.status === 'ZAKONCZONY')
+  );
+
+  const safeUsers = db.users.map(({ passwordHash: _, ...u }) => {
+    const attendedLeague = playedLeagueEvents.filter(e =>
+      (e.actualAttendees && e.actualAttendees.includes(u.id)) ||
+      (e.attendees || []).some(a => a.userId === u.id && a.status === 'BEDE')
+    ).length;
+    const attendedSparrings = playedSparringEvents.filter(e =>
+      (e.actualAttendees && e.actualAttendees.includes(u.id)) ||
+      (e.attendees || []).some(a => a.userId === u.id && a.status === 'BEDE')
+    ).length;
+
+    const currentMatches = u.stats?.matchesPlayed || 0;
+    const currentSparrings = u.stats?.sparringsPlayed || 0;
+
+    if (attendedLeague > currentMatches || attendedSparrings > currentSparrings) {
+      return {
+        ...u,
+        stats: {
+          totalPoints: u.stats?.totalPoints || 0,
+          attackPoints: u.stats?.attackPoints || 0,
+          blockPoints: u.stats?.blockPoints || 0,
+          acePoints: u.stats?.acePoints || 0,
+          ...(u.stats || {}),
+          matchesPlayed: Math.max(currentMatches, attendedLeague),
+          sparringsPlayed: Math.max(currentSparrings, attendedSparrings),
+        }
+      };
+    }
+    return u;
+  });
+
   return NextResponse.json({ users: safeUsers });
 }
 

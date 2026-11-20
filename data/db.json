@@ -68,7 +68,7 @@
       "number": 4,
       "position": "Rozgrywający",
       "role": "KIEROWNIK",
-      "isCaptain": false,
+      "isCaptain": true,
       "email": "kamil.pujanek@angelsztp.pl",
       "phone": "",
       "status": "Aktywny",
@@ -128,7 +128,16 @@
       "status": "Aktywny",
       "passwordHash": "$2a$08$ZQ0QeuDOvE/CoIgY3QZ30.VpGzRnF0wvq5r.4fC4xYezQE7mFNUwy",
       "createdAt": "2026-09-05T12:00:00Z",
-      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/3246310/"
+      "volleystationUrl": "https://panel.volleystation.com/website/809/pl/phase-6925-l3d-20262027/players/3246310/",
+      "stats": {
+        "totalPoints": 0,
+        "attackPoints": 0,
+        "blockPoints": 0,
+        "servePoints": 0,
+        "acePoints": 0,
+        "matchesPlayed": 4,
+        "mvpCount": 1
+      }
     },
     {
       "id": "usr_graczyk",
