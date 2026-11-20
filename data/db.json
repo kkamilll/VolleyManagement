@@ -180,7 +180,8 @@
         "blockPoints": 5,
         "servePoints": 1,
         "acePoints": 1,
-        "matchesPlayed": 3
+        "matchesPlayed": 3,
+        "mvpCount": 1
       }
     },
     {
@@ -362,7 +363,8 @@
         "blockPoints": 1,
         "servePoints": 0,
         "acePoints": 0,
-        "matchesPlayed": 3
+        "matchesPlayed": 3,
+        "mvpCount": 1
       }
     }
   ],
