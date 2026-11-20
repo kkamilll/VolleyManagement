@@ -1727,14 +1727,14 @@ function EventsAttendanceContent() {
                         </div>
                       </div>
 
-                      {/* Prawa strona nagłówka: Wygodne, duże przyciski akcji dopasowane pod kciuk */}
+                      {/* Prawa strona nagłówka: Idealnie równe kolumny przycisków na desktopie i wygodne pod kciuk na telefonie */}
                       <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-slate-100 flex-wrap sm:flex-nowrap">
                         {/* 1. Szybki link do Ligi / Sparingów / Treningu */}
                         {isLeagueMatch ? (
                           <Link
                             href="/rozgrywki?tab=liga"
                             onClick={e => e.stopPropagation()}
-                            className="flex-1 sm:flex-initial h-10 sm:h-9 px-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition shrink-0 cursor-pointer active:scale-95 min-h-[40px]"
+                            className="flex-1 sm:flex-none sm:w-[122px] h-10 sm:h-9 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-400 border border-slate-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition shrink-0 cursor-pointer active:scale-95 min-h-[40px]"
                             title="Przejdź do oficjalnego meczu i tabeli LALS"
                           >
                             <img src="/lals_logo.png" alt="LALS" className="w-4 h-4 rounded-full bg-white p-0.5 object-contain shrink-0" />
@@ -1744,7 +1744,7 @@ function EventsAttendanceContent() {
                           <Link
                             href="/rozgrywki?tab=sparingi"
                             onClick={e => e.stopPropagation()}
-                            className="flex-1 sm:flex-initial h-10 sm:h-9 px-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition shrink-0 cursor-pointer active:scale-95 min-h-[40px]"
+                            className="flex-1 sm:flex-none sm:w-[122px] h-10 sm:h-9 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition shrink-0 cursor-pointer active:scale-95 min-h-[40px]"
                             title="Przejdź do sparingów"
                           >
                             <Swords className="w-4 h-4 text-slate-950 shrink-0" />
@@ -1754,11 +1754,11 @@ function EventsAttendanceContent() {
                           <Link
                             href={`/trening?eventId=${event.id}`}
                             onClick={e => e.stopPropagation()}
-                            className="flex-1 sm:flex-initial h-10 sm:h-9 px-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs hover:shadow transition shrink-0 cursor-pointer active:scale-95 min-h-[40px]"
+                            className="flex-1 sm:flex-none sm:w-[122px] h-10 sm:h-9 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs hover:shadow transition shrink-0 cursor-pointer active:scale-95 min-h-[40px]"
                             title="Otwórz konspekt i ćwiczenia treningu"
                           >
                             <Volleyball className="w-4 h-4 shrink-0" />
-                            <span>Rozpiska &rarr;</span>
+                            <span>Rozpiska</span>
                           </Link>
                         ) : null}
 
@@ -1768,7 +1768,7 @@ function EventsAttendanceContent() {
                             <Link
                               href={event.type === 'SPARING' ? `/taktyka?tab=sparingi&eventId=${event.id}&type=SPARING` : event.type === 'TURNIEJ' ? `/taktyka?tab=turnieje&eventId=${event.id}&type=TURNIEJ` : `/taktyka?tab=matches&eventId=${event.id}&type=MECZ`}
                               onClick={e => e.stopPropagation()}
-                              className="flex-1 sm:flex-initial h-10 sm:h-9 px-3 rounded-xl border font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-2xs transition shrink-0 bg-sky-50 hover:bg-sky-100 text-sky-900 border-sky-300 cursor-pointer active:scale-95 min-h-[40px]"
+                              className="flex-1 sm:flex-none sm:w-[118px] h-10 sm:h-9 px-3 rounded-xl border font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-2xs transition shrink-0 bg-sky-50 hover:bg-sky-100 text-sky-900 border-sky-300 cursor-pointer active:scale-95 min-h-[40px]"
                               title={`Założenia taktyczne (${eventTactics.length})`}
                             >
                               <Target className="w-4 h-4 shrink-0 text-sky-600" />
@@ -1778,7 +1778,7 @@ function EventsAttendanceContent() {
                             <Link
                               href={event.type === 'SPARING' ? `/taktyka?tab=sparingi&eventId=${event.id}&type=SPARING` : event.type === 'TURNIEJ' ? `/taktyka?tab=turnieje&eventId=${event.id}&type=TURNIEJ` : `/taktyka?tab=matches&eventId=${event.id}&type=MECZ`}
                               onClick={e => e.stopPropagation()}
-                              className="flex-1 sm:flex-initial h-10 sm:h-9 px-3 rounded-xl border font-bold text-xs sm:text-sm flex items-center justify-center gap-1 shadow-2xs transition shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-300 opacity-80 hover:opacity-100 cursor-pointer active:scale-95 min-h-[40px]"
+                              className="flex-1 sm:flex-none sm:w-[118px] h-10 sm:h-9 px-3 rounded-xl border font-bold text-xs sm:text-sm flex items-center justify-center gap-1 shadow-2xs transition shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-300 opacity-80 hover:opacity-100 cursor-pointer active:scale-95 min-h-[40px]"
                               title="Dodaj taktykę"
                             >
                               <Target className="w-4 h-4 shrink-0 text-slate-500" />
@@ -1791,7 +1791,7 @@ function EventsAttendanceContent() {
                         {!isEventPast && !isFinished && matchInfo.ourSetsWon === undefined && (
                           myAttendance ? (
                             <span
-                              className={`flex-1 sm:flex-initial h-10 sm:h-9 px-3 rounded-xl text-xs sm:text-sm font-bold border flex items-center justify-center text-center shrink-0 min-h-[40px] ${
+                              className={`flex-1 sm:flex-none sm:w-[124px] h-10 sm:h-9 px-3 rounded-xl text-xs sm:text-sm font-bold border flex items-center justify-center text-center shrink-0 min-h-[40px] ${
                                 myAttendance.status === 'BEDE'
                                   ? 'bg-emerald-50 text-emerald-800 border-emerald-300 shadow-2xs'
                                   : myAttendance.status === 'NIEPEWNE'
@@ -1807,7 +1807,7 @@ function EventsAttendanceContent() {
                             <button
                               type="button"
                               onClick={() => setExpandedEventId(isExpanded ? null : event.id)}
-                              className="flex-1 sm:flex-initial h-10 sm:h-9 px-3 rounded-xl text-xs sm:text-sm font-bold bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 flex items-center justify-center gap-1.5 transition shadow-2xs shrink-0 cursor-pointer active:scale-95 min-h-[40px]"
+                              className="flex-1 sm:flex-none sm:w-[124px] h-10 sm:h-9 px-3 rounded-xl text-xs sm:text-sm font-bold bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 flex items-center justify-center gap-1.5 transition shadow-2xs shrink-0 cursor-pointer active:scale-95 min-h-[40px]"
                               title="Kliknij, aby oddać głos w ankiecie obecności"
                             >
                               <Lock className="w-4 h-4 text-amber-600 shrink-0" />
