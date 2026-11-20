@@ -311,7 +311,21 @@ function TacticsContent() {
 
   // Section switcher: 1. Tablica, 2. Rozpiski Meczowe, 3. Sparingi, 4. Turnieje, 5. Treningi
   const [tacticsSection, setTacticsSection] = useState<'board' | 'matches' | 'sparingi' | 'turnieje' | 'trainings'>('board');
+  const [showTargetDropdown, setShowTargetDropdown] = useState(false);
+  const targetDropdownRef = useRef<HTMLDivElement>(null);
   const [showLoadTacticModal, setShowLoadTacticModal] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (targetDropdownRef.current && !targetDropdownRef.current.contains(event.target as Node)) {
+        setShowTargetDropdown(false);
+      }
+    };
+    if (showTargetDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showTargetDropdown]);
   const [loadTacticSearch, setLoadTacticSearch] = useState('');
 
   useEffect(() => {
@@ -3495,31 +3509,93 @@ function TacticsContent() {
                 <div className="flex items-center gap-1.5 w-full sm:max-w-xl">
                   <button
                     type="button"
-                    onClick={handlePrevTarget}
+                    onClick={() => { handlePrevTarget(); setShowTargetDropdown(false); }}
                     disabled={currentSectionTargetIndex <= 0}
-                    className="w-9 h-9 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0 cursor-pointer active:scale-95"
+                    className="w-10 h-11 sm:h-10 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 hover:border-amber-400 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0 cursor-pointer active:scale-95"
                     title="Poprzedni mecz"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
 
-                  <select
-                    value={selectedContextKey}
-                    onChange={e => setSelectedContextKey(e.target.value)}
-                    className="flex-1 h-9 bg-slate-50 hover:bg-white border border-slate-200/90 text-slate-900 rounded-xl px-3 text-xs sm:text-sm font-bold focus:outline-none focus:border-sky-500 shadow-2xs min-w-0 truncate cursor-pointer"
-                  >
-                    {sectionTargetOptions.map((opt) => (
-                      <option key={opt.key} value={opt.key}>
-                        {new Date(opt.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} — {opt.title}
-                      </option>
-                    ))}
-                  </select>
+                  {/* Nowoczesny, stylowy selektor meczu (Angels Navy & Gold) */}
+                  <div ref={targetDropdownRef} className="relative flex-1 min-w-0">
+                    {(() => {
+                      const activeOpt = sectionTargetOptions.find(o => o.key === selectedContextKey) || sectionTargetOptions[0];
+                      return (
+                        <button
+                          type="button"
+                          onClick={() => setShowTargetDropdown(prev => !prev)}
+                          className={`w-full h-11 sm:h-10 px-3 rounded-xl bg-white hover:bg-slate-50 border text-left flex items-center justify-between gap-2 transition shadow-2xs cursor-pointer ${
+                            showTargetDropdown
+                              ? 'border-amber-500 ring-2 ring-amber-400/25'
+                              : 'border-slate-200/90 hover:border-amber-400'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            {activeOpt && (
+                              <span className="px-2 py-0.5 rounded-lg bg-slate-900 text-amber-400 text-[11px] font-black font-mono shrink-0">
+                                {new Date(activeOpt.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })}
+                              </span>
+                            )}
+                            <span className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                              {activeOpt ? activeOpt.title : 'Wybierz spotkanie'}
+                            </span>
+                          </div>
+                          <ChevronDown
+                            className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${
+                              showTargetDropdown ? 'rotate-180 text-amber-600' : ''
+                            }`}
+                          />
+                        </button>
+                      );
+                    })()}
+
+                    {showTargetDropdown && (
+                      <div className="absolute left-0 right-0 top-full mt-2 z-50 bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-900/10 p-1.5 max-h-72 overflow-y-auto space-y-1 animate-fadeIn">
+                        {sectionTargetOptions.map((opt) => {
+                          const isSelected = opt.key === selectedContextKey;
+                          const shortDate = new Date(opt.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' });
+                          return (
+                            <button
+                              key={opt.key}
+                              type="button"
+                              onClick={() => {
+                                setSelectedContextKey(opt.key);
+                                setShowTargetDropdown(false);
+                              }}
+                              className={`w-full px-3 py-2.5 rounded-xl flex items-center justify-between gap-2.5 text-left transition cursor-pointer ${
+                                isSelected
+                                  ? 'bg-slate-900 text-white shadow-xs'
+                                  : 'text-slate-800 hover:bg-slate-100'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                <span
+                                  className={`px-2 py-0.5 rounded-lg text-[11px] font-black font-mono shrink-0 ${
+                                    isSelected
+                                      ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
+                                      : 'bg-slate-100 text-slate-600 border border-slate-200/80'
+                                  }`}
+                                >
+                                  {shortDate}
+                                </span>
+                                <span className={`text-xs sm:text-sm truncate ${isSelected ? 'font-bold text-white' : 'font-semibold text-slate-800'}`}>
+                                  {opt.title}
+                                </span>
+                              </div>
+                              {isSelected && <Check className="w-4 h-4 text-amber-400 shrink-0" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
 
                   <button
                     type="button"
-                    onClick={handleNextTarget}
+                    onClick={() => { handleNextTarget(); setShowTargetDropdown(false); }}
                     disabled={currentSectionTargetIndex >= sectionTargetOptions.length - 1}
-                    className="w-9 h-9 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0 cursor-pointer active:scale-95"
+                    className="w-10 h-11 sm:h-10 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/90 hover:border-amber-400 disabled:opacity-30 disabled:pointer-events-none text-slate-700 flex items-center justify-center transition shrink-0 cursor-pointer active:scale-95"
                     title="Następny mecz"
                   >
                     <ChevronRight className="w-4 h-4" />
