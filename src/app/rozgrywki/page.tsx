@@ -3578,14 +3578,6 @@ function RozgrywkiContent() {
             <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-0.5 justify-start xl:justify-end w-full xl:w-auto shrink-0">
               {ligaSubTab === 'tabela' && (
                 <>
-                  <button
-                    type="button"
-                    onClick={() => setShowTeamCrestsModal(true)}
-                    className="inline-flex items-center justify-center px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 hover:border-sky-300 transition shadow-sm whitespace-nowrap shrink-0"
-                    title="Dodawaj i zarządzaj herbami rywali i drużyn ligowych"
-                  >
-                    <span>Herby drużyn</span>
-                  </button>
                   {canManageMatches && (
                     <>
                       <button
@@ -3628,14 +3620,6 @@ function RozgrywkiContent() {
               )}
               {ligaSubTab === 'wyniki' && (
                 <>
-                  <button
-                    type="button"
-                    onClick={() => setShowTeamCrestsModal(true)}
-                    className="inline-flex items-center justify-center px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 hover:border-sky-300 transition shadow-sm whitespace-nowrap shrink-0"
-                    title="Dodawaj i zarządzaj herbami rywali i drużyn ligowych"
-                  >
-                    <span>Herby drużyn</span>
-                  </button>
                   {canManageMatches && (
                     <>
                       <button
