@@ -313,6 +313,8 @@ function TacticsContent() {
   const [tacticsSection, setTacticsSection] = useState<'board' | 'matches' | 'sparingi' | 'turnieje' | 'trainings'>('board');
   const [showTargetDropdown, setShowTargetDropdown] = useState(false);
   const targetDropdownRef = useRef<HTMLDivElement>(null);
+  const [showBoardContextDropdown, setShowBoardContextDropdown] = useState(false);
+  const boardContextDropdownRef = useRef<HTMLDivElement>(null);
   const [showLoadTacticModal, setShowLoadTacticModal] = useState(false);
 
   useEffect(() => {
@@ -320,12 +322,15 @@ function TacticsContent() {
       if (targetDropdownRef.current && !targetDropdownRef.current.contains(event.target as Node)) {
         setShowTargetDropdown(false);
       }
+      if (boardContextDropdownRef.current && !boardContextDropdownRef.current.contains(event.target as Node)) {
+        setShowBoardContextDropdown(false);
+      }
     };
-    if (showTargetDropdown) {
+    if (showTargetDropdown || showBoardContextDropdown) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showTargetDropdown]);
+  }, [showTargetDropdown, showBoardContextDropdown]);
   const [loadTacticSearch, setLoadTacticSearch] = useState('');
 
   useEffect(() => {
@@ -2633,69 +2638,179 @@ function TacticsContent() {
       {/* PASEK KONTEKSTU I ZAPISU TABLICY (DEDYKOWANY, CZYSTY RZĄD TYLKO W TRYBIE TABLICY) */}
       {tacticsSection === 'board' && (
         <div className="bg-white border border-slate-200/90 rounded-2xl p-2.5 sm:p-3 shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
-          {/* Wybór kontekstu tablicy */}
+          {/* Wybór kontekstu tablicy - nowoczesny selektor Angels Navy & Gold */}
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <span className="hidden md:inline-flex items-center gap-1 text-[11px] font-black uppercase tracking-wider text-slate-400 shrink-0 pl-1">
               Przypisz do:
             </span>
-            <select
-              value={selectedContextKey}
-              onChange={e => setSelectedContextKey(e.target.value)}
-              className="flex-1 sm:max-w-md h-10 bg-slate-50 hover:bg-white border border-slate-200/90 text-slate-900 rounded-xl px-3 text-xs sm:text-sm font-bold focus:outline-none focus:border-amber-500 shadow-2xs truncate cursor-pointer"
-              title="Wybierz wydarzenie, którego dotyczy ta taktyka"
-            >
-              <option value="GENERAL">🌐 Ogólna Tablica Drużyny</option>
+            {(() => {
+              const boardContextGroups = [
+                {
+                  label: '🏐 Najbliższe Treningi',
+                  items: events.filter(e => e.type === 'TRENING').map(e => ({
+                    key: `EVENT_${e.id}`,
+                    badge: new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }),
+                    title: `Trening — ${e.title}`
+                  }))
+                },
+                {
+                  label: '⚔️ Sparingi',
+                  items: events.filter(e => e.type === 'SPARING').map(e => ({
+                    key: `EVENT_${e.id}`,
+                    badge: new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }),
+                    title: `Sparing vs ${e.opponent || 'Rywal'}`
+                  }))
+                },
+                {
+                  label: '🏆 Mecze Ligowe LALS',
+                  items: [
+                    ...events
+                      .filter(e => e.type === 'MECZ' || e.title.toLowerCase().includes('lals') || e.title.toLowerCase().includes('mecz'))
+                      .map(e => ({
+                        key: `EVENT_${e.id}`,
+                        badge: new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }),
+                        title: `Mecz LALS vs ${e.opponent || 'Rywal'}`
+                      })),
+                    ...matches.map(m => ({
+                      key: `MATCH_${m.id}`,
+                      badge: new Date(m.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }),
+                      title: `LALS vs ${m.opponent}`
+                    }))
+                  ]
+                },
+                {
+                  label: '🥇 Turnieje',
+                  items: events.filter(e => e.type === 'TURNIEJ').map(e => ({
+                    key: `EVENT_${e.id}`,
+                    badge: new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }),
+                    title: `Turniej — ${e.title}`
+                  }))
+                }
+              ].filter(g => g.items.length > 0);
 
-              {events.some(e => e.type === 'TRENING') && (
-                <optgroup label="🏐 Najbliższe Treningi">
-                  {events.filter(e => e.type === 'TRENING').map(e => (
-                    <option key={e.id} value={`EVENT_${e.id}`}>
-                      Trening: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} — {e.title}
-                    </option>
-                  ))}
-                </optgroup>
-              )}
+              const allItems = boardContextGroups.flatMap(g => g.items);
+              const activeItem = allItems.find(i => i.key === selectedContextKey);
 
-              {events.some(e => e.type === 'SPARING') && (
-                <optgroup label="⚔️ Sparingi">
-                  {events.filter(e => e.type === 'SPARING').map(e => (
-                    <option key={e.id} value={`EVENT_${e.id}`}>
-                      Sparing: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} vs {e.opponent || 'Rywal'}
-                    </option>
-                  ))}
-                </optgroup>
-              )}
+              return (
+                <div ref={boardContextDropdownRef} className="relative flex-1 sm:max-w-md min-w-0">
+                  <button
+                    type="button"
+                    onClick={() => setShowBoardContextDropdown(prev => !prev)}
+                    className={`w-full h-10 px-3 rounded-xl bg-slate-50 hover:bg-white border text-left flex items-center justify-between gap-2 transition shadow-2xs cursor-pointer ${
+                      showBoardContextDropdown
+                        ? 'border-amber-500 bg-white ring-2 ring-amber-400/25'
+                        : 'border-slate-200/90 hover:border-amber-400'
+                    }`}
+                    title="Wybierz wydarzenie, którego dotyczy ta taktyka"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      {activeItem ? (
+                        <>
+                          <span className="px-2 py-0.5 rounded-lg bg-slate-900 text-amber-400 text-[11px] font-black font-mono shrink-0">
+                            {activeItem.badge}
+                          </span>
+                          <span className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                            {activeItem.title}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="px-2 py-0.5 rounded-lg bg-slate-900 text-amber-400 text-[10px] font-black uppercase tracking-wider shrink-0">
+                            Klub
+                          </span>
+                          <span className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                            Ogólna Tablica Drużyny
+                          </span>
+                        </>
+                      )}
+                    </div>
+                    <ChevronDown
+                      className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${
+                        showBoardContextDropdown ? 'rotate-180 text-amber-600' : ''
+                      }`}
+                    />
+                  </button>
 
-              {(events.some(e => e.type === 'MECZ' || e.title.toLowerCase().includes('lals') || e.title.toLowerCase().includes('mecz')) || matches.length > 0) && (
-                <optgroup label="🏆 Mecze Ligowe LALS">
-                  {events.filter(e => e.type === 'MECZ' || e.title.toLowerCase().includes('lals') || e.title.toLowerCase().includes('mecz')).map(e => (
-                    <option key={e.id} value={`EVENT_${e.id}`}>
-                      Mecz LALS: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} vs {e.opponent || 'Rywal'}
-                    </option>
-                  ))}
-                  {matches.map(m => (
-                    <option key={m.id} value={`MATCH_${m.id}`}>
-                      LALS: {new Date(m.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} vs {m.opponent}
-                    </option>
-                  ))}
-                </optgroup>
-              )}
+                  {showBoardContextDropdown && (
+                    <div className="absolute left-0 right-0 top-full mt-2 z-50 bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-900/10 p-1.5 max-h-80 overflow-y-auto space-y-1.5 animate-fadeIn">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedContextKey('GENERAL');
+                          setShowBoardContextDropdown(false);
+                        }}
+                        className={`w-full px-3 py-2.5 rounded-xl flex items-center justify-between gap-2 text-left transition cursor-pointer ${
+                          selectedContextKey === 'GENERAL'
+                            ? 'bg-slate-900 text-white shadow-xs'
+                            : 'text-slate-800 hover:bg-slate-100'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span
+                            className={`px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider shrink-0 ${
+                              selectedContextKey === 'GENERAL'
+                                ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
+                                : 'bg-slate-100 text-slate-600 border border-slate-200/80'
+                            }`}
+                          >
+                            Klub
+                          </span>
+                          <span className="text-xs sm:text-sm font-bold truncate">Ogólna Tablica Drużyny</span>
+                        </div>
+                        {selectedContextKey === 'GENERAL' && <Check className="w-4 h-4 text-amber-400 shrink-0" />}
+                      </button>
 
-              {events.some(e => e.type === 'TURNIEJ') && (
-                <optgroup label="🥇 Turnieje">
-                  {events.filter(e => e.type === 'TURNIEJ').map(e => (
-                    <option key={e.id} value={`EVENT_${e.id}`}>
-                      Turniej: {new Date(e.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })} — {e.title}
-                    </option>
-                  ))}
-                </optgroup>
-              )}
-            </select>
+                      {boardContextGroups.map(group => (
+                        <div key={group.label} className="pt-1 border-t border-slate-100 space-y-1">
+                          <div className="px-2.5 pt-1 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                            {group.label}
+                          </div>
+                          {group.items.map(item => {
+                            const isSelected = selectedContextKey === item.key;
+                            return (
+                              <button
+                                key={item.key}
+                                type="button"
+                                onClick={() => {
+                                  setSelectedContextKey(item.key);
+                                  setShowBoardContextDropdown(false);
+                                }}
+                                className={`w-full px-3 py-2 rounded-xl flex items-center justify-between gap-2 text-left transition cursor-pointer ${
+                                  isSelected
+                                    ? 'bg-slate-900 text-white shadow-xs'
+                                    : 'text-slate-800 hover:bg-slate-100'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <span
+                                    className={`px-2 py-0.5 rounded-lg text-[11px] font-black font-mono shrink-0 ${
+                                      isSelected
+                                        ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
+                                        : 'bg-slate-100 text-slate-600 border border-slate-200/80'
+                                    }`}
+                                  >
+                                    {item.badge}
+                                  </span>
+                                  <span className={`text-xs truncate ${isSelected ? 'font-bold text-white' : 'font-semibold text-slate-800'}`}>
+                                    {item.title}
+                                  </span>
+                                </div>
+                                {isSelected && <Check className="w-4 h-4 text-amber-400 shrink-0" />}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             {selectedContextKey !== 'GENERAL' && (
               <button
                 onClick={() => setSelectedContextKey('GENERAL')}
-                className="w-10 h-10 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 text-xs font-bold transition shadow-2xs shrink-0 flex items-center justify-center cursor-pointer"
+                className="w-10 h-10 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 hover:border-amber-400 text-xs font-bold transition shadow-2xs shrink-0 flex items-center justify-center cursor-pointer"
                 title="Powrót do ogólnej tablicy"
               >
                 ✕
