@@ -1,0 +1,311 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 15, 23, 42;
+  --background-start-rgb: 248, 250, 252;
+  --background-end-rgb: 241, 245, 249;
+}
+
+html,
+body {
+  color: #0f172a;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
+  max-width: 100%;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   1. MODERN PRO SPORTS DESIGN SYSTEM - LIGHT AS DEFAULT
+   ========================================================================== */
+
+/* Modern Pro Sports Canvas Background - Clean, Elegant & Stadium Ambient */
+.cyber-court-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-color: #f8fafc;
+  background-image: 
+    radial-gradient(ellipse 90% 55% at 50% -12%, rgba(15, 23, 42, 0.055) 0%, transparent 65%),
+    radial-gradient(ellipse 65% 45% at 100% 100%, rgba(245, 158, 11, 0.045) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 40% at 0% 85%, rgba(30, 58, 138, 0.04) 0%, transparent 55%);
+}
+
+.court-lines-overlay {
+  display: none !important;
+}
+
+/* Volleyball Tactical Net Texture Utility */
+.volleyball-net-mesh-h {
+  background-color: rgba(15, 23, 42, 0.85);
+  background-image: 
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.35) 0px, rgba(255, 255, 255, 0.35) 1px, transparent 1px, transparent 5px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.35) 0px, rgba(255, 255, 255, 0.35) 1px, transparent 1px, transparent 5px);
+}
+
+.volleyball-net-mesh-v {
+  background-color: rgba(15, 23, 42, 0.85);
+  background-image: 
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.35) 0px, rgba(255, 255, 255, 0.35) 1px, transparent 1px, transparent 5px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.35) 0px, rgba(255, 255, 255, 0.35) 1px, transparent 1px, transparent 5px);
+}
+
+/* Premium Clean Pro Sports Cards - Angels Navy & Gold Hover Accent */
+.cyber-card,
+.angel-card {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid rgba(226, 232, 240, 0.75);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 6px 18px -3px rgba(15, 23, 42, 0.03);
+  border-radius: 1.25rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cyber-card:hover,
+.angel-card:hover {
+  border-color: #fbbf24;
+  box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.06), 0 4px 14px -2px rgba(245, 158, 11, 0.12);
+  transform: translateY(-1.5px);
+}
+
+.sports-card-dark {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.96) 0%, rgba(10, 15, 30, 0.98) 100%);
+  color: #ffffff;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.4), 0 4px 12px rgba(0, 0, 0, 0.4);
+  border-radius: 1.5rem;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sports-card-dark:hover {
+  border-color: rgba(245, 158, 11, 0.6);
+  box-shadow: 0 16px 40px -5px rgba(245, 158, 11, 0.15), 0 6px 16px rgba(0, 0, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+.sports-card-light {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid rgba(226, 232, 240, 0.75);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 6px 18px -3px rgba(15, 23, 42, 0.03);
+  border-radius: 1.5rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sports-card-light:hover {
+  border-color: #fbbf24;
+  box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.06), 0 4px 14px -2px rgba(245, 158, 11, 0.12);
+  transform: translateY(-1.5px);
+}
+
+.cyber-card-gold {
+  background: #fffdf5;
+  color: #0f172a;
+  border: 1px solid #fde68a;
+  box-shadow: 0 4px 18px -2px rgba(245, 158, 11, 0.08);
+  border-radius: 1.25rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cyber-card-gold:hover {
+  border-color: #f59e0b;
+  box-shadow: 0 12px 28px -4px rgba(245, 158, 11, 0.16);
+  transform: translateY(-2px);
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
+}
+
+/* Header, Footer & Navigation */
+header {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03) !important;
+  color: #0f172a !important;
+}
+
+footer {
+  background-color: #ffffff !important;
+  border-top: 1px solid #e2e8f0 !important;
+  color: #64748b !important;
+}
+
+nav.fixed.bottom-0 {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  border-top: 1px solid #e2e8f0 !important;
+  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.05) !important;
+}
+
+/* Headings & Text hierarchy */
+h1, h2, h3, h4, h5, h6 {
+  color: #0f172a;
+}
+
+/* Gradients */
+.text-gradient-cyan {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-fire {
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Athletic Pills */
+.neon-pill-cyan {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #7dd3fc;
+}
+
+.neon-pill-gold {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.neon-pill-emerald {
+  background: #d1fae5;
+  color: #047857;
+  border: 1px solid #6ee7b7;
+}
+
+/* Table Light Styling */
+table thead {
+  background-color: #f8fafc;
+  color: #475569;
+}
+
+table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+table tbody tr:hover {
+  background-color: #f1f5f9;
+}
+
+/* Form Controls */
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #94a3b8;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Common Athletic Utilities */
+.font-athletic {
+  font-family: var(--font-display), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* Clean Justified Typography */
+.text-justified-clean {
+  text-align: justify;
+  text-justify: inter-word;
+  text-align-last: left;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.glow-cyan {
+  box-shadow: 0 4px 16px -2px rgba(2, 132, 199, 0.25);
+}
+
+.glow-gold {
+  box-shadow: 0 4px 16px -2px rgba(245, 158, 11, 0.25);
+}
+
+.glow-emerald {
+  box-shadow: 0 4px 16px -2px rgba(16, 185, 129, 0.25);
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+/* Ensure all full-screen modal overlays cover the entire viewport cleanly above Navbar (never pushed down by space-y-*) */
+.fixed.inset-0 {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  z-index: 60 !important;
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
